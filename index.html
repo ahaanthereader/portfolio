@@ -140,7 +140,8 @@
   .reading-now strong { color: var(--plum); }
 
   /* ============ Geography ============ */
-  .geo-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; }
+  .geo-wrap { max-width: 1100px; }
+  .geo-layout { display: flex; flex-direction: column; gap: 22px; }
   .map-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
   .map-card svg { width: 100%; height: auto; border-radius: 12px; }
   .map-card .cont path { stroke: #cfe6f3; stroke-width: 0.6; vector-effect: non-scaling-stroke; transition: fill .15s; cursor: pointer; }
@@ -150,11 +151,11 @@
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: .82rem; font-weight: 700; color: var(--ink-soft); }
   .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .map-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-  .geo-info { }
-  .geo-info .fact-box { background: var(--paper-2); border: 1px solid var(--line); border-left: 5px solid var(--forest); border-radius: var(--radius-sm); padding: 18px 20px; min-height: 120px; box-shadow: var(--shadow-sm); }
-  .geo-info .fact-box h3 { color: var(--forest-d); }
-  .quiz { margin-top: 22px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px 20px; box-shadow: var(--shadow-sm); }
-  .quiz .q { font-weight: 800; font-size: 1.1rem; margin-bottom: 12px; }
+  .fact-box { background: var(--paper-2); border: 1px solid var(--line); border-left: 6px solid var(--forest); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: center; }
+  .fact-box h3 { color: var(--forest-d); font-size: clamp(1.4rem, 3vw, 1.9rem); margin-bottom: .5em; }
+  .fact-box p { font-size: clamp(1.02rem, 2.2vw, 1.18rem); color: var(--ink); margin: 0; }
+  .quiz { max-width: 660px; margin: 0 auto; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow); }
+  .quiz .q { font-weight: 800; font-size: 1.3rem; margin-bottom: 16px; }
   .quiz .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .quiz button.opt { font-family: inherit; font-weight: 700; cursor: pointer; padding: 11px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--paper); transition: .15s; }
   .quiz button.opt:hover { border-color: var(--forest); }
@@ -295,7 +296,7 @@
 
   /* ============ Responsive ============ */
   @media (max-width: 860px) {
-    .geo-grid { grid-template-columns: 1fr; }
+    .geo-layout { grid-template-columns: 1fr; }
     .lib-stats { grid-template-columns: 1fr 1fr 1fr; }
   }
   @media (max-width: 680px) {
@@ -327,6 +328,7 @@
       <a href="#reading">Reading</a>
       <a href="#reader">Reader</a>
       <a href="#geography">Geography</a>
+      <a href="#capitals">Quiz</a>
       <a href="#swing">The Swing</a>
       <a href="#library">Library</a>
       <a href="#story">Story Studio</a>
@@ -416,13 +418,13 @@
 
 <!-- ============ GEOGRAPHY ============ -->
 <section id="geography">
-  <div class="wrap">
+  <div class="wrap geo-wrap">
     <div class="sec-head">
       <div class="eyebrow">Around the World</div>
       <h2>Maps &amp; far-off places 🌍</h2>
-      <p>Click any country on the world map to explore it — the gold ones are countries I'm reading about! Then take on the 50 trickiest capitals on Earth.</p>
+      <p>Click any country on the world map to explore it — the gold ones are countries I'm reading about!</p>
     </div>
-    <div class="geo-grid">
+    <div class="geo-layout">
       <div class="map-card">
         <!-- Real world map (Natural Earth 110m, public domain), grouped by continent -->
         <svg viewBox="0 0 1000 500" role="img" aria-label="World map" preserveAspectRatio="xMidYMid meet">
@@ -620,22 +622,31 @@
           <span><i style="background:var(--gold)"></i>📚 Countries I'm reading about</span>
         </div>
       </div>
-      <div class="geo-info">
-        <div class="fact-box" id="factBox">
-          <h3 id="factTitle">Pick a country 👆</h3>
-          <p id="factText">Click any country on the map to learn where it is — try the gold ones first!</p>
-        </div>
-        <div class="quiz" id="quiz">
-          <div class="quiz-top">
-            <span id="quizProg">Question 1 of 50</span>
-            <span class="score" id="quizScore">Score: 0</span>
-          </div>
-          <div class="quiz-bar"><div class="quiz-bar-fill" id="quizBar"></div></div>
-          <div class="q" id="quizQ">Loading quiz…</div>
-          <div class="opts" id="quizOpts"></div>
-          <div class="quiz-final" id="quizFinal" hidden></div>
-        </div>
+      <div class="fact-box" id="factBox">
+        <h3 id="factTitle">Pick a country 👆</h3>
+        <p id="factText">Click any country on the map to learn where it is — try the gold ones first!</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPITALS QUIZ ============ -->
+<section id="capitals">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Test Yourself</div>
+      <h2>The 50 toughest capitals 🧠</h2>
+      <p>The trickiest capital cities on Earth — the ones almost everyone gets wrong. How many can you get?</p>
+    </div>
+    <div class="quiz" id="quiz">
+      <div class="quiz-top">
+        <span id="quizProg">Question 1 of 50</span>
+        <span class="score" id="quizScore">Score: 0</span>
+      </div>
+      <div class="quiz-bar"><div class="quiz-bar-fill" id="quizBar"></div></div>
+      <div class="q" id="quizQ">Loading quiz…</div>
+      <div class="opts" id="quizOpts"></div>
+      <div class="quiz-final" id="quizFinal" hidden></div>
     </div>
   </div>
 </section>
