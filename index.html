@@ -7,7 +7,7 @@
 <meta name="description" content="Ahaan's corner of the internet: books he loves, maps of the world, the library, and the best swing in the park." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
 <style>
   /* ============ Design tokens ============ */
@@ -34,7 +34,7 @@
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    font-family: "Nunito", system-ui, sans-serif;
+    font-family: "Fredoka", system-ui, sans-serif;
     color: var(--ink);
     background: var(--paper);
     background-image:
@@ -193,7 +193,7 @@
     box-shadow: var(--shadow); overflow: hidden; max-width: 720px; margin: 0 auto;
   }
   .lib-card .head { background: repeating-linear-gradient(45deg, var(--gold), var(--gold) 14px, #d9a83c 14px, #d9a83c 28px); color: var(--ink); padding: 16px 24px; font-family: "Fraunces", serif; font-weight: 900; font-size: 1.25rem; display: flex; align-items: center; justify-content: space-between; }
-  .lib-card .head .num { font-family: "Nunito"; font-weight: 800; font-size: .9rem; background: rgba(255,255,255,.6); padding: 4px 10px; border-radius: 8px; }
+  .lib-card .head .num { font-family: "Fredoka"; font-weight: 800; font-size: .9rem; background: rgba(255,255,255,.6); padding: 4px 10px; border-radius: 8px; }
   .lib-rows { padding: 8px 24px 20px; }
   .lib-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px dashed var(--line); }
   .lib-row:last-child { border-bottom: 0; }
@@ -307,6 +307,40 @@
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,118,66,.5); } 50% { box-shadow: 0 0 0 12px rgba(217,118,66,0); } }
   @media (max-width: 760px) { .music-grid { grid-template-columns: 1fr; } }
 
+  /* ============ Calendar ============ */
+  .cal-card { max-width: 760px; margin: 0 auto; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .cal-head { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; }
+  .cal-title { font-family: "Fraunces", serif; font-weight: 900; font-size: clamp(1.4rem, 4vw, 2rem); color: var(--forest-d); min-width: 230px; text-align: center; }
+  .cal-nav { font-family: inherit; cursor: pointer; border: 0; width: 42px; height: 42px; border-radius: 50%; background: var(--forest); color: #fff; font-size: 1.1rem; font-weight: 800; transition: transform .15s, background .2s; }
+  .cal-nav:hover { transform: scale(1.12) rotate(-6deg); background: var(--forest-d); }
+  .cal-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .mbtn.surprise { background: var(--terra); }
+  .mbtn.surprise:hover { background: #c25f30; }
+  .cal-pick { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  .cal-sticker { cursor: pointer; font-size: 1.35rem; line-height: 1; border: 2px solid transparent; border-radius: 10px; background: var(--paper); padding: 5px 6px; transition: transform .12s; }
+  .cal-sticker:hover { transform: scale(1.2) rotate(-8deg); }
+  .cal-sticker.sel { border-color: var(--terra); background: rgba(217,118,66,.16); }
+  .cal-msg { text-align: center; font-weight: 700; color: var(--ink-soft); min-height: 22px; margin-bottom: 12px; }
+  .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 6px; }
+  .cal-dow span { text-align: center; font-weight: 800; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cal-day { aspect-ratio: 1/1; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 5px; cursor: pointer; position: relative; font-weight: 700; color: var(--ink); transition: transform .12s, box-shadow .12s; animation: calPop .35s both; }
+  .cal-day:hover { transform: rotate(-4deg) scale(1.07); box-shadow: var(--shadow-sm); z-index: 2; }
+  .cal-day.empty { background: transparent; border-color: transparent; cursor: default; animation: none; }
+  .cal-day.weekend { background: rgba(106,174,221,.14); }
+  .cal-day .dnum { font-size: .9rem; }
+  .cal-day .dsticker { font-size: clamp(1.1rem, 4vw, 1.6rem); line-height: 1; margin-top: 1px; }
+  .cal-day.pop .dsticker { animation: calStick .4s ease; }
+  .cal-day.today { background: linear-gradient(160deg, var(--gold), #f0c455); border-color: var(--terra); color: var(--ink); box-shadow: 0 0 0 3px rgba(217,118,66,.35); }
+  .cal-day.today .dnum::after { content: " ⭐"; }
+  .cal-day.today { animation: calPop .35s both, calBounce 1.4s ease-in-out .4s infinite; }
+  .cal-day.surprise-hit { animation: calWobble .7s ease; }
+  @keyframes calPop { 0% { opacity: 0; transform: scale(.4) translateY(8px); } 100% { opacity: 1; transform: scale(1); } }
+  @keyframes calStick { 0% { transform: scale(0) rotate(-30deg); } 60% { transform: scale(1.5) rotate(12deg); } 100% { transform: scale(1) rotate(0); } }
+  @keyframes calBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes calWobble { 0%,100% { transform: rotate(0) scale(1.1); } 25% { transform: rotate(-12deg) scale(1.2); } 75% { transform: rotate(12deg) scale(1.2); } }
+  @media (prefers-reduced-motion: reduce) { .cal-day, .cal-day.today { animation: none; } }
+
   /* ============ Footer ============ */
   footer { background: var(--ink); color: var(--paper); text-align: center; padding: 50px 22px; }
   footer h2 { color: var(--paper); }
@@ -365,6 +399,7 @@
       <a href="#library">Library</a>
       <a href="#story">Story Studio</a>
       <a href="#music">Music</a>
+      <a href="#calendar">Calendar</a>
       <a href="#journey">Journey</a>
     </div>
   </div>
@@ -836,6 +871,32 @@
         <div class="piano" id="piano"><!-- keys built by JS --></div>
         <p class="piano-hint">Tap the keys, or use your keyboard: <b>A S D F G H J K</b></p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALENDAR ============ -->
+<section id="calendar">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Days &amp; Plans</div>
+      <h2>My silly calendar 📅</h2>
+      <p>Tap any day to stick a sticker on it, or hit <b>Surprise me!</b> for something fun to do. Today is bouncing! 🎉</p>
+    </div>
+    <div class="cal-card">
+      <div class="cal-head">
+        <button class="cal-nav" id="calPrev" aria-label="Previous month">◀</button>
+        <div class="cal-title" id="calTitle">Month</div>
+        <button class="cal-nav" id="calNext" aria-label="Next month">▶</button>
+      </div>
+      <div class="cal-toolbar">
+        <button class="mbtn" id="calToday">📍 Jump to today</button>
+        <button class="mbtn surprise" id="calSurprise">🎲 Surprise me!</button>
+        <div class="cal-pick" id="calPick"><!-- sticker palette by JS --></div>
+      </div>
+      <div class="cal-msg" id="calMsg">Pick a sticker, then tap a day! 👇</div>
+      <div class="cal-dow"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="cal-grid" id="calGrid"><!-- days by JS --></div>
     </div>
   </div>
 </section>
@@ -1490,6 +1551,88 @@ function openBook(b) {
     }
   }
   $("#echoStart").addEventListener("click", () => { if (!ensure()) return; seq = []; playing = true; nextRound(); });
+})();
+
+/* ---- Calendar: interactive, animated month view (saves to localStorage) ---- */
+(() => {
+  const KEY = "ahaan-calendar";
+  const STICKERS = ["🌟","🎈","❤️","🎂","⚽","📚","🎹","🦖","🌈","🎉","🏊","✈️"];
+  const ACTIVITIES = [
+    "📚 Read a chapter up on the swing!",
+    "🗺️ Learn a brand-new capital city!",
+    "🎹 Make up a 5-note song on the piano!",
+    "✍️ Write a page of your own story!",
+    "🌍 Spin the globe and pick a country to explore!",
+    "🦖 Draw the silliest dinosaur ever!",
+    "🎈 Build the tallest pillow fort in the world!",
+    "🏊 Swing SO high you nearly touch the clouds!",
+  ];
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { store = {}; }
+  const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+
+  const now = new Date();
+  const today = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
+  let viewY = today.y, viewM = today.m, activeSticker = STICKERS[0];
+
+  const grid = $("#calGrid"), titleEl = $("#calTitle"), msgEl = $("#calMsg"), pick = $("#calPick");
+  const keyFor = (y, m, d) => `${y}-${m + 1}-${d}`;
+  const ordinal = d => { const s = ["th","st","nd","rd"], v = d % 100; return d + (s[(v - 20) % 10] || s[v] || s[0]); };
+
+  pick.innerHTML = STICKERS.map(s => `<button class="cal-sticker" data-s="${s}">${s}</button>`).join("")
+    + `<button class="cal-sticker" data-s="" title="Eraser">🧽</button>`;
+  function selectSticker(s, btn) { activeSticker = s; $$(".cal-sticker", pick).forEach(b => b.classList.toggle("sel", b === btn)); }
+  pick.addEventListener("click", e => { const b = e.target.closest(".cal-sticker"); if (b) selectSticker(b.dataset.s, b); });
+  selectSticker(STICKERS[0], pick.querySelector(".cal-sticker"));
+
+  function render() {
+    titleEl.textContent = `${MONTHS[viewM]} ${viewY}`;
+    const first = new Date(viewY, viewM, 1).getDay();
+    const days = new Date(viewY, viewM + 1, 0).getDate();
+    let html = "";
+    for (let i = 0; i < first; i++) html += `<div class="cal-day empty"></div>`;
+    for (let d = 1; d <= days; d++) {
+      const dow = new Date(viewY, viewM, d).getDay();
+      const isToday = viewY === today.y && viewM === today.m && d === today.d;
+      const st = store[keyFor(viewY, viewM, d)] || "";
+      const cls = ["cal-day"];
+      if (dow === 0 || dow === 6) cls.push("weekend");
+      if (isToday) cls.push("today");
+      html += `<div class="${cls.join(" ")}" data-d="${d}" style="animation-delay:${(first + d) * 13}ms"><span class="dnum">${d}</span><span class="dsticker">${st}</span></div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  grid.addEventListener("click", e => {
+    const cell = e.target.closest(".cal-day"); if (!cell || cell.classList.contains("empty")) return;
+    const d = +cell.dataset.d, k = keyFor(viewY, viewM, d), stEl = cell.querySelector(".dsticker");
+    if (activeSticker === "") { delete store[k]; stEl.textContent = ""; msgEl.textContent = "Wiped it clean! 🧽"; }
+    else if (store[k] === activeSticker) { delete store[k]; stEl.textContent = ""; msgEl.textContent = "Sticker removed!"; }
+    else {
+      store[k] = activeSticker; stEl.textContent = activeSticker;
+      cell.classList.remove("pop"); void cell.offsetWidth; cell.classList.add("pop");
+      msgEl.textContent = `${activeSticker} on the ${ordinal(d)}! Nice!`;
+    }
+    save();
+  });
+
+  $("#calPrev").addEventListener("click", () => { if (--viewM < 0) { viewM = 11; viewY--; } render(); });
+  $("#calNext").addEventListener("click", () => { if (++viewM > 11) { viewM = 0; viewY++; } render(); });
+  $("#calToday").addEventListener("click", () => { viewY = today.y; viewM = today.m; render(); msgEl.textContent = "Here's today! ⭐"; });
+
+  $("#calSurprise").addEventListener("click", () => {
+    const days = new Date(viewY, viewM + 1, 0).getDate();
+    const d = 1 + Math.floor(Math.random() * days);
+    const act = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+    store[keyFor(viewY, viewM, d)] = "🎲"; save(); render();
+    const cell = grid.querySelector(`.cal-day[data-d="${d}"]`);
+    if (cell) cell.classList.add("surprise-hit");
+    msgEl.textContent = `🎲 On the ${ordinal(d)}: ${act}`;
+  });
+
+  render();
 })();
 </script>
 </body>
