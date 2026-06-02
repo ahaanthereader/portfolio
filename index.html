@@ -100,7 +100,8 @@
   .hero .tag { font-size: clamp(1.05rem, 2.8vw, 1.55rem); color: #eafff4; max-width: 680px; margin: 14px auto 1.6rem; font-weight: 700; }
   .hero .tag b { color: var(--gold); }
   .hero .pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
-  .pill { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34); color: #fff; border-radius: 999px; padding: 8px 16px; font-weight: 800; font-size: .92rem; backdrop-filter: blur(4px); }
+  .pill { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34); color: #fff; border-radius: 999px; padding: 8px 16px; font-weight: 800; font-size: .92rem; backdrop-filter: blur(4px); text-decoration: none; cursor: pointer; transition: transform .15s, background .2s, box-shadow .2s; }
+  a.pill:hover { transform: translateY(-2px) scale(1.05); background: rgba(255,255,255,.32); color: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.18); }
   .cta { display: inline-flex; align-items: center; gap: .5rem; background: var(--gold); color: var(--ink); text-decoration: none; font-weight: 900; padding: 14px 28px; border-radius: 16px; box-shadow: 0 6px 0 rgba(0,0,0,.18); transition: transform .15s, box-shadow .15s; }
   .cta:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,.28), 0 6px 0 rgba(0,0,0,.18); color: var(--ink); }
   .cta:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.18); }
@@ -434,10 +435,10 @@
     <h1>Hi, I'm <span class="wave">Ahaan</span> 👋</h1>
     <p class="tag">A reader, a map-lover, and the kid you'll find on the highest swing in the park. Welcome to my world.</p>
     <div class="pills">
-      <span class="pill">📖 Reader</span>
-      <span class="pill">🌍 Explorer</span>
-      <span class="pill">🌳 Swinger of Trees</span>
-      <span class="pill">📚 Library Regular</span>
+      <a class="pill" href="#reading">📖 Reader</a>
+      <a class="pill" href="#geography">🌍 Explorer</a>
+      <a class="pill" href="#swing">🌳 Swinger of Trees</a>
+      <a class="pill" href="#library">📚 Library Regular</a>
     </div>
     <a href="#reading" class="cta">Take a look around →</a>
   </div>
