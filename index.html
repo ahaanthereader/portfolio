@@ -1488,8 +1488,12 @@ function openBook(b) {
   let ambientOn = false, ambGain = null, ambTimer = null;
   function ambVol() { return (+$("#ambientVol").value) / 100 * 0.6; }
   function ambientStart() {
+    if (ambientOn) return;          // already playing — never start a 2nd loop
     if (!ensure()) return;
-    ambGain = actx.createGain(); ambGain.gain.value = ambVol(); ambGain.connect(master);
+    if (!ambGain) { ambGain = actx.createGain(); ambGain.connect(master); }  // single persistent node
+    const t = actx.currentTime;
+    ambGain.gain.cancelScheduledValues(t);
+    ambGain.gain.setValueAtTime(Math.max(0.0001, ambVol()), t);
     ambientOn = true;
     (function step() {
       if (!ambientOn) return;
@@ -1500,12 +1504,19 @@ function openBook(b) {
     })();
   }
   function ambientStop() {
+    if (!ambientOn) return;
     ambientOn = false;
-    if (ambTimer) clearTimeout(ambTimer);
-    if (ambGain && actx) { try { ambGain.gain.exponentialRampToValueAtTime(0.0008, actx.currentTime + 0.4); } catch (e) {} }
+    if (ambTimer) { clearTimeout(ambTimer); ambTimer = null; }
+    if (ambGain && actx) {
+      const t = actx.currentTime;
+      ambGain.gain.cancelScheduledValues(t);
+      ambGain.gain.setValueAtTime(ambGain.gain.value, t);
+      ambGain.gain.linearRampToValueAtTime(0.0001, t + 0.35); // fade out, no orphan sound
+    }
   }
   function setAmbient(on) {
     if (on) ambientStart(); else ambientStop();
+    on = ambientOn; // reflect the real state in case start/stop bailed
     const b = $("#ambientToggle"), fab = $("#musicFab");
     b.textContent = on ? "⏸ Pause calm music" : "▶ Play calm music";
     b.classList.toggle("on", on);
@@ -1514,7 +1525,7 @@ function openBook(b) {
   }
   $("#ambientToggle").addEventListener("click", () => setAmbient(!ambientOn));
   $("#musicFab").addEventListener("click", () => setAmbient(!ambientOn));
-  $("#ambientVol").addEventListener("input", e => { if (ambGain) ambGain.gain.value = ambVol(); });
+  $("#ambientVol").addEventListener("input", () => { if (ambGain && ambientOn) ambGain.gain.value = Math.max(0.0001, ambVol()); });
 
   /* --- piano --- */
   const KEYS = [
