@@ -178,10 +178,8 @@
   .swing-sec { background: linear-gradient(180deg, transparent, rgba(106,174,221,.10) 40%, rgba(47,122,91,.12)); }
   .swing-stage { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .swing-svg { width: min(420px, 90%); cursor: pointer; user-select: none; }
-  .swing-seat-grp { transform-origin: 200px 40px; animation: sway 3.2s ease-in-out infinite; }
-  .swing-svg.pushed .swing-seat-grp { animation: sway-big 2.4s ease-in-out infinite; }
-  @keyframes sway { 0%,100% { transform: rotate(11deg); } 50% { transform: rotate(-11deg); } }
-  @keyframes sway-big { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
+  .swing-seat-grp { transform-origin: 200px 40px; --amp: 11; --dur: 3.2s; animation: sway-dyn var(--dur) ease-in-out infinite; }
+  @keyframes sway-dyn { 0%,100% { transform: rotate(calc(var(--amp) * 1deg)); } 50% { transform: rotate(calc(var(--amp) * -1deg)); } }
   .swing-hint { color: var(--ink-soft); font-weight: 700; font-size: .95rem; }
   .swing-spots { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 16px; margin-top: 36px; }
   .spot { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px; box-shadow: var(--shadow-sm); }
@@ -199,7 +197,10 @@
   .lib-rows { padding: 8px 24px 20px; }
   .lib-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px dashed var(--line); }
   .lib-row:last-child { border-bottom: 0; }
-  .lib-row .title { font-weight: 800; display: flex; flex-direction: column; }
+  .lib-row .title { font-weight: 800; display: flex; align-items: center; gap: 12px; }
+  .lib-cover { width: 42px; height: 58px; border-radius: 5px; object-fit: cover; box-shadow: var(--shadow-sm); flex: none; }
+  .lib-cover.ph { display: grid; place-items: center; font-size: 1.4rem; color: #fff; }
+  .lib-meta { display: flex; flex-direction: column; min-width: 0; }
   .lib-row .title .auth { font-weight: 600; font-size: .82rem; color: var(--ink-soft); }
   .lib-row .stamp { flex: none; font-family: "Fraunces", serif; font-weight: 700; color: var(--terra); border: 2px solid var(--terra); border-radius: 6px; padding: 2px 8px; font-size: .8rem; white-space: nowrap; transform: rotate(-3deg); }
   .lib-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; max-width: 720px; margin: 26px auto 0; }
@@ -275,6 +276,37 @@
   .tl-item .yr { font-family: "Fraunces", serif; font-weight: 800; color: var(--forest-d); }
   .tl-item p { margin: 2px 0 0; color: var(--ink-soft); font-weight: 600; }
 
+  /* ============ Music + Piano ============ */
+  .music-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 22px; align-items: stretch; }
+  .music-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+  .music-card.calm { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .mc-emoji { font-size: 2.6rem; }
+  .music-card h3 { margin: 4px 0; color: var(--forest-d); }
+  .music-card p { color: var(--ink-soft); font-weight: 600; margin: 0 0 12px; }
+  .mbtn { font-family: inherit; font-weight: 800; cursor: pointer; border: 0; border-radius: 999px; padding: 11px 20px; background: var(--forest); color: #fff; box-shadow: var(--shadow-sm); transition: transform .15s, background .2s; }
+  .mbtn:hover { transform: translateY(-2px); background: var(--forest-d); }
+  .mbtn.big { font-size: 1.05rem; padding: 13px 26px; }
+  .mbtn.on { background: var(--terra); }
+  .vol { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--ink-soft); font-size: .9rem; margin-top: 14px; }
+  .vol input { accent-color: var(--forest); }
+  .piano-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .piano-modes { display: flex; align-items: center; gap: 10px; }
+  .echo-status { font-weight: 800; color: var(--terra); font-size: .9rem; }
+  .piano { position: relative; display: flex; gap: 0; height: 180px; user-select: none; touch-action: manipulation; }
+  .key { position: relative; flex: 1 1 0; background: linear-gradient(#fff, #f4ead3); border: 1px solid #cbb892; border-radius: 0 0 8px 8px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-weight: 800; color: var(--ink-soft); transition: background .06s, transform .06s; }
+  .key:active, .key.down { background: linear-gradient(#ffe9b0, var(--gold)); transform: translateY(2px); }
+  .key.lit { background: linear-gradient(#ffe9b0, var(--gold)); }
+  .key .kb { position: absolute; top: 8px; font-size: .7rem; opacity: .55; }
+  .key.black { position: absolute; top: 0; width: 9%; height: 62%; background: linear-gradient(#3a2e21, #1c150d); border: 1px solid #000; border-radius: 0 0 6px 6px; color: #fff; z-index: 3; }
+  .key.black:active, .key.black.down, .key.black.lit { background: linear-gradient(#7a5230, #4a3018); }
+  .piano-hint { color: var(--ink-soft); font-weight: 700; font-size: .88rem; margin: 12px 0 0; text-align: center; }
+  /* floating music button */
+  .music-fab { position: fixed; right: 18px; bottom: 18px; z-index: 60; width: 56px; height: 56px; border-radius: 50%; border: 0; cursor: pointer; font-size: 1.5rem; background: var(--forest); color: #fff; box-shadow: var(--shadow); transition: transform .15s, background .2s; }
+  .music-fab:hover { transform: scale(1.08); }
+  .music-fab.on { background: var(--terra); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,118,66,.5); } 50% { box-shadow: 0 0 0 12px rgba(217,118,66,0); } }
+  @media (max-width: 760px) { .music-grid { grid-template-columns: 1fr; } }
+
   /* ============ Footer ============ */
   footer { background: var(--ink); color: var(--paper); text-align: center; padding: 50px 22px; }
   footer h2 { color: var(--paper); }
@@ -326,16 +358,20 @@
     <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="nav-links" id="navLinks">
       <a href="#reading">Reading</a>
-      <a href="#reader">Reader</a>
+      <a href="#reader">Kindle</a>
       <a href="#geography">Geography</a>
       <a href="#capitals">Quiz</a>
       <a href="#swing">The Swing</a>
       <a href="#library">Library</a>
       <a href="#story">Story Studio</a>
+      <a href="#music">Music</a>
       <a href="#journey">Journey</a>
     </div>
   </div>
 </nav>
+
+<!-- Floating background-music toggle -->
+<button class="music-fab" id="musicFab" title="Play / pause calm music" aria-label="Toggle music">🎵</button>
 
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
@@ -386,9 +422,9 @@
 <section id="reader">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">My Reader</div>
-      <h2>Read a book right here 📖</h2>
-      <p>Pick a free classic from the menu — like <b>Around the World in Eighty Days</b> — or open your own EPUB. Turn the pages and make the text bigger or smaller.</p>
+      <div class="eyebrow">My Kindle</div>
+      <h2>Ahaan's Kindle 📖</h2>
+      <p>Pick a free classic from the menu — like <b>Around the World in Eighty Days</b> — or open your own book. Turn the pages and make the text bigger or smaller.</p>
     </div>
     <div class="reader-card">
       <div class="reader-toolbar">
@@ -412,7 +448,6 @@
       </div>
       <div class="reader-foot"><span id="readerStatus"></span></div>
     </div>
-    <p class="reader-note">ℹ️ <b>About Kindle:</b> Kindle books are locked by Amazon (DRM) and can't be imported into other apps. This reader opens <b>EPUB</b> files instead — grab free classics from <a href="https://www.gutenberg.org/" target="_blank" rel="noopener">Project&nbsp;Gutenberg</a>, or export EPUBs from your library, and open them above.</p>
   </div>
 </section>
 
@@ -768,6 +803,43 @@
   </div>
 </section>
 
+<!-- ============ MUSIC + PIANO ============ -->
+<section id="music">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Sounds &amp; Songs</div>
+      <h2>Music corner 🎹</h2>
+      <p>Turn on some calm background music, then play the piano — or try the "Echo" game and repeat the tune!</p>
+    </div>
+
+    <div class="music-grid">
+      <!-- Background music -->
+      <div class="music-card calm">
+        <div class="mc-emoji">🎧</div>
+        <h3>Calm background music</h3>
+        <p>Gentle, never-ending notes to read and draw to.</p>
+        <button class="mbtn big" id="ambientToggle">▶ Play calm music</button>
+        <label class="vol">Volume
+          <input type="range" id="ambientVol" min="0" max="100" value="45">
+        </label>
+      </div>
+
+      <!-- Piano + game -->
+      <div class="music-card piano-card">
+        <div class="piano-top">
+          <h3>🎹 Play the piano</h3>
+          <div class="piano-modes">
+            <button class="mbtn" id="echoStart">🎮 Echo game</button>
+            <span class="echo-status" id="echoStatus"></span>
+          </div>
+        </div>
+        <div class="piano" id="piano"><!-- keys built by JS --></div>
+        <p class="piano-hint">Tap the keys, or use your keyboard: <b>A S D F G H J K</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ TIMELINE ============ -->
 <section id="journey">
   <div class="wrap">
@@ -891,22 +963,22 @@ const QUIZ = [
 
 /* ---- Library: Ahaan's REAL current checkouts (from the library app) ---- */
 const CHECKOUTS = [
-  { title: "Countries of the World", author: "Andrea Mills", stamp: "DUE JUN 6" },
-  { title: "Colombia",              author: "Golriz Golkar", stamp: "DUE JUN 6" },
-  { title: "South Africa",          author: "Alicia Klepeis", stamp: "DUE JUN 6" },
-  { title: "Angola",                author: "Sean Sheehan", stamp: "DUE JUN 6" },
-  { title: "Chad",                  author: "Martha Kneib", stamp: "DUE JUN 6" },
-  { title: "Mali",                  author: "Ettagale Blauer", stamp: "DUE JUN 6" },
-  { title: "The Travel Bucket List", author: "Dream Up Your Next Trip", stamp: "DUE JUN 6" },
+  { title: "Countries of the World", author: "Andrea Mills", stamp: "DUE JUN 6", color: "var(--sky)" },
+  { title: "Colombia",              author: "Golriz Golkar", stamp: "DUE JUN 6", color: "var(--gold)" },
+  { title: "South Africa",          author: "Alicia Klepeis", stamp: "DUE JUN 6", color: "var(--plum)" },
+  { title: "Angola",                author: "Sean Sheehan", stamp: "DUE JUN 6", cover: "images/book-covers/angola.jpg" },
+  { title: "Chad",                  author: "Martha Kneib", stamp: "DUE JUN 6", cover: "images/book-covers/chad.jpg" },
+  { title: "Mali",                  author: "Ettagale Blauer", stamp: "DUE JUN 6", cover: "images/book-covers/mali.jpg" },
+  { title: "The Travel Bucket List", author: "Lonely Planet", stamp: "DUE JUN 6", color: "var(--terra)" },
 ];
 const LIB_STATS = { books: "7", renewals: "3", genre: "Geography" };
 
 /* ---- Timeline ---- */
 const TIMELINE = [
-  { yr: "Year", text: "Placeholder milestone — e.g. read his first chapter book." },
-  { yr: "Year", text: "Placeholder milestone — e.g. memorized all the capitals." },
-  { yr: "Year", text: "Placeholder milestone — e.g. got his own library card." },
-  { yr: "Now",  text: "Placeholder — what Ahaan is up to today." },
+  { yr: "2022", text: "Read my first chapter book 📖" },
+  { yr: "2023", text: "Memorized all the capitals 🗺️" },
+  { yr: "Recently", text: "Got my own library card 📚" },
+  { yr: "Now",  text: "Reading a whole stack of country books — and writing my own stories! ✍️" },
 ];
 
 /* =================================================================
@@ -1088,22 +1160,43 @@ function openBook(b) {
   start();
 })();
 
-/* ---- Swing: click to push ---- */
+/* ---- Swing: each click pushes faster & higher ---- */
 (() => {
-  const svg = $("#swingSvg"), hint = $("#swingHint");
-  let pushed = false;
+  const svg = $("#swingSvg"), hint = $("#swingHint"), grp = $(".swing-seat-grp");
+  const MAX = 5;
+  let level = 0;
+  const hints = [
+    "↑ click to push higher",
+    "a little push… 🙂",
+    "higher! 😄",
+    "faster! 😆",
+    "wheee! 🎉",
+    "MAXIMUM SWING! 🚀 (click to slow down)",
+  ];
+  function apply() {
+    const amp = 11 + level * 8;        // 11 → 51 degrees
+    const dur = (3.2 - level * 0.45).toFixed(2); // 3.2s → ~0.95s
+    grp.style.setProperty("--amp", amp);
+    grp.style.setProperty("--dur", dur + "s");
+    hint.textContent = hints[level];
+  }
   svg.addEventListener("click", () => {
-    pushed = !pushed;
-    svg.classList.toggle("pushed", pushed);
-    hint.textContent = pushed ? "wheee! 🎉 (click to slow down)" : "↑ click to push higher";
+    level = level >= MAX ? 0 : level + 1; // climb, then loop back to gentle
+    apply();
   });
+  apply();
 })();
 
 /* ---- Library rows + stats ---- */
 (() => {
   $("#libRows").innerHTML = CHECKOUTS.map(c => `
     <div class="lib-row">
-      <span class="title">📕 ${c.title}<span class="auth">${c.author}</span></span>
+      <span class="title">
+        ${c.cover
+          ? `<img class="lib-cover" src="${c.cover}" alt="${c.title} book cover" loading="lazy">`
+          : `<span class="lib-cover ph" style="background:${c.color || 'var(--forest)'}">📕</span>`}
+        <span class="lib-meta"><span>${c.title}</span><span class="auth">${c.author}</span></span>
+      </span>
       <span class="stamp">${c.stamp}</span>
     </div>
   `).join("");
@@ -1282,6 +1375,121 @@ function openBook(b) {
   $("#sbNext").addEventListener("click", () => { if (rp < story.pages.length) { rp++; renderRead(); } });
 
   renderEdit();
+})();
+
+/* ---- Music corner: Web Audio (calm ambient + piano + Echo game) ----
+   All sound is generated live in the browser from oscillators — no audio files. */
+(() => {
+  let actx = null, master = null;
+  function ensure() {
+    if (actx) { if (actx.state === "suspended") actx.resume(); return true; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    actx = new AC();
+    master = actx.createGain();
+    master.gain.value = 0.8;
+    master.connect(actx.destination);
+    return true;
+  }
+
+  const FREQ = { C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88, C5:523.25 };
+
+  function tone(freq, dur, type, gain, dest) {
+    const t = actx.currentTime;
+    const osc = actx.createOscillator(), g = actx.createGain();
+    osc.type = type || "triangle"; osc.frequency.value = freq;
+    osc.connect(g); g.connect(dest || master);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(gain, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+
+  /* --- calm ambient --- */
+  const PENT = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33];
+  let ambientOn = false, ambGain = null, ambTimer = null;
+  function ambVol() { return (+$("#ambientVol").value) / 100 * 0.6; }
+  function ambientStart() {
+    if (!ensure()) return;
+    ambGain = actx.createGain(); ambGain.gain.value = ambVol(); ambGain.connect(master);
+    ambientOn = true;
+    (function step() {
+      if (!ambientOn) return;
+      const f = PENT[Math.floor(Math.random() * PENT.length)];
+      tone(f, 2.6 + Math.random() * 1.6, "sine", 0.18, ambGain);
+      if (Math.random() < 0.5) tone(f / 2, 3.0, "triangle", 0.10, ambGain);
+      ambTimer = setTimeout(step, 850 + Math.random() * 950);
+    })();
+  }
+  function ambientStop() {
+    ambientOn = false;
+    if (ambTimer) clearTimeout(ambTimer);
+    if (ambGain && actx) { try { ambGain.gain.exponentialRampToValueAtTime(0.0008, actx.currentTime + 0.4); } catch (e) {} }
+  }
+  function setAmbient(on) {
+    if (on) ambientStart(); else ambientStop();
+    const b = $("#ambientToggle"), fab = $("#musicFab");
+    b.textContent = on ? "⏸ Pause calm music" : "▶ Play calm music";
+    b.classList.toggle("on", on);
+    fab.classList.toggle("on", on);
+    fab.textContent = on ? "⏸" : "🎵";
+  }
+  $("#ambientToggle").addEventListener("click", () => setAmbient(!ambientOn));
+  $("#musicFab").addEventListener("click", () => setAmbient(!ambientOn));
+  $("#ambientVol").addEventListener("input", e => { if (ambGain) ambGain.gain.value = ambVol(); });
+
+  /* --- piano --- */
+  const KEYS = [
+    { n: "C4", l: "C", kb: "A" }, { n: "D4", l: "D", kb: "S" }, { n: "E4", l: "E", kb: "D" },
+    { n: "F4", l: "F", kb: "F" }, { n: "G4", l: "G", kb: "G" }, { n: "A4", l: "A", kb: "H" },
+    { n: "B4", l: "B", kb: "J" }, { n: "C5", l: "C", kb: "K" },
+  ];
+  const piano = $("#piano");
+  piano.innerHTML = KEYS.map(k => `<div class="key" data-n="${k.n}"><span class="kb">${k.kb}</span>${k.l}</div>`).join("");
+
+  function pressKey(n) {
+    if (!ensure()) return;
+    tone(FREQ[n], 0.7, "triangle", 0.5);
+    const el = piano.querySelector(`.key[data-n="${n}"]`);
+    if (el) { el.classList.add("down"); setTimeout(() => el.classList.remove("down"), 150); }
+  }
+  function handlePlay(n) { pressKey(n); if (playing && accepting) checkGame(n); }
+
+  piano.addEventListener("pointerdown", e => { const k = e.target.closest(".key"); if (k) handlePlay(k.dataset.n); });
+  const KBMAP = { a: "C4", s: "D4", d: "E4", f: "F4", g: "G4", h: "A4", j: "B4", k: "C5" };
+  document.addEventListener("keydown", e => {
+    if (e.repeat) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    const n = KBMAP[e.key.toLowerCase()];
+    if (n) handlePlay(n);
+  });
+
+  /* --- Echo memory game --- */
+  const ORDER = ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"];
+  let seq = [], userIdx = 0, playing = false, accepting = false;
+  const status = $("#echoStatus");
+  function lite(n) {
+    const el = piano.querySelector(`.key[data-n="${n}"]`);
+    if (el) { el.classList.add("lit"); setTimeout(() => el.classList.remove("lit"), 320); }
+  }
+  function playSeq() {
+    accepting = false; userIdx = 0;
+    status.textContent = `Listen… 🎧`;
+    seq.forEach((n, i) => setTimeout(() => { if (!ensure()) return; lite(n); tone(FREQ[n], 0.45, "triangle", 0.5); }, 520 * i));
+    setTimeout(() => { accepting = true; status.textContent = `Your turn! Round ${seq.length}`; }, 520 * seq.length + 250);
+  }
+  function nextRound() { seq.push(ORDER[Math.floor(Math.random() * ORDER.length)]); playSeq(); }
+  function checkGame(n) {
+    if (n === seq[userIdx]) {
+      userIdx++;
+      if (userIdx === seq.length) { accepting = false; status.textContent = `✅ Round ${seq.length} cleared!`; setTimeout(nextRound, 850); }
+    } else {
+      accepting = false; playing = false;
+      status.textContent = `❌ Reached round ${seq.length}! Tap Echo to try again.`;
+    }
+  }
+  $("#echoStart").addEventListener("click", () => { if (!ensure()) return; seq = []; playing = true; nextRound(); });
 })();
 </script>
 </body>
