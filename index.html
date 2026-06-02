@@ -213,6 +213,8 @@
   .reader-btn:hover { background: rgba(255,255,255,.30); transform: translateY(-1px); }
   .reader-btn.primary { background: var(--gold); color: var(--ink); }
   .reader-btn.icon { padding: 9px 11px; }
+  .reader-select { font-family: inherit; font-weight: 800; font-size: .9rem; cursor: pointer; border: 0; border-radius: 10px; padding: 9px 12px; background: rgba(255,255,255,.18); color: #fff; max-width: 230px; }
+  .reader-select option { color: var(--ink); }
   .reader-spacer { flex: 1 1 auto; }
   .book-title { color: #eafff4; font-weight: 700; font-size: .9rem; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .reader-stage { display: flex; align-items: stretch; }
@@ -384,12 +386,18 @@
     <div class="sec-head">
       <div class="eyebrow">My Reader</div>
       <h2>Read a book right here 📖</h2>
-      <p>Open an EPUB book and read it on the page — turn the pages, make the text bigger, and pick up where you left off.</p>
+      <p>Pick a free classic from the menu — like <b>Around the World in Eighty Days</b> — or open your own EPUB. Turn the pages and make the text bigger or smaller.</p>
     </div>
     <div class="reader-card">
       <div class="reader-toolbar">
         <label class="reader-btn primary">📂 Open an EPUB<input type="file" id="epubInput" accept=".epub,application/epub+zip" hidden></label>
-        <button class="reader-btn" id="loadSample">📚 Load sample book</button>
+        <select class="reader-select" id="builtinBooks" aria-label="Pick a free book">
+          <option value="" disabled selected>📚 Pick a free book…</option>
+          <option value="books/welcome.epub|Welcome to Ahaan's Reader">⭐ Welcome (start here)</option>
+          <option value="books/around-the-world-80-days.epub|Around the World in Eighty Days">🌍 Around the World in Eighty Days</option>
+          <option value="books/alice-in-wonderland.epub|Alice's Adventures in Wonderland">🐇 Alice's Adventures in Wonderland</option>
+          <option value="books/wizard-of-oz.epub|The Wonderful Wizard of Oz">🦁 The Wonderful Wizard of Oz</option>
+        </select>
         <span class="book-title" id="bookTitle">No book open yet</span>
         <span class="reader-spacer"></span>
         <button class="reader-btn icon" id="fontDown" title="Smaller text">A−</button>
@@ -1107,6 +1115,8 @@ function openBook(b) {
   let book = null, rendition = null, fontPct = 100;
 
   const fail = msg => { viewer.innerHTML = `<div class="reader-empty">😕<br>${msg}</div>`; };
+  const fit = () => { if (rendition) { try { rendition.resize(viewer.clientWidth, viewer.clientHeight); } catch (e) {} } };
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(fit, 150); });
   if (typeof ePub === "undefined") {
     fail("The reader needs an internet connection to load.<br><small>Reconnect and refresh to read EPUBs.</small>");
     return;
@@ -1123,7 +1133,11 @@ function openBook(b) {
       // wait until the book is fully parsed before displaying the FIRST page
       book.ready
         .then(() => rendition.display(book.spine.first() && book.spine.first().href))
-        .then(() => { statusEl.textContent = "Use the ‹ › arrows or your keyboard to turn pages."; })
+        .then(() => {
+          statusEl.textContent = "Use the ‹ › arrows or your keyboard to turn pages.";
+          // re-fit the columns to the viewer once layout has settled (epub.js sizing quirk)
+          setTimeout(fit, 60);
+        })
         .catch(() => fail("Hmm, that file couldn't be opened.<br><small>Make sure it's a valid .epub book.</small>"));
       book.loaded.metadata.then(m => { if (m && m.title) titleEl.textContent = m.title; }).catch(() => {});
     } catch (e) {
@@ -1138,9 +1152,11 @@ function openBook(b) {
     reader.readAsArrayBuffer(file);
   });
 
-  $("#loadSample").addEventListener("click", () => {
-    titleEl.textContent = "Loading sample…";
-    openBook("books/welcome.epub", "Welcome to Ahaan's Reader");
+  $("#builtinBooks").addEventListener("change", e => {
+    const [path, label] = e.target.value.split("|");
+    if (!path) return;
+    titleEl.textContent = "Loading…";
+    openBook(path, label);
   });
 
   prevBtn.addEventListener("click", () => rendition && rendition.prev());
