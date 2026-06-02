@@ -127,7 +127,8 @@
     color: #fff; font-family: "Fraunces", serif; font-weight: 800; font-size: 1.05rem;
     position: relative;
   }
-  .book .cover::before { content: ""; position: absolute; left: 10px; top: 0; bottom: 0; width: 4px; background: rgba(0,0,0,.18); }
+  .book .cover::before { content: ""; position: absolute; left: 10px; top: 0; bottom: 0; width: 4px; background: rgba(0,0,0,.18); z-index: 1; }
+  .book .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
   .book .meta { padding: 10px 12px; }
   .book .meta .by { font-size: .82rem; color: var(--ink-soft); font-weight: 700; }
   .book .meta .stars { color: var(--gold); font-size: .9rem; letter-spacing: 1px; }
@@ -137,6 +138,7 @@
     display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   }
   .reading-now .big { font-size: 2.4rem; }
+  .reading-now .reading-cover { width: 66px; height: 90px; border-radius: 8px; object-fit: cover; box-shadow: var(--shadow-sm); flex: none; }
   .reading-now strong { color: var(--plum); }
 
   /* ============ Geography ============ */
@@ -277,9 +279,11 @@
   .tl-item p { margin: 2px 0 0; color: var(--ink-soft); font-weight: 600; }
 
   /* ============ Music + Piano ============ */
-  .music-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 22px; align-items: stretch; }
+  .music-stack { display: flex; flex-direction: column; gap: 22px; }
   .music-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
-  .music-card.calm { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .music-card.calm { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: center; text-align: left; }
+  .music-card.calm .calm-text { flex: 1 1 240px; }
+  .music-card.calm .calm-ctrls { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
   .mc-emoji { font-size: 2.6rem; }
   .music-card h3 { margin: 4px 0; color: var(--forest-d); }
   .music-card p { color: var(--ink-soft); font-weight: 600; margin: 0 0 12px; }
@@ -287,12 +291,14 @@
   .mbtn:hover { transform: translateY(-2px); background: var(--forest-d); }
   .mbtn.big { font-size: 1.05rem; padding: 13px 26px; }
   .mbtn.on { background: var(--terra); }
-  .vol { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--ink-soft); font-size: .9rem; margin-top: 14px; }
+  .mbtn.ghost { background: var(--paper); color: var(--forest-d); border: 1.5px solid var(--line); }
+  .mbtn.ghost:hover { background: var(--paper); border-color: var(--forest); }
+  .vol { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--ink-soft); font-size: .9rem; }
   .vol input { accent-color: var(--forest); }
   .piano-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-  .piano-modes { display: flex; align-items: center; gap: 10px; }
+  .piano-modes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .echo-status { font-weight: 800; color: var(--terra); font-size: .9rem; }
-  .piano { position: relative; display: flex; gap: 0; height: 180px; user-select: none; touch-action: manipulation; }
+  .piano { position: relative; display: flex; gap: 0; height: clamp(220px, 34vw, 320px); user-select: none; touch-action: manipulation; }
   .key { position: relative; flex: 1 1 0; background: linear-gradient(#fff, #f4ead3); border: 1px solid #cbb892; border-radius: 0 0 8px 8px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-weight: 800; color: var(--ink-soft); transition: background .06s, transform .06s; }
   .key:active, .key.down { background: linear-gradient(#ffe9b0, var(--gold)); transform: translateY(2px); }
   .key.lit { background: linear-gradient(#ffe9b0, var(--gold)); }
@@ -305,7 +311,12 @@
   .music-fab:hover { transform: scale(1.08); }
   .music-fab.on { background: var(--terra); animation: pulse 1.6s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(217,118,66,.5); } 50% { box-shadow: 0 0 0 12px rgba(217,118,66,0); } }
-  @media (max-width: 760px) { .music-grid { grid-template-columns: 1fr; } }
+  /* piano full-screen mode */
+  .piano-card:fullscreen { background: var(--paper); display: flex; flex-direction: column; justify-content: center; padding: 4vh 4vw; }
+  .piano-card:fullscreen .piano { height: 64vh; }
+  .piano-card:fullscreen .piano-hint { font-size: 1.1rem; }
+  .piano-card:-webkit-full-screen { background: var(--paper); }
+  .piano-card:-webkit-full-screen .piano { height: 64vh; }
 
   /* ============ Calendar ============ */
   .cal-card { max-width: 760px; margin: 0 auto; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
@@ -443,11 +454,11 @@
     <div class="shelf" id="shelf"><!-- filled by JS --></div>
 
     <div class="reading-now">
-      <div class="big">🔖</div>
+      <img class="reading-cover" src="images/book-covers/atlas.jpg" alt="Atlas of the World cover" loading="lazy">
       <div>
         <div style="font-weight:800; text-transform:uppercase; letter-spacing:.08em; font-size:.8rem; color:var(--plum);">Currently Reading</div>
-        <div style="font-size:1.2rem; font-weight:800;">"<strong id="currentBook">Add Ahaan's current read here</strong>"</div>
-        <div style="color:var(--ink-soft); font-weight:600;">Swap this out as he turns the pages.</div>
+        <div style="font-size:1.2rem; font-weight:800;">"<strong id="currentBook">Atlas of the World</strong>"</div>
+        <div style="color:var(--ink-soft); font-weight:600;">Exploring a brand-new country on every page. 🌍</div>
       </div>
     </div>
   </div>
@@ -847,25 +858,30 @@
       <p>Turn on some calm background music, then play the piano — or try the "Echo" game and repeat the tune!</p>
     </div>
 
-    <div class="music-grid">
-      <!-- Background music -->
+    <div class="music-stack">
+      <!-- Background music (separate, full-width) -->
       <div class="music-card calm">
         <div class="mc-emoji">🎧</div>
-        <h3>Calm background music</h3>
-        <p>Gentle, never-ending notes to read and draw to.</p>
-        <button class="mbtn big" id="ambientToggle">▶ Play calm music</button>
-        <label class="vol">Volume
-          <input type="range" id="ambientVol" min="0" max="100" value="45">
-        </label>
+        <div class="calm-text">
+          <h3>Calm background music</h3>
+          <p>Gentle, never-ending notes to read and draw to.</p>
+        </div>
+        <div class="calm-ctrls">
+          <button class="mbtn big" id="ambientToggle">▶ Play calm music</button>
+          <label class="vol">Volume
+            <input type="range" id="ambientVol" min="0" max="100" value="45">
+          </label>
+        </div>
       </div>
 
-      <!-- Piano + game -->
-      <div class="music-card piano-card">
+      <!-- Piano + game (full width, can go full screen) -->
+      <div class="music-card piano-card" id="pianoCard">
         <div class="piano-top">
           <h3>🎹 Play the piano</h3>
           <div class="piano-modes">
             <button class="mbtn" id="echoStart">🎮 Echo game</button>
             <span class="echo-status" id="echoStatus"></span>
+            <button class="mbtn ghost" id="pianoFull">⛶ Full screen</button>
           </div>
         </div>
         <div class="piano" id="piano"><!-- keys built by JS --></div>
@@ -950,12 +966,10 @@
 
 /* ---- Reading: favorite books ---- */
 const BOOKS = [
-  { title: "Favorite Book #1", author: "Author name", color: "var(--plum)",  stars: 5, blurb: "Why Ahaan loved it goes here." },
-  { title: "Favorite Book #2", author: "Author name", color: "var(--forest)", stars: 5, blurb: "A one-line reason it's a keeper." },
-  { title: "Favorite Book #3", author: "Author name", color: "var(--terra)",  stars: 4, blurb: "What made this one special." },
-  { title: "Favorite Book #4", author: "Author name", color: "var(--sky)",    stars: 5, blurb: "The part he couldn't put down." },
-  { title: "Favorite Book #5", author: "Author name", color: "var(--gold)",   stars: 4, blurb: "A quick note about this story." },
-  { title: "Favorite Book #6", author: "Author name", color: "#8a5a7a",       stars: 5, blurb: "Add the real blurb here." },
+  { title: "Alice's Adventures in Wonderland", author: "Lewis Carroll", cover: "images/book-covers/alice.jpg", color: "var(--plum)", stars: 5,
+    blurb: "A girl follows a hurrying rabbit down a hole into a topsy-turvy world of riddles, a grinning cat, and a very grumpy queen. Ahaan's favorite!" },
+  { title: "Rapunzel", author: "Paul O. Zelinsky", cover: "images/book-covers/rapunzel.jpg", color: "var(--gold)", stars: 5,
+    blurb: "The classic fairy tale of a girl with impossibly long hair, locked away in a tall tower — beautifully retold and painted." },
 ];
 
 /* ---- Geography: continent facts ---- */
@@ -1088,7 +1102,9 @@ const stars = n => "★★★★★☆☆☆☆☆".slice(5 - n, 10 - n);
   const shelf = $("#shelf");
   shelf.innerHTML = BOOKS.map((b, i) => `
     <div class="book" data-i="${i}">
-      <div class="cover" style="background:${b.color}">${b.title}</div>
+      <div class="cover" style="background:${b.color}">
+        ${b.cover ? `<img src="${b.cover}" alt="${b.title} cover">` : b.title}
+      </div>
       <div class="meta">
         <div class="by">${b.author}</div>
         <div class="stars">${stars(b.stars)}</div>
@@ -1102,8 +1118,9 @@ const stars = n => "★★★★★☆☆☆☆☆".slice(5 - n, 10 - n);
 
 /* ---- Book lightbox ---- */
 function openBook(b) {
-  $("#lbCover").textContent = b.title;
-  $("#lbCover").style.background = b.color;
+  const cov = $("#lbCover");
+  if (b.cover) { cov.textContent = ""; cov.style.background = `url("${b.cover}") center/cover, ${b.color}`; }
+  else { cov.textContent = b.title; cov.style.background = b.color; }
   $("#lbTitle").textContent = b.title;
   $("#lbBy").textContent = "by " + b.author;
   $("#lbStars").textContent = stars(b.stars);
@@ -1551,6 +1568,22 @@ function openBook(b) {
     }
   }
   $("#echoStart").addEventListener("click", () => { if (!ensure()) return; seq = []; playing = true; nextRound(); });
+
+  /* fullscreen piano */
+  const card = $("#pianoCard"), fsBtn = $("#pianoFull");
+  fsBtn.addEventListener("click", () => {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!fsEl) {
+      const req = card.requestFullscreen || card.webkitRequestFullscreen;
+      if (req) req.call(card);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  });
+  document.addEventListener("fullscreenchange", () => {
+    const on = !!document.fullscreenElement;
+    fsBtn.textContent = on ? "✕ Exit full screen" : "⛶ Full screen";
+  });
 })();
 
 /* ---- Calendar: interactive, animated month view (saves to localStorage) ---- */
