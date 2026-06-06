@@ -359,6 +359,38 @@
   @keyframes calWobble { 0%,100% { transform: rotate(0) scale(1.1); } 25% { transform: rotate(-12deg) scale(1.2); } 75% { transform: rotate(12deg) scale(1.2); } }
   @media (prefers-reduced-motion: reduce) { .cal-day, .cal-day.today { animation: none; } }
 
+  /* ============ Rewards ============ */
+  .medal-card { position: relative; overflow: hidden; max-width: 760px; margin: 0 auto 26px; display: flex; align-items: center; gap: 22px;
+    background: linear-gradient(135deg, #fff4d2, var(--gold)); border: 1px solid #e0ad3c; border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 26px; }
+  .medal-emoji { font-size: clamp(3rem, 9vw, 4.6rem); line-height: 1; flex: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,.2)); animation: medalBob 2.6s ease-in-out infinite; }
+  @keyframes medalBob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-7px) rotate(4deg); } }
+  .medal-kicker { font-weight: 800; text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; color: #9a6a00; }
+  .medal-text h3 { font-size: clamp(1.4rem, 3.6vw, 2rem); color: var(--ink); margin: 2px 0 6px; }
+  .medal-text p { margin: 0; color: #5a4a25; font-weight: 600; }
+  .medal-shine { position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.7), transparent); transform: skewX(-18deg); animation: medalShine 4.5s ease-in-out infinite; pointer-events: none; }
+  @keyframes medalShine { 0%, 60% { left: -60%; } 85%, 100% { left: 130%; } }
+  .reward-bar { max-width: 760px; margin: 0 auto 18px; text-align: center; }
+  .reward-count { font-family: "Fraunces", serif; font-weight: 900; font-size: 1.3rem; color: var(--forest-d); }
+  .reward-track { height: 12px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 8px 0; }
+  .reward-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--forest), var(--gold)); border-radius: 99px; transition: width .5s ease; }
+  .reward-msg { font-weight: 700; color: var(--ink-soft); }
+  .badge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; }
+  .badge { text-align: center; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 18px 12px; box-shadow: var(--shadow-sm); transition: transform .15s; position: relative; }
+  .badge .b-emoji { font-size: 2.6rem; line-height: 1; filter: grayscale(1) opacity(.35); transition: filter .3s, transform .3s; }
+  .badge .b-title { font-weight: 800; margin-top: 6px; color: var(--ink); }
+  .badge .b-desc { font-size: .8rem; font-weight: 600; color: var(--ink-soft); margin-top: 2px; }
+  .badge .b-lock { position: absolute; top: 8px; right: 10px; font-size: .9rem; opacity: .5; }
+  .badge.earned { border-color: var(--gold); background: linear-gradient(180deg, #fffaf0, var(--paper-2)); }
+  .badge.earned .b-emoji { filter: none; transform: scale(1.05); }
+  .badge.earned .b-lock { content: ""; }
+  .badge.just-earned { animation: badgePop .6s ease; }
+  @keyframes badgePop { 0% { transform: scale(.8); } 50% { transform: scale(1.12) rotate(-3deg); } 100% { transform: scale(1); } }
+  .reward-toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%) translateY(20px); z-index: 70; opacity: 0;
+    background: var(--ink); color: #fff; font-weight: 800; padding: 12px 22px; border-radius: 999px; box-shadow: var(--shadow); transition: opacity .3s, transform .3s; pointer-events: none; }
+  .reward-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .confetti-bit { position: fixed; z-index: 65; font-size: 1.2rem; pointer-events: none; will-change: transform, opacity; }
+  @media (max-width: 560px) { .medal-card { flex-direction: column; text-align: center; } }
+
   /* ============ Footer ============ */
   footer { background: var(--ink); color: var(--paper); text-align: center; padding: 50px 22px; }
   footer h2 { color: var(--paper); }
@@ -418,6 +450,7 @@
       <a href="#story">Story Studio</a>
       <a href="#music">Music</a>
       <a href="#calendar">Calendar</a>
+      <a href="#rewards">Rewards</a>
       <a href="#journey">Journey</a>
     </div>
   </div>
@@ -924,6 +957,39 @@
   </div>
 </section>
 
+<!-- ============ REWARDS ============ -->
+<section id="rewards">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Trophies &amp; Badges</div>
+      <h2>My rewards 🏆</h2>
+      <p>A real-life medal I'm proud of — plus fun badges to unlock by exploring my world!</p>
+    </div>
+
+    <!-- Featured real achievement -->
+    <div class="medal-card">
+      <div class="medal-shine"></div>
+      <div class="medal-emoji">🥇</div>
+      <div class="medal-text">
+        <div class="medal-kicker">Real achievement</div>
+        <h3>Kumon Math Medal</h3>
+        <p>Earned for hard work and finishing my Kumon math levels. Numbers are my superpower! ➗✖️➕</p>
+      </div>
+    </div>
+
+    <!-- Unlockable badges -->
+    <div class="reward-bar">
+      <div class="reward-count"><span id="badgeCount">0</span> / <span id="badgeTotal">0</span> badges</div>
+      <div class="reward-track"><div class="reward-fill" id="badgeFill"></div></div>
+      <div class="reward-msg" id="badgeMsg">Explore the site to light up your badges! ✨</div>
+    </div>
+    <div class="badge-grid" id="badgeGrid"><!-- badges by JS --></div>
+  </div>
+</section>
+
+<!-- celebration toast -->
+<div class="reward-toast" id="rewardToast" hidden></div>
+
 <!-- ============ TIMELINE ============ -->
 <section id="journey">
   <div class="wrap">
@@ -1070,6 +1136,79 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const stars = n => "★★★★★☆☆☆☆☆".slice(5 - n, 10 - n);
 
+/* ---- Rewards: unlockable badges earned by exploring the site (localStorage) ---- */
+const BADGES = [
+  { id: "bookworm",     emoji: "📖", title: "Bookworm",     desc: "Opened a book to read" },
+  { id: "globetrotter", emoji: "🗺️", title: "Globe Trotter", desc: "Explored 5 countries" },
+  { id: "quizwhiz",     emoji: "🧠", title: "Quiz Whiz",     desc: "Tried the capitals quiz" },
+  { id: "pianist",      emoji: "🎹", title: "Little Mozart", desc: "Played the piano" },
+  { id: "storyteller",  emoji: "✍️", title: "Storyteller",   desc: "Wrote a story page" },
+  { id: "planner",      emoji: "📅", title: "Planner",       desc: "Stickered the calendar" },
+  { id: "skyswinger",   emoji: "🌳", title: "Sky Swinger",   desc: "Swung super high" },
+  { id: "calmcat",      emoji: "🎧", title: "Calm Cat",      desc: "Played calm music" },
+];
+const RKEY = "ahaan-badges";
+let earned = {};
+try { earned = JSON.parse(localStorage.getItem(RKEY)) || {}; } catch (e) { earned = {}; }
+
+function renderBadges() {
+  const grid = $("#badgeGrid"); if (!grid) return;
+  grid.innerHTML = BADGES.map(b => `
+    <div class="badge ${earned[b.id] ? "earned" : ""}" data-id="${b.id}">
+      <div class="b-lock">${earned[b.id] ? "✅" : "🔒"}</div>
+      <div class="b-emoji">${b.emoji}</div>
+      <div class="b-title">${b.title}</div>
+      <div class="b-desc">${b.desc}</div>
+    </div>`).join("");
+  const n = BADGES.filter(b => earned[b.id]).length;
+  $("#badgeCount").textContent = n;
+  $("#badgeTotal").textContent = BADGES.length;
+  $("#badgeFill").style.width = (n / BADGES.length * 100) + "%";
+  $("#badgeMsg").textContent = n === 0 ? "Explore the site to light up your badges! ✨"
+    : n === BADGES.length ? "🎉 WOW! You collected every badge — you're a superstar!"
+    : `Awesome! ${BADGES.length - n} more to collect.`;
+}
+
+function award(id) {
+  if (earned[id]) return;
+  const badge = BADGES.find(b => b.id === id); if (!badge) return;
+  earned[id] = true;
+  localStorage.setItem(RKEY, JSON.stringify(earned));
+  renderBadges();
+  const el = $(`.badge[data-id="${id}"]`);
+  if (el) { el.classList.add("just-earned"); setTimeout(() => el.classList.remove("just-earned"), 600); }
+  showToast(`🎉 New badge: ${badge.title}!`);
+  confettiBurst();
+}
+
+let _toastT;
+function showToast(msg) {
+  const t = $("#rewardToast"); if (!t) return;
+  t.textContent = msg; t.hidden = false;
+  requestAnimationFrame(() => t.classList.add("show"));
+  clearTimeout(_toastT); _toastT = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+function confettiBurst() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const bits = ["🎉", "⭐", "🎈", "✨", "🏅"];
+  for (let i = 0; i < 18; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti-bit";
+    c.textContent = bits[i % bits.length];
+    c.style.left = (38 + Math.random() * 24) + "vw";
+    c.style.top = "72vh";
+    document.body.appendChild(c);
+    const dx = (Math.random() * 2 - 1) * 42, dy = -(30 + Math.random() * 42), rot = (Math.random() * 2 - 1) * 360;
+    c.animate(
+      [{ transform: "translate(0,0) rotate(0)", opacity: 1 }, { transform: `translate(${dx}vw, ${dy}vh) rotate(${rot}deg)`, opacity: 0 }],
+      { duration: 1100 + Math.random() * 500, easing: "cubic-bezier(.2,.7,.3,1)" }
+    ).onfinish = () => c.remove();
+  }
+}
+
+renderBadges();
+
 /* ---- Mobile menu ---- */
 (() => {
   const btn = $("#menuBtn"), links = $("#navLinks");
@@ -1160,11 +1299,14 @@ function openBook(b) {
     if (name && BOOK_COUNTRIES[name]) p.classList.add("book");
   });
 
+  const explored = new Set();
   svg.addEventListener("click", e => {
     const path = e.target.closest("path"); if (!path) return;
     $$(".cont path.active", svg).forEach(p => p.classList.remove("active"));
     path.classList.add("active");
     const name = path.querySelector("title")?.textContent || "Somewhere";
+    explored.add(name);
+    if (explored.size >= 5) award("globetrotter");
     const cont = path.closest(".cont")?.dataset.name || "the world";
     const fact = FACTS[slug(cont)]?.text || "";
     const note = BOOK_COUNTRIES[name]
@@ -1210,6 +1352,7 @@ function openBook(b) {
   optsEl.addEventListener("click", e => {
     const btn = e.target.closest(".opt"); if (!btn || locked) return;
     locked = true;
+    award("quizwhiz");
     const right = btn.dataset.correct === "true";
     if (right) score++;
     $$(".opt", optsEl).forEach(b => {
@@ -1268,6 +1411,7 @@ function openBook(b) {
   svg.addEventListener("click", () => {
     level = level >= MAX ? 0 : level + 1; // climb, then loop back to gentle
     apply();
+    if (level >= MAX) award("skyswinger");
   });
   apply();
 })();
@@ -1313,6 +1457,7 @@ function openBook(b) {
 
   function openBook(src, label) {
     try {
+      award("bookworm");
       if (rendition) rendition.destroy();
       viewer.innerHTML = "";
       titleEl.textContent = label || "Loading…";
@@ -1409,7 +1554,7 @@ function openBook(b) {
   }
 
   titleInput.addEventListener("input", () => { story.title = titleInput.value; save(); });
-  pageText.addEventListener("input", () => { story.pages[cur].text = pageText.value; save(); });
+  pageText.addEventListener("input", () => { story.pages[cur].text = pageText.value; save(); if (pageText.value.trim()) award("storyteller"); });
   $("#stickerRow").addEventListener("click", e => {
     const b = e.target.closest(".sticker"); if (!b) return;
     story.pages[cur].sticker = b.dataset.s; pageSticker.textContent = b.dataset.s;
@@ -1524,6 +1669,7 @@ function openBook(b) {
   function setAmbient(on) {
     if (on) ambientStart(); else ambientStop();
     on = ambientOn; // reflect the real state in case start/stop bailed
+    if (on) award("calmcat");
     const b = $("#ambientToggle"), fab = $("#musicFab");
     b.textContent = on ? "⏸ Pause calm music" : "▶ Play calm music";
     b.classList.toggle("on", on);
@@ -1545,6 +1691,7 @@ function openBook(b) {
 
   function pressKey(n) {
     if (!ensure()) return;
+    award("pianist");
     tone(FREQ[n], 0.7, "triangle", 0.5);
     const el = piano.querySelector(`.key[data-n="${n}"]`);
     if (el) { el.classList.add("down"); setTimeout(() => el.classList.remove("down"), 150); }
@@ -1665,6 +1812,7 @@ function openBook(b) {
       store[k] = activeSticker; stEl.textContent = activeSticker;
       cell.classList.remove("pop"); void cell.offsetWidth; cell.classList.add("pop");
       msgEl.textContent = `${activeSticker} on the ${ordinal(d)}! Nice!`;
+      award("planner");
     }
     save();
   });
