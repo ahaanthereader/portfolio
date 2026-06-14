@@ -391,6 +391,20 @@
   .confetti-bit { position: fixed; z-index: 65; font-size: 1.2rem; pointer-events: none; will-change: transform, opacity; }
   @media (max-width: 560px) { .medal-card { flex-direction: column; text-align: center; } }
 
+  /* ============ Movies ============ */
+  .movie-spin { text-align: center; margin: 0 auto 28px; max-width: 640px; }
+  .spin-result { margin-top: 14px; font-family: "Fraunces", serif; font-weight: 800; font-size: clamp(1.1rem, 3vw, 1.5rem); color: var(--forest-d); min-height: 1.6em; }
+  .spin-result.pop { animation: badgePop .5s ease; }
+  .movie-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; }
+  .movie { background: var(--paper-2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform .18s, box-shadow .18s; display: flex; flex-direction: column; }
+  .movie:hover { transform: translateY(-6px) rotate(1deg); box-shadow: var(--shadow); }
+  .movie .poster { aspect-ratio: 2/3; display: grid; place-items: center; gap: 6px; padding: 16px; text-align: center; color: #fff; }
+  .movie .poster .pico { font-size: 3rem; line-height: 1; }
+  .movie .poster .pname { font-family: "Fraunces", serif; font-weight: 800; font-size: 1.02rem; }
+  .movie .mmeta { padding: 9px 12px; }
+  .movie .mmeta .stars { color: var(--gold); font-size: .9rem; letter-spacing: 1px; }
+  .movie .mmeta .mby { font-size: .8rem; color: var(--ink-soft); font-weight: 700; }
+
   /* ============ Footer ============ */
   footer { background: var(--ink); color: var(--paper); text-align: center; padding: 50px 22px; }
   footer h2 { color: var(--paper); }
@@ -449,6 +463,7 @@
       <a href="#library">Library</a>
       <a href="#story">Story Studio</a>
       <a href="#music">Music</a>
+      <a href="#movies">Movies</a>
       <a href="#calendar">Calendar</a>
       <a href="#rewards">Rewards</a>
       <a href="#journey">Journey</a>
@@ -931,6 +946,26 @@
   </div>
 </section>
 
+<!-- ============ MOVIES ============ -->
+<section id="movies">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Movie Night</div>
+      <h2>At the movies 🍿</h2>
+      <p>Tap a film to see why I love it — or spin the popcorn for what to watch tonight!</p>
+    </div>
+
+    <!-- popcorn spinner -->
+    <div class="movie-spin">
+      <button class="mbtn big" id="spinBtn">🍿 What should we watch?</button>
+      <div class="spin-result" id="spinResult">Tap the popcorn for a movie-night idea! 🎬</div>
+    </div>
+
+    <!-- favorite movies -->
+    <div class="movie-grid" id="movieGrid"><!-- filled by JS --></div>
+  </div>
+</section>
+
 <!-- ============ CALENDAR ============ -->
 <section id="calendar">
   <div class="wrap">
@@ -1026,10 +1061,6 @@
     <p class="blurb" id="lbBlurb"></p>
   </div>
 </div>
-
-<!-- EPUB reader library (open-source, loaded from CDN) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 
 <script>
 /* =================================================================
@@ -1450,14 +1481,40 @@ function openBook(b) {
   const fail = msg => { viewer.innerHTML = `<div class="reader-empty">😕<br>${msg}</div>`; };
   const fit = () => { if (rendition) { try { rendition.resize(viewer.clientWidth, viewer.clientHeight); } catch (e) {} } };
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(fit, 150); });
-  if (typeof ePub === "undefined") {
-    fail("The reader needs an internet connection to load.<br><small>Reconnect and refresh to read EPUBs.</small>");
-    return;
+
+  // Lazily load the EPUB library only when a book is opened, so the page never
+  // blocks on (or breaks because of) an external CDN at load time.
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src; s.onload = resolve; s.onerror = () => reject(new Error("load failed: " + src));
+      document.head.appendChild(s);
+    });
+  }
+  let epubLibPromise = null;
+  function loadEpubLib() {
+    if (typeof ePub !== "undefined" && typeof JSZip !== "undefined") return Promise.resolve();
+    if (!epubLibPromise) {
+      // JSZip MUST be defined before epub.js evaluates (epub.js binds the global
+      // at load time), so load sequentially — both from the same reliable CDN.
+      epubLibPromise = loadScript("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js")
+        .then(() => loadScript("https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"))
+        .catch(e => { epubLibPromise = null; throw e; });
+    }
+    return epubLibPromise;
   }
 
-  function openBook(src, label) {
+  async function openBook(src, label) {
+    award("bookworm");
+    titleEl.textContent = label || "Loading…";
+    viewer.innerHTML = `<div class="reader-empty">📖<br>Loading the reader…</div>`;
     try {
-      award("bookworm");
+      await loadEpubLib();
+    } catch (e) {
+      fail("The reader needs the internet to load books.<br><small>Reconnect and try again.</small>");
+      return;
+    }
+    try {
       if (rendition) rendition.destroy();
       viewer.innerHTML = "";
       titleEl.textContent = label || "Loading…";
@@ -1832,6 +1889,56 @@ function openBook(b) {
   });
 
   render();
+})();
+
+/* ---- Movies: favorites grid + popcorn "what to watch" spinner ---- */
+(() => {
+  // PLACEHOLDER favorites — swap in Ahaan's real movies (name, why he loves it).
+  const MOVIES = [
+    { name: "Add a favorite", emoji: "🎬", color: "var(--plum)",   stars: 5, why: "Tell me one of Ahaan's favorite movies and I'll add it here!" },
+    { name: "Add a favorite", emoji: "🍿", color: "var(--forest)", stars: 5, why: "What movie makes Ahaan laugh the most?" },
+    { name: "Add a favorite", emoji: "🎥", color: "var(--terra)",  stars: 5, why: "His all-time favorite goes here." },
+    { name: "Add a favorite", emoji: "⭐", color: "var(--sky)",    stars: 4, why: "A movie he could watch again and again." },
+  ];
+  const grid = $("#movieGrid");
+  if (grid) {
+    grid.innerHTML = MOVIES.map(m => `
+      <div class="movie" title="${m.why}">
+        <div class="poster" style="background:${m.color}">
+          <span class="pico">${m.emoji}</span>
+          <span class="pname">${m.name}</span>
+        </div>
+        <div class="mmeta">
+          <div class="stars">${stars(m.stars)}</div>
+          <div class="mby">${m.why}</div>
+        </div>
+      </div>`).join("");
+  }
+
+  const IDEAS = [
+    "🦸 A superhero adventure!",
+    "🚀 A trip to outer space!",
+    "🐾 A funny animal cartoon!",
+    "🏰 A magical fairy-tale!",
+    "🦖 Dinosaurs vs. everything!",
+    "🕵️ A mystery to solve!",
+    "🌊 An underwater adventure!",
+    "🤖 Robots and gadgets!",
+    "😂 A silly laugh-out-loud comedy!",
+    "🗺️ An around-the-world journey!",
+    "🐉 Dragons and brave heroes!",
+    "🎢 A wild theme-park ride of a movie!",
+  ];
+  const btn = $("#spinBtn"), out = $("#spinResult");
+  if (btn) btn.addEventListener("click", () => {
+    let n = 0;
+    const tick = () => {
+      out.textContent = IDEAS[Math.floor(Math.random() * IDEAS.length)];
+      if (++n < 10) { setTimeout(tick, 70 + n * 14); }
+      else { out.classList.remove("pop"); void out.offsetWidth; out.classList.add("pop"); out.textContent = "Tonight: " + IDEAS[Math.floor(Math.random() * IDEAS.length)]; }
+    };
+    tick();
+  });
 })();
 </script>
 </body>
