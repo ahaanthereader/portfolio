@@ -2059,7 +2059,7 @@ function openBook(b) {
   const tabs = $$(".game-tab");
   tabs.forEach(t => t.addEventListener("click", () => {
     tabs.forEach(x => x.classList.toggle("active", x === t));
-    ["memory", "ttt", "catch"].forEach(g => { $("#game-" + g).hidden = g !== t.dataset.game; });
+    ["memory", "ttt", "catch", "math"].forEach(g => { $("#game-" + g).hidden = g !== t.dataset.game; });
   }));
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
