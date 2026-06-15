@@ -431,6 +431,15 @@
   .catch-hint { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: var(--ink-soft); font-weight: 800; }
   .catch-star { position: absolute; font-size: 2.4rem; cursor: pointer; user-select: none; transition: transform .08s; }
   .catch-star:active { transform: scale(1.3); }
+  /* math dash */
+  .math-stage { text-align: center; }
+  .math-q { font-family: "Fraunces", serif; font-weight: 900; font-size: clamp(2rem, 9vw, 3.2rem); color: var(--forest-d); margin: 8px 0 18px; min-height: 1.2em; }
+  .math-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .math-opt { font-family: inherit; font-weight: 800; font-size: 1.4rem; cursor: pointer; padding: 16px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper); transition: .12s; }
+  .math-opt:hover { border-color: var(--forest); }
+  .math-opt:disabled { cursor: default; }
+  .math-opt.right { background: var(--forest); color: #fff; border-color: var(--forest); }
+  .math-opt.wrong { background: #e7806a; color: #fff; border-color: #e7806a; }
 
   /* ============ Footer ============ */
   footer { background: var(--ink); color: var(--paper); text-align: center; padding: 50px 22px; }
@@ -558,12 +567,18 @@
     <div class="reader-card">
       <div class="reader-toolbar">
         <label class="reader-btn primary">📂 Open an EPUB<input type="file" id="epubInput" accept=".epub,application/epub+zip" hidden></label>
-        <select class="reader-select" id="builtinBooks" aria-label="Pick a free book">
-          <option value="" disabled selected>📚 Pick a free book…</option>
-          <option value="books/welcome.epub|Welcome to Ahaan's Reader">⭐ Welcome (start here)</option>
-          <option value="books/around-the-world-80-days.epub|Around the World in Eighty Days">🌍 Around the World in Eighty Days</option>
-          <option value="books/alice-in-wonderland.epub|Alice's Adventures in Wonderland">🐇 Alice's Adventures in Wonderland</option>
-          <option value="books/wizard-of-oz.epub|The Wonderful Wizard of Oz">🦁 The Wonderful Wizard of Oz</option>
+        <select class="reader-select" id="builtinBooks" aria-label="Pick a book">
+          <option value="" disabled selected>📚 Pick a book…</option>
+          <optgroup label="Free books — read here">
+            <option value="books/welcome.epub|Welcome to Ahaan's Reader">⭐ Welcome (start here)</option>
+            <option value="books/around-the-world-80-days.epub|Around the World in Eighty Days">🌍 Around the World in Eighty Days</option>
+            <option value="books/alice-in-wonderland.epub|Alice's Adventures in Wonderland">🐇 Alice's Adventures in Wonderland</option>
+            <option value="books/wizard-of-oz.epub|The Wonderful Wizard of Oz">🦁 The Wonderful Wizard of Oz</option>
+          </optgroup>
+          <optgroup label="Ahaan's favorite series">
+            <option value="fav:Dog Man">🐶 Dog Man (Dav Pilkey)</option>
+            <option value="fav:Captain Underpants">🦸 Captain Underpants (Dav Pilkey)</option>
+          </optgroup>
         </select>
         <span class="book-title" id="bookTitle">No book open yet</span>
         <span class="reader-spacer"></span>
@@ -1007,6 +1022,7 @@
       <button class="game-tab active" data-game="memory">🧩 Memory Match</button>
       <button class="game-tab" data-game="ttt">⭕ Tic-Tac-Toe</button>
       <button class="game-tab" data-game="catch">⭐ Catch the Star</button>
+      <button class="game-tab" data-game="math">➗ Math Dash</button>
     </div>
 
     <!-- Memory Match -->
@@ -1036,6 +1052,19 @@
         <button class="sbtn read" id="catchStart">▶ Start</button>
       </div>
       <div class="catch-arena" id="catchArena"><div class="catch-hint">Tap ▶ Start, then catch the ⭐ as fast as you can!</div></div>
+    </div>
+
+    <!-- Math Dash -->
+    <div class="game-panel" id="game-math" hidden>
+      <div class="game-bar">
+        <span id="mathScore">Score: 0</span>
+        <span id="mathTime">Tap start!</span>
+        <button class="sbtn read" id="mathStart">▶ Start</button>
+      </div>
+      <div class="math-stage">
+        <div class="math-q" id="mathQ">Solve as many as you can in 30 seconds!</div>
+        <div class="math-opts" id="mathOpts"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1619,8 +1648,16 @@ function openBook(b) {
   });
 
   $("#builtinBooks").addEventListener("change", e => {
-    const [path, label] = e.target.value.split("|");
-    if (!path) return;
+    const val = e.target.value;
+    if (!val) return;
+    if (val.startsWith("fav:")) {
+      const name = val.slice(4);
+      award("bookworm");
+      titleEl.textContent = name + " (Ahaan's favorite!)";
+      viewer.innerHTML = `<div class="reader-empty">📚<br>${name} is one of Ahaan's favorite series!<br><small>It's not free online, so open it on his Kindle — or tap 📂 Open an EPUB to load his own copy.</small></div>`;
+      return;
+    }
+    const [path, label] = val.split("|");
     titleEl.textContent = "Loading…";
     openBook(path, label);
   });
@@ -2122,6 +2159,49 @@ function openBook(b) {
       arena.innerHTML = ""; score = 0; time = 20; running = true;
       scoreEl.textContent = "Score: 0"; timeEl.textContent = "Time: 20s"; startBtn.textContent = "Playing…";
       place(); loop();
+      tickT = setInterval(() => { time--; timeEl.textContent = "Time: " + time + "s"; if (time <= 0) end(); }, 1000);
+    });
+  })();
+
+  /* ---- Math Dash (30s arithmetic sprint) ---- */
+  (() => {
+    const qEl = $("#mathQ"), optsEl = $("#mathOpts"), scoreEl = $("#mathScore"), timeEl = $("#mathTime"), startBtn = $("#mathStart");
+    const BKEY = "ahaan-math-best";
+    let score = 0, time = 0, running = false, tickT = null, answer = 0, best = +(localStorage.getItem(BKEY) || 0);
+    const rnd = n => Math.floor(Math.random() * n);
+    function newProblem() {
+      const ops = ["+", "-", "×"];
+      const op = ops[rnd(3)];
+      let a, b;
+      if (op === "+") { a = rnd(20) + 1; b = rnd(20) + 1; answer = a + b; }
+      else if (op === "-") { a = rnd(20) + 5; b = rnd(a); answer = a - b; }
+      else { a = rnd(9) + 2; b = rnd(9) + 2; answer = a * b; }
+      qEl.textContent = `${a} ${op} ${b} = ?`;
+      // build 4 unique options including the answer
+      const opts = new Set([answer]);
+      while (opts.size < 4) { const d = answer + (rnd(11) - 5); if (d >= 0 && d !== answer) opts.add(d); }
+      const arr = [...opts].sort(() => Math.random() - 0.5);
+      optsEl.innerHTML = arr.map(v => `<button class="math-opt" data-v="${v}">${v}</button>`).join("");
+    }
+    optsEl.addEventListener("click", e => {
+      const b = e.target.closest(".math-opt"); if (!b || !running) return;
+      const v = +b.dataset.v;
+      if (v === answer) { score++; scoreEl.textContent = "Score: " + score; newProblem(); }
+      else { b.classList.add("wrong"); const right = optsEl.querySelector(`.math-opt[data-v="${answer}"]`); if (right) right.classList.add("right"); setTimeout(newProblem, 550); }
+    });
+    function end() {
+      running = false; clearInterval(tickT);
+      best = Math.max(best, score); localStorage.setItem(BKEY, best);
+      qEl.textContent = `⏰ Time's up! You solved ${score}! 🎉`;
+      optsEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;font-weight:800;color:var(--ink-soft)">Best: ${best} — tap Start to beat it!</div>`;
+      timeEl.textContent = "Done!"; startBtn.textContent = "▶ Play again";
+    }
+    startBtn.addEventListener("click", () => {
+      award("gamer");
+      score = 0; time = 30; running = true;
+      scoreEl.textContent = "Score: 0"; timeEl.textContent = "Time: 30s"; startBtn.textContent = "Playing…";
+      newProblem();
+      clearInterval(tickT);
       tickT = setInterval(() => { time--; timeEl.textContent = "Time: " + time + "s"; if (time <= 0) end(); }, 1000);
     });
   })();
