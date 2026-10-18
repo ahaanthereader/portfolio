@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ahaan's Kindle · Ahaan's World</title>
+<meta name="description" content="Ahaan's Kindle — Read free classics right here." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-kindle">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="reading.html">Reading</a>
+      <a href="kindle.html" aria-current="page">Kindle</a>
+      <a href="geography.html">Geography</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="doors.html">Doors</a>
+      <a href="bells.html">Bells</a>
+      <a href="swing.html">The Swing</a>
+      <a href="library.html">Library</a>
+      <a href="story.html">Story Studio</a>
+      <a href="music.html">Music</a>
+      <a href="movies.html">Movies</a>
+      <a href="games.html">Games</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="journey.html">Journey</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="reader">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">My Kindle</div>
+      <h2>Ahaan's Kindle 📖</h2>
+      <p>Pick a free classic from the menu — like <b>Around the World in Eighty Days</b> — or open your own book. Turn the pages and make the text bigger or smaller.</p>
+    </div>
+    <div class="reader-card">
+      <div class="reader-toolbar">
+        <label class="reader-btn primary">📂 Open an EPUB<input type="file" id="epubInput" accept=".epub,application/epub+zip" hidden></label>
+        <select class="reader-select" id="builtinBooks" aria-label="Pick a book">
+          <option value="" disabled selected>📚 Pick a book…</option>
+          <optgroup label="Free books — read here">
+            <option value="books/welcome.epub|Welcome to Ahaan's Reader">⭐ Welcome (start here)</option>
+            <option value="books/around-the-world-80-days.epub|Around the World in Eighty Days">🌍 Around the World in Eighty Days</option>
+            <option value="books/alice-in-wonderland.epub|Alice's Adventures in Wonderland">🐇 Alice's Adventures in Wonderland</option>
+            <option value="books/wizard-of-oz.epub|The Wonderful Wizard of Oz">🦁 The Wonderful Wizard of Oz</option>
+          </optgroup>
+          <optgroup label="Ahaan's favorite series">
+            <option value="fav:Dog Man">🐶 Dog Man (Dav Pilkey)</option>
+            <option value="fav:Captain Underpants">🦸 Captain Underpants (Dav Pilkey)</option>
+          </optgroup>
+        </select>
+        <span class="book-title" id="bookTitle">No book open yet</span>
+        <span class="reader-spacer"></span>
+        <button class="reader-btn icon" id="fontDown" title="Smaller text">A−</button>
+        <button class="reader-btn icon" id="fontUp" title="Bigger text">A+</button>
+      </div>
+      <div class="reader-stage">
+        <button class="page-arrow" id="prevPage" aria-label="Previous page">‹</button>
+        <div class="reader-viewer" id="viewer"><div class="reader-empty">📖<br>Open a book to start reading.<br><small>Tip: try "Load sample book".</small></div></div>
+        <button class="page-arrow" id="nextPage" aria-label="Next page">›</button>
+      </div>
+      <div class="reader-foot"><span id="readerStatus"></span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/kindle.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Swing · Ahaan's World</title>
+<meta name="description" content="The Swing — Push the swing higher and higher." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-swing">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="reading.html">Reading</a>
+      <a href="kindle.html">Kindle</a>
+      <a href="geography.html">Geography</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="doors.html">Doors</a>
+      <a href="bells.html">Bells</a>
+      <a href="swing.html" aria-current="page">The Swing</a>
+      <a href="library.html">Library</a>
+      <a href="story.html">Story Studio</a>
+      <a href="music.html">Music</a>
+      <a href="movies.html">Movies</a>
+      <a href="games.html">Games</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="journey.html">Journey</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="swing" class="swing-sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Up in the Air</div>
+      <h2>The best swing in the park 🌳</h2>
+      <p>Give it a push — go on, click the swing.</p>
+    </div>
+    <div class="swing-stage">
+      <svg class="swing-svg" id="swingSvg" viewBox="0 0 400 280" aria-label="A tire swing hanging from a tree branch">
+        <!-- tree branch -->
+        <rect x="20" y="32" width="360" height="16" rx="8" fill="#7a5230"/>
+        <ellipse cx="60" cy="40" rx="46" ry="30" fill="#3f8f5f"/>
+        <ellipse cx="120" cy="30" rx="40" ry="26" fill="#4a9e6a"/>
+        <ellipse cx="340" cy="38" rx="46" ry="30" fill="#3f8f5f"/>
+        <!-- swing group (animated) -->
+        <g class="swing-seat-grp">
+          <line x1="200" y1="44" x2="178" y2="200" stroke="#5b3a1e" stroke-width="5"/>
+          <line x1="200" y1="44" x2="222" y2="200" stroke="#5b3a1e" stroke-width="5"/>
+          <ellipse cx="200" cy="210" rx="44" ry="44" fill="none" stroke="#2b2b2b" stroke-width="16"/>
+          <ellipse cx="200" cy="210" rx="30" ry="30" fill="#cfe6f3"/>
+          <text x="200" y="220" font-size="26" text-anchor="middle">🙂</text>
+        </g>
+        <!-- ground -->
+        <rect x="0" y="266" width="400" height="14" fill="#cdebc4"/>
+      </svg>
+      <div class="swing-hint" id="swingHint">↑ click to push higher</div>
+    </div>
+
+    <div class="swing-spots">
+      <div class="spot"><div class="ico">🌳</div><h3>The Park Swing</h3><p>Placeholder — add Ahaan's favorite swinging spot here.</p></div>
+      <div class="spot"><div class="ico">🏞️</div><h3>The Tall One</h3><p>Placeholder — that one swing that goes really high.</p></div>
+      <div class="spot"><div class="ico">⛅</div><h3>Best on a Breezy Day</h3><p>Placeholder — when's the best time to swing?</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/swing.js"></script>
+</body>
+</html>

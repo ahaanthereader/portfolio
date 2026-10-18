@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reading Nook · Ahaan's World</title>
+<meta name="description" content="Reading Nook — Books I love, with a peek inside each one." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-reading">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="reading.html" aria-current="page">Reading</a>
+      <a href="kindle.html">Kindle</a>
+      <a href="geography.html">Geography</a>
+      <a href="quiz.html">Quiz</a>
+      <a href="doors.html">Doors</a>
+      <a href="bells.html">Bells</a>
+      <a href="swing.html">The Swing</a>
+      <a href="library.html">Library</a>
+      <a href="story.html">Story Studio</a>
+      <a href="music.html">Music</a>
+      <a href="movies.html">Movies</a>
+      <a href="games.html">Games</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="rewards.html">Rewards</a>
+      <a href="journey.html">Journey</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="reading">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">The Reading Nook</div>
+      <h2>Books I've loved 📖</h2>
+      <p>A growing shelf of favorites. Tap a book to see why I liked it.</p>
+    </div>
+    <div class="shelf" id="shelf"><!-- filled by JS --></div>
+
+    <div class="reading-now">
+      <img class="reading-cover" src="images/book-covers/atlas.jpg" alt="Atlas of the World cover" loading="lazy">
+      <div>
+        <div style="font-weight:800; text-transform:uppercase; letter-spacing:.08em; font-size:.8rem; color:var(--plum);">Currently Reading</div>
+        <div style="font-size:1.2rem; font-weight:800;">"<strong id="currentBook">Atlas of the World</strong>"</div>
+        <div style="color:var(--ink-soft); font-weight:600;">Exploring a brand-new country on every page. 🌍</div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+<div class="lb" id="lb">
+  <div class="lb-inner">
+    <button class="close" id="lbClose" aria-label="Close">×</button>
+    <div class="lb-cover" id="lbCover"></div>
+    <h3 id="lbTitle"></h3>
+    <div class="by" id="lbBy"></div>
+    <div class="stars" id="lbStars"></div>
+    <p class="blurb" id="lbBlurb"></p>
+  </div>
+</div>
+<script src="assets/shared.js"></script>
+<script src="assets/reading.js"></script>
+</body>
+</html>
