@@ -14,6 +14,16 @@ Evidence ID: `ev_b107607d9b4e7a232b32d30392894db4c79105693eeb25fc52517ca32361538
 - **Type:** a soft geometric sans (CSS variable `--font-neoris`) for headline and body, a pixel mono (`--font-departure`) and IBM Plex Mono as accents. Headline is light weight, large, white on sky.
 - **Palette:** sky blues, leafy greens, warm off-white text and buttons.
 
+### Second pass (same Evidence, DOM classes)
+
+- **Headline:** `h1`, normal weight, 46 px (38 px under 900 px, 34 px under 500 px), line-height 108%, max 20ch, white gradient text with a 1–3 px soft drop shadow.
+- **Subline:** 16 px, weight ~460, line-height 140%, white at 80% opacity, max 540 px.
+- **Buttons:** 41 px tall, 8 px radius; one light solid surface, one translucent glass; 15 px labels.
+- **Nav:** 15 px links, weight ~410, grouped in translucent pills.
+- **Chips:** "glass-pill" items inside a `hero-notif-wheel` (they rotate through, i.e. self-moving).
+- **Entrance:** text uses a `hero-stagger` class with a `--stagger` index (staggered entrance on load).
+- **Hero height:** a `--hero-min-height` of 720 px (620 px from the md breakpoint).
+
 ## Inferred (why it feels calm)
 
 - One big, quiet picture instead of many competing elements; text sits on the calmest area (sky).
@@ -31,3 +41,4 @@ Evidence ID: `ev_b107607d9b4e7a232b32d30392894db4c79105693eeb25fc52517ca32361538
 - **Change for the sensory spec:** no looping video. The scene is a **static, original watercolor park** (SF-10, SF-11). The only motion is 3D Ahaan's head following the cursor, which Ahaan starts himself; Calm mode makes him still (SF-14).
 - **Ahaan:** full-length 3D figure standing in the scene (owner request).
 - **Fonts:** keep the site's own Fraunces and Fredoka.
+- **Not adopted for the sensory spec:** the rotating chip wheel (ours are static progress chips) and the staggered entrance on load (SF-11).

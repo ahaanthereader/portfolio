@@ -73,14 +73,18 @@
   const SEG = 9, GRAV = 900;
   let W = 0, H = 0, S = 1, ropes = [], drag = null, raf = 0, quiet = 0, last = 0;
 
+  const roof = stage.querySelector(".bel-roof");
   function build() {
-    W = stage.clientWidth; H = canvas.clientHeight;
+    const cr = canvas.getBoundingClientRect(); W = cr.width; H = cr.height;
+    if (!W || !H) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    S = Math.max(0.7, Math.min(1.25, W / 620));
+    // The roof may be letterboxed to save height: hang each bell from the beam where the roof is actually drawn.
+    const rr = roof.getBoundingClientRect(), sc = Math.min(rr.width / 600, rr.height / 150), cw = 600 * sc, left = rr.left + (rr.width - cw) / 2 - cr.left;
+    S = Math.max(0.55, Math.min(1.25, cw / 620));
     ropes = BELLS.map((b, i) => {
-      const ax = W * (0.21 + i * 0.116), len = (H - 80 * S) * (0.55 + (i % 3) * 0.14), seg = len / SEG, pts = [];
+      const ax = left + cw * (0.21 + i * 0.116), len = Math.max(24, H - 70 * S) * (0.55 + (i % 3) * 0.14), seg = len / SEG, pts = [];
       for (let k = 0; k <= SEG; k++) pts.push({ x: ax, y: k * seg, px: ax, py: k * seg });
       return { b, ax, seg, len, pts, glow: got.indexOf(b.id) >= 0 && openId === b.id ? 1 : 0 };
     });
@@ -227,10 +231,12 @@
     if (isNew) { got.push(b.id); saveStamps(); paintStamp(b); paintCount(); }
     $id("belNew").hidden = !isNew;
     panel.hidden = false;
+    if (window.CardDialog) CardDialog.open(panel, stampBtns[b.id]);
     if (window.AhaanBrush) AhaanBrush.card(panel, b.c, b.cd);
   }
   function closeCard() {
     panel.hidden = true; openId = null;
+    if (window.CardDialog) CardDialog.close(panel);
     Object.keys(stampBtns).forEach(k => stampBtns[k].setAttribute("aria-expanded", "false"));
     ropes.forEach(o => { o.glow = 0; }); draw();
   }
@@ -261,6 +267,7 @@
   canvas.addEventListener("pointerup", release);
   canvas.addEventListener("pointercancel", () => { drag = null; });
 
-  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+  let rt; const rebuild = () => { clearTimeout(rt); rt = setTimeout(build, 120); };
+  if ("ResizeObserver" in window) new ResizeObserver(rebuild).observe(canvas); else addEventListener("resize", rebuild);
   build();
 })();

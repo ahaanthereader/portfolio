@@ -148,6 +148,8 @@ Each requirement has an acceptance check (AC) that can be tested in the browser.
 | D5 | 3D Ahaan in Calm mode | **Stays, as a still figure, and should look more like Ahaan** | SF-14 and new SF-16 (likeness, from the parent's photo). |
 | D6 | Music | **Start with about 5 seconds of music, then turn off** | SF-26. Interpreted as a tap-started 5 s preview that fades and stops; see open points. |
 | D8 | Chimes site inspiration | **Use the chimes idea for the Doors knock sound, as a soft opt-in chime** | SF-27 and section 4.7. |
+| D9 | Home scenery motion | **Owner: slight background motion makes it cool (like cofounder.co)** | Exception to SF-11 on the home hero only: a gentle breeze in leaves, swing and grass (owner asked for visible sway: ≤ 1.4° leaves, ≤ 5° grass, 3–7 s cycles, no flashing). Sky and clouds stay still. Must have a visible Breeze on/off button (WCAG 2.2.2), pause while off screen, and be fully off in Calm mode / reduced motion. Sound stays off by default. |
+| D10 | Home layout | **One screen, no scrolling** | On laptop-size screens the home page fits the viewport; small screens may still scroll so nothing becomes unreachable. |
 | D7 | Device | **Laptop** | SF-54 reworked for mouse and keyboard; touch is secondary. |
 
 ### Still open

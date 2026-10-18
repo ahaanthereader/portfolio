@@ -1,11 +1,11 @@
 /* ---- Pick a sweet: every page is a candy. Clicking one sends it to 3D Ahaan, he eats it, and the page opens.
    Calm mode (reduced motion) and modified clicks (new tab, etc.) just follow the link. ---- */
 (function () {
-  const PAGES = [
-    ["reading.html", "Reading"], ["kindle.html", "Kindle"], ["geography.html", "Geography"], ["quiz.html", "Quiz"],
-    ["doors.html", "Doors"], ["bells.html", "Bells"], ["swing.html", "The Swing"], ["library.html", "Library"],
-    ["story.html", "Story Studio"], ["music.html", "Music"], ["movies.html", "Movies"], ["games.html", "Games"],
-    ["calendar.html", "Calendar"], ["rewards.html", "Rewards"], ["journey.html", "Journey"]
+  const GROUPS = [
+    ["📚 Read", [["reading.html", "Reading"], ["kindle.html", "Kindle"], ["library.html", "Library"], ["story.html", "Stories"]]],
+    ["🧭 Explore", [["geography.html", "Maps"], ["quiz.html", "Quiz"], ["doors.html", "Doors"], ["bells.html", "Bells"]]],
+    ["🎈 Play", [["swing.html", "Swing"], ["games.html", "Games"], ["music.html", "Music"], ["movies.html", "Movies"]]],
+    ["⭐ My stuff", [["calendar.html", "Calendar"], ["rewards.html", "Rewards"], ["journey.html", "Journey"]]]
   ];
   const COLORS = ["#f28b82", "#f7b267", "#f2cf4a", "#8fd19e", "#7cc4e4", "#b39ddb", "#f4a6c6"];
   const shelf = document.getElementById("candyShelf");
@@ -21,12 +21,21 @@
     c => `<rect x="38" y="46" width="4.5" height="30" rx="2" fill="#f3e9da" stroke="#d8c8ae"/><path d="M40 50 C20 38 18 20 30 16 C36 14 40 19 40 22 C40 19 44 14 50 16 C62 20 60 38 40 50 Z" fill="${c}"/><ellipse cx="32" cy="26" rx="4" ry="6" fill="#fff" opacity=".45"/>`
   ];
 
-  PAGES.forEach(([href, label], i) => {
-    const a = document.createElement("a");
-    a.className = "candy"; a.href = href;
-    a.innerHTML = '<span class="candy-art" aria-hidden="true"><svg viewBox="0 0 80 80">' + ART[i % ART.length](COLORS[i % COLORS.length]) + '</svg></span><span class="candy-label">' + label + "</span>";
-    a.addEventListener("click", e => eat(e, a));
-    shelf.appendChild(a);
+  let i = 0;
+  GROUPS.forEach(([title, links]) => {
+    const g = document.createElement("div");
+    g.className = "candy-group"; g.setAttribute("role", "group"); g.setAttribute("aria-label", title.replace(/^\S+\s/, ""));
+    g.style.setProperty("--n", links.length);
+    g.innerHTML = '<div class="candy-glabel" aria-hidden="true">' + title + '</div><div class="candy-row"></div>';
+    const row = g.querySelector(".candy-row");
+    links.forEach(([href, label]) => {
+      const a = document.createElement("a");
+      a.className = "candy"; a.href = href;
+      a.innerHTML = '<span class="candy-art" aria-hidden="true"><svg viewBox="0 0 80 80">' + ART[i % ART.length](COLORS[i % COLORS.length]) + '</svg></span><span class="candy-label">' + label + "</span>";
+      a.addEventListener("click", e => eat(e, a));
+      row.appendChild(a); i++;
+    });
+    shelf.appendChild(g);
   });
 
   let busy = false;
@@ -51,6 +60,13 @@
     }, 650);
     setTimeout(() => { location.href = a.href; }, 1300);
   }
+  // Progress chips: real numbers from what Ahaan has collected on this device.
+  function count(key) { try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v.length : v && typeof v === "object" ? Object.keys(v).filter(k => v[k]).length : 0; } catch (e) { return 0; } }
+  function paintChips() {
+    const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    set("chipDoors", count("ahaanDoorsCards") + " of 6"); set("chipBells", count("ahaanBellsStamps") + " of 6"); set("chipBadges", String(count("ahaan-badges")));
+  }
+  paintChips();
   // Coming back with the Back button: clear any leftover sweets.
-  addEventListener("pageshow", () => { busy = false; document.querySelectorAll(".candy-fly, .nom").forEach(n => n.remove()); });
+  addEventListener("pageshow", () => { busy = false; paintChips(); document.querySelectorAll(".candy-fly, .nom").forEach(n => n.remove()); });
 })();

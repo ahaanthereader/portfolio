@@ -179,8 +179,42 @@ renderBadges();
 /* ---- Mobile menu ---- */
 (() => {
   const btn = $("#menuBtn"), links = $("#navLinks");
-  btn.addEventListener("click", () => { btn.classList.toggle("open"); links.classList.toggle("open"); });
-  $$("#navLinks a").forEach(a => a.addEventListener("click", () => { btn.classList.remove("open"); links.classList.remove("open"); }));
+  if (btn && links) {
+    btn.addEventListener("click", () => { btn.classList.toggle("open"); links.classList.toggle("open"); });
+    $$("#navLinks a").forEach(a => a.addEventListener("click", () => { btn.classList.remove("open"); links.classList.remove("open"); }));
+  }
+  // Grouped menus (Read / Explore / Play / My stuff): open on click, one at a time; Esc or a click outside closes.
+  const groups = $$(".nav-group");
+  const closeAll = keep => groups.forEach(g => { if (g !== keep) { g.classList.remove("open"); g.querySelector(".nav-gbtn").setAttribute("aria-expanded", "false"); } });
+  groups.forEach(g => {
+    const b = g.querySelector(".nav-gbtn");
+    b.addEventListener("click", e => { e.stopPropagation(); const open = !g.classList.contains("open"); closeAll(g); g.classList.toggle("open", open); b.setAttribute("aria-expanded", String(open)); });
+  });
+  document.addEventListener("click", e => { if (!e.target.closest(".nav-group")) closeAll(); });
+  document.addEventListener("keydown", e => { if (e.key !== "Escape") return; const g = groups.find(x => x.classList.contains("open")); if (g) { closeAll(); g.querySelector(".nav-gbtn").focus(); } });
+})();
+
+/* ---- Card dialogs (Doors, Bells): the card opens over a softly dimmed page, so each page stays one screen ---- */
+window.CardDialog = (() => {
+  let back = null, current = null, returnTo = null;
+  function backdrop() {
+    if (back) return back;
+    back = document.createElement("div"); back.className = "card-backdrop"; back.hidden = true;
+    back.addEventListener("click", () => { const c = current && current.querySelector(".dow-close"); if (c) c.click(); });
+    document.body.appendChild(back); return back;
+  }
+  return {
+    open(panel, from) {
+      backdrop().hidden = false; current = panel; returnTo = from || document.activeElement;
+      panel.classList.add("as-dialog"); panel.setAttribute("role", "dialog"); panel.setAttribute("aria-modal", "true"); panel.removeAttribute("aria-live");
+      const c = panel.querySelector(".dow-close"); if (c) c.focus({ preventScroll: true });
+    },
+    close(panel) {
+      if (back) back.hidden = true;
+      panel.classList.remove("as-dialog"); current = null;
+      if (returnTo && returnTo.focus) returnTo.focus({ preventScroll: true }); returnTo = null;
+    }
+  };
 })();
 
 /* ---- Navbar elevation on scroll ---- */

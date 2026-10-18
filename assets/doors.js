@@ -107,11 +107,13 @@
     if (isNew) { got.push(ct.id); saveCards(); paintDoor(ct); paintCount(); }
     $("dowNew").hidden = !isNew;
     panel.hidden = false;
+    if (window.CardDialog) CardDialog.open(panel, buttons[ct.id]);
     if (window.AhaanBrush) AhaanBrush.card(panel, ct.c, ct.cd);   // optional painted wash; CSS watercolor is the fallback
     if (soundOn) chime(ct.base);                           // silent unless Ahaan switched the chime on
   }
   function closeDoor() {
     cancelAnimationFrame(raf); openId = null; panel.hidden = true;
+    if (window.CardDialog) CardDialog.close(panel);
     Object.keys(buttons).forEach(k => buttons[k].setAttribute("aria-expanded", "false"));
   }
   closeBtn.addEventListener("click", closeDoor);

@@ -18,21 +18,14 @@
     <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
     <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="nav-links" id="navLinks">
-      <a href="reading.html">Reading</a>
-      <a href="kindle.html">Kindle</a>
-      <a href="geography.html">Geography</a>
-      <a href="quiz.html">Quiz</a>
-      <a href="doors.html">Doors</a>
-      <a href="bells.html" aria-current="page">Bells</a>
-      <a href="swing.html">The Swing</a>
-      <a href="library.html">Library</a>
-      <a href="story.html">Story Studio</a>
-      <a href="music.html">Music</a>
-      <a href="movies.html">Movies</a>
-      <a href="games.html">Games</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="rewards.html">Rewards</a>
-      <a href="journey.html">Journey</a>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-read">📚 Read</button>
+        <div class="nav-pop" id="ng-read"><a href="reading.html">Reading Nook</a><a href="kindle.html">Kindle</a><a href="library.html">Library</a><a href="story.html">Story Studio</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn is-current" aria-expanded="false" aria-controls="ng-explore">🧭 Explore</button>
+        <div class="nav-pop" id="ng-explore"><a href="geography.html">Geography</a><a href="quiz.html">Capitals Quiz</a><a href="doors.html">Doors of the World</a><a href="bells.html" aria-current="page">Bells of the World</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-play">🎈 Play</button>
+        <div class="nav-pop" id="ng-play"><a href="swing.html">The Swing</a><a href="games.html">Games</a><a href="music.html">Music</a><a href="movies.html">Movies</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-mine">⭐ My stuff</button>
+        <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a></div></div>
     </div>
   </div>
 </nav>
@@ -49,7 +42,7 @@
       <div class="bel-head">
         <div class="eyebrow">Listen to the World</div>
         <h2>Bells of the World 🔔</h2>
-        <p>Every country rings its own bell. Tap a bell (or its stamp) to ring it, and collect its stamp card.</p>
+        <p>Tap a bell or its stamp to ring it and collect its card.</p>
       </div>
       <div class="bel-sound">
         <button type="button" class="bel-toggle" id="belToggle" aria-pressed="false">🔔 Sound: off</button>
