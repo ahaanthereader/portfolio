@@ -198,7 +198,7 @@ renderBadges();
 
 /* ---- Card dialogs (Doors, Bells): the card opens over a softly dimmed page, so each page stays one screen ---- */
 window.CardDialog = (() => {
-  let back = null, current = null, returnTo = null;
+  let back = null, current = null, returnTo = null, origParent = null, origNext = null;
   function backdrop() {
     if (back) return back;
     back = document.createElement("div"); back.className = "card-backdrop"; back.hidden = true;
@@ -208,12 +208,21 @@ window.CardDialog = (() => {
   return {
     open(panel, from) {
       backdrop().hidden = false; current = panel; returnTo = from || document.activeElement;
+      if (panel.parentNode !== document.body) {
+        origParent = panel.parentNode; origNext = panel.nextSibling;
+        document.body.appendChild(panel);
+      }
       panel.classList.add("as-dialog"); panel.setAttribute("role", "dialog"); panel.setAttribute("aria-modal", "true"); panel.removeAttribute("aria-live");
       const c = panel.querySelector(".dow-close"); if (c) c.focus({ preventScroll: true });
     },
     close(panel) {
       if (back) back.hidden = true;
-      panel.classList.remove("as-dialog"); current = null;
+      panel.classList.remove("as-dialog");
+      if (origParent && panel.parentNode === document.body) {
+        origParent.insertBefore(panel, origNext);
+        origParent = null; origNext = null;
+      }
+      current = null;
       if (returnTo && returnTo.focus) returnTo.focus({ preventScroll: true }); returnTo = null;
     }
   };

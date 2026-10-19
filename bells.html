@@ -51,6 +51,7 @@
     </div>
     <div class="bel-layout">
       <div class="bel-stage" id="belStage">
+        <div class="bel-set-bar"><button type="button" class="bel-set-btn" id="belSetPrev" aria-label="Previous set">‹</button><span class="bel-set-label" id="belSetLabel">Set 1 of 6 · Bells 1–6</span><button type="button" class="bel-set-btn" id="belSetNext" aria-label="Next set">›</button></div>
         <svg class="bel-roof" viewBox="0 0 600 150" aria-hidden="true" focusable="false">
           <path d="M228 40 Q300 14 372 40" fill="none" stroke="#8a5a1a" stroke-width="5" stroke-linecap="round"/>
           <circle cx="226" cy="40" r="6" fill="#b8432f"/><circle cx="374" cy="40" r="6" fill="#b8432f"/>
@@ -66,7 +67,7 @@
       </div>
       <aside class="bel-words" aria-label="The word for bell in six languages">
         <div class="bel-words-h">Bell</div>
-        <ol>
+        <ol id="belWordsList">
           <li><span class="v" lang="ja">鐘</span><small>kane · Japanese</small></li>
           <li><span class="v" lang="zh">钟</span><small>zhōng · Chinese</small></li>
           <li><span class="v" lang="hi">घंटा</span><small>ghaṇṭā · Hindi</small></li>
