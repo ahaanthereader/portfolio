@@ -86,7 +86,7 @@ window.AhaanModel = {
     const rightLeg = makeLeg(-1), leftLeg = makeLeg(1);
 
     // ---- Head with Photo-Mapped Cartoon Texture ----
-    const head = new T.Group(); rig.add(head);
+    const head = new T.Group(); head.rotation.x = -0.32; rig.add(head);
     const HS = new T.Vector3(0.95, 1.07, 0.96);
     const headProf = [[0.001, 1.07], [0.36, 1.0], [0.6, 0.85], [0.8, 0.6], [0.93, 0.25], [0.95, 0.0], [0.92, -0.3], [0.8, -0.6], [0.58, -0.86], [0.3, -1.0], [0.001, -1.04]].reverse().map(p => new T.Vector2(p[0], p[1]));
     const skull = new T.Mesh(new T.LatheGeometry(new T.SplineCurve(headProf).getPoints(40), 48), skin);
@@ -191,9 +191,57 @@ window.AhaanModel = {
       }
     }
 
+    // ---- Hand Wave Handler ----
+    let waveTime = 0;
+    let isWavingActive = false;
+
+    function startWave() {
+      isWavingActive = true;
+      waveTime = 0;
+    }
+
+    function stopWave() {
+      isWavingActive = false;
+    }
+
+    function updateWave(dt, walking, calmMode) {
+      if (walking) {
+        isWavingActive = false;
+      }
+      if (isWavingActive) {
+        waveTime += dt;
+        if (calmMode) {
+          // Calm mode: steady raised hand pose without rapid motion
+          const targetArmZ = -2.1;
+          const targetElbowZ = -0.4;
+          const targetElbowX = 0.25;
+          wavingArm.arm.rotation.z += (targetArmZ - wavingArm.arm.rotation.z) * Math.min(1, dt * 8);
+          wavingArm.elbow.rotation.z += (targetElbowZ - wavingArm.elbow.rotation.z) * Math.min(1, dt * 8);
+          wavingArm.elbow.rotation.x += (targetElbowX - wavingArm.elbow.rotation.x) * Math.min(1, dt * 8);
+        } else {
+          // Cheerful hand wave with gentle forearm oscillation
+          const waveOsc = Math.sin(waveTime * 11);
+          const targetArmZ = -2.35 + waveOsc * 0.12;
+          const targetElbowZ = -0.45 + Math.sin(waveTime * 13) * 0.32;
+          const targetElbowX = 0.3;
+          wavingArm.arm.rotation.z += (targetArmZ - wavingArm.arm.rotation.z) * Math.min(1, dt * 10);
+          wavingArm.elbow.rotation.z += (targetElbowZ - wavingArm.elbow.rotation.z) * Math.min(1, dt * 10);
+          wavingArm.elbow.rotation.x += (targetElbowX - wavingArm.elbow.rotation.x) * Math.min(1, dt * 10);
+          head.rotation.z += (-0.05 * waveOsc - head.rotation.z) * Math.min(1, dt * 8);
+        }
+      } else {
+        // Return smoothly to natural rest posture
+        wavingArm.arm.rotation.z += (wavingArm.rest - wavingArm.arm.rotation.z) * Math.min(1, dt * 8);
+        wavingArm.elbow.rotation.z += (0 - wavingArm.elbow.rotation.z) * Math.min(1, dt * 8);
+        wavingArm.elbow.rotation.x += (0 - wavingArm.elbow.rotation.x) * Math.min(1, dt * 8);
+        head.rotation.z += (0 - head.rotation.z) * Math.min(1, dt * 8);
+      }
+      return isWavingActive;
+    }
+
     return {
       rig, head, eyes, brows, mouth, wavingArm, leftArm, leftLeg, rightLeg,
-      updateWalk,
+      updateWalk, startWave, stopWave, updateWave,
       footY: b3.min.y,
       height: b3.max.y - b3.min.y
     };
