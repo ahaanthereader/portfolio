@@ -73,6 +73,15 @@
       window.AhaanAudio.bell(659.25, 0, 0.06);
     } else if (type === "arch") {
       window.AhaanAudio.bell(440.00, 0, 0.06);
+    } else if (type === "chime") {
+      window.AhaanAudio.bell(523.25, 0, 0.05);
+      window.AhaanAudio.bell(659.25, 0.12, 0.04);
+    } else if (type === "harp") {
+      window.AhaanAudio.bell(440.00, 0, 0.05);
+      window.AhaanAudio.bell(554.37, 0.1, 0.05);
+      window.AhaanAudio.bell(659.25, 0.2, 0.04);
+    } else if (type === "bell") {
+      window.AhaanAudio.bell(587.33, 0, 0.06);
     }
   }
 
@@ -1495,6 +1504,261 @@
     A.rig.rotation.y = ahaanAngle;
     scene.add(A.rig);
 
+    // ==========================================
+    // International Greetings & Interactive Waving
+    // ==========================================
+    const INTERNATIONAL_GREETINGS = [
+      {
+        flag: "🇮🇳",
+        lang: "Hindi",
+        country: "India",
+        greeting: "Namaste! (नमस्ते)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "harp"
+      },
+      {
+        flag: "🇪🇸",
+        lang: "Spanish",
+        country: "Spain & Latin America",
+        greeting: "¡Hola! Bienvenidos",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "guitar"
+      },
+      {
+        flag: "🇯🇵",
+        lang: "Japanese",
+        country: "Japan",
+        greeting: "Konnichiwa! (こんにちは)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "bell"
+      },
+      {
+        flag: "🇫🇷",
+        lang: "French",
+        country: "France",
+        greeting: "Bonjour! Bienvenue",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "chime"
+      },
+      {
+        flag: "🇮🇹",
+        lang: "Italian",
+        country: "Italy",
+        greeting: "Ciao! Benvenuti",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "guitar"
+      },
+      {
+        flag: "🇩🇪",
+        lang: "German",
+        country: "Germany",
+        greeting: "Hallo! Willkommen",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "bell"
+      },
+      {
+        flag: "🇨🇳",
+        lang: "Mandarin",
+        country: "China",
+        greeting: "Nǐ hǎo! (你好)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "harp"
+      },
+      {
+        flag: "🇰🇷",
+        lang: "Korean",
+        country: "South Korea",
+        greeting: "Annyeong! (안녕)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "chime"
+      },
+      {
+        flag: "🇧🇷",
+        lang: "Portuguese",
+        country: "Brazil & Portugal",
+        greeting: "Olá! Bem-vindo",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "guitar"
+      },
+      {
+        flag: "🇰🇪",
+        lang: "Swahili",
+        country: "Kenya & East Africa",
+        greeting: "Jambo! Karibu",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "bell"
+      },
+      {
+        flag: "🇪🇬",
+        lang: "Arabic",
+        country: "Egypt & Arab World",
+        greeting: "Marhaban! (مرحباً)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "harp"
+      },
+      {
+        flag: "🇬🇷",
+        lang: "Greek",
+        country: "Greece",
+        greeting: "Geia sou! (Γεια σου)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "chime"
+      },
+      {
+        flag: "🇳🇵",
+        lang: "Nepali",
+        country: "Nepal",
+        greeting: "Namaskar! (नमस्कार)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "bell"
+      },
+      {
+        flag: "🇳🇱",
+        lang: "Dutch",
+        country: "Netherlands",
+        greeting: "Hallo! Welkom",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "guitar"
+      },
+      {
+        flag: "🇻🇳",
+        lang: "Vietnamese",
+        country: "Vietnam",
+        greeting: "Xin chào! (👋)",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "chime"
+      },
+      {
+        flag: "🌺",
+        lang: "Hawaiian",
+        country: "Hawaii",
+        greeting: "Aloha! E komo mai",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "guitar"
+      },
+      {
+        flag: "🇺🇸",
+        lang: "English",
+        country: "United States",
+        greeting: "Hello there!",
+        sub: "Welcome to my world! I'm Ahaan.",
+        sound: "bell"
+      }
+    ];
+
+    let lastGreetingIndex = -1;
+    function pickRandomGreeting() {
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * INTERNATIONAL_GREETINGS.length);
+      } while (idx === lastGreetingIndex && INTERNATIONAL_GREETINGS.length > 1);
+      lastGreetingIndex = idx;
+      return INTERNATIONAL_GREETINGS[idx];
+    }
+
+    let waveTimer = 0;
+    let bubbleHideTimer = null;
+
+    function updateBubblePosition() {
+      const bubble = document.getElementById("ahaanBubble");
+      if (!bubble) return;
+
+      const headPos = new T.Vector3();
+      A.head.getWorldPosition(headPos);
+      headPos.y += 1.25; // Position with breathing space above hair fringe
+
+      headPos.project(camera);
+
+      const rect = canvas.getBoundingClientRect();
+      const heroRect = hero.getBoundingClientRect();
+
+      const canvasX = (headPos.x + 1) * 0.5 * rect.width;
+      const canvasY = (1 - headPos.y) * 0.5 * rect.height;
+
+      const rawX = (rect.left - heroRect.left) + canvasX;
+      const rawY = (rect.top - heroRect.top) + canvasY;
+
+      // Keep bubble inside viewport boundaries
+      const minX = 145;
+      const maxX = Math.max(minX, hero.clientWidth - 145);
+      const clampedX = Math.max(minX, Math.min(maxX, rawX));
+      const tailOffset = Math.max(-70, Math.min(70, rawX - clampedX));
+
+      bubble.style.left = `${clampedX}px`;
+      bubble.style.top = `${rawY}px`;
+
+      const tail = bubble.querySelector(".ab-tail");
+      if (tail) {
+        tail.style.transform = `translateX(calc(-50% + ${tailOffset}px))`;
+      }
+    }
+
+    function greetRandom(isInitial) {
+      const item = pickRandomGreeting();
+      const bubble = document.getElementById("ahaanBubble");
+      const flagEl = document.getElementById("abFlag");
+      const miniFlagEl = document.getElementById("abMiniFlag");
+      const greetEl = document.getElementById("abGreeting");
+      const subEl = document.getElementById("abSub");
+      const langEl = document.getElementById("abLang");
+
+      if (flagEl) flagEl.textContent = item.flag;
+      if (miniFlagEl) miniFlagEl.textContent = item.flag;
+      if (greetEl) greetEl.textContent = item.greeting;
+      if (subEl) subEl.textContent = item.sub;
+      if (langEl) langEl.textContent = `${item.lang} · ${item.country}`;
+
+      if (bubble) {
+        bubble.classList.remove("is-compact", "is-walking");
+        bubble.classList.add("is-visible");
+      }
+
+      // Start arm wave animation on character model
+      if (A.startWave) {
+        A.startWave();
+        waveTimer = 3.8;
+      }
+
+      // Play soft sound if user enabled audio
+      if (!isInitial && soundOn) {
+        playSound(item.sound || "chime");
+      }
+
+      updateBubblePosition();
+      wake();
+
+      // Compact the bubble after idle period
+      clearTimeout(bubbleHideTimer);
+      bubbleHideTimer = setTimeout(() => {
+        if (bubble && !isWalking) {
+          bubble.classList.add("is-compact");
+        }
+      }, 8500);
+    }
+
+    // Register Ahaan's 3D model for tap interactions
+    registerInteractive(A.rig, {
+      name: "Ahaan",
+      onInteract() {
+        greetRandom(false);
+      }
+    });
+
+    // Wire up speech bubble clicks to cycle greetings
+    const ahaanBubbleEl = document.getElementById("ahaanBubble");
+    if (ahaanBubbleEl) {
+      ahaanBubbleEl.addEventListener("click", () => {
+        greetRandom(false);
+      });
+    }
+    const abCycleBtnEl = document.getElementById("abCycleBtn");
+    if (abCycleBtnEl) {
+      abCycleBtnEl.addEventListener("click", e => {
+        e.stopPropagation();
+        greetRandom(false);
+      });
+    }
+
     // Walking State
     let targetPos = null;
     let isWalking = false;
@@ -1568,7 +1832,7 @@
 
     hero.addEventListener("pointerdown", e => {
       if (calm()) return;
-      if (e.target.closest && e.target.closest(".candy-blanket, .nav, .breeze-pill, .sound-btn, .map-controls, .discovery-modal, .discovery-backdrop, .state-toast, button, a")) return;
+      if (e.target.closest && e.target.closest(".candy-blanket, .nav, .breeze-pill, .sound-btn, .map-controls, .discovery-modal, .discovery-backdrop, .state-toast, .ahaan-bubble, button, a")) return;
 
       isPointerDown = true;
       isDragging = false;
@@ -1864,9 +2128,28 @@
         A.rig.rotation.y += diff * Math.min(1, dt * 14);
       }
 
+      // Update hand wave animation
+      let wavingActive = false;
+      if (waveTimer > 0) {
+        waveTimer -= dt;
+        if (waveTimer <= 0 && A.stopWave) A.stopWave();
+      }
+      if (A.updateWave) wavingActive = A.updateWave(dt, isWalking, calm());
+
       // Update leg and arm walk cycle
       if (A.updateWalk) A.updateWalk(isWalking, 8.5, dt);
       A.rig.position.y = rigBaseY; // Lock vertical baseline
+
+      // Track speech bubble above Ahaan and update walk state
+      updateBubblePosition();
+      const currentBubble = document.getElementById("ahaanBubble");
+      if (currentBubble) {
+        if (isWalking) {
+          currentBubble.classList.add("is-walking");
+        } else if (currentBubble.classList.contains("is-walking")) {
+          currentBubble.classList.remove("is-walking");
+        }
+      }
 
       // Check current state boundary
       checkCurrentState(A.rig.position.x, A.rig.position.z);
@@ -1890,7 +2173,7 @@
 
       render();
 
-      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive) {
+      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -1903,6 +2186,7 @@
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       updateCameraPosition();
+      updateBubblePosition();
       render();
     }
     window.addEventListener("resize", resize);
@@ -1945,5 +2229,7 @@
     };
 
     hero.classList.add("park-ready");
+    greetRandom(true);
+    updateBubblePosition();
   }
 })();
