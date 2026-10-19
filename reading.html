@@ -10,8 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
 <link rel="stylesheet" href="assets/site.css" />
+<link rel="stylesheet" href="assets/fit-reading.css" />
 </head>
-<body class="page-reading">
+<body class="page-reading fit-screen">
 <a class="skip" href="#main">Skip to content</a>
 <nav class="nav" id="nav">
   <div class="nav-inner">
@@ -40,7 +41,11 @@
       <h2>Books I've loved 📖</h2>
       <p>A growing shelf of favorites. Tap a book to see why I liked it.</p>
     </div>
-    <div class="shelf" id="shelf"><!-- filled by JS --></div>
+    <div class="shelf-row">
+      <button type="button" class="shelf-arrow" id="shelfPrev" aria-label="Earlier books" hidden>‹</button>
+      <div class="shelf" id="shelf"><!-- filled by JS --></div>
+      <button type="button" class="shelf-arrow" id="shelfNext" aria-label="More books" hidden>›</button>
+    </div>
 
     <div class="reading-now">
       <img class="reading-cover" src="images/book-covers/atlas.jpg" alt="Atlas of the World cover" loading="lazy">

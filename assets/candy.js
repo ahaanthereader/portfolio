@@ -38,35 +38,73 @@
     shelf.appendChild(g);
   });
 
-  let busy = false;
+  // Five silly comic lines per page (original, in a goofy comic-book spirit). One is picked at random,
+  // never the same as last time for that page, so Ahaan doesn't get bored.
+  const PHRASES = {
+    "reading.html": ["Bookworm power, ACTIVATE!", "This book is so good my eyeballs did a backflip!", "Shh... the pages are whispering!", "One more chapter. Okay, FIVE more!", "Reading gives my brain the zoomies!"],
+    "kindle.html": ["Beep boop! Story download complete!", "My Kindle is HUNGRY for stories!", "Swipe, swipe... ADVENTURE!", "Tiny screen, GIGANTIC stories!", "Page-turning power: 1000 percent!"],
+    "library.html": ["To the library, at TOP SPEED!", "Shhh... ZOOM! Library mode!", "So many books, so little bedtime!", "Library card: FULLY CHARGED!", "The books missed me. I could tell."],
+    "story.html": ["Once upon a time... something SILLY happened!", "Author Ahaan is IN the building!", "My pencil has BIG plans!", "Warning: this story may contain giggles!", "Plot twist: the hot dog was the hero all along!"],
+    "geography.html": ["Map-tastic! Where to, Captain?", "Continents, ASSEMBLE!", "Latitude! Longitude! LUNCH-itude!", "Adventure is THAT way. Probably.", "I can see my house from here! (Not really.)"],
+    "quiz.html": ["Brain, don't fail me now!", "Capital cities? I've GOT this!", "Ding ding! Quiz brain ONLINE!", "My brain is doing push-ups!", "Ask me anything. Well... almost anything!"],
+    "doors.html": ["Knock knock! Who's there? THE WHOLE WORLD!", "Which door? ALL the doors!", "Opening doors like a PRO!", "Wisdom delivery, coming right up!", "Behind this door: something AWESOME!"],
+    "bells.html": ["DING! DONG! Hello, world!", "Ring-a-ding-ding, here I go!", "Bells of the world, UNITE!", "Jingle mode: ON!", "Tiny ring, BIG smile!"],
+    "swing.html": ["Higher! HIGHER! To the MOON!", "Whoosh! My tummy just did a flip!", "Swing champion, reporting for duty!", "I'm basically flying. Pretty much.", "Up, up, and a-SWING!"],
+    "games.html": ["Game face: ON!", "Ready, set, GAME TIME!", "Level up, here I come!", "Victory dance... loading...", "High score, you're MINE!"],
+    "music.html": ["Drop the beat! (Gently.)", "My ears are throwing a PARTY!", "La la la... I'm a ROCK STAR!", "Piano fingers: warmed up!", "This song is stuck in my brain. GOOD!"],
+    "movies.html": ["Lights, camera, SNACKS!", "Popcorn ready! Eyeballs ready!", "Movie night is the BEST night!", "Plot twist: I ate all the popcorn!", "Shh... the good part is coming!"],
+    "calendar.html": ["What day is it? FUN day!", "Stickers on my calendar? YES!", "Planning mode: ACTIVATED!", "Today is a great day to be awesome!", "Countdown to fun: 3... 2... 1!"],
+    "rewards.html": ["Badge time! SHINY!", "Look at all my trophies!", "Achievement unlocked: being AWESOME!", "Gold star for ME!", "My badges are sparkling at me!"],
+    "journey.html": ["Look how far I've come!", "Chapter one: me! Chapter two: ALSO me!", "My story so far is EPIC!", "Time machine, take me back!", "From tiny to TERRIFIC!"]
+  };
+  function phraseFor(href) {
+    const list = PHRASES[href] || ["YUM! Let's go!"];
+    let lastMap = {}; try { lastMap = JSON.parse(localStorage.getItem("ahaanPhraseLast")) || {}; } catch (e) {}
+    let i = Math.floor(Math.random() * list.length);
+    if (list.length > 1 && i === lastMap[href]) i = (i + 1 + Math.floor(Math.random() * (list.length - 1))) % list.length;
+    lastMap[href] = i; try { localStorage.setItem("ahaanPhraseLast", JSON.stringify(lastMap)); } catch (e) {}
+    return list[i];
+  }
+  function bubble(text, at) {
+    const b = document.createElement("div"); b.className = "comic-bubble"; b.setAttribute("role", "status"); b.textContent = text;
+    const m = (window.AhaanFigure && AhaanFigure.mouth && AhaanFigure.mouth()) || at;
+    Object.assign(b.style, { left: Math.max(290, m.x - 30) + "px", top: (m.y + 46) + "px" });
+    document.body.appendChild(b);
+  }
+  function burst(text, at) {
+    const b = document.createElement("div"); b.className = "comic-burst"; b.setAttribute("aria-hidden", "true"); b.textContent = text;
+    Object.assign(b.style, { left: at.x + 70 + "px", top: at.y + 10 + "px" }); document.body.appendChild(b);
+  }
+
+  let busy = false, timers = [];
   function eat(e, a) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || calm()) return;   // normal link
     e.preventDefault();
     if (busy) return; busy = true;
-    const art = a.querySelector(".candy-art"), r = art.getBoundingClientRect();
-    let to = window.AhaanFigure && AhaanFigure.mouth();
-    if (!to) { const fig = document.getElementById("ahaanFigure").getBoundingClientRect(); to = { x: fig.left + fig.width / 2, y: fig.top + fig.height * 0.2 }; }
+    const F = window.AhaanFigure || {}, href = a.getAttribute("href");
+    const art = a.querySelector(".candy-art"), r = art.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const fig = document.getElementById("ahaanFigure").getBoundingClientRect();
+    const fallback = { x: fig.left + fig.width / 2, y: fig.top + fig.height * 0.2 };
+    const where = fn => (typeof fn === "function" && fn()) || fallback;
     const fly = art.cloneNode(true);
     fly.className = "candy-fly";
     Object.assign(fly.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
     document.body.appendChild(fly);
-    const dx = to.x - (r.left + r.width / 2), dy = to.y - (r.top + r.height / 2);
-    requestAnimationFrame(() => requestAnimationFrame(() => { fly.style.transform = "translate(" + dx + "px," + dy + "px) scale(.35) rotate(25deg)"; }));
-    setTimeout(() => {
-      fly.style.opacity = "0";
-      if (window.AhaanFigure) AhaanFigure.chomp();
-      const nom = document.createElement("div"); nom.className = "nom"; nom.textContent = "Nom nom!";
-      Object.assign(nom.style, { left: to.x + "px", top: to.y + "px" }); document.body.appendChild(nom);
-    }, 650);
-    setTimeout(() => { location.href = a.href; }, 1300);
+    const moveTo = (pt, scale, ms) => { fly.style.transitionDuration = ms + "ms, 250ms"; fly.style.transform = "translate(" + (pt.x - cx) + "px," + (pt.y - cy) + "px) scale(" + scale + ") rotate(20deg)"; };
+    const go = () => { if (busy) location.href = a.href; };
+    if (F.pose) F.pose("reach");                                                               // 1. he reaches for the sweet
+    timers = [
+      setTimeout(() => moveTo(where(F.hand), 0.55, 420), 300),                                  // 2. it lands in his hand
+      setTimeout(() => { if (F.pose) F.pose("mouth"); moveTo(where(F.mouth), 0.4, 380); }, 760), // 3. hand to mouth
+      setTimeout(() => {                                                                        // 4. CHOMP! and a silly line
+        fly.style.opacity = "0"; if (F.chomp) F.chomp();
+        burst("CHOMP!", where(F.mouth)); bubble(phraseFor(href), where(F.head));
+      }, 1160),
+      setTimeout(() => { if (F.pose) F.pose("rest"); }, 1600),
+      setTimeout(go, 3000)                                                                      // 5. off to the page
+    ];
+    setTimeout(() => document.addEventListener("click", go, { once: true }), 50);              // a click anywhere skips ahead
   }
-  // Progress chips: real numbers from what Ahaan has collected on this device.
-  function count(key) { try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v.length : v && typeof v === "object" ? Object.keys(v).filter(k => v[k]).length : 0; } catch (e) { return 0; } }
-  function paintChips() {
-    const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-    set("chipDoors", count("ahaanDoorsCards") + " of 6"); set("chipBells", count("ahaanBellsStamps") + " of 6"); set("chipBadges", String(count("ahaan-badges")));
-  }
-  paintChips();
   // Coming back with the Back button: clear any leftover sweets.
-  addEventListener("pageshow", () => { busy = false; paintChips(); document.querySelectorAll(".candy-fly, .nom").forEach(n => n.remove()); });
+  addEventListener("pageshow", () => { busy = false; timers.forEach(clearTimeout); if (window.AhaanFigure && AhaanFigure.pose) AhaanFigure.pose("rest"); document.querySelectorAll(".candy-fly, .nom, .comic-bubble, .comic-burst").forEach(n => n.remove()); });
 })();

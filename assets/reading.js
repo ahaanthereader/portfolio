@@ -15,6 +15,22 @@
     const card = e.target.closest(".book"); if (!card) return;
     openBook(BOOKS[card.dataset.i]);
   });
+
+  const prev = $("#shelfPrev"), next = $("#shelfNext");
+  if (prev && next) {
+    const updateArrows = () => {
+      const canScroll = shelf.scrollWidth > shelf.clientWidth + 4;
+      prev.hidden = !canScroll;
+      next.hidden = !canScroll;
+      prev.disabled = shelf.scrollLeft <= 4;
+      next.disabled = shelf.scrollLeft + shelf.clientWidth >= shelf.scrollWidth - 4;
+    };
+    prev.addEventListener("click", () => { shelf.scrollBy({ left: -280, behavior: "smooth" }); setTimeout(updateArrows, 320); });
+    next.addEventListener("click", () => { shelf.scrollBy({ left: 280, behavior: "smooth" }); setTimeout(updateArrows, 320); });
+    shelf.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    setTimeout(updateArrows, 100);
+  }
 })();
 
 /* ---- Book lightbox ---- */

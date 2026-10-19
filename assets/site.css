@@ -797,3 +797,102 @@
     .dow-card.as-dialog > .dow-words { grid-area: words; margin: 8px 18px 0 14px; }
     .dow-card.as-dialog > .dow-close { grid-area: close; }
   }
+
+  /* ============ Home: 3D park ============ */
+  .park-canvas { position: absolute; inset: 0; z-index: -3; display: block; width: 100%; height: 100%; }
+  .park-ready .hero-scene { display: none; }
+  .park-ready .hero-grain { opacity: .12; }
+  .park-ready .ahaan-figure { pointer-events: none; cursor: default; }
+  .breeze-pill { position: absolute; top: 18px; right: max(16px, calc((100vw - var(--maxw)) / 2 + 22px)); z-index: 55; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px; border-radius: 10px; color: #fff; font: inherit; font-weight: 700; font-size: .92rem; cursor: pointer; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.38); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .breeze-pill:hover { background: rgba(255,255,255,.26); }
+  .breeze-pill[aria-pressed="false"] { opacity: .85; }
+  .hero-shade { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse 60% 55% at 18% 28%, rgba(18,62,115,.42), rgba(18,62,115,0) 70%); }
+
+  /* ============ Home: vertical sweets tray to the right of Ahaan (laptop and up) ============ */
+  @media (min-width: 861px) and (min-height: 480px) {
+    .home-hero { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: 1fr; }
+    .hero-copy { grid-row: 1; align-self: start; }
+    .ahaan-figure { grid-column: 2; grid-row: 1; align-self: end; height: 100%; margin: 0 4px 0 0; }
+    .candy-blanket { grid-column: 3; grid-row: 1; align-self: center; width: 268px; margin: 40px max(16px, calc((100vw - var(--maxw)) / 2 + 22px)) 0 8px; padding: 8px 8px 6px; }
+    .candy-shelf { flex-direction: column; }
+    .candy-group { flex: none; padding: 6px 2px 4px; }
+    .candy-group + .candy-group { border-left: 0; border-top: 1px solid rgba(58,46,33,.12); }
+    .candy-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .candy-art { width: 46px; height: 46px; }
+    .candy-art svg { width: 36px; height: 36px; }
+    .candy-label { font-size: .7rem; }
+  }
+  /* ---- see-through sweets tray: light tint, little blur, labels kept readable ---- */
+  .candy-blanket { background-color: rgba(255,252,246,.22); background-image: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.06)); -webkit-backdrop-filter: blur(5px) saturate(1.15); backdrop-filter: blur(5px) saturate(1.15); border-color: rgba(255,255,255,.6); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 14px 34px rgba(25,55,30,.14); }
+  .candy-glabel { color: #2f261c; text-shadow: 0 0 6px rgba(255,255,255,.95), 0 0 2px rgba(255,255,255,.95); }
+  .candy-label { color: #2f261c; text-shadow: 0 0 5px rgba(255,255,255,1), 0 0 2px rgba(255,255,255,1); }
+  .candy-group + .candy-group { border-color: rgba(255,255,255,.45); }
+  .candy-art { background: radial-gradient(circle at 50% 42%, rgba(255,255,255,.85), rgba(255,255,255,.3) 66%, transparent 70%); }
+
+  /* ============ Comic moments when Ahaan eats a sweet ============ */
+  .comic-bubble { position: fixed; z-index: 95; max-width: 270px; padding: 12px 16px 10px; background: #fff; color: #1b1b1b; border: 3px solid #1b1b1b; border-radius: 22px; box-shadow: 4px 4px 0 #1b1b1b; font-family: "Bangers", "Fredoka", system-ui, sans-serif; font-size: 1.4rem; letter-spacing: .04em; line-height: 1.12; text-transform: uppercase; transform: translate(-100%, -100%) rotate(-2deg); pointer-events: none; animation: comicPop .22s ease-out; }
+  .comic-bubble::after { content: ""; position: absolute; right: 22px; bottom: -13px; width: 20px; height: 20px; background: #fff; border-right: 3px solid #1b1b1b; border-bottom: 3px solid #1b1b1b; transform: rotate(45deg) skew(12deg, 12deg); }
+  .comic-burst { position: fixed; z-index: 96; padding: 16px 22px; color: #1b1b1b; background: #ffd23f; font-family: "Bangers", "Fredoka", system-ui, sans-serif; font-size: 1.5rem; letter-spacing: .05em; transform: translate(-50%, -50%) rotate(-8deg); pointer-events: none; animation: comicPop .2s ease-out; clip-path: polygon(50% 0%, 61% 18%, 82% 8%, 78% 30%, 100% 35%, 83% 50%, 100% 65%, 78% 70%, 82% 92%, 61% 82%, 50% 100%, 39% 82%, 18% 92%, 22% 70%, 0% 65%, 17% 50%, 0% 35%, 22% 30%, 18% 8%, 39% 18%); }
+  @keyframes comicPop { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
+  @media (prefers-reduced-motion: reduce) { .comic-bubble, .comic-burst { animation: none; } }
+  .nav-inner .breeze-pill { position: static; }
+  .home-hero h1 { max-width: none; }
+
+  /* bubble sits beside his chest; its tail points up to his mouth */
+  .comic-bubble { transform: translate(-100%, 0) rotate(-2deg); }
+  .comic-bubble::after { top: -13px; bottom: auto; right: 22px; transform: rotate(225deg) skew(12deg, 12deg); }
+
+  /* ============ Inner pages: blue watercolor wash on paper ============ */
+  body:not(.page-home), body.page-bells { background-color: #f3f6f6; background-image: url("paper-wash.svg"); background-size: cover; background-position: center top; background-attachment: fixed; }
+  body:not(.page-home) .nav { background: rgba(250,252,252,.72); }
+  #doors::before { opacity: .2; }
+
+  /* ============ Footer: light frosted paper that sits on the blue watercolor ============ */
+  footer { background: rgba(255,255,255,.5); color: var(--ink); padding: 30px 22px 26px; border-top: 1px solid rgba(47,127,207,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  footer h2 { color: var(--ink); font-size: clamp(1.25rem, 2.6vw, 1.6rem); font-weight: 700; margin-bottom: .2em; }
+  footer p { color: var(--ink-soft); font-weight: 600; margin: 0; }
+  footer .links { margin-top: 10px; color: var(--ink-soft); }
+  footer .links a { color: #1f5f9e; font-weight: 800; }
+  footer .links a:hover { text-decoration: underline; }
+  footer .links a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
+  footer .tiny { margin-top: 12px; color: var(--ink-soft); opacity: .75; }
+
+  /* ============ Calendar: one screen, no scrolling (laptop and up) ============ */
+  @media (min-width: 861px) and (min-height: 480px) {
+    body.page-calendar { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    .page-calendar footer { display: none; }
+    .page-calendar main { flex: 1 1 auto; min-height: 0; }
+    .page-calendar #calendar { height: 100%; padding: 10px 0 12px; }
+    .page-calendar #calendar > .wrap { height: 100%; display: flex; flex-direction: column; }
+    .page-calendar .sec-head { flex: none; margin-bottom: 8px; }
+    .page-calendar .sec-head .eyebrow, .page-calendar .sec-head p { display: none; }
+    .page-calendar .sec-head h2 { margin: 0; font-size: clamp(1.4rem, 4.4vh, 2.4rem); }
+    .cal-card { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 920px; display: flex; flex-direction: column; padding: 12px 14px; }
+    .cal-head { flex: none; margin-bottom: 6px; gap: 14px; }
+    .cal-title { font-size: clamp(1.15rem, 3.6vh, 1.8rem); min-width: 200px; }
+    .cal-nav { width: 36px; height: 36px; font-size: .95rem; }
+    .cal-toolbar { flex: none; flex-wrap: nowrap; gap: 8px; margin-bottom: 4px; }
+    .cal-toolbar .mbtn { white-space: nowrap; padding: 7px 12px; font-size: .9rem; }
+    .cal-pick { flex-wrap: nowrap; gap: 3px; }
+    .cal-sticker { font-size: 1.05rem; padding: 3px 4px; }
+    .cal-msg { flex: none; min-height: 18px; margin-bottom: 4px; font-size: .9rem; }
+    .cal-dow { flex: none; margin-bottom: 4px; }
+    .cal-grid { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); gap: 5px; }
+    .cal-day { aspect-ratio: auto; min-height: 0; overflow: hidden; padding-top: 3px; font-size: clamp(.75rem, 2vh, 1rem); }
+  }
+
+  /* ============ Every inner page: one screen, no scrolling (laptop and up) ============
+     Shared frame: the page fills the window, the footer hides, the heading is compact, and the
+     content below gets the remaining height. Per-page fitting lives in assets/fit-<page>.css. */
+  @media (min-width: 861px) and (min-height: 480px) {
+    body.fit-screen { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    body.fit-screen footer { display: none; }
+    body.fit-screen main { flex: 1 1 auto; min-height: 0; }
+    body.fit-screen main > section { height: 100%; padding: 10px 0 12px; }
+    body.fit-screen main > section > .wrap { height: 100%; display: flex; flex-direction: column; }
+    body.fit-screen .sec-head { flex: none; margin-bottom: 10px; }
+    body.fit-screen .sec-head .eyebrow { display: none; }
+    body.fit-screen .sec-head h2 { margin: 0; font-size: clamp(1.4rem, 4.4vh, 2.4rem); }
+    body.fit-screen .sec-head p { margin: 2px auto 0; max-width: 760px; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    body.fit-screen main > section > .wrap > :not(.sec-head) { min-height: 0; }
+  }
