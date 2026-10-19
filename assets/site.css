@@ -995,12 +995,12 @@
     z-index: 60;
     width: max-content;
     max-width: min(340px, calc(100vw - 32px));
-    background: #ffffff;
+    background: #fffdf9;
     color: var(--ink);
-    border: 2.5px solid #4a2818;
+    border: 2px solid #d4af37;
     border-radius: 20px;
     padding: 12px 14px 10px;
-    box-shadow: 0 14px 34px rgba(24, 44, 66, 0.24), 0 3px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 16px 40px rgba(24, 44, 66, 0.20), 0 4px 12px rgba(0, 0, 0, 0.06);
     pointer-events: auto;
     cursor: pointer;
     user-select: none;
@@ -1012,10 +1012,10 @@
     will-change: transform, opacity;
   }
   .ahaan-bubble:hover {
-    box-shadow: 0 18px 40px rgba(24, 44, 66, 0.28), 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 20px 48px rgba(24, 44, 66, 0.26), 0 4px 14px rgba(212, 175, 55, 0.25);
   }
   .ahaan-bubble:focus-visible {
-    outline: 3px solid #1f73c7;
+    outline: 3px solid #d4af37;
     outline-offset: 3px;
   }
   .ahaan-bubble.is-walking {
@@ -1109,7 +1109,7 @@
     height: 0;
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
-    border-top: 12px solid #4a2818;
+    border-top: 12px solid #d4af37;
     pointer-events: none;
     transition: transform 0.2s ease;
   }
@@ -1122,7 +1122,7 @@
     height: 0;
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
-    border-top: 10px solid #ffffff;
+    border-top: 10px solid #fffdf9;
   }
   /* Compact mode when idle */
   .ahaan-bubble .ab-compact-pill {
@@ -1168,12 +1168,49 @@
     .candy-art svg { width: 34px; height: 34px; }
     .candy-label { font-size: .68rem; }
   }
-  /* ---- see-through sweets tray: light tint, little blur, labels kept readable ---- */
-  .candy-blanket { background-color: rgba(255,252,246,.22); background-image: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.06)); -webkit-backdrop-filter: blur(5px) saturate(1.15); backdrop-filter: blur(5px) saturate(1.15); border-color: rgba(255,255,255,.6); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 14px 34px rgba(25,55,30,.14); }
-  .candy-glabel { color: #2f261c; text-shadow: 0 0 6px rgba(255,255,255,.95), 0 0 2px rgba(255,255,255,.95); }
-  .candy-label { color: #2f261c; text-shadow: 0 0 5px rgba(255,255,255,1), 0 0 2px rgba(255,255,255,1); }
-  .candy-group + .candy-group { border-color: rgba(255,255,255,.45); }
-  .candy-art { background: radial-gradient(circle at 50% 42%, rgba(255,255,255,.85), rgba(255,255,255,.3) 66%, transparent 70%); }
+  /* ---- Rich frosted glassmorphic confectionery shelf with golden trim ---- */
+  .candy-blanket {
+    background-color: rgba(255, 253, 248, 0.82);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(254, 250, 242, 0.78) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1.5px solid rgba(212, 175, 55, 0.42);
+    border-radius: 26px;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 0 rgba(212, 175, 55, 0.18), 0 24px 54px -10px rgba(24, 44, 68, 0.18), 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+  .candy-glabel {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #654321;
+    text-shadow: none;
+    margin: 4px 0 3px;
+  }
+  .candy {
+    border-radius: 14px;
+    transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), background 0.18s ease, box-shadow 0.18s ease;
+  }
+  .candy:hover {
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.24);
+  }
+  .candy-label {
+    color: #1a2c3f;
+    font-family: "Fredoka", sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-shadow: none;
+  }
+  .candy-group + .candy-group {
+    border-color: rgba(212, 175, 55, 0.28);
+  }
+  .candy-art {
+    background: radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.5) 68%, transparent 72%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
 
   /* ============ Comic moments when Ahaan eats a sweet ============ */
   .comic-bubble { position: fixed; z-index: 95; max-width: 270px; padding: 12px 16px 10px; background: #fff; color: #1b1b1b; border: 3px solid #1b1b1b; border-radius: 22px; box-shadow: 4px 4px 0 #1b1b1b; font-family: "Bangers", "Fredoka", system-ui, sans-serif; font-size: 1.4rem; letter-spacing: .04em; line-height: 1.12; text-transform: uppercase; transform: translate(-100%, -100%) rotate(-2deg); pointer-events: none; animation: comicPop .22s ease-out; }
@@ -1369,39 +1406,40 @@
   .action-prompt-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    background: #ffffff;
-    color: #162c4a;
-    border: 2.5px solid #2f7fcf;
+    gap: 12px;
+    background: #fffdf9;
+    color: #12263f;
+    border: 2px solid #d4af37;
     border-radius: 999px;
-    padding: 10px 20px;
+    padding: 10px 22px;
     font: inherit;
     font-size: 1.05rem;
     font-weight: 700;
-    box-shadow: 0 8px 24px rgba(20, 50, 85, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 12px 32px rgba(24, 44, 66, 0.20), 0 3px 8px rgba(0, 0, 0, 0.06);
     cursor: pointer;
     min-height: 48px;
-    transition: background 0.18s ease-out, transform 0.18s ease-out, box-shadow 0.18s ease-out;
+    transition: background 0.18s ease-out, transform 0.18s ease-out, box-shadow 0.18s ease-out, border-color 0.18s ease-out;
   }
   .action-prompt-btn:hover {
-    background: #f0f7ff;
-    border-color: #1e63a8;
+    background: #ffffff;
+    border-color: #b8972e;
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(20, 50, 85, 0.24);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 16px 38px rgba(24, 44, 66, 0.26), 0 4px 12px rgba(212, 175, 55, 0.25);
   }
   .action-prompt-btn:focus-visible {
-    outline: 3px solid #2f7fcf;
+    outline: 3px solid #d4af37;
     outline-offset: 3px;
   }
   .action-key-badge {
-    background: #2f7fcf;
+    background: linear-gradient(180deg, #1f3b5c 0%, #12263f 100%);
     color: #ffffff;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     font-weight: 800;
-    padding: 4px 8px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    letter-spacing: 0.02em;
+    padding: 4px 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.03em;
   }
   .action-text {
     font-family: "Fredoka", system-ui, sans-serif;
@@ -1419,13 +1457,13 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid rgba(47, 127, 207, 0.35);
+    background: rgba(255, 253, 249, 0.94);
+    border: 1.5px solid rgba(212, 175, 55, 0.45);
     padding: 8px 12px;
-    border-radius: 18px;
-    box-shadow: 0 10px 28px rgba(20, 50, 85, 0.2);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    border-radius: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 16px 40px rgba(24, 44, 66, 0.22);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
     opacity: 0;
     pointer-events: auto;
     transition: opacity 0.22s ease-out, transform 0.22s ease-out;
@@ -1446,7 +1484,7 @@
     cursor: pointer;
     border: 2px solid transparent;
     min-height: 48px;
-    transition: background 0.16s ease-out, transform 0.16s ease-out;
+    transition: background 0.16s ease-out, transform 0.16s ease-out, box-shadow 0.16s ease-out;
   }
   .act-hud-btn.boost {
     background: #06d6a0;
@@ -1456,6 +1494,7 @@
   .act-hud-btn.boost:hover {
     background: #05be8e;
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(6, 214, 160, 0.35);
   }
   .act-hud-btn.dismount {
     background: #fff0f2;
@@ -1467,7 +1506,7 @@
     transform: translateY(-1px);
   }
   .act-hud-btn:focus-visible {
-    outline: 3px solid #2f7fcf;
+    outline: 3px solid #d4af37;
     outline-offset: 2px;
   }
   .act-key {
@@ -1547,75 +1586,77 @@
   }
   .disc-card {
     position: relative;
-    background: #ffffff;
-    color: #1b2a4a;
-    border: 2.5px solid #2f7fcf;
-    border-radius: 24px;
-    padding: 24px 22px 20px;
-    box-shadow: 0 16px 42px rgba(20, 50, 85, 0.22);
+    background: #fffdf9;
+    color: #12263f;
+    border: 2px solid #d4af37;
+    border-radius: 28px;
+    padding: 26px 24px 22px;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), 0 24px 60px -10px rgba(20, 44, 70, 0.32), 0 4px 16px rgba(0, 0, 0, 0.06);
     text-align: center;
   }
   .disc-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    border: 1.5px solid #d0dfed;
-    background: #f4f8fc;
-    color: #3a5b7d;
-    font-size: 1.1rem;
+    border: 1.5px solid rgba(212, 175, 55, 0.45);
+    background: #faf7f0;
+    color: #654321;
+    font-size: 1.15rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.16s, color 0.16s;
+    transition: background 0.16s, color 0.16s, transform 0.16s;
   }
   .disc-close:hover {
-    background: #e2edf8;
-    color: #153250;
+    background: #f4ece0;
+    color: #12263f;
+    transform: scale(1.05);
   }
   .disc-close:focus-visible {
-    outline: 3px solid #2f7fcf;
+    outline: 3px solid #d4af37;
     outline-offset: 2px;
   }
   .disc-badge {
     font-size: 2.5rem;
     line-height: 1;
-    margin: 0 auto 10px;
-    width: 66px;
-    height: 66px;
+    margin: 0 auto 12px;
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
-    background: #eaf3fc;
-    border: 2px solid #bcd7f2;
+    background: #faf4e8;
+    border: 2px solid #d4af37;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 2px 6px rgba(47, 127, 207, 0.15);
+    box-shadow: inset 0 2px 6px rgba(212, 175, 55, 0.2);
   }
   .disc-title {
-    font-family: "Fraunces", serif;
-    font-size: 1.6rem;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.65rem;
     font-weight: 900;
-    color: #162c4a;
+    color: #12263f;
     margin: 0 0 4px;
   }
   .disc-subtitle {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: #436a8e;
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: #654321;
     margin: 0 0 14px;
+    letter-spacing: 0.02em;
   }
   .disc-fact {
     font-size: 0.98rem;
     line-height: 1.45;
-    color: #23364f;
-    background: #f6faff;
-    border: 1.5px solid #e1edfa;
-    border-radius: 14px;
-    padding: 12px 14px;
+    color: #1a2c3f;
+    background: #faf7f0;
+    border: 1.5px solid rgba(212, 175, 55, 0.32);
+    border-radius: 16px;
+    padding: 12px 16px;
     margin: 0 0 14px;
     text-align: left;
   }
@@ -1628,10 +1669,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fff;
-    border: 1px solid #dbe6f0;
-    border-radius: 10px;
-    padding: 6px 10px;
+    background: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 8px 12px;
     margin-bottom: 6px;
   }
   .disc-book-title {
@@ -1650,34 +1691,37 @@
     font: inherit;
     font-size: 0.94rem;
     font-weight: 700;
-    padding: 10px 18px;
-    border-radius: 12px;
+    padding: 10px 20px;
+    border-radius: 14px;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: background 0.18s, transform 0.16s;
+    transition: background 0.18s, transform 0.16s, box-shadow 0.16s;
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
   .disc-btn.primary {
-    background: #2f7fcf;
+    background: #12263f;
     color: #ffffff;
+    border-color: #d4af37;
+    box-shadow: 0 4px 14px rgba(18, 38, 63, 0.25);
   }
   .disc-btn.primary:hover {
-    background: #2368ad;
+    background: #1f3b5c;
     transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(18, 38, 63, 0.32);
   }
   .disc-btn.secondary {
-    background: #eef6ff;
-    color: #1a4f82;
-    border-color: #bad3ed;
+    background: #faf7f0;
+    color: #654321;
+    border-color: rgba(212, 175, 55, 0.5);
   }
   .disc-btn.secondary:hover {
-    background: #dcebff;
+    background: #f4ece0;
     transform: translateY(-1px);
   }
   .disc-btn:focus-visible {
-    outline: 3px solid #2f7fcf;
+    outline: 3px solid #d4af37;
     outline-offset: 2px;
   }
 

@@ -143,14 +143,22 @@
     })));
 
     // ---- Lighting ----
-    scene.add(new T.HemisphereLight(0xe4f2ff, 0x6e8a56, 0.95));
-    const sun = new T.DirectionalLight(0xfff6e3, 1.5);
+    scene.add(new T.HemisphereLight(0xe8f4ff, 0x6e8a56, 1.0));
+    const sun = new T.DirectionalLight(0xfff8e8, 1.55);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -35, right: 35, top: 35, bottom: -35, near: 1, far: 110 });
+    Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
     sun.shadow.bias = -0.0003;
-    sun.position.set(-20, 45, 25);
+    sun.position.set(-25, 48, 28);
     scene.add(sun);
+
+    // Warm golden rim light for specular depth on trees and landmarks
+    const rimSun = new T.DirectionalLight(0xffdfa9, 0.45);
+    rimSun.position.set(30, 24, -32);
+    scene.add(rimSun);
+
+    // Storybook atmospheric horizon depth fog
+    scene.fog = new T.Fog(0xdff0fa, 52, 125);
 
     // ==========================================
     // 3D Arkansas & Neighboring States Map Data
@@ -179,8 +187,8 @@
         motto: "Show-Me State",
         color: 0x4d8a54,
         x: 0,
-        z: -13.5,
-        rad: 5.6,
+        z: -25.5,
+        rad: 6.4,
         icon: "🏛️",
         fact: "The St. Louis Gateway Arch is 630 feet tall. It is the tallest human-made monument in the United States!",
         extra: "Explorers Meriwether Lewis and William Clark began their historic journey west from here in 1804.",
@@ -193,9 +201,9 @@
         capital: "Nashville",
         motto: "Volunteer State",
         color: 0x487d85,
-        x: 13.5,
-        z: -5.8,
-        rad: 5.4,
+        x: 24.5,
+        z: -10.5,
+        rad: 6.0,
         icon: "🎶",
         fact: "Nashville is known as Music City! Tennessee is famous for bluegrass tunes and the Great Smoky Mountains.",
         extra: "Acoustic guitars, banjos, and fiddles fill the mountain air with cheerful melodies.",
@@ -208,9 +216,9 @@
         capital: "Jackson",
         motto: "Magnolia State",
         color: 0x498a67,
-        x: 12.8,
-        z: 7.2,
-        rad: 5.4,
+        x: 23.5,
+        z: 13.5,
+        rad: 6.0,
         icon: "🌊",
         fact: "The Mississippi River flows all the way south to the Gulf of Mexico. White magnolia blossoms grow here.",
         extra: "Warm river breezes carry the scent of sweet magnolias as river barges float past.",
@@ -224,8 +232,8 @@
         motto: "Pelican State",
         color: 0x3d7b73,
         x: 0,
-        z: 13.5,
-        rad: 5.6,
+        z: 25.5,
+        rad: 6.4,
         icon: "🌿",
         fact: "Louisiana has rich bayous and wetland habitats. Pelican birds glide in the water beside historic riverboats.",
         extra: "The red paddle wheel splashes water as the boat cruises past Spanish moss and cypress trees.",
@@ -238,9 +246,9 @@
         capital: "Austin",
         motto: "The Lone Star State",
         color: 0xa4793f,
-        x: -13.8,
-        z: 7.2,
-        rad: 6.2,
+        x: -25.0,
+        z: 13.0,
+        rad: 7.0,
         icon: "🤠",
         fact: "Texas is famous for wide open prairies and big starry skies. Bluebonnet wildflowers bloom across hills each spring.",
         extra: "On clear nights, you can see constellations and shooting stars sparkling across the big open sky.",
@@ -253,9 +261,9 @@
         capital: "Oklahoma City",
         motto: "Sooner State",
         color: 0x9c5f42,
-        x: -13.8,
-        z: -7.2,
-        rad: 5.6,
+        x: -25.0,
+        z: -13.0,
+        rad: 6.2,
         icon: "🌻",
         fact: "Strong prairie winds sweep across the plains. Giant wind turbines capture the breeze to create clean electricity.",
         extra: "Golden tallgrass prairie grasses wave gently like ocean ripples under the sunny sky.",
@@ -377,13 +385,24 @@
       mapGroup.add(tile);
       stateMeshes.push(tile);
 
-      // Elevated white border ring
-      const ringGeo = new T.RingGeometry(st.rad * 0.97, st.rad * 1.04, 40);
+      // Elevated white border ring with warm golden bevel inlay
+      const ringGeo = new T.RingGeometry(st.rad * 0.97, st.rad * 1.04, 44);
       ringGeo.rotateX(-Math.PI / 2);
-      const ringMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+      const ringMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.90 });
       const ring = new T.Mesh(ringGeo, ringMat);
       ring.position.set(st.x, 0.48, st.z);
       mapGroup.add(ring);
+
+      const goldRingGeo = new T.RingGeometry(st.rad * 0.93, st.rad * 0.97, 44);
+      goldRingGeo.rotateX(-Math.PI / 2);
+      const goldRingMat = new T.MeshStandardMaterial({
+        color: 0xd4af37,
+        metalness: 0.85,
+        roughness: 0.25
+      });
+      const goldRing = new T.Mesh(goldRingGeo, goldRingMat);
+      goldRing.position.set(st.x, 0.47, st.z);
+      mapGroup.add(goldRing);
 
       // 3D Landmark & State Pin
       buildLandmark(st, mapGroup, T);
@@ -547,20 +566,20 @@
     }
 
     function buildRiver(parent, T, walkables) {
-      const riverGeo = new T.PlaneGeometry(3.6, 52, 1, 36);
+      const riverGeo = new T.PlaneGeometry(4.6, 78, 1, 48);
       riverGeo.rotateX(-Math.PI / 2);
       const pos = riverGeo.attributes.position;
       for (let i = 0; i < pos.count; i++) {
         const z = pos.getZ(i);
-        const curve = Math.sin(z * 0.12) * 2.2 + Math.cos(z * 0.07) * 1.0;
-        pos.setX(i, pos.getX(i) + curve + 7.0);
+        const curve = Math.sin(z * 0.08) * 3.0 + Math.cos(z * 0.05) * 1.5;
+        pos.setX(i, pos.getX(i) + curve + 11.2);
       }
       riverGeo.computeVertexNormals();
 
       const riverMat = new T.MeshStandardMaterial({
         color: 0x3d90cb,
-        roughness: 0.18,
-        metalness: 0.22,
+        roughness: 0.16,
+        metalness: 0.28,
         transparent: true,
         opacity: 0.92
       });
@@ -570,51 +589,67 @@
 
       function makeBridge(bx, bz, rot) {
         const b = new T.Group();
-        b.position.set(bx, 0.44, bz);
+        b.position.set(bx, 0.32, bz);
         b.rotation.y = rot;
-        const woodMat = new T.MeshStandardMaterial({ color: 0x7a4928, roughness: 0.85 });
-        const deck = new T.Mesh(new T.BoxGeometry(2.6, 0.16, 4.4), woodMat);
+        const woodMat = new T.MeshStandardMaterial({ color: 0x7a4928, roughness: 0.82 });
+        const darkWoodMat = new T.MeshStandardMaterial({ color: 0x543218, roughness: 0.90 });
+
+        // Solid wood plank deck spanning riverbanks
+        const deck = new T.Mesh(new T.BoxGeometry(2.6, 0.16, 6.4), woodMat);
         deck.castShadow = true;
+        deck.receiveShadow = true;
         b.add(deck);
         if (walkables) walkables.push(deck);
 
-        [-1.15, 1.15].forEach(x => {
-          const rail = new T.Mesh(new T.BoxGeometry(0.12, 0.52, 4.4), woodMat);
+        // Under-deck support beams and handrails
+        [-1.25, 1.25].forEach(x => {
+          const underBeam = new T.Mesh(new T.BoxGeometry(0.14, 0.28, 6.4), darkWoodMat);
+          underBeam.position.set(x, -0.14, 0);
+          b.add(underBeam);
+
+          const rail = new T.Mesh(new T.BoxGeometry(0.12, 0.44, 6.4), woodMat);
           rail.position.set(x, 0.32, 0);
           b.add(rail);
+
+          [-2.6, -1.3, 0, 1.3, 2.6].forEach(pz => {
+            const post = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 0.55, 8), darkWoodMat);
+            post.position.set(x, 0.26, pz);
+            b.add(post);
+          });
         });
         parent.add(b);
       }
-      makeBridge(6.8, -3.2, -0.42);
-      makeBridge(8.2, 4.4, 0.46);
+      // Wooden footbridges crossing the river aligned with trail vectors to Tennessee and Mississippi
+      makeBridge(11.5, -4.9, 1.98);
+      makeBridge(14.2, 8.15, 1.05);
 
-      // Floating water lily pads and pink lotus flowers
-      const lilyGeo = new T.CircleGeometry(0.55, 14);
+      // Floating water lily pads and pink lotus flowers along the extended river
+      const lilyGeo = new T.CircleGeometry(0.60, 14);
       lilyGeo.rotateX(-Math.PI / 2);
       const lilyMat = new T.MeshStandardMaterial({ color: 0x3d7a42, roughness: 0.6 });
       const lotusMat = new T.MeshStandardMaterial({ color: 0xf498b8, roughness: 0.5 });
       const lilyPositions = [
-        [6.8, -10.5], [7.6, -7.0], [7.2, 0.5], [8.0, 9.5], [7.4, 15.0]
+        [10.8, -26.0], [11.5, -16.0], [11.2, -8.0], [10.6, 1.2], [11.8, 14.0], [11.4, 24.0], [10.9, 32.0]
       ];
       lilyPositions.forEach(([lx, lz]) => {
         const pad = new T.Mesh(lilyGeo, lilyMat);
         pad.position.set(lx, 0.17, lz);
         parent.add(pad);
-        const flower = new T.Mesh(new T.ConeGeometry(0.2, 0.28, 6), lotusMat);
+        const flower = new T.Mesh(new T.ConeGeometry(0.22, 0.30, 6), lotusMat);
         flower.position.set(lx, 0.32, lz);
         parent.add(flower);
       });
 
       // Wooden river dock / pier on the Arkansas riverbank
       const dock = new T.Group();
-      dock.position.set(5.4, 0.35, -0.5);
+      dock.position.set(8.2, 0.35, 0.8);
       const dockMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
-      const pier = new T.Mesh(new T.BoxGeometry(2.4, 0.14, 1.6), dockMat);
+      const pier = new T.Mesh(new T.BoxGeometry(2.6, 0.14, 1.8), dockMat);
       dock.add(pier);
       if (walkables) walkables.push(pier);
-      [-1.1, 1.1].forEach(px => {
+      [-1.2, 1.2].forEach(px => {
         const post = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 0.6, 8), dockMat);
-        post.position.set(px, 0.3, 0.7);
+        post.position.set(px, 0.3, 0.8);
         dock.add(post);
       });
       parent.add(dock);
@@ -1411,74 +1446,79 @@
       }
 
       // Northwest Grove (between Oklahoma & Missouri)
-      createOak(-8.5, -14.2, 1.1, 0);
-      createPine(-10.8, -16.0, 1.2);
-      createOak(-6.8, -11.0, 0.95, 2);
-      createPine(-15.2, -14.5, 1.05);
-      createOak(-11.5, -9.5, 0.9, 5);
+      createOak(-14.5, -20.2, 1.25, 0);
+      createPine(-18.8, -22.0, 1.3);
+      createOak(-11.8, -17.0, 1.1, 2);
+      createPine(-21.2, -19.5, 1.15);
+      createOak(-16.5, -13.5, 1.05, 5);
 
       // Northeast Grove (between Missouri & Tennessee)
-      createPine(7.5, -15.2, 1.15);
-      createOak(9.8, -13.0, 1.05, 1);
-      createOak(5.6, -10.5, 0.9, 4);
-      createPine(12.5, -14.8, 1.1);
+      createPine(12.5, -22.2, 1.25);
+      createOak(16.8, -19.0, 1.15, 1);
+      createOak(9.6, -16.5, 1.0, 4);
+      createPine(19.5, -18.8, 1.2);
 
       // East & Riverbank Grove (near Tennessee & Mississippi)
-      createOak(18.5, -11.5, 1.2, 0);
-      createOak(19.2, -1.5, 1.15, 2);
-      createPine(18.0, 3.8, 1.1);
-      createOak(17.5, 12.5, 1.25, 1);
-      createOak(6.2, -7.5, 0.85, 4);
-      createPine(6.4, 8.5, 0.95);
+      createOak(28.5, -16.5, 1.3, 0);
+      createOak(29.2, -1.5, 1.25, 2);
+      createPine(28.0, 5.8, 1.2);
+      createOak(27.5, 18.5, 1.35, 1);
+      createOak(16.2, -12.5, 1.05, 4);
+      createPine(16.4, 14.5, 1.1);
 
       // South Grove (between Louisiana, Mississippi & Texas)
-      createOak(7.2, 14.8, 1.1, 0);
-      createPine(9.5, 13.0, 1.05);
-      createOak(-7.5, 14.5, 1.15, 2);
-      createPine(-9.2, 16.5, 1.2);
-      createOak(0.0, 21.0, 1.3, 1);
+      createOak(12.2, 22.8, 1.2, 0);
+      createPine(15.5, 20.0, 1.15);
+      createOak(-12.5, 21.5, 1.25, 2);
+      createPine(-15.2, 24.5, 1.3);
+      createOak(0.0, 32.0, 1.4, 1);
 
       // Southwest Grove (between Texas & Oklahoma)
-      createOak(-18.5, 0.0, 1.25, 5);
-      createPine(-21.0, -3.5, 1.15);
-      createOak(-21.2, 3.8, 1.1, 0);
-      createPine(-17.8, 13.0, 1.05);
-      createOak(-14.2, 0.0, 0.85, 2);
+      createOak(-26.5, 0.0, 1.35, 5);
+      createPine(-29.0, -4.5, 1.25);
+      createOak(-28.2, 5.8, 1.2, 0);
+      createPine(-24.8, 18.0, 1.15);
+      createOak(-20.2, 0.0, 1.05, 2);
 
-      // Forest rim framing around perimeter
+      // Forest rim framing around the expansive perimeter (r ~ 40 to 48)
       const rimTrees = [
-        [-24, -12], [-22, -19], [-16, -23], [-8, -25], [0, -25], [8, -25], [16, -23], [23, -18],
-        [25, -9], [25, 0], [25, 10], [22, 19], [15, 24], [7, 26], [-1, 26], [-8, 25], [-16, 23],
-        [-23, 17], [-26, 8], [-26, -2]
+        [-38, -18], [-34, -28], [-24, -36], [-12, -40], [0, -42], [12, -40], [24, -36], [34, -28],
+        [40, -14], [42, 0], [40, 16], [35, 28], [24, 38], [12, 42], [0, 43], [-12, 42], [-24, 38],
+        [-35, 28], [-40, 14], [-42, 0]
       ];
       rimTrees.forEach(([rx, rz], i) => {
-        if (i % 2 === 0) createOak(rx, rz, 1.15 + (i % 3) * 0.1, i % 3);
-        else createPine(rx, rz, 1.1 + (i % 3) * 0.12);
+        if (i % 2 === 0) createOak(rx, rz, 1.3 + (i % 3) * 0.15, i % 3);
+        else createPine(rx, rz, 1.25 + (i % 3) * 0.18);
       });
 
-      // Rocks
+      // Trailside boulders & mossy stones
       createRock(-4.8, -4.5, 1.1, 0.8, 1.2);
       createRock(-5.4, -4.0, 0.7, 0.6, 0.8);
       createRock(5.0, -3.5, 1.2, 0.9, 1.0);
       createRock(7.5, -2.0, 0.9, 0.7, 1.1);
       createRock(8.5, 6.0, 1.0, 0.8, 0.9);
       createRock(-6.5, 5.0, 1.2, 0.9, 1.1);
-      createRock(-8.0, 11.0, 1.4, 1.1, 1.3);
-      createRock(10.5, -9.0, 1.1, 0.8, 1.0);
+      createRock(-14.0, 17.0, 1.5, 1.1, 1.3);
+      createRock(16.5, -14.0, 1.3, 0.9, 1.1);
+      createRock(-17.5, -9.0, 1.4, 1.0, 1.2);
 
-      // Flower patches
+      // Colorful wildflower patches along trail verges
       createFlowerPatch(-3.5, -3.5, 1.8, 14);
       createFlowerPatch(4.2, -4.8, 2.0, 16);
       createFlowerPatch(-4.5, 4.2, 1.8, 14);
       createFlowerPatch(5.5, 4.8, 2.0, 16);
-      createFlowerPatch(-9.5, -3.0, 2.2, 18);
-      createFlowerPatch(11.5, 2.5, 2.2, 18);
+      createFlowerPatch(-14.5, -6.0, 2.6, 22);
+      createFlowerPatch(16.5, 4.5, 2.6, 22);
+      createFlowerPatch(0.0, -16.0, 2.5, 20);
+      createFlowerPatch(0.0, 16.0, 2.5, 20);
 
-      // Directional trail signs on grass verges
-      createSignpost(-2.0, -6.6, "Missouri", "↑");
-      createSignpost(6.8, -0.6, "Tennessee", "→");
-      createSignpost(-6.8, 3.4, "Texas", "←");
-      createSignpost(2.0, 6.6, "Louisiana", "↓");
+      // Directional trail signs on grass verges at all 6 trail exits from Arkansas
+      createSignpost(-1.8, -6.6, "Missouri", "↑");
+      createSignpost(5.6, -3.2, "Tennessee", "↗");
+      createSignpost(5.6, 3.2, "Mississippi", "↘");
+      createSignpost(1.8, 6.6, "Louisiana", "↓");
+      createSignpost(-5.6, 3.2, "Texas", "↙");
+      createSignpost(-5.6, -3.2, "Oklahoma", "↖");
     }
 
     function buildLandmark(st, parent, T) {
@@ -1813,25 +1853,60 @@
 
     function createStatePin(st, parent, T) {
       const c = document.createElement("canvas");
-      c.width = 256; c.height = 128;
+      c.width = 512; c.height = 256;
       const g = c.getContext("2d");
-      g.fillStyle = "rgba(255, 255, 255, 0.96)";
-      g.roundRect(4, 4, 248, 120, 20);
+
+      // Soft drop shadow
+      g.shadowColor = "rgba(18, 38, 60, 0.22)";
+      g.shadowBlur = 12;
+      g.shadowOffsetY = 6;
+
+      // Ivory parchment card
+      g.fillStyle = "rgba(255, 253, 249, 0.98)";
+      g.roundRect(8, 8, 496, 240, 32);
       g.fill();
-      g.strokeStyle = "#2f7fcf"; g.lineWidth = 6;
+
+      // Reset shadow for crisp borders
+      g.shadowColor = "transparent";
+
+      // Outer gilded gold border
+      g.strokeStyle = "#d4af37";
+      g.lineWidth = 10;
       g.stroke();
-      g.fillStyle = "#1b2a4a"; g.font = "bold 32px sans-serif"; g.textAlign = "center";
-      g.fillText(st.name, 128, 52);
-      g.fillStyle = "#3d6482"; g.font = "bold 24px sans-serif";
-      g.fillText(st.capital, 128, 92);
+
+      // Inner subtle hairline
+      g.strokeStyle = "rgba(180, 140, 50, 0.45)";
+      g.lineWidth = 2;
+      g.roundRect(18, 18, 476, 220, 24);
+      g.stroke();
+
+      // State icon badge
+      g.font = "38px sans-serif";
+      g.textAlign = "center";
+      g.fillText(st.icon, 256, 56);
+
+      // State Name in rich serif
+      g.fillStyle = "#12263f";
+      g.font = "bold 52px serif";
+      g.fillText(st.name, 256, 126);
+
+      // Capital & Motto
+      g.fillStyle = "#4a6884";
+      g.font = "600 32px sans-serif";
+      g.fillText(st.capital, 256, 178);
+
+      // Subtle decorative star flourish
+      g.fillStyle = "#d4af37";
+      g.font = "20px sans-serif";
+      g.fillText("★  ★  ★", 256, 218);
 
       const tex = new T.CanvasTexture(c);
       tex.encoding = T.sRGBEncoding;
       const pinMat = new T.MeshBasicMaterial({ map: tex, transparent: true, side: T.DoubleSide });
-      const pin = new T.Mesh(new T.PlaneGeometry(3.0, 1.5), pinMat);
+      const pin = new T.Mesh(new T.PlaneGeometry(3.6, 1.8), pinMat);
       // Tilt pin upward so it faces the elevated camera view directly
       pin.rotation.x = -Math.PI * 0.25;
-      pin.position.set(st.x, 2.2, st.z + st.rad * 0.45);
+      pin.position.set(st.x, 2.5, st.z + st.rad * 0.45);
 
       registerInteractive(pin, {
         ...st,
@@ -2251,83 +2326,18 @@
         promptText: "Press Enter to Slide! 🛝",
         onActivate: () => startPlayActivity("slide")
       },
-      {
-        id: "MO",
-        name: "Missouri",
-        city: "St. Louis",
-        x: 0,
-        z: -13.5,
-        approachRadius: 5.5,
-        actionLabel: "Explore St. Louis! 🏛️",
-        promptText: "Press Enter to Explore St. Louis! 🏛️",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "MO"))
-      },
-      {
-        id: "TN",
-        name: "Tennessee",
-        city: "Nashville",
-        x: 13.5,
-        z: -5.8,
-        approachRadius: 5.5,
-        actionLabel: "Explore Nashville! 🎶",
-        promptText: "Press Enter to Explore Nashville! 🎶",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "TN"))
-      },
-      {
-        id: "MS",
-        name: "Mississippi",
-        city: "Jackson",
-        x: 12.8,
-        z: 7.2,
-        approachRadius: 5.5,
-        actionLabel: "Explore Jackson! 🌊",
-        promptText: "Press Enter to Explore Jackson! 🌊",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "MS"))
-      },
-      {
-        id: "LA",
-        name: "Louisiana",
-        city: "Baton Rouge",
-        x: 0,
-        z: 13.5,
-        approachRadius: 5.5,
-        actionLabel: "Explore Baton Rouge! 🌿",
-        promptText: "Press Enter to Explore Baton Rouge! 🌿",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "LA"))
-      },
-      {
-        id: "TX",
-        name: "Texas",
-        city: "Austin",
-        x: -13.8,
-        z: 7.2,
-        approachRadius: 5.5,
-        actionLabel: "Explore Austin! 🤠",
-        promptText: "Press Enter to Explore Austin! 🤠",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "TX"))
-      },
-      {
-        id: "OK",
-        name: "Oklahoma",
-        city: "Oklahoma City",
-        x: -13.8,
-        z: -7.2,
-        approachRadius: 5.5,
-        actionLabel: "Explore Oklahoma City! 🌻",
-        promptText: "Press Enter to Explore Oklahoma City! 🌻",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "OK"))
-      },
-      {
-        id: "AR",
-        name: "Arkansas",
-        city: "Little Rock",
-        x: 2.0,
-        z: 1.2,
-        approachRadius: 3.5,
-        actionLabel: "Explore Little Rock! ⭐",
-        promptText: "Press Enter to Explore Little Rock! ⭐",
-        onActivate: () => exploreLandmark(STATES.find(s => s.id === "AR"))
-      }
+      // State landmarks generated dynamically from STATES
+      ...STATES.map(st => ({
+        id: st.id,
+        name: st.name,
+        city: st.city,
+        x: st.x,
+        z: st.z,
+        approachRadius: st.id === "AR" ? 3.5 : st.rad * 0.95,
+        actionLabel: `Explore ${st.city}! ${st.icon}`,
+        promptText: `Press Enter to Explore ${st.city}! ${st.icon}`,
+        onActivate: () => exploreLandmark(st)
+      }))
     ];
 
     // Detect nearby playground items and landmarks
@@ -2822,8 +2832,8 @@
         desiredTarget = actionCamTarget;
         desiredPos = actionCamPos;
       } else {
-        const targetX = A.rig.position.x * 0.45 + panOffset.x;
-        const targetZ = A.rig.position.z * 0.45 + panOffset.y;
+        const targetX = A.rig.position.x * 0.78 + panOffset.x;
+        const targetZ = A.rig.position.z * 0.78 + panOffset.y;
         normalCamTarget.set(targetX, 0.5, targetZ);
         normalCamPos.set(targetX, baseCamY * zoomLevel, targetZ + baseCamZ * zoomLevel);
         desiredTarget = normalCamTarget;
