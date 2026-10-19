@@ -921,10 +921,28 @@
   }
   .state-toast.show {
     opacity: 1;
+    pointer-events: auto;
     transform: translateX(-50%) translateY(0);
   }
   .state-toast .icon { font-size: 1.3rem; margin-right: 6px; }
   .state-toast u { text-decoration-color: #2f7fcf; text-underline-offset: 3px; }
+  .toast-card-btn {
+    margin-left: 10px;
+    background: #2f7fcf;
+    color: #ffffff;
+    border: none;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: background 0.16s ease;
+  }
+  .toast-card-btn:hover {
+    background: #1f64aa;
+  }
   .map-hint {
     margin: 8px 0 0;
     font-size: 0.92rem;
@@ -972,6 +990,188 @@
     transform: translateY(-1px);
   }
   .mctl-btn:focus-visible {
+    outline: 3px solid #2f7fcf;
+    outline-offset: 2px;
+  }
+
+  /* ============ Nav Controls (Breeze & Sound) ============ */
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ============ Discovery Card Modal ============ */
+  .discovery-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(16, 36, 56, 0.42);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease-out;
+  }
+  .discovery-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .discovery-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+    z-index: 125;
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.22s ease-out;
+  }
+  .discovery-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .discovery-modal, .discovery-backdrop {
+      transition: none;
+    }
+  }
+  .disc-card {
+    position: relative;
+    background: #ffffff;
+    color: #1b2a4a;
+    border: 2.5px solid #2f7fcf;
+    border-radius: 24px;
+    padding: 24px 22px 20px;
+    box-shadow: 0 16px 42px rgba(20, 50, 85, 0.22);
+    text-align: center;
+  }
+  .disc-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid #d0dfed;
+    background: #f4f8fc;
+    color: #3a5b7d;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.16s, color 0.16s;
+  }
+  .disc-close:hover {
+    background: #e2edf8;
+    color: #153250;
+  }
+  .disc-close:focus-visible {
+    outline: 3px solid #2f7fcf;
+    outline-offset: 2px;
+  }
+  .disc-badge {
+    font-size: 2.5rem;
+    line-height: 1;
+    margin: 0 auto 10px;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background: #eaf3fc;
+    border: 2px solid #bcd7f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 6px rgba(47, 127, 207, 0.15);
+  }
+  .disc-title {
+    font-family: "Fraunces", serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #162c4a;
+    margin: 0 0 4px;
+  }
+  .disc-subtitle {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #436a8e;
+    margin: 0 0 14px;
+  }
+  .disc-fact {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: #23364f;
+    background: #f6faff;
+    border: 1.5px solid #e1edfa;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin: 0 0 14px;
+    text-align: left;
+  }
+  .disc-extra {
+    margin-bottom: 16px;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  .disc-book-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #dbe6f0;
+    border-radius: 10px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+  }
+  .disc-book-title {
+    font-weight: 700;
+    color: #1a324d;
+    font-size: 0.88rem;
+  }
+  .disc-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .disc-btn {
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: background 0.18s, transform 0.16s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .disc-btn.primary {
+    background: #2f7fcf;
+    color: #ffffff;
+  }
+  .disc-btn.primary:hover {
+    background: #2368ad;
+    transform: translateY(-1px);
+  }
+  .disc-btn.secondary {
+    background: #eef6ff;
+    color: #1a4f82;
+    border-color: #bad3ed;
+  }
+  .disc-btn.secondary:hover {
+    background: #dcebff;
+    transform: translateY(-1px);
+  }
+  .disc-btn:focus-visible {
     outline: 3px solid #2f7fcf;
     outline-offset: 2px;
   }
