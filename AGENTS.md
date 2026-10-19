@@ -76,3 +76,13 @@ All agents must use Simplified Technical English (STE) for:
 - **Create Worktree**: Use `git worktree add .worktrees/<branch-name> -b <branch-name>` for new tasks.
 - **Work Off Worktree**: Perform edits, tests, and commits inside the designated worktree path.
 - **Cleanup**: Remove the worktree with `git worktree remove` after merging the branch.
+
+---
+
+## 5. Quality and Verification Standard (Check Your Work)
+
+- **Verify Before Completion**: Always verify your changes before you declare a task complete.
+- **No Assumptions**: Do not claim a feature works without testing its real behavior.
+- **Visual Inspection**: Inspect visual rendering to ensure elements appear in correct positions and proportions.
+- **Interactive Testing**: Test keyboard controls, touch actions, and mouse clicks thoroughly.
+- **Fix Before Reporting**: If an interaction fails, diagnose the root cause and fix the failure immediately.
