@@ -85,6 +85,25 @@
     <h2 class="candy-title">Pick a sweet</h2>
     <nav class="candy-shelf" id="candyShelf" aria-label="All pages" tabindex="-1"></nav>
   </div>
+  <!-- Interactive Action Prompt (Approaching playground or landmarks) -->
+  <div class="action-prompt" id="actionPrompt" role="region" aria-live="polite" hidden>
+    <button type="button" class="action-prompt-btn" id="actionPromptBtn">
+      <span class="action-key-badge">Enter ⏎</span>
+      <span class="action-text" id="actionPromptText">Jump! 🤸</span>
+    </button>
+  </div>
+
+  <!-- Playground Activity HUD (Controls during Trampoline / Swing) -->
+  <div class="activity-hud" id="activityHud" role="toolbar" aria-label="Playground Controls" hidden>
+    <button type="button" class="act-hud-btn boost" id="actBoostBtn">
+      <span class="act-key">Space</span>
+      <span class="act-label" id="actBoostLabel">Bounce Higher! ⬆️</span>
+    </button>
+    <button type="button" class="act-hud-btn dismount" id="actDismountBtn">
+      <span class="act-key">Esc</span>
+      <span class="act-label">Hop Off 🚪</span>
+    </button>
+  </div>
 </section>
 </main>
 

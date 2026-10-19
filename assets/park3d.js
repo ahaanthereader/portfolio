@@ -67,6 +67,20 @@
       window.AhaanAudio.bell(659.25, 0.22, 0.05);
     } else if (type === "wind") {
       window.AhaanAudio.bell(392.00, 0, 0.05);
+    } else if (type === "bounce") {
+      window.AhaanAudio.strike(196.00, {
+        decay: 0.28,
+        peak: 0.08,
+        attack: 0.02,
+        partials: [[1, 1, 1], [1.5, 0.4, 0.8], [2, 0.2, 0.5]]
+      });
+    } else if (type === "breeze") {
+      window.AhaanAudio.strike(261.63, {
+        decay: 0.55,
+        peak: 0.04,
+        attack: 0.08,
+        partials: [[1, 0.8, 1], [1.25, 0.5, 0.9]]
+      });
     } else if (type === "star") {
       window.AhaanAudio.bell(880.00, 0, 0.06);
     } else if (type === "apple") {
@@ -145,6 +159,7 @@
       {
         id: "AR",
         name: "Arkansas",
+        city: "Little Rock",
         capital: "Little Rock",
         motto: "The Natural State",
         color: 0x5a9e4d,
@@ -159,6 +174,7 @@
       {
         id: "MO",
         name: "Missouri",
+        city: "St. Louis",
         capital: "Jefferson City",
         motto: "Show-Me State",
         color: 0x4d8a54,
@@ -173,6 +189,7 @@
       {
         id: "TN",
         name: "Tennessee",
+        city: "Nashville",
         capital: "Nashville",
         motto: "Volunteer State",
         color: 0x487d85,
@@ -187,6 +204,7 @@
       {
         id: "MS",
         name: "Mississippi",
+        city: "Jackson",
         capital: "Jackson",
         motto: "Magnolia State",
         color: 0x498a67,
@@ -201,6 +219,7 @@
       {
         id: "LA",
         name: "Louisiana",
+        city: "Baton Rouge",
         capital: "Baton Rouge",
         motto: "Pelican State",
         color: 0x3d7b73,
@@ -215,6 +234,7 @@
       {
         id: "TX",
         name: "Texas",
+        city: "Austin",
         capital: "Austin",
         motto: "The Lone Star State",
         color: 0xa4793f,
@@ -229,6 +249,7 @@
       {
         id: "OK",
         name: "Oklahoma",
+        city: "Oklahoma City",
         capital: "Oklahoma City",
         motto: "Sooner State",
         color: 0x9c5f42,
@@ -395,6 +416,77 @@
     // 3D Playground Equipment (Arkansas)
     // ==========================================
     buildPlayground(mapGroup, T, walkableSurfaces);
+
+    // ==========================================
+    // 3D Trampoline Particles System
+    // ==========================================
+    const trampParticlesGroup = new T.Group();
+    mapGroup.add(trampParticlesGroup);
+
+    const particlePool = [];
+    const PARTICLE_COUNT = 24;
+    const pGeo = new T.DodecahedronGeometry(0.08, 0);
+    const pColors = [0xffd166, 0x06d6a0, 0x118ab2, 0xff5964, 0xfff3b0];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const pMat = new T.MeshStandardMaterial({
+        color: pColors[i % pColors.length],
+        roughness: 0.3,
+        emissive: pColors[i % pColors.length],
+        emissiveIntensity: 0.35,
+        transparent: true,
+        opacity: 0
+      });
+      const pMesh = new T.Mesh(pGeo, pMat);
+      pMesh.visible = false;
+      pMesh.userData = { vx: 0, vy: 0, vz: 0, life: 0, maxLife: 0.6 };
+      trampParticlesGroup.add(pMesh);
+      particlePool.push(pMesh);
+    }
+
+    // Emit sparkling star particles during trampoline bounce launch
+    function spawnTrampParticles() {
+      if (calm()) return;
+      for (let i = 0; i < 12; i++) {
+        const p = particlePool[(Math.random() * PARTICLE_COUNT) | 0];
+        if (!p) continue;
+        p.visible = true;
+        const ang = Math.random() * Math.PI * 2;
+        const rad = 0.2 + Math.random() * 0.7;
+        p.position.set(-4.3 + Math.cos(ang) * rad, 0.58, 0.2 + Math.sin(ang) * rad);
+        p.userData.vx = Math.cos(ang) * (0.8 + Math.random() * 1.2);
+        p.userData.vy = 2.4 + Math.random() * 1.8;
+        p.userData.vz = Math.sin(ang) * (0.8 + Math.random() * 1.2);
+        p.userData.life = 0.5 + Math.random() * 0.25;
+        p.userData.maxLife = p.userData.life;
+        p.material.opacity = 0.9;
+        p.scale.set(1, 1, 1);
+      }
+    }
+
+    // Update particle positions and fade opacity
+    function updateParticles(dt) {
+      let anyActive = false;
+      particlePool.forEach(p => {
+        if (!p.visible) return;
+        anyActive = true;
+        p.userData.life -= dt;
+        if (p.userData.life <= 0) {
+          p.visible = false;
+          p.material.opacity = 0;
+          return;
+        }
+        p.userData.vy -= 9.8 * dt;
+        p.position.x += p.userData.vx * dt;
+        p.position.y += p.userData.vy * dt;
+        p.position.z += p.userData.vz * dt;
+        p.rotation.x += dt * 5;
+        p.rotation.y += dt * 6;
+        const alpha = p.userData.life / p.userData.maxLife;
+        p.material.opacity = alpha * 0.9;
+        p.scale.setScalar(Math.max(0.2, alpha));
+      });
+      return anyActive;
+    }
 
     // ==========================================
     // 3D Sky: Storybook Clouds & Sunbeams
@@ -1927,6 +2019,15 @@
       const bubble = document.getElementById("ahaanBubble");
       if (!bubble) return;
 
+      if (currentActivity || cameraMode === "landmark") {
+        bubble.style.opacity = "0";
+        bubble.style.pointerEvents = "none";
+        return;
+      } else {
+        bubble.style.opacity = "";
+        bubble.style.pointerEvents = "";
+      }
+
       const headPos = new T.Vector3();
       A.head.getWorldPosition(headPos);
       headPos.y += 1.25; // Position with breathing space above hair fringe
@@ -2052,6 +2153,230 @@
     let activityTimer = 0;
     let lastApexChime = 0;
 
+    // Trampoline physics state
+    let trampY = 0.54;
+    let trampVy = 0.0;
+    let trampBounceApex = 1.6;
+    let trampDeflection = 0.0;
+    let trampIsFlipping = false;
+    let trampFlip = 0.0;
+
+    // Swing pendulum physics state
+    let swingAngle = 0.0;
+    let swingVelocity = 0.0;
+    let lastBreezeSoundTime = 0;
+
+    // Camera action close-up state
+    let cameraMode = "normal"; // "normal" | "action" | "landmark"
+    const actionCamTarget = new T.Vector3();
+    const actionCamPos = new T.Vector3();
+    const normalCamTarget = new T.Vector3();
+    const normalCamPos = new T.Vector3();
+    const currentCamTarget = new T.Vector3(0, 0.5, 0);
+    const currentCamPos = new T.Vector3(0, 28, 22);
+
+    // Nearby interaction prompt state
+    let currentNearbyItem = null;
+    const actionPrompt = document.getElementById("actionPrompt");
+    const actionPromptBtn = document.getElementById("actionPromptBtn");
+    const actionPromptText = document.getElementById("actionPromptText");
+
+    // Activity control buttons state
+    const activityHud = document.getElementById("activityHud");
+    const actBoostBtn = document.getElementById("actBoostBtn");
+    const actBoostLabel = document.getElementById("actBoostLabel");
+    const actDismountBtn = document.getElementById("actDismountBtn");
+
+    if (actionPromptBtn) {
+      actionPromptBtn.addEventListener("click", () => {
+        if (currentNearbyItem && currentNearbyItem.onActivate) {
+          currentNearbyItem.onActivate();
+        }
+      });
+    }
+
+    if (actBoostBtn) {
+      actBoostBtn.addEventListener("click", () => {
+        boostCurrentActivity();
+      });
+    }
+
+    if (actDismountBtn) {
+      actDismountBtn.addEventListener("click", () => {
+        stopPlayActivity();
+      });
+    }
+
+    // List of interactive locations and prompts
+    const INTERACTABLES = [
+      {
+        id: "trampoline",
+        name: "Spring Trampoline",
+        x: -4.3,
+        z: 0.2,
+        approachRadius: 2.8,
+        actionLabel: "Jump! 🤸",
+        promptText: "Press Enter to Jump! 🤸",
+        onActivate: () => startPlayActivity("trampoline")
+      },
+      {
+        id: "swing",
+        name: "Cedar Swings",
+        x: 3.2,
+        z: -2.8,
+        approachRadius: 2.8,
+        actionLabel: "Swing! 🪁",
+        promptText: "Press Enter to Swing! 🪁",
+        onActivate: () => startPlayActivity("swing")
+      },
+      {
+        id: "slide",
+        name: "Playground Slide",
+        x: -2.6,
+        z: -3.2,
+        approachRadius: 2.8,
+        actionLabel: "Slide! 🛝",
+        promptText: "Press Enter to Slide! 🛝",
+        onActivate: () => startPlayActivity("slide")
+      },
+      {
+        id: "MO",
+        name: "Missouri",
+        city: "St. Louis",
+        x: 0,
+        z: -13.5,
+        approachRadius: 5.5,
+        actionLabel: "Explore St. Louis! 🏛️",
+        promptText: "Press Enter to Explore St. Louis! 🏛️",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "MO"))
+      },
+      {
+        id: "TN",
+        name: "Tennessee",
+        city: "Nashville",
+        x: 13.5,
+        z: -5.8,
+        approachRadius: 5.5,
+        actionLabel: "Explore Nashville! 🎶",
+        promptText: "Press Enter to Explore Nashville! 🎶",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "TN"))
+      },
+      {
+        id: "MS",
+        name: "Mississippi",
+        city: "Jackson",
+        x: 12.8,
+        z: 7.2,
+        approachRadius: 5.5,
+        actionLabel: "Explore Jackson! 🌊",
+        promptText: "Press Enter to Explore Jackson! 🌊",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "MS"))
+      },
+      {
+        id: "LA",
+        name: "Louisiana",
+        city: "Baton Rouge",
+        x: 0,
+        z: 13.5,
+        approachRadius: 5.5,
+        actionLabel: "Explore Baton Rouge! 🌿",
+        promptText: "Press Enter to Explore Baton Rouge! 🌿",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "LA"))
+      },
+      {
+        id: "TX",
+        name: "Texas",
+        city: "Austin",
+        x: -13.8,
+        z: 7.2,
+        approachRadius: 5.5,
+        actionLabel: "Explore Austin! 🤠",
+        promptText: "Press Enter to Explore Austin! 🤠",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "TX"))
+      },
+      {
+        id: "OK",
+        name: "Oklahoma",
+        city: "Oklahoma City",
+        x: -13.8,
+        z: -7.2,
+        approachRadius: 5.5,
+        actionLabel: "Explore Oklahoma City! 🌻",
+        promptText: "Press Enter to Explore Oklahoma City! 🌻",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "OK"))
+      },
+      {
+        id: "AR",
+        name: "Arkansas",
+        city: "Little Rock",
+        x: 2.0,
+        z: 1.2,
+        approachRadius: 3.5,
+        actionLabel: "Explore Little Rock! ⭐",
+        promptText: "Press Enter to Explore Little Rock! ⭐",
+        onActivate: () => exploreLandmark(STATES.find(s => s.id === "AR"))
+      }
+    ];
+
+    // Detect nearby playground items and landmarks
+    function checkProximity() {
+      if (currentActivity) {
+        if (actionPrompt && !actionPrompt.hidden) {
+          actionPrompt.classList.remove("show");
+          actionPrompt.hidden = true;
+        }
+        currentNearbyItem = null;
+        return;
+      }
+
+      let closest = null;
+      let minD = 999;
+      const px = A.rig.position.x;
+      const pz = A.rig.position.z;
+
+      for (let i = 0; i < INTERACTABLES.length; i++) {
+        const item = INTERACTABLES[i];
+        const d = Math.hypot(px - item.x, pz - item.z);
+        if (d <= item.approachRadius && d < minD) {
+          minD = d;
+          closest = item;
+        }
+      }
+
+      if (closest !== currentNearbyItem) {
+        currentNearbyItem = closest;
+        if (currentNearbyItem && actionPrompt && actionPromptText) {
+          actionPromptText.textContent = currentNearbyItem.promptText;
+          actionPrompt.hidden = false;
+          requestAnimationFrame(() => actionPrompt.classList.add("show"));
+        } else if (actionPrompt) {
+          actionPrompt.classList.remove("show");
+          setTimeout(() => {
+            if (!currentNearbyItem) actionPrompt.hidden = true;
+          }, 220);
+        }
+      }
+    }
+
+    // Zoom into landmark and open discovery card
+    function exploreLandmark(st) {
+      if (!st) return;
+      if (currentActivity) stopPlayActivity();
+
+      cameraMode = "landmark";
+      actionCamTarget.set(st.x, 2.2, st.z);
+      actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+
+      A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+      if (A.startWave) A.startWave();
+
+      playSound("bell");
+      sayAhaan("Welcome to " + (st.city || st.name) + "! 🌍", st.fact, st.icon || "📍", st.name);
+      openDiscoveryModal(st);
+      wake();
+    }
+
+    // Start a playground activity
     function startPlayActivity(type) {
       if (currentActivity) stopPlayActivity();
       currentActivity = type;
@@ -2063,21 +2388,53 @@
         targetPos = new T.Vector3(-2.6, rigBaseY, -3.8);
         marker.position.set(-2.6, 0.52, -3.8);
         markerMat.opacity = 0.95;
-        sayAhaan("Let's go slide! 🛝", "Climbing up to the top!", "🛝", "Playground Slide");
+        cameraMode = "action";
+        actionCamTarget.set(-2.6, 1.6, -2.4);
+        actionCamPos.set(-2.6 + 6.2, 5.5, -2.4 + 7.5);
+        sayAhaan("Let us slide! 🛝", "Climb up to the top!", "🛝", "Playground Slide");
       } else if (type === "swing") {
         targetPos = new T.Vector3(2.75, rigBaseY, -2.3);
         marker.position.set(2.75, 0.52, -2.3);
         markerMat.opacity = 0.95;
-        sayAhaan("Let's go swing! 🎈", "Running to the swings!", "🎈", "Cedar Swing Set");
+        swingAngle = 0.25;
+        swingVelocity = 1.2;
+        cameraMode = "action";
+        actionCamTarget.set(2.75, 1.8, -2.8);
+        actionCamPos.set(2.75 - 6.8, 5.4, -2.8 + 6.8);
+        sayAhaan("Let us swing! 🪁", "Pump legs to touch the sky!", "🪁", "Cedar Swings");
       } else if (type === "trampoline") {
         targetPos = new T.Vector3(-2.95, rigBaseY, 0.2);
         marker.position.set(-2.95, 0.52, 0.2);
         markerMat.opacity = 0.95;
-        sayAhaan("Trampoline time! 🤸", "Heading over to bounce!", "🤸", "Spring Trampoline");
+        trampY = 0.54;
+        trampVy = 5.6;
+        trampBounceApex = 1.6;
+        trampDeflection = 0;
+        trampIsFlipping = false;
+        trampFlip = 0;
+        cameraMode = "action";
+        actionCamTarget.set(-4.3, 1.8, 0.2);
+        actionCamPos.set(-4.3 + 6.2, 6.2, 0.2 + 8.5);
+        sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high!", "🤸", "Spring Trampoline");
+      }
+
+      if (type === "trampoline" || type === "swing") {
+        if (activityHud) {
+          if (actBoostLabel) {
+            actBoostLabel.textContent = type === "trampoline" ? "Bounce Higher! ⬆️" : "Swing Higher! 🪁";
+          }
+          activityHud.hidden = false;
+          requestAnimationFrame(() => activityHud.classList.add("show"));
+        }
+      }
+      if (actionPrompt) {
+        actionPrompt.classList.remove("show");
+        actionPrompt.hidden = true;
       }
       wake();
     }
 
+    // Stop current playground activity and return to grass
     function stopPlayActivity() {
       if (!currentActivity) return;
       const prev = currentActivity;
@@ -2085,10 +2442,19 @@
       activityPhase = 0;
       activityTimer = 0;
 
+      cameraMode = "normal";
+
+      if (activityHud) {
+        activityHud.classList.remove("show");
+        setTimeout(() => {
+          if (!currentActivity) activityHud.hidden = true;
+        }, 220);
+      }
+
       if (A.resetLimbs) A.resetLimbs();
+      A.rig.scale.set(1, 1, 1);
+      A.rig.rotation.set(0, 0, 0);
       A.rig.position.y = rigBaseY;
-      A.rig.rotation.x = 0;
-      A.rig.rotation.z = 0;
 
       if (prev === "trampoline") {
         A.rig.position.set(-2.95, rigBaseY, 0.2);
@@ -2099,14 +2465,41 @@
       } else if (prev === "slide") {
         A.rig.position.set(-2.6, rigBaseY, -1.1);
       }
+
+      sayAhaan("That was great fun! ✨", "Walk around the park to explore more.", "🎈", "Park");
       wake();
     }
 
+    // Boost bounce height or swing momentum
+    function boostCurrentActivity() {
+      if (!currentActivity) return;
+      if (currentActivity === "trampoline") {
+        trampBounceApex = Math.min(3.8, trampBounceApex + 0.85);
+        if (trampVy < 0) {
+          trampVy += 3.5;
+        } else {
+          trampVy = Math.max(trampVy, Math.sqrt(2 * 16.0 * trampBounceApex));
+        }
+        playSound("bounce");
+        spawnTrampParticles();
+        sayAhaan("Boing! Higher! 🤸", "Look at the clouds!", "🤸", "Spring Trampoline");
+        wake();
+      } else if (currentActivity === "swing") {
+        const dir = Math.sign(swingVelocity) || 1;
+        swingVelocity += dir * 1.6;
+        if (Math.abs(swingVelocity) > 4.6) swingVelocity = Math.sign(swingVelocity) * 4.6;
+        playSound("breeze");
+        sayAhaan("Wheeee! Swing higher! 🪁", "Fly high into the sky!", "🪁", "Cedar Swings");
+        wake();
+      }
+    }
+
+    // Update ongoing playground activity simulation
     function updatePlayActivity(dt) {
       if (!currentActivity) return;
 
       if (currentActivity === "slide") {
-        // Phase 0: Approach ladder at (-2.6, -3.8)
+        // Phase 0: Approach ladder
         if (activityPhase === 0) {
           const dist = Math.hypot(A.rig.position.x - (-2.6), A.rig.position.z - (-3.8));
           if (dist < 0.65 || !targetPos) {
@@ -2116,10 +2509,10 @@
             isWalking = false;
             markerMat.opacity = 0;
             A.rig.position.set(-2.6, rigBaseY, -3.8);
-            A.rig.rotation.y = 0; // Face South
+            A.rig.rotation.y = 0;
           }
         }
-        // Phase 1: Climb ladder up to platform
+        // Phase 1: Climb ladder
         else if (activityPhase === 1) {
           activityTimer += dt;
           const climbDuration = calm() ? 1.6 : 1.1;
@@ -2127,7 +2520,6 @@
           A.rig.position.set(-2.6, rigBaseY + t * 1.55, -3.8 + t * 0.6);
           A.rig.rotation.y = 0;
 
-          // Limb climbing motions
           const cycle = t * Math.PI * 4;
           A.leftLeg.hip.rotation.x = Math.sin(cycle) * 0.45;
           A.rightLeg.hip.rotation.x = -Math.sin(cycle) * 0.45;
@@ -2140,7 +2532,6 @@
             activityPhase = 2;
             activityTimer = 0;
             A.rig.position.set(-2.6, rigBaseY + 1.55, -3.2);
-            // Sit down ready to slide
             A.leftLeg.hip.rotation.x = -1.4;
             A.rightLeg.hip.rotation.x = -1.4;
             A.leftLeg.knee.rotation.x = 0.2;
@@ -2156,10 +2547,10 @@
             activityPhase = 3;
             activityTimer = 0;
             playSound("wind");
-            sayAhaan("Wheeeee! 🛝", "That was fast!", "🛝", "Playground Slide");
+            sayAhaan("Wheeeee! 🛝", "Fly down the chute!", "🛝", "Playground Slide");
           }
         }
-        // Phase 3: Slide down chute (+Z direction)
+        // Phase 3: Slide down chute
         else if (activityPhase === 3) {
           activityTimer += dt;
           const slideDuration = calm() ? 1.8 : 1.1;
@@ -2171,7 +2562,6 @@
           A.rig.position.set(-2.6, rigBaseY + hFactor * 1.55, curZ);
           A.rig.rotation.y = 0;
 
-          // Joyful hands in air
           A.leftArm.arm.rotation.z = 2.4;
           A.wavingArm.arm.rotation.z = -2.4;
           const armWave = calm() ? 0 : Math.sin(activityTimer * 14) * 0.2;
@@ -2197,11 +2587,10 @@
           A.rig.position.set(-2.6, rigBaseY + hopHeight, -1.1);
           if (activityTimer >= hopTime) {
             stopPlayActivity();
-            sayAhaan("That was fun! ✨", "Tap anywhere to walk or play again.", "🛝", "Playground");
           }
         }
       } else if (currentActivity === "swing") {
-        // Phase 0: Approach swing at (2.75, -2.3)
+        // Phase 0: Approach swing
         if (activityPhase === 0) {
           const dist = Math.hypot(A.rig.position.x - 2.75, A.rig.position.z - (-2.3));
           if (dist < 0.65 || !targetPos) {
@@ -2211,53 +2600,67 @@
             isWalking = false;
             markerMat.opacity = 0;
             A.rig.position.set(2.75, rigBaseY, -2.3);
-            A.rig.rotation.y = 0; // Face South
+            A.rig.rotation.y = 0;
           }
         }
-        // Phase 1: Swinging in pendulum arc
+        // Phase 1: Real pendulum swinging physics
         else if (activityPhase === 1) {
           activityTimer += dt;
-          const maxAng = calm() ? 0.22 : 0.58;
-          const spd = calm() ? 2.2 : 3.4;
-          const ramp = Math.min(1, activityTimer / 1.8);
-          const swingAng = Math.sin(activityTimer * spd) * maxAng * ramp;
+          const swingL = 1.4;
+          const swingG = 9.8;
+          const swingDamping = 0.25;
 
-          if (swingPivot) swingPivot.rotation.x = swingAng;
+          const angularAcc = -(swingG / swingL) * Math.sin(swingAngle) - swingDamping * swingVelocity;
+          swingVelocity += angularAcc * dt;
+          swingAngle += swingVelocity * dt;
 
-          const L = 1.4;
+          if (swingPivot) swingPivot.rotation.x = swingAngle;
+
           const py = 2.65, pz = -2.8;
-          const seatY = py - Math.cos(swingAng) * L;
-          const seatZ = pz + Math.sin(swingAng) * L;
+          const seatY = py - Math.cos(swingAngle) * swingL;
+          const seatZ = pz + Math.sin(swingAngle) * swingL;
 
           A.rig.position.set(2.75, seatY - 0.22, seatZ);
-          A.rig.rotation.x = swingAng;
+          A.rig.rotation.x = swingAngle;
           A.rig.rotation.y = 0;
+          A.rig.scale.set(1, 1, 1);
 
-          // Sitting pose with dynamic leg kicking
-          const kick = Math.sin(activityTimer * spd);
-          A.leftLeg.hip.rotation.x = -1.1 - kick * 0.35;
-          A.rightLeg.hip.rotation.x = -1.1 - kick * 0.35;
-          A.leftLeg.knee.rotation.x = 0.6 - kick * 0.45;
-          A.rightLeg.knee.rotation.x = 0.6 - kick * 0.45;
+          // Leg-pumping animation based on motion direction
+          if (swingVelocity > 0.2) {
+            A.leftLeg.hip.rotation.x = -1.45;
+            A.rightLeg.hip.rotation.x = -1.45;
+            A.leftLeg.knee.rotation.x = 0.05;
+            A.rightLeg.knee.rotation.x = 0.05;
+          } else if (swingVelocity < -0.2) {
+            A.leftLeg.hip.rotation.x = -0.65;
+            A.rightLeg.hip.rotation.x = -0.65;
+            A.leftLeg.knee.rotation.x = 1.05;
+            A.rightLeg.knee.rotation.x = 1.05;
+          }
 
-          // Hands holding chains
-          A.leftArm.arm.rotation.x = -1.1;
-          A.wavingArm.arm.rotation.x = -1.1;
+          // Hands gripping chains
+          A.leftArm.arm.rotation.x = -1.15;
+          A.wavingArm.arm.rotation.x = -1.15;
           A.leftArm.arm.rotation.z = 0.25;
           A.wavingArm.arm.rotation.z = -0.25;
 
-          // Audio chime on forward apex
-          if (Math.abs(swingAng) > maxAng * 0.85 && (activityTimer - lastApexChime > 0.85)) {
+          // Breeze sound at high velocity
+          if (Math.abs(swingAngle) < 0.18 && Math.abs(swingVelocity) > 2.0) {
+            const nowTime = performance.now();
+            if (nowTime - lastBreezeSoundTime > 650) {
+              lastBreezeSoundTime = nowTime;
+              playSound("breeze");
+            }
+          }
+
+          // Apex chime
+          if (Math.abs(swingAngle) > 0.65 && (activityTimer - lastApexChime > 0.85)) {
             lastApexChime = activityTimer;
             playSound("chime");
           }
-
-          if (activityTimer > 4.2 && activityTimer < 4.4) {
-            sayAhaan("Look how high! 🎈", "I can swing into the sky!", "🎈", "Cedar Swing Set");
-          }
         }
       } else if (currentActivity === "trampoline") {
-        // Phase 0: Approach access ladder at (-2.95, 0.2)
+        // Phase 0: Approach access ladder
         if (activityPhase === 0) {
           const dist = Math.hypot(A.rig.position.x - (-2.95), A.rig.position.z - 0.2);
           if (dist < 0.65 || !targetPos) {
@@ -2283,57 +2686,88 @@
           if (t >= 1) {
             activityPhase = 2;
             activityTimer = 0;
+            trampY = 0.54;
+            trampVy = 5.2;
             A.rig.position.set(-4.3, rigBaseY + 0.54, 0.2);
             sayAhaan("Boing! Boing! 🤸", "I can touch the clouds!", "🤸", "Spring Trampoline");
           }
         }
-        // Phase 2: Bouncing rhythm on mat
+        // Phase 2: Real spring bouncing physics
         else if (activityPhase === 2) {
           activityTimer += dt;
-          const freq = calm() ? 2.5 : 3.6;
-          const maxJump = calm() ? 0.45 : 1.55;
-          const cycle = (activityTimer * freq) % (Math.PI * 2);
-          const sinCycle = Math.sin(cycle);
+          const gravity = 16.0;
 
-          A.rig.position.set(-4.3, A.rig.position.y, 0.2);
-          A.rig.rotation.y = 0;
+          if (trampBounceApex > 1.4) {
+            trampBounceApex = Math.max(1.4, trampBounceApex - dt * 0.15);
+          }
 
-          if (sinCycle < 0) {
-            // Mat compression & landing crouch
-            const sag = -sinCycle * 0.12;
-            if (trampMat) trampMat.position.y = 0.54 - sag;
-            A.rig.position.y = rigBaseY + 0.54 - sag;
+          if (trampY > 0.54) {
+            // Airborne flight
+            trampVy -= gravity * dt;
+            trampY += trampVy * dt;
 
-            A.leftLeg.knee.rotation.x = sag * 6;
-            A.rightLeg.knee.rotation.x = sag * 6;
-            A.leftLeg.hip.rotation.x = -sag * 3;
-            A.rightLeg.hip.rotation.x = -sag * 3;
-            A.leftArm.arm.rotation.x = 0.4;
-            A.wavingArm.arm.rotation.x = 0.4;
-            A.leftArm.arm.rotation.z = 0.2;
-            A.wavingArm.arm.rotation.z = -0.2;
-          } else {
-            // Airborne launch
-            if (trampMat) trampMat.position.y = 0.54;
-            const jumpH = sinCycle * maxJump;
-            A.rig.position.y = rigBaseY + 0.54 + jumpH;
+            const stretch = Math.min(0.2, Math.max(0, trampVy / 12) * 0.2);
+            A.rig.scale.set(1 - stretch * 0.4, 1 + stretch * 0.6, 1 - stretch * 0.4);
 
-            // Star jump pose in air
-            const spread = Math.sin(cycle);
-            A.leftArm.arm.rotation.z = 1.9 + spread * 0.35;
-            A.wavingArm.arm.rotation.z = -1.9 - spread * 0.35;
+            A.leftArm.arm.rotation.z = 2.0;
+            A.wavingArm.arm.rotation.z = -2.0;
             A.leftArm.arm.rotation.x = -0.3;
             A.wavingArm.arm.rotation.x = -0.3;
-            A.leftLeg.hip.rotation.z = -0.25 * spread;
-            A.rightLeg.hip.rotation.z = 0.25 * spread;
             A.leftLeg.knee.rotation.x = 0;
             A.rightLeg.knee.rotation.x = 0;
 
-            if (cycle < 0.2 && (activityTimer - lastApexChime > 0.55)) {
-              lastApexChime = activityTimer;
+            if (trampIsFlipping) {
+              trampFlip += dt * 8.0;
+              if (trampFlip >= Math.PI * 2) {
+                trampFlip = 0;
+                trampIsFlipping = false;
+              }
+              A.rig.rotation.x = trampFlip;
+            } else {
+              A.rig.rotation.x = 0;
+            }
+
+            if (trampVy < 0 && (trampVy + gravity * dt) >= 0 && trampBounceApex >= 2.0) {
               playSound("bell");
             }
+          } else {
+            // Mat compression and rebound
+            trampDeflection = 0.54 - trampY;
+            const springK = 220.0, springDamping = 4.0;
+            const springForce = springK * trampDeflection - springDamping * trampVy;
+            trampVy += springForce * dt;
+            trampY += trampVy * dt;
+
+            trampDeflection = Math.min(0.24, Math.max(0, 0.54 - trampY));
+            if (trampMat) trampMat.position.y = 0.54 - trampDeflection;
+
+            const squash = Math.min(0.35, trampDeflection * 1.6);
+            A.rig.scale.set(1 + squash * 0.7, 1 - squash * 0.85, 1 + squash * 0.7);
+            A.rig.rotation.x = 0;
+
+            A.leftLeg.knee.rotation.x = squash * 4.5;
+            A.rightLeg.knee.rotation.x = squash * 4.5;
+            A.leftLeg.hip.rotation.x = -squash * 2.2;
+            A.rightLeg.hip.rotation.x = -squash * 2.2;
+            A.leftArm.arm.rotation.x = 0.35;
+            A.wavingArm.arm.rotation.x = 0.35;
+            A.leftArm.arm.rotation.z = 0.2;
+            A.wavingArm.arm.rotation.z = -0.2;
+
+            if (trampVy > 0 && trampY >= 0.52) {
+              trampY = 0.54;
+              if (trampMat) trampMat.position.y = 0.54;
+              playSound("bounce");
+              spawnTrampParticles();
+              if (trampBounceApex >= 2.2) {
+                trampIsFlipping = true;
+                trampFlip = 0;
+              }
+            }
           }
+
+          A.rig.position.set(-4.3, rigBaseY + (trampY - 0.54) + 0.54, 0.2);
+          A.rig.rotation.y = 0;
         }
       }
     }
@@ -2347,12 +2781,32 @@
     let panOffset = new T.Vector2(0, 0);
     const cameraTarget = new T.Vector3(0, 0, 0);
 
-    function updateCameraPosition() {
-      const targetX = A.rig.position.x * 0.45 + panOffset.x;
-      const targetZ = A.rig.position.z * 0.45 + panOffset.y;
-      cameraTarget.set(targetX, 0.5, targetZ);
-      camera.position.set(targetX, baseCamY * zoomLevel, targetZ + baseCamZ * zoomLevel);
-      camera.lookAt(cameraTarget);
+    function updateCameraPosition(dt) {
+      let desiredTarget, desiredPos;
+      if (cameraMode === "action" || cameraMode === "landmark") {
+        desiredTarget = actionCamTarget;
+        desiredPos = actionCamPos;
+      } else {
+        const targetX = A.rig.position.x * 0.45 + panOffset.x;
+        const targetZ = A.rig.position.z * 0.45 + panOffset.y;
+        normalCamTarget.set(targetX, 0.5, targetZ);
+        normalCamPos.set(targetX, baseCamY * zoomLevel, targetZ + baseCamZ * zoomLevel);
+        desiredTarget = normalCamTarget;
+        desiredPos = normalCamPos;
+      }
+
+      if (!calm()) {
+        const factor = Math.min(1, (dt || 0.016) * 4.5);
+        currentCamPos.lerp(desiredPos, factor);
+        currentCamTarget.lerp(desiredTarget, factor);
+        camera.position.copy(currentCamPos);
+        camera.lookAt(currentCamTarget);
+      } else {
+        currentCamPos.copy(desiredPos);
+        currentCamTarget.copy(desiredTarget);
+        camera.position.copy(desiredPos);
+        camera.lookAt(desiredTarget);
+      }
     }
     updateCameraPosition();
 
@@ -2504,8 +2958,48 @@
       const key = e.key || "";
       let handled = false;
 
-      // Up = North (towards Missouri, -Z)
+      // Enter key to interact with nearby item or boost active equipment
+      if (isDown && (code === "Enter" || key === "Enter")) {
+        if (currentNearbyItem && !currentActivity) {
+          e.preventDefault();
+          currentNearbyItem.onActivate();
+          return;
+        } else if (currentActivity === "trampoline" || currentActivity === "swing") {
+          e.preventDefault();
+          boostCurrentActivity();
+          return;
+        }
+      }
+
+      // Space key to boost bounce or swing
+      if (isDown && (code === "Space" || key === " " || key === "Spacebar")) {
+        if (currentActivity === "trampoline" || currentActivity === "swing") {
+          e.preventDefault();
+          boostCurrentActivity();
+          return;
+        } else if (currentNearbyItem && !currentActivity) {
+          e.preventDefault();
+          currentNearbyItem.onActivate();
+          return;
+        }
+      }
+
+      // Escape key to dismount from playground equipment
+      if (isDown && (code === "Escape" || key === "Escape")) {
+        if (currentActivity) {
+          e.preventDefault();
+          stopPlayActivity();
+          return;
+        }
+      }
+
+      // Up = North (towards Missouri, -Z) or boost active equipment
       if (code === "ArrowUp" || key === "ArrowUp" || code === "KeyW" || key === "w" || key === "W") {
+        if (isDown && (currentActivity === "trampoline" || currentActivity === "swing")) {
+          e.preventDefault();
+          boostCurrentActivity();
+          return;
+        }
         keys.up = isDown; handled = true;
       }
       // Down = South (towards Louisiana, +Z)
@@ -2637,6 +3131,10 @@
       if (!discModal || !discBackdrop) return;
       discModal.classList.remove("show");
       discBackdrop.classList.remove("show");
+      if (cameraMode === "landmark") {
+        cameraMode = "normal";
+        wake();
+      }
       setTimeout(() => {
         discModal.hidden = true;
         discBackdrop.hidden = true;
@@ -2740,11 +3238,17 @@
         }
       }
 
+      // Check nearby interactive items for action prompt
+      checkProximity();
+
       // Check current state boundary
       checkCurrentState(A.rig.position.x, A.rig.position.z);
 
-      // Update camera in top view
-      updateCameraPosition();
+      // Update camera in top view or close-up action view
+      updateCameraPosition(dt);
+
+      // Update trampoline sparkle particles
+      const anyParticlesActive = updateParticles(dt);
 
       // Drift storybook clouds if motion is allowed
       if (!calm() && clouds) {
@@ -2762,7 +3266,17 @@
 
       render();
 
-      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity) {
+      let desiredTarget, desiredPos;
+      if (cameraMode === "action" || cameraMode === "landmark") {
+        desiredTarget = actionCamTarget;
+        desiredPos = actionCamPos;
+      } else {
+        desiredTarget = normalCamTarget;
+        desiredPos = normalCamPos;
+      }
+      const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
+
+      if (cameraMoving || isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -2812,12 +3326,29 @@
     window.Park3D = {
       interactiveMeshes,
       STATES,
+      INTERACTABLES,
       openDiscoveryModal,
       closeDiscoveryModal,
       playSound,
       startPlayActivity,
       stopPlayActivity,
-      getCurrentActivity: () => currentActivity
+      boostCurrentActivity,
+      exploreLandmark,
+      teleportAhaan: (x, z) => {
+        if (currentActivity) stopPlayActivity();
+        A.rig.position.x = x;
+        A.rig.position.z = z;
+        checkProximity();
+        checkCurrentState(x, z);
+        updateBubblePosition();
+        wake();
+      },
+      walkTo: (x, z) => {
+        targetPos = new T.Vector3(x, rigBaseY, z);
+        wake();
+      },
+      getCurrentActivity: () => currentActivity,
+      getCurrentNearbyItem: () => currentNearbyItem
     };
 
     hero.classList.add("park-ready");
