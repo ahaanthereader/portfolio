@@ -312,9 +312,25 @@ window.AhaanModel = {
       return isWavingActive;
     }
 
+    // Reset all character limbs to standard rest posture
+    function resetLimbs() {
+      leftLeg.hip.rotation.set(0, 0, 0);
+      rightLeg.hip.rotation.set(0, 0, 0);
+      leftLeg.knee.rotation.set(0, 0, 0);
+      rightLeg.knee.rotation.set(0, 0, 0);
+      leftArm.arm.rotation.set(0, 0, leftArm.rest);
+      leftArm.elbow.rotation.set(0, 0, 0);
+      wavingArm.arm.rotation.set(0, 0, wavingArm.rest);
+      wavingArm.elbow.rotation.set(0, 0, 0);
+      torso.position.set(0, 0, 0);
+      head.position.set(0, 0, 0);
+      head.rotation.set(0, 0, 0);
+      isWavingActive = false;
+    }
+
     return {
-      rig, head, eyes, brows, mouth, wavingArm, leftArm, leftLeg, rightLeg,
-      updateWalk, startWave, stopWave, updateWave,
+      rig, head, torso, eyes, brows, mouth, wavingArm, leftArm, leftLeg, rightLeg,
+      updateWalk, startWave, stopWave, updateWave, resetLimbs,
       footY: b3.min.y,
       height: b3.max.y - b3.min.y
     };
