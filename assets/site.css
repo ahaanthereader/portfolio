@@ -677,8 +677,9 @@
   .dow-stats dd { margin: 2px 0 0; font-weight: 800; font-size: 1.02rem; }
   .dow-h { margin: 14px 20px 6px; color: var(--forest-d); font-size: .8rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
   .dow-facts { list-style: none; margin: 0; padding: 0 20px; }
-  .dow-facts li { display: flex; gap: 10px; padding: 6px 0; font-weight: 700; line-height: 1.4; }
-  .dow-facts li span { flex: none; }
+  .dow-facts li { display: flex; gap: 10px; padding: 6px 0; font-weight: 700; line-height: 1.4; align-items: baseline; }
+  .dow-facts li span:first-child { flex: none; font-size: 1.15rem; }
+  .dow-facts li span:last-child { flex: 1 1 auto; min-width: 0; }
   .dow-words { margin: 14px 16px 0; padding: 4px 4px 14px; background: var(--paper); border: 1px dashed var(--c, var(--forest)); border-radius: 16px; text-align: center; }
   .dow-words .dow-h { margin-top: 10px; }
   .dow-script { font-family: "Fraunces", serif; font-weight: 700; font-size: clamp(1.5rem, 4.5vw, 2.1rem); line-height: 1.5; margin: 4px 12px 2px; }
@@ -747,6 +748,7 @@
   .bel-toggle[aria-pressed="true"] { background: var(--forest-d); }
   .bel-toggle:focus-visible, .bel-stamp:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
   .bel-layout { display: grid; grid-template-columns: 1fr 128px; gap: 18px; align-items: start; margin-top: 18px; }
+  .bel-stage { display: flex; flex-direction: column; align-items: center; width: 100%; min-width: 0; }
   .bel-roof { display: block; width: 100%; height: auto; filter: url(#dow-wc); }
   .bel-canvas { display: block; width: 100%; height: 360px; margin-top: -4px; touch-action: none; }
   .bel-words { border: 1.5px dashed rgba(90,60,30,.35); border-radius: 12px; padding: 12px 8px; text-align: center; background: rgba(255,250,238,.55); }
@@ -915,37 +917,33 @@
   html[data-motion="off"] .dow-card.as-dialog { animation: none; }
   @media (prefers-reduced-motion: reduce) { .dow-card.as-dialog { animation: none; } }
 
-  /* ============ Doors and Bells: one screen, no scrolling (laptop and up) ============ */
-  @media (min-width: 861px) and (min-height: 480px) {
-    body.page-bells, body.page-doors { height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
-    .page-bells footer, .page-doors footer { display: none; }
-    .page-bells main, .page-doors main { flex: 1 1 auto; min-height: 0; }
-    .page-bells #bells, .page-doors #doors { height: 100%; padding: 12px 0; }
-    .page-bells #bells > .wrap, .page-doors #doors > .wrap { height: 100%; display: flex; flex-direction: column; }
-    .bel-top { flex: none; align-items: center; }
-    .bel-head .eyebrow { margin-bottom: 0; }
-    .bel-head h2 { margin: 0; font-size: clamp(1.5rem, 4.2vh, 2.3rem); }
-    .bel-head p { margin: 2px 0 0; font-size: 1rem; }
-    .bel-layout { flex: 1 1 auto; min-height: 0; margin-top: 8px; grid-template-columns: 1fr 116px; }
-    .bel-stage { height: 100%; min-height: 0; display: flex; flex-direction: column; }
-    .bel-roof { flex: none; height: clamp(64px, 17vh, 190px); }
-    .bel-canvas { flex: 1 1 0; min-height: 0; height: auto; margin-top: -2px; }
-    .bel-words { align-self: stretch; display: flex; flex-direction: column; justify-content: center; overflow: hidden; padding: 8px 6px; }
-    .bel-words ol { gap: 4px; }
-    .bel-words .v { font-size: clamp(.95rem, 2.6vh, 1.3rem); }
-    .bel-words small { font-size: .66rem; }
-    .bel-stamps { flex: none; margin-top: 8px; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  /* ============ Doors and Bells (36 items each) ============ */
+  /* ---- Bell set switcher bar ---- */
+  .bel-set-bar { display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin: 0 auto 10px; padding: 4px 14px; background: rgba(255,252,244,.92); border: 1.5px solid rgba(138,90,26,.28); border-radius: 999px; box-shadow: 0 2px 8px rgba(58,46,33,.08); }
+  .bel-set-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(138,90,26,.35); background: #fff; color: var(--earth, #8a5a1a); font-family: inherit; font-size: 1.25rem; font-weight: 700; line-height: 1; cursor: pointer; transition: background .15s ease, color .15s ease, transform .15s ease, border-color .15s ease; user-select: none; }
+  .bel-set-btn:hover { background: var(--forest, #2d5a3f); color: #fff; border-color: var(--forest, #2d5a3f); transform: scale(1.08); }
+  .bel-set-btn:active { transform: scale(0.94); }
+  .bel-set-btn:focus-visible { outline: 3px solid var(--ink, #2b261f); outline-offset: 2px; }
+  .bel-set-label { font-family: "Fredoka", system-ui, sans-serif; font-size: .94rem; font-weight: 700; color: var(--ink, #2b261f); letter-spacing: .02em; min-width: 175px; text-align: center; }
+
+  @media (min-width: 861px) {
+    .bel-top { align-items: center; }
+    .bel-layout { margin-top: 8px; grid-template-columns: 1fr 130px; }
+    .bel-roof { height: clamp(70px, 18vh, 180px); }
+    .bel-canvas { height: clamp(260px, 38vh, 360px); margin-top: -2px; }
+    .bel-words { align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding: 8px 6px; }
+    .bel-words ol { gap: 6px; }
+    .bel-words .v { font-size: clamp(1rem, 2.4vh, 1.3rem); }
+    .bel-words small { font-size: .68rem; }
+    .bel-stamps { margin-top: 14px; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
     .bel-stamp { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; text-align: left; padding: 8px 10px; outline-offset: -5px; }
     .bel-flag { grid-row: span 2; font-size: 1.5rem; }
     .bel-post { top: 4px; right: 4px; width: 34px; height: 34px; font-size: .52rem; }
-    .page-bells .dow-count { flex: none; margin: 6px 0 0; font-size: .9rem; min-height: 0; }
-    .bel-credit { display: none; }
-    .page-doors .sec-head { flex: none; margin-bottom: 8px; }
-    .page-doors .sec-head h2 { font-size: clamp(1.6rem, 4.6vh, 2.6rem); }
-    .page-doors .dow-doors { flex: none; flex-wrap: nowrap; }
-    .page-doors .dow-leaf { height: clamp(110px, 30vh, 176px); }
-    .page-doors .dow-crest { height: clamp(34px, 7vh, 50px); }
-    .page-doors .dow-sound { margin-top: 10px; }
+    .page-bells .dow-count { margin: 10px 0 0; font-size: .95rem; }
+    .page-doors .dow-doors { flex-wrap: wrap; gap: 16px; justify-content: center; }
+    .page-doors .dow-door { width: 124px; }
+    .page-doors .dow-leaf { height: 160px; }
+    .page-doors .dow-crest { height: 46px; }
   }
 
   /* ---- short-window tuning (laptops ~550px tall) ---- */
@@ -965,7 +963,7 @@
   }
   /* ---- card dialog: two columns on wider screens so it fits without scrolling ---- */
   @media (min-width: 761px) {
-    .dow-card.as-dialog { width: min(900px, calc(100vw - 32px)); display: grid; grid-template-columns: 1fr 1.2fr; grid-template-areas: "top top" "stats fh" "stats facts" "stats words" "close close"; align-content: start; column-gap: 4px; }
+    .dow-card.as-dialog { width: min(900px, calc(100vw - 32px)); display: grid; grid-template-columns: 1fr 1.2fr; grid-template-areas: "top top" "stats fh" "stats facts" "stats words" "close close"; align-content: start; column-gap: 16px; }
     .dow-card.as-dialog > .dow-card-top { grid-area: top; }
     .dow-card.as-dialog > .dow-stats { grid-area: stats; grid-template-columns: 1fr 1fr; align-content: start; padding: 12px 8px 4px 18px; }
     .dow-card.as-dialog > h4.dow-h { grid-area: fh; margin-top: 12px; }
