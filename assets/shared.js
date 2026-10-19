@@ -86,6 +86,8 @@ const CHECKOUTS = [
   { title: "The Travel Bucket List", author: "Lonely Planet", stamp: "DUE JUN 6", color: "var(--terra)" },
 ];
 const LIB_STATS = { books: "7", renewals: "3", genre: "Geography" };
+window.CHECKOUTS = CHECKOUTS;
+window.BOOKS = BOOKS;
 
 /* ---- Timeline ---- */
 const TIMELINE = [

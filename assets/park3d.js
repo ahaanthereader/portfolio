@@ -15,6 +15,67 @@
   const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.dataset.motion === "off";
   window.AhaanFigure = { mouth: () => null, chomp: () => {} };
 
+  // Sensory-friendly audio settings: silent until enabled
+  const SKEY = "ahaanDoorsSound";
+  let soundOn = false;
+  try {
+    const s = JSON.parse(localStorage.getItem(SKEY));
+    if (s) soundOn = !!s.on;
+  } catch (e) {}
+
+  const soundBtn = document.getElementById("soundBtn");
+  function syncSoundUI() {
+    if (!soundBtn) return;
+    soundBtn.setAttribute("aria-pressed", String(soundOn));
+    soundBtn.textContent = "🔔 Sound: " + (soundOn ? "on" : "off");
+    if (window.AhaanAudio) window.AhaanAudio.setMuted(!soundOn);
+  }
+  if (soundBtn) {
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      try { localStorage.setItem(SKEY, JSON.stringify({ on: soundOn, vol: 60 })); } catch (e) {}
+      syncSoundUI();
+      if (soundOn && window.AhaanAudio) {
+        window.AhaanAudio.bell(523.25, 0, 0.08);
+      }
+    });
+    syncSoundUI();
+  }
+
+  function playSound(type) {
+    if (!soundOn || !window.AhaanAudio) return;
+    if (type === "guitar") {
+      [
+        { f: 220.00, when: 0.00, peak: 0.07, decay: 2.2 },
+        { f: 277.18, when: 0.08, peak: 0.06, decay: 2.0 },
+        { f: 329.63, when: 0.16, peak: 0.06, decay: 1.8 },
+        { f: 440.00, when: 0.24, peak: 0.05, decay: 1.6 }
+      ].forEach(n => {
+        window.AhaanAudio.strike(n.f, {
+          when: n.when,
+          peak: n.peak,
+          decay: n.decay,
+          partials: [[1, 1, 1], [2, 0.4, 0.7], [3, 0.2, 0.5]]
+        });
+      });
+    } else if (type === "storybook") {
+      window.AhaanAudio.bell(587.33, 0, 0.06);
+    } else if (type === "beacon") {
+      window.AhaanAudio.strike(130.81, { decay: 2.6, peak: 0.07, partials: [[1, 1, 1], [2, 0.5, 0.8]] });
+    } else if (type === "riverboat") {
+      window.AhaanAudio.bell(523.25, 0, 0.06);
+      window.AhaanAudio.bell(659.25, 0.22, 0.05);
+    } else if (type === "wind") {
+      window.AhaanAudio.bell(392.00, 0, 0.05);
+    } else if (type === "star") {
+      window.AhaanAudio.bell(880.00, 0, 0.06);
+    } else if (type === "apple") {
+      window.AhaanAudio.bell(659.25, 0, 0.06);
+    } else if (type === "arch") {
+      window.AhaanAudio.bell(440.00, 0, 0.06);
+    }
+  }
+
   function loadThree() {
     if (window.THREE) return Promise.resolve();
     return new Promise((resolve, reject) => {
@@ -72,14 +133,117 @@
     // 3D Arkansas & Neighboring States Map Data
     // ==========================================
     const STATES = [
-      { id: "AR", name: "Arkansas", capital: "Little Rock", motto: "The Natural State", color: 0x5a9e4d, x: 0, z: 0, rad: 6.2, icon: "⭐" },
-      { id: "MO", name: "Missouri", capital: "Jefferson City", motto: "Show-Me State", color: 0x4d8a54, x: 0, z: -13.5, rad: 5.6, icon: "🏛️" },
-      { id: "TN", name: "Tennessee", capital: "Nashville", motto: "Volunteer State", color: 0x487d85, x: 13.5, z: -5.8, rad: 5.4, icon: "🎶" },
-      { id: "MS", name: "Mississippi", capital: "Jackson", motto: "Magnolia State", color: 0x498a67, x: 12.8, z: 7.2, rad: 5.4, icon: "🌊" },
-      { id: "LA", name: "Louisiana", capital: "Baton Rouge", motto: "Pelican State", color: 0x3d7b73, x: 0, z: 13.5, rad: 5.6, icon: "🌿" },
-      { id: "TX", name: "Texas", capital: "Austin", motto: "The Lone Star State", color: 0xa4793f, x: -13.8, z: 7.2, rad: 6.2, icon: "🤠" },
-      { id: "OK", name: "Oklahoma", capital: "Oklahoma City", motto: "Sooner State", color: 0x9c5f42, x: -13.8, z: -7.2, rad: 5.6, icon: "🌻" }
+      {
+        id: "AR",
+        name: "Arkansas",
+        capital: "Little Rock",
+        motto: "The Natural State",
+        color: 0x5a9e4d,
+        x: 0,
+        z: 0,
+        rad: 6.2,
+        icon: "⭐",
+        fact: "Arkansas has diamond fields, sparkling quartz crystal mines, and emerald forests.",
+        extra: "Ahaan's Home Base: The picnic blanket and open storybook where adventures begin.",
+        actionLabel: "Open Reading Nook"
+      },
+      {
+        id: "MO",
+        name: "Missouri",
+        capital: "Jefferson City",
+        motto: "Show-Me State",
+        color: 0x4d8a54,
+        x: 0,
+        z: -13.5,
+        rad: 5.6,
+        icon: "🏛️",
+        fact: "The St. Louis Gateway Arch is 630 feet tall. It is the tallest human-made monument in the United States!",
+        extra: "Explorers Meriwether Lewis and William Clark began their historic journey west from here in 1804.",
+        actionLabel: "Glow Gateway Arch"
+      },
+      {
+        id: "TN",
+        name: "Tennessee",
+        capital: "Nashville",
+        motto: "Volunteer State",
+        color: 0x487d85,
+        x: 13.5,
+        z: -5.8,
+        rad: 5.4,
+        icon: "🎶",
+        fact: "Nashville is known as Music City! Tennessee is famous for bluegrass tunes and the Great Smoky Mountains.",
+        extra: "Acoustic guitars, banjos, and fiddles fill the mountain air with cheerful melodies.",
+        actionLabel: "Strum Acoustic Guitar"
+      },
+      {
+        id: "MS",
+        name: "Mississippi",
+        capital: "Jackson",
+        motto: "Magnolia State",
+        color: 0x498a67,
+        x: 12.8,
+        z: 7.2,
+        rad: 5.4,
+        icon: "🌊",
+        fact: "The Mississippi River flows all the way south to the Gulf of Mexico. White magnolia blossoms grow here.",
+        extra: "Warm river breezes carry the scent of sweet magnolias as river barges float past.",
+        actionLabel: "Sweep River Beacon"
+      },
+      {
+        id: "LA",
+        name: "Louisiana",
+        capital: "Baton Rouge",
+        motto: "Pelican State",
+        color: 0x3d7b73,
+        x: 0,
+        z: 13.5,
+        rad: 5.6,
+        icon: "🌿",
+        fact: "Louisiana has rich bayous and wetland habitats. Pelican birds glide in the water beside historic riverboats.",
+        extra: "The red paddle wheel splashes water as the boat cruises past Spanish moss and cypress trees.",
+        actionLabel: "Ring Riverboat Bell"
+      },
+      {
+        id: "TX",
+        name: "Texas",
+        capital: "Austin",
+        motto: "The Lone Star State",
+        color: 0xa4793f,
+        x: -13.8,
+        z: 7.2,
+        rad: 6.2,
+        icon: "🤠",
+        fact: "Texas is famous for wide open prairies and big starry skies. Bluebonnet wildflowers bloom across hills each spring.",
+        extra: "On clear nights, you can see constellations and shooting stars sparkling across the big open sky.",
+        actionLabel: "Spin Lone Star"
+      },
+      {
+        id: "OK",
+        name: "Oklahoma",
+        capital: "Oklahoma City",
+        motto: "Sooner State",
+        color: 0x9c5f42,
+        x: -13.8,
+        z: -7.2,
+        rad: 5.6,
+        icon: "🌻",
+        fact: "Strong prairie winds sweep across the plains. Giant wind turbines capture the breeze to create clean electricity.",
+        extra: "Golden tallgrass prairie grasses wave gently like ocean ripples under the sunny sky.",
+        actionLabel: "Spin Wind Turbine"
+      }
     ];
+
+    const interactiveMeshes = [];
+    const landmarkAnimators = [];
+
+    function registerInteractive(obj, meta) {
+      obj.traverse(child => {
+        if (child.isMesh) {
+          child.userData = meta;
+          interactiveMeshes.push(child);
+        }
+      });
+    }
 
     const mapGroup = new T.Group();
     scene.add(mapGroup);
@@ -372,7 +536,7 @@
       storyGroup.add(blanket);
       if (walkables) walkables.push(blanket);
 
-      // 2. Open Hardcover Storybook
+      // 2. Open Hardcover Storybook (Interactive Page Flip)
       const bookGroup = new T.Group();
       bookGroup.position.set(2.0, 0.50, 1.2);
       bookGroup.rotation.y = -0.25;
@@ -380,15 +544,60 @@
       const pagesMat = new T.MeshStandardMaterial({ color: 0xfffaee, roughness: 0.8 });
       const cover = new T.Mesh(new T.BoxGeometry(1.2, 0.04, 0.85), coverMat);
       bookGroup.add(cover);
-      [-0.28, 0.28].forEach(px => {
-        const page = new T.Mesh(new T.BoxGeometry(0.52, 0.03, 0.78), pagesMat);
-        page.position.set(px, 0.03, 0);
-        bookGroup.add(page);
-      });
+
+      const leftPage = new T.Mesh(new T.BoxGeometry(0.52, 0.03, 0.78), pagesMat);
+      leftPage.position.set(-0.28, 0.03, 0);
+      const rightPageGroup = new T.Group();
+      rightPageGroup.position.set(0, 0.03, 0);
+      const rightPage = new T.Mesh(new T.BoxGeometry(0.52, 0.03, 0.78), pagesMat);
+      rightPage.position.set(0.28, 0, 0);
+      rightPageGroup.add(rightPage);
+      bookGroup.add(leftPage, rightPageGroup);
+
       const ribbon = new T.Mesh(new T.BoxGeometry(0.08, 0.02, 0.95), new T.MeshStandardMaterial({ color: 0xe63946 }));
       ribbon.position.set(0, 0.04, 0.08);
       bookGroup.add(ribbon);
       storyGroup.add(bookGroup);
+
+      let bookFlipT = 0;
+      const triggerBook = () => {
+        bookFlipT = 1.0;
+        playSound("storybook");
+        const list = (typeof CHECKOUTS !== "undefined" ? CHECKOUTS : (window.CHECKOUTS || []));
+        const checkoutsList = list.slice(0, 3).map(b => `
+          <div class="disc-book-item">
+            <span>📖</span>
+            <div class="disc-book-title">${b.title} <small style="color:#577390; font-weight:normal;">by ${b.author}</small></div>
+          </div>
+        `).join("");
+
+        openDiscoveryModal({
+          icon: "📖",
+          name: "Ahaan's Reading Nook",
+          subtitle: "Stories, Adventure & Favorite Books",
+          fact: "Reading takes you on magical journeys around the globe! Ahaan loves exploring country tales, maps, and curious riddles.",
+          extraContentHtml: `
+            <div style="font-weight:700; margin-bottom:8px; color:#1a324d;">Ahaan's Library Checkouts:</div>
+            ${checkoutsList}
+          `,
+          actionLabel: "Flip Story Page",
+          x: 2.0,
+          z: 1.2,
+          onInteract: triggerBook
+        });
+        wake();
+      };
+      registerInteractive(bookGroup, { name: "Storybook", x: 2.0, z: 1.2, onInteract: triggerBook });
+
+      landmarkAnimators.push((dt) => {
+        if (bookFlipT > 0.001) {
+          rightPageGroup.rotation.z = Math.sin(bookFlipT * Math.PI) * 1.8;
+          bookFlipT = Math.max(0, bookFlipT - dt * 2.2);
+          return true;
+        }
+        rightPageGroup.rotation.z = 0;
+        return false;
+      });
 
       // 3. Adventure Journal & Pen
       const journalGroup = new T.Group();
@@ -403,7 +612,27 @@
       journalGroup.add(pen);
       storyGroup.add(journalGroup);
 
-      // 4. Stargazing Telescope on Wooden Tripod
+      registerInteractive(journalGroup, {
+        name: "Adventure Journal",
+        x: 3.3,
+        z: 1.8,
+        onInteract: () => {
+          playSound("storybook");
+          openDiscoveryModal({
+            icon: "✍️",
+            name: "Adventure Journal",
+            subtitle: "Travel Notes & Story Pages",
+            fact: "Ahaan writes his own adventure tales in this leather-bound journal.",
+            extra: "Every explorer needs a pencil and notebook to sketch maps and record discoveries!",
+            actionLabel: "Write Story Idea",
+            x: 3.3,
+            z: 1.8,
+            onInteract: () => showToast("✍️ Story idea added to your adventure journal!")
+          });
+        }
+      });
+
+      // 4. Stargazing Brass Telescope on Tripod
       const teleGroup = new T.Group();
       teleGroup.position.set(-2.8, 0.45, 2.0);
       const woodMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
@@ -420,6 +649,7 @@
       const mount = new T.Mesh(new T.CylinderGeometry(0.12, 0.14, 0.25, 10), brassMat);
       mount.position.y = 1.82;
       teleGroup.add(mount);
+
       const tubeGroup = new T.Group();
       tubeGroup.position.set(0, 1.95, 0);
       tubeGroup.rotation.y = -0.5;
@@ -433,6 +663,39 @@
       teleGroup.add(tubeGroup);
       storyGroup.add(teleGroup);
 
+      let teleTiltT = 0;
+      const triggerTele = () => {
+        teleTiltT = 1.0;
+        playSound("star");
+        openDiscoveryModal({
+          icon: "🔭",
+          name: "Sky & Stars Explorer",
+          subtitle: "Brass Telescope Observations",
+          fact: "Look through the brass telescope to see fluffy cumulus clouds by day and sparkling stars by night.",
+          extraContentHtml: `
+            <div style="background:#eef6fc; border:1px solid #c9dff2; border-radius:10px; padding:10px 12px; color:#183b5d;">
+              <b>⭐ Constellation Fact:</b> The Big Dipper is part of Ursa Major (the Great Bear). It points straight to Polaris, the North Star!
+            </div>
+          `,
+          actionLabel: "Aim Skyward",
+          x: -2.8,
+          z: 2.0,
+          onInteract: triggerTele
+        });
+        wake();
+      };
+      registerInteractive(teleGroup, { name: "Brass Telescope", x: -2.8, z: 2.0, onInteract: triggerTele });
+
+      landmarkAnimators.push((dt) => {
+        if (teleTiltT > 0.001) {
+          tubeGroup.rotation.x = -0.55 - Math.sin(teleTiltT * Math.PI) * 0.35;
+          teleTiltT = Math.max(0, teleTiltT - dt * 1.8);
+          return true;
+        }
+        tubeGroup.rotation.x = -0.55;
+        return false;
+      });
+
       // 5. Picnic Basket with Shiny Red Apple
       const basketGroup = new T.Group();
       basketGroup.position.set(1.5, 0.46, 2.2);
@@ -444,24 +707,66 @@
       const handle = new T.Mesh(new T.TorusGeometry(0.38, 0.04, 8, 16, Math.PI), wickerMat);
       handle.position.y = 0.55;
       basketGroup.add(handle);
-      const apple = new T.Mesh(new T.SphereGeometry(0.12, 10, 8), new T.MeshStandardMaterial({ color: 0xd90429, roughness: 0.4 }));
+      const appleMat = new T.MeshStandardMaterial({ color: 0xd90429, roughness: 0.4 });
+      const apple = new T.Mesh(new T.SphereGeometry(0.12, 10, 8), appleMat);
       apple.position.set(0.65, 0.12, -0.2);
       apple.castShadow = true;
       basketGroup.add(apple);
       storyGroup.add(basketGroup);
 
-      // 6. Garden Lantern
+      let appleBounceT = 0;
+      const triggerApple = () => {
+        appleBounceT = 1.0;
+        playSound("apple");
+        if (window.AhaanFigure && window.AhaanFigure.chomp) window.AhaanFigure.chomp();
+        showToast("🍎 CRUNCH! Delicious sweet Honeycrisp apple!");
+        wake();
+      };
+      registerInteractive(basketGroup, { name: "Picnic Apple", x: 1.5, z: 2.2, onInteract: triggerApple });
+
+      landmarkAnimators.push((dt) => {
+        if (appleBounceT > 0.001) {
+          apple.position.y = 0.12 + Math.sin(appleBounceT * Math.PI) * 0.45;
+          appleBounceT = Math.max(0, appleBounceT - dt * 2.5);
+          return true;
+        }
+        apple.position.y = 0.12;
+        return false;
+      });
+
+      // 6. Garden Lantern (Interactive PointLight Toggle)
       const lanternGroup = new T.Group();
       lanternGroup.position.set(-2.0, 0.45, -1.6);
       const metalMat = new T.MeshStandardMaterial({ color: 0x333333, metalness: 0.6, roughness: 0.4 });
       const baseLantern = new T.Mesh(new T.CylinderGeometry(0.2, 0.24, 0.1, 8), metalMat); baseLantern.position.y = 0.05;
       const capLantern = new T.Mesh(new T.ConeGeometry(0.26, 0.22, 8), metalMat); capLantern.position.y = 0.7;
-      const glass = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.5, 8), new T.MeshStandardMaterial({ color: 0xffd166, roughness: 0.2, emissive: 0xffaa00, emissiveIntensity: 0.4 }));
+      const glassMat = new T.MeshStandardMaterial({ color: 0xffd166, roughness: 0.2, emissive: 0xffaa00, emissiveIntensity: 0.5 });
+      const glass = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.5, 8), glassMat);
       glass.position.y = 0.35;
       lanternGroup.add(baseLantern, glass, capLantern);
+
+      const lanternLight = new T.PointLight(0xffa726, 1.4, 8.0);
+      lanternLight.position.set(-2.0, 0.9, -1.6);
+      lanternLight.castShadow = true;
+      parent.add(lanternLight);
       storyGroup.add(lanternGroup);
 
-      // 7. Dandelions with Leaves (like the reference photo!)
+      let lanternOn = true;
+      const triggerLantern = () => {
+        lanternOn = !lanternOn;
+        lanternLight.intensity = lanternOn ? 1.4 : 0;
+        glassMat.emissiveIntensity = lanternOn ? 0.5 : 0.05;
+        playSound("storybook");
+        showToast(`💡 Lantern ${lanternOn ? "turned on" : "turned off"}!`);
+        wake();
+      };
+      registerInteractive(lanternGroup, { name: "Garden Lantern", x: -2.0, z: -1.6, onInteract: triggerLantern });
+
+      // 7. Dandelions with Floating Seed Tufts
+      const dandelionSeeds = [];
+      const seedGeo = new T.SphereGeometry(0.06, 6, 4);
+      const seedMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+
       function createDandelion(x, z, scale) {
         const dand = new T.Group();
         dand.position.set(x, 0.45, z);
@@ -482,11 +787,49 @@
           dand.add(leaf);
         }
         storyGroup.add(dand);
+
+        registerInteractive(dand, {
+          name: "Dandelion",
+          x, z,
+          onInteract: () => {
+            if (calm()) {
+              showToast("🌼 Yellow sunshine dandelion in the grass!");
+              return;
+            }
+            playSound("wind");
+            for (let s = 0; s < 8; s++) {
+              const seed = new T.Mesh(seedGeo, seedMat.clone());
+              seed.position.set(x + (Math.random() - 0.5) * 0.3, 0.45 + 1.15 * scale, z + (Math.random() - 0.5) * 0.3);
+              const vel = new T.Vector3((Math.random() - 0.2) * 1.4, 0.8 + Math.random() * 1.2, (Math.random() - 0.5) * 1.4);
+              storyGroup.add(seed);
+              dandelionSeeds.push({ mesh: seed, vel, life: 1.0 });
+            }
+            showToast("✨ Made a wish on the dandelion seeds!");
+            wake();
+          }
+        });
       }
       createDandelion(-3.4, 3.8, 1.2);
       createDandelion(-3.8, 4.4, 0.9);
       createDandelion(3.8, 3.6, 1.1);
       createDandelion(4.4, 4.2, 0.85);
+
+      landmarkAnimators.push((dt) => {
+        let active = false;
+        for (let i = dandelionSeeds.length - 1; i >= 0; i--) {
+          active = true;
+          const sd = dandelionSeeds[i];
+          sd.mesh.position.addScaledVector(sd.vel, dt);
+          sd.vel.x += dt * 0.4;
+          sd.life -= dt * 0.45;
+          sd.mesh.material.opacity = Math.max(0, sd.life);
+          if (sd.life <= 0) {
+            storyGroup.remove(sd.mesh);
+            dandelionSeeds.splice(i, 1);
+          }
+        }
+        return active;
+      });
     }
 
     function buildClouds(scene, T) {
@@ -763,62 +1106,331 @@
 
     function buildLandmark(st, parent, T) {
       if (st.id === "AR") {
-        const bench = new T.Group(); bench.position.set(st.x, 0.45, st.z - 2.8);
-        const wood = new T.MeshStandardMaterial({ color: 0x8a532d });
-        const seat = new T.Mesh(new T.BoxGeometry(2.4, 0.15, 0.7), wood); seat.position.y = 0.55;
-        const back = new T.Mesh(new T.BoxGeometry(2.4, 0.6, 0.12), wood); back.position.set(0, 0.9, -0.32);
-        bench.add(seat, back);
-        bench.traverse(o => { o.castShadow = true; });
-        parent.add(bench);
-      } else if (st.id === "MO") {
-        const arch = new T.Mesh(
-          new T.TorusGeometry(3.6, 0.42, 12, 32, Math.PI),
-          new T.MeshStandardMaterial({ color: 0xdce2ea, metalness: 0.45, roughness: 0.25 })
-        );
-        arch.position.set(st.x, 0.45, st.z);
+        return;
+      }
+
+      if (st.id === "MO") {
+        const archGroup = new T.Group();
+        archGroup.position.set(st.x, 0.45, st.z);
+
+        const archMat = new T.MeshStandardMaterial({
+          color: 0xdce2ea,
+          metalness: 0.5,
+          roughness: 0.25,
+          emissive: new T.Color(0x000000),
+          emissiveIntensity: 0
+        });
+        const arch = new T.Mesh(new T.TorusGeometry(3.6, 0.42, 14, 36, Math.PI), archMat);
         arch.castShadow = true;
-        parent.add(arch);
+        archGroup.add(arch);
+
+        // Golden apex halo ring
+        const haloMat = new T.MeshBasicMaterial({ color: 0xffd166, transparent: true, opacity: 0 });
+        const halo = new T.Mesh(new T.TorusGeometry(3.8, 0.08, 8, 36, Math.PI), haloMat);
+        archGroup.add(halo);
+
+        let pulseT = 0;
+        const trigger = () => {
+          pulseT = 1.0;
+          playSound("arch");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(archGroup, { ...st, onInteract: trigger });
+        parent.add(archGroup);
+
+        landmarkAnimators.push((dt) => {
+          if (pulseT > 0.001) {
+            pulseT = Math.max(0, pulseT - dt * 1.5);
+            archMat.emissive.setHex(0xf4d06f);
+            archMat.emissiveIntensity = Math.sin(pulseT * Math.PI) * 0.7;
+            haloMat.opacity = Math.sin(pulseT * Math.PI) * 0.85;
+            return true;
+          }
+          archMat.emissiveIntensity = 0;
+          haloMat.opacity = 0;
+          return false;
+        });
       } else if (st.id === "TX") {
-        const star = new T.Group(); star.position.set(st.x, 0.45, st.z);
-        const starMesh = new T.Mesh(
-          new T.ConeGeometry(1.8, 2.4, 5),
-          new T.MeshStandardMaterial({ color: 0xffcf40, roughness: 0.35 })
+        const starGroup = new T.Group();
+        starGroup.position.set(st.x, 0.45, st.z);
+
+        const pedestal = new T.Mesh(
+          new T.CylinderGeometry(1.6, 1.9, 0.6, 16),
+          new T.MeshStandardMaterial({ color: 0x8c6239, roughness: 0.8 })
         );
-        starMesh.position.y = 1.4;
-        starMesh.rotation.y = Math.PI / 5;
-        star.add(starMesh);
-        star.traverse(o => { o.castShadow = true; });
-        parent.add(star);
+        pedestal.position.y = 0.3;
+        pedestal.castShadow = true;
+        starGroup.add(pedestal);
+
+        const starMat = new T.MeshStandardMaterial({
+          color: 0xffcf40,
+          roughness: 0.3,
+          metalness: 0.4,
+          emissive: new T.Color(0x000000)
+        });
+        const starMesh = new T.Mesh(new T.ConeGeometry(1.8, 2.4, 5), starMat);
+        starMesh.position.y = 1.7;
+        starMesh.castShadow = true;
+        starGroup.add(starMesh);
+
+        let spinSpeed = 0;
+        const trigger = () => {
+          spinSpeed = 8.5;
+          playSound("star");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(starGroup, { ...st, onInteract: trigger });
+        parent.add(starGroup);
+
+        landmarkAnimators.push((dt) => {
+          if (spinSpeed > 0.01) {
+            starMesh.rotation.y += spinSpeed * dt;
+            starMat.emissive.setHex(0xffb703);
+            starMat.emissiveIntensity = Math.min(0.6, spinSpeed * 0.08);
+            spinSpeed = Math.max(0, spinSpeed - dt * 3.5);
+            return true;
+          }
+          starMat.emissiveIntensity = 0;
+          return false;
+        });
       } else if (st.id === "TN") {
-        const guitar = new T.Group(); guitar.position.set(st.x, 0.45, st.z);
-        const body = new T.Mesh(new T.CylinderGeometry(1.1, 1.4, 0.35, 16), new T.MeshStandardMaterial({ color: 0xb5632d }));
-        body.position.y = 0.8; body.rotation.z = 0.35;
+        const guitar = new T.Group();
+        guitar.position.set(st.x, 0.45, st.z);
+
+        const woodMat = new T.MeshStandardMaterial({ color: 0xb5632d, roughness: 0.6 });
+        const body = new T.Mesh(new T.CylinderGeometry(1.1, 1.4, 0.35, 18), woodMat);
+        body.position.y = 0.8;
+        body.rotation.z = 0.35;
+        body.castShadow = true;
+
+        const soundHole = new T.Mesh(new T.CircleGeometry(0.35, 16), new T.MeshBasicMaterial({ color: 0x1a0f08 }));
+        soundHole.position.set(0, 0.8, 0.18);
+        soundHole.rotation.z = 0.35;
+
         const neck = new T.Mesh(new T.BoxGeometry(0.25, 2.6, 0.2), new T.MeshStandardMaterial({ color: 0x3d2314 }));
-        neck.position.set(-0.55, 1.9, 0); neck.rotation.z = 0.35;
-        guitar.add(body, neck);
-        guitar.traverse(o => { o.castShadow = true; });
+        neck.position.set(-0.55, 1.9, 0);
+        neck.rotation.z = 0.35;
+        neck.castShadow = true;
+
+        guitar.add(body, soundHole, neck);
+
+        // Guitar strings
+        const stringMat = new T.MeshBasicMaterial({ color: 0xffffff });
+        for (let s = -2; s <= 2; s++) {
+          const str = new T.Mesh(new T.BoxGeometry(0.018, 2.2, 0.01), stringMat);
+          str.position.set(-0.45 + s * 0.04, 1.8, 0.12);
+          str.rotation.z = 0.35;
+          guitar.add(str);
+        }
+
+        let wobbleT = 0;
+        const trigger = () => {
+          wobbleT = 1.0;
+          playSound("guitar");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(guitar, { ...st, onInteract: trigger });
         parent.add(guitar);
+
+        landmarkAnimators.push((dt) => {
+          if (wobbleT > 0.001) {
+            guitar.rotation.y = Math.sin(wobbleT * 18) * 0.22 * wobbleT;
+            wobbleT = Math.max(0, wobbleT - dt * 2.2);
+            return true;
+          }
+          guitar.rotation.y = 0;
+          return false;
+        });
       } else if (st.id === "LA") {
-        const boat = new T.Group(); boat.position.set(st.x, 0.45, st.z);
-        const hull = new T.Mesh(new T.BoxGeometry(3.0, 0.65, 1.3), new T.MeshStandardMaterial({ color: 0xffffff })); hull.position.y = 0.4;
-        const cabin = new T.Mesh(new T.BoxGeometry(1.8, 0.85, 0.85), new T.MeshStandardMaterial({ color: 0xd9534f })); cabin.position.y = 0.95;
-        boat.add(hull, cabin);
-        boat.traverse(o => { o.castShadow = true; });
+        const boat = new T.Group();
+        boat.position.set(st.x, 0.45, st.z);
+
+        const hull = new T.Mesh(new T.BoxGeometry(3.2, 0.65, 1.4), new T.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.6 }));
+        hull.position.y = 0.4;
+        hull.castShadow = true;
+
+        const cabin = new T.Mesh(new T.BoxGeometry(2.0, 0.85, 0.95), new T.MeshStandardMaterial({ color: 0xd9534f, roughness: 0.6 }));
+        cabin.position.y = 0.95;
+        cabin.castShadow = true;
+
+        const stackMat = new T.MeshStandardMaterial({ color: 0x2b2d42 });
+        const stack1 = new T.Mesh(new T.CylinderGeometry(0.12, 0.12, 0.9, 8), stackMat);
+        stack1.position.set(-0.5, 1.6, 0);
+        const stack2 = new T.Mesh(new T.CylinderGeometry(0.12, 0.12, 0.9, 8), stackMat);
+        stack2.position.set(0.5, 1.6, 0);
+
+        const wheelGroup = new T.Group();
+        wheelGroup.position.set(0, 0.45, -0.85);
+        const wheelMat = new T.MeshStandardMaterial({ color: 0xb53229, roughness: 0.7 });
+        for (let p = 0; p < 6; p++) {
+          const spoke = new T.Mesh(new T.BoxGeometry(0.85, 0.06, 0.18), wheelMat);
+          spoke.rotation.z = (p * Math.PI) / 3;
+          wheelGroup.add(spoke);
+        }
+
+        boat.add(hull, cabin, stack1, stack2, wheelGroup);
+
+        const steamMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+        const steam1 = new T.Mesh(new T.SphereGeometry(0.24, 8, 6), steamMat);
+        steam1.position.set(-0.5, 2.2, 0);
+        const steam2 = new T.Mesh(new T.SphereGeometry(0.28, 8, 6), steamMat);
+        steam2.position.set(0.5, 2.3, 0);
+        boat.add(steam1, steam2);
+
+        let paddleBoost = 0;
+        const trigger = () => {
+          paddleBoost = 1.0;
+          playSound("riverboat");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(boat, { ...st, onInteract: trigger });
         parent.add(boat);
+
+        landmarkAnimators.push((dt) => {
+          wheelGroup.rotation.z += dt * (1.5 + paddleBoost * 7.0);
+          if (paddleBoost > 0.001) {
+            steamMat.opacity = Math.sin(paddleBoost * Math.PI) * 0.75;
+            steam1.position.y = 2.1 + (1 - paddleBoost) * 0.6;
+            steam2.position.y = 2.2 + (1 - paddleBoost) * 0.7;
+            paddleBoost = Math.max(0, paddleBoost - dt * 1.4);
+            return true;
+          }
+          steamMat.opacity = 0;
+          return false;
+        });
       } else if (st.id === "OK") {
-        const turbine = new T.Group(); turbine.position.set(st.x, 0.45, st.z);
-        const pole = new T.Mesh(new T.CylinderGeometry(0.14, 0.25, 4.0, 12), new T.MeshStandardMaterial({ color: 0xf5f5f5 })); pole.position.y = 2.0;
-        const blades = new T.Mesh(new T.BoxGeometry(2.6, 0.16, 0.05), new T.MeshStandardMaterial({ color: 0xffffff })); blades.position.y = 4.0;
-        turbine.add(pole, blades);
-        turbine.traverse(o => { o.castShadow = true; });
+        const turbine = new T.Group();
+        turbine.position.set(st.x, 0.45, st.z);
+
+        const pole = new T.Mesh(new T.CylinderGeometry(0.14, 0.28, 4.2, 12), new T.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.6 }));
+        pole.position.y = 2.1;
+        pole.castShadow = true;
+
+        const hub = new T.Mesh(new T.SphereGeometry(0.25, 10, 8), new T.MeshStandardMaterial({ color: 0xcccccc }));
+        hub.position.set(0, 4.2, 0.2);
+
+        const bladesGroup = new T.Group();
+        bladesGroup.position.set(0, 4.2, 0.32);
+        const bladeMat = new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+        for (let b = 0; b < 3; b++) {
+          const ang = (b * Math.PI * 2) / 3;
+          const blade = new T.Mesh(new T.BoxGeometry(0.16, 2.2, 0.04), bladeMat);
+          blade.position.set(Math.sin(ang) * 1.1, Math.cos(ang) * 1.1, 0);
+          blade.rotation.z = -ang;
+          bladesGroup.add(blade);
+        }
+
+        turbine.add(pole, hub, bladesGroup);
+
+        let spinBoost = 0;
+        const trigger = () => {
+          spinBoost = 9.0;
+          playSound("wind");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(turbine, { ...st, onInteract: trigger });
         parent.add(turbine);
+
+        landmarkAnimators.push((dt) => {
+          const baseSpd = calm() ? 0 : 0.8;
+          bladesGroup.rotation.z += (baseSpd + spinBoost) * dt;
+          if (spinBoost > 0.01) {
+            spinBoost = Math.max(0, spinBoost - dt * 2.5);
+            return true;
+          }
+          return false;
+        });
       } else if (st.id === "MS") {
-        const light = new T.Group(); light.position.set(st.x, 0.45, st.z);
-        const tower = new T.Mesh(new T.CylinderGeometry(0.55, 0.95, 3.4, 12), new T.MeshStandardMaterial({ color: 0xffffff })); tower.position.y = 1.7;
-        const top = new T.Mesh(new T.CylinderGeometry(0.7, 0.7, 0.45, 12), new T.MeshStandardMaterial({ color: 0x2b4c7e })); top.position.y = 3.4;
-        light.add(tower, top);
-        light.traverse(o => { o.castShadow = true; });
-        parent.add(light);
+        const lightGroup = new T.Group();
+        lightGroup.position.set(st.x, 0.45, st.z);
+
+        const tower = new T.Mesh(new T.CylinderGeometry(0.55, 0.95, 3.4, 14), new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }));
+        tower.position.y = 1.7;
+        tower.castShadow = true;
+
+        const topMat = new T.MeshStandardMaterial({ color: 0x2b4c7e });
+        const lanternRoom = new T.Mesh(new T.CylinderGeometry(0.7, 0.7, 0.45, 14), topMat);
+        lanternRoom.position.y = 3.4;
+
+        const beaconLamp = new T.Mesh(
+          new T.SphereGeometry(0.28, 10, 8),
+          new T.MeshBasicMaterial({ color: 0xffe66d })
+        );
+        beaconLamp.position.set(0, 3.4, 0);
+
+        const beamGroup = new T.Group();
+        beamGroup.position.set(0, 3.4, 0);
+        const beamMat = new T.MeshBasicMaterial({
+          color: 0xfff3b0,
+          transparent: true,
+          opacity: 0.35,
+          side: T.DoubleSide,
+          depthWrite: false,
+          blending: T.AdditiveBlending
+        });
+        const lightBeam = new T.Mesh(new T.ConeGeometry(2.4, 8.5, 16, 1, true), beamMat);
+        lightBeam.position.set(0, 0, 4.2);
+        lightBeam.rotation.x = -Math.PI / 2;
+        beamGroup.add(lightBeam);
+
+        lightGroup.add(tower, lanternRoom, beaconLamp, beamGroup);
+
+        let sweepBoost = 0;
+        const trigger = () => {
+          sweepBoost = 4.5;
+          playSound("beacon");
+          openDiscoveryModal({
+            ...st,
+            onInteract: trigger
+          });
+          wake();
+        };
+
+        st.onInteract = trigger;
+        registerInteractive(lightGroup, { ...st, onInteract: trigger });
+        parent.add(lightGroup);
+
+        landmarkAnimators.push((dt) => {
+          const baseSpd = calm() ? 0 : 0.6;
+          beamGroup.rotation.y += (baseSpd + sweepBoost) * dt;
+          if (sweepBoost > 0.01) {
+            sweepBoost = Math.max(0, sweepBoost - dt * 1.5);
+            beamMat.opacity = 0.35 + (sweepBoost / 4.5) * 0.35;
+            return true;
+          }
+          beamMat.opacity = 0.35;
+          return false;
+        });
       }
     }
 
@@ -843,6 +1455,19 @@
       // Tilt pin upward so it faces the elevated camera view directly
       pin.rotation.x = -Math.PI * 0.25;
       pin.position.set(st.x, 2.2, st.z + st.rad * 0.45);
+
+      registerInteractive(pin, {
+        ...st,
+        onInteract: () => {
+          openDiscoveryModal({
+            ...st,
+            onInteract: () => {
+              if (st.onInteract) st.onInteract();
+            }
+          });
+        }
+      });
+
       parent.add(pin);
     }
 
@@ -943,7 +1568,7 @@
 
     hero.addEventListener("pointerdown", e => {
       if (calm()) return;
-      if (e.target.closest && e.target.closest(".candy-blanket, .nav, .breeze-pill, .map-controls, button, a")) return;
+      if (e.target.closest && e.target.closest(".candy-blanket, .nav, .breeze-pill, .sound-btn, .map-controls, .discovery-modal, .discovery-backdrop, .state-toast, button, a")) return;
 
       isPointerDown = true;
       isDragging = false;
@@ -951,6 +1576,16 @@
       dragStart.y = e.clientY;
       downPos.x = e.clientX;
       downPos.y = e.clientY;
+    });
+
+    hero.addEventListener("pointermove", e => {
+      if (isPointerDown || isDragging) return;
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(interactiveMeshes);
+      canvas.style.cursor = hits.length > 0 ? "pointer" : "default";
     });
 
     window.addEventListener("pointermove", e => {
@@ -976,13 +1611,32 @@
       if (!isPointerDown) return;
       isPointerDown = false;
 
-      // If user tapped without dragging: raycast walk destination
+      // If user tapped without dragging: check interactive objects first, then walkable ground
       if (!isDragging && (e.button === 0 || e.button === undefined)) {
         const rect = canvas.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
+
+        // 1. Raycast interactive 3D landmarks, props, and pins
+        const intHits = raycaster.intersectObjects(interactiveMeshes);
+        if (intHits.length > 0) {
+          const hit = intHits[0];
+          const data = hit.object.userData;
+          if (data && data.onInteract) {
+            data.onInteract();
+            if (typeof data.x === "number" && typeof data.z === "number") {
+              targetPos = new T.Vector3(data.x, rigBaseY, data.z);
+              marker.position.set(data.x, 0.52, data.z);
+              markerMat.opacity = 0.95;
+            }
+            wake();
+            return;
+          }
+        }
+
+        // 2. Raycast walkable ground surfaces
         const hits = raycaster.intersectObjects(walkableSurfaces);
         if (hits.length > 0) {
           const hit = hits[0];
@@ -1058,11 +1712,101 @@
         toast.setAttribute("role", "status");
         document.body.appendChild(toast);
       }
-      toast.innerHTML = `<span class="icon">${st.icon}</span> <b>${st.name}</b> · Capital: <u>${st.capital}</u> (${st.motto})`;
+      toast.innerHTML = `
+        <span class="icon">${st.icon}</span> <b>${st.name}</b> · Capital: <u>${st.capital}</u> (${st.motto})
+        <button type="button" class="toast-card-btn" id="toastCardBtn">Explore 📖</button>
+      `;
       toast.classList.add("show");
+      const btn = toast.querySelector("#toastCardBtn");
+      if (btn) {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          openDiscoveryModal(st);
+        };
+      }
+      toast.onclick = () => openDiscoveryModal(st);
       clearTimeout(toast._tid);
-      toast._tid = setTimeout(() => toast.classList.remove("show"), 3600);
+      toast._tid = setTimeout(() => toast.classList.remove("show"), 4200);
     }
+
+    // ==========================================
+    // Interactive Discovery Modal Controls
+    // ==========================================
+    const discModal = document.getElementById("discoveryModal");
+    const discBackdrop = document.getElementById("discoveryBackdrop");
+    const discCloseBtn = document.getElementById("discClose");
+    const discIconEl = document.getElementById("discIcon");
+    const discTitleEl = document.getElementById("discTitle");
+    const discSubtitleEl = document.getElementById("discSubtitle");
+    const discFactEl = document.getElementById("discFact");
+    const discExtraEl = document.getElementById("discExtra");
+    const discWalkBtn = document.getElementById("discWalkBtn");
+    const discInteractBtn = document.getElementById("discInteractBtn");
+
+    function openDiscoveryModal(item) {
+      if (!discModal || !discBackdrop) return;
+      if (discIconEl) discIconEl.textContent = item.icon || "📍";
+      if (discTitleEl) discTitleEl.textContent = item.name || item.title || "";
+      if (discSubtitleEl) discSubtitleEl.textContent = item.subtitle || (item.capital ? `Capital: ${item.capital} · ${item.motto}` : "");
+      if (discFactEl) discFactEl.textContent = item.fact || "";
+
+      if (discExtraEl) {
+        if (item.extraContentHtml) {
+          discExtraEl.innerHTML = item.extraContentHtml;
+          discExtraEl.hidden = false;
+        } else if (item.extra) {
+          discExtraEl.textContent = item.extra;
+          discExtraEl.hidden = false;
+        } else {
+          discExtraEl.innerHTML = "";
+          discExtraEl.hidden = true;
+        }
+      }
+
+      if (discWalkBtn) {
+        discWalkBtn.textContent = `🚶 Walk to ${item.name || "Here"}`;
+        discWalkBtn.onclick = () => {
+          closeDiscoveryModal();
+          if (typeof item.x === "number" && typeof item.z === "number") {
+            targetPos = new T.Vector3(item.x, rigBaseY, item.z);
+            marker.position.set(item.x, 0.52, item.z);
+            markerMat.opacity = 0.95;
+            wake();
+          }
+        };
+      }
+
+      if (discInteractBtn) {
+        discInteractBtn.textContent = item.actionLabel ? `✨ ${item.actionLabel}` : "✨ Animate Landmark";
+        discInteractBtn.onclick = () => {
+          if (item.onInteract) item.onInteract();
+        };
+      }
+
+      discBackdrop.hidden = false;
+      discModal.hidden = false;
+      requestAnimationFrame(() => {
+        discBackdrop.classList.add("show");
+        discModal.classList.add("show");
+        if (discCloseBtn) discCloseBtn.focus({ preventScroll: true });
+      });
+    }
+
+    function closeDiscoveryModal() {
+      if (!discModal || !discBackdrop) return;
+      discModal.classList.remove("show");
+      discBackdrop.classList.remove("show");
+      setTimeout(() => {
+        discModal.hidden = true;
+        discBackdrop.hidden = true;
+      }, 240);
+    }
+
+    if (discCloseBtn) discCloseBtn.addEventListener("click", closeDiscoveryModal);
+    if (discBackdrop) discBackdrop.addEventListener("click", closeDiscoveryModal);
+    window.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeDiscoveryModal();
+    });
 
     // ==========================================
     // Main Animation Loop
@@ -1138,9 +1882,15 @@
         });
       }
 
+      // Update landmark and story prop animations
+      let anyAnimActive = false;
+      landmarkAnimators.forEach(fn => {
+        if (fn(dt)) anyAnimActive = true;
+      });
+
       render();
 
-      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging) {
+      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -1184,6 +1934,14 @@
       },
       pose(name) { wake(); },
       chomp() { wake(); }
+    };
+
+    window.Park3D = {
+      interactiveMeshes,
+      STATES,
+      openDiscoveryModal,
+      closeDiscoveryModal,
+      playSound
     };
 
     hero.classList.add("park-ready");

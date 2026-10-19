@@ -16,7 +16,10 @@
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
-    <button type="button" class="breeze-pill breeze-btn" id="breezeBtn" aria-pressed="true">🍃 Breeze: on</button>
+    <div class="nav-controls">
+      <button type="button" class="breeze-pill breeze-btn" id="breezeBtn" aria-pressed="true">🍃 Breeze: on</button>
+      <button type="button" class="breeze-pill sound-btn" id="soundBtn" aria-pressed="false">🔔 Sound: off</button>
+    </div>
   </div>
 </nav>
 
@@ -82,7 +85,29 @@
 </footer>
 <div class="reward-toast" id="rewardToast" hidden></div>
 
+<!-- Interactive Discovery Card Dialog -->
+<div class="discovery-backdrop" id="discoveryBackdrop" hidden></div>
+<div class="discovery-modal" id="discoveryModal" role="dialog" aria-modal="true" aria-labelledby="discTitle" hidden>
+  <div class="disc-card">
+    <button type="button" class="disc-close" id="discClose" aria-label="Close discovery card">✕</button>
+    <div class="disc-badge" id="discIcon">⭐</div>
+    <div class="disc-header">
+      <h2 class="disc-title" id="discTitle">Arkansas</h2>
+      <div class="disc-subtitle" id="discSubtitle">Capital: Little Rock · The Natural State</div>
+    </div>
+    <div class="disc-body">
+      <p class="disc-fact" id="discFact">Arkansas has sparkling quartz crystals, rushing rivers, and emerald forests.</p>
+      <div class="disc-extra" id="discExtra"></div>
+    </div>
+    <div class="disc-actions" id="discActions">
+      <button type="button" class="disc-btn primary" id="discWalkBtn">🚶 Walk to Landmark</button>
+      <button type="button" class="disc-btn secondary" id="discInteractBtn">✨ Interact</button>
+    </div>
+  </div>
+</div>
+
 <script src="assets/shared.js"></script>
+<script src="assets/audio.js"></script>
 <script src="assets/ahaan-model.js"></script>
 <script src="assets/park3d.js"></script>
 <script src="assets/candy.js"></script>
