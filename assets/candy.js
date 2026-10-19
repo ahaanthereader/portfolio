@@ -2,7 +2,7 @@
    Calm mode (reduced motion) and modified clicks (new tab, etc.) just follow the link. ---- */
 (function () {
   const GROUPS = [
-    ["📚 Read", [["reading.html", "Reading"], ["kindle.html", "Kindle"], ["library.html", "Library"], ["story.html", "Stories"]]],
+    ["📚 Read", [["reading.html", "Reading"], ["kindle.html", "Kindle"], ["library.html", "Library"], ["story.html", "Stories"], ["sketchbook.html", "Sketch"]]],
     ["🧭 Explore", [["geography.html", "Maps"], ["quiz.html", "Quiz"], ["doors.html", "Doors"], ["bells.html", "Bells"]]],
     ["🎈 Play", [["swing.html", "Swing"], ["games.html", "Games"], ["music.html", "Music"], ["movies.html", "Movies"]]],
     ["⭐ My stuff", [["calendar.html", "Calendar"], ["rewards.html", "Rewards"], ["journey.html", "Journey"]]]
@@ -45,6 +45,7 @@
     "kindle.html": ["Beep boop! Story download complete!", "My Kindle is HUNGRY for stories!", "Swipe, swipe... ADVENTURE!", "Tiny screen, GIGANTIC stories!", "Page-turning power: 1000 percent!"],
     "library.html": ["To the library, at TOP SPEED!", "Shhh... ZOOM! Library mode!", "So many books, so little bedtime!", "Library card: FULLY CHARGED!", "The books missed me. I could tell."],
     "story.html": ["Once upon a time... something SILLY happened!", "Author Ahaan is IN the building!", "My pencil has BIG plans!", "Warning: this story may contain giggles!", "Plot twist: the hot dog was the hero all along!"],
+    "sketchbook.html": ["Time to draw and explore!", "Singapore sketchbook open!", "Check out these cool drawings!", "Magnifying glass ready!", "Curled pages feel like real paper!"],
     "geography.html": ["Map-tastic! Where to, Captain?", "Continents, ASSEMBLE!", "Latitude! Longitude! LUNCH-itude!", "Adventure is THAT way. Probably.", "I can see my house from here! (Not really.)"],
     "quiz.html": ["Brain, don't fail me now!", "Capital cities? I've GOT this!", "Ding ding! Quiz brain ONLINE!", "My brain is doing push-ups!", "Ask me anything. Well... almost anything!"],
     "doors.html": ["Knock knock! Who's there? THE WHOLE WORLD!", "Which door? ALL the doors!", "Opening doors like a PRO!", "Wisdom delivery, coming right up!", "Behind this door: something AWESOME!"],
