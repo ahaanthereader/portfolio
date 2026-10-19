@@ -175,8 +175,10 @@ window.AhaanModel = {
         rightLeg.knee.rotation.x = Math.max(0, swing * 0.75);
         leftArm.arm.rotation.x = -swing * 0.45;
         wavingArm.arm.rotation.x = swing * 0.45;
-        // energetic child bounce
-        rig.position.y = -6.95 + Math.abs(Math.sin(walkPhase * 2)) * 0.16;
+        // Subtle vertical bounce for torso and head
+        const bounce = Math.abs(Math.sin(walkPhase * 2)) * 0.12;
+        torso.position.y = bounce;
+        head.position.y = bounce;
       } else {
         leftLeg.hip.rotation.x *= 0.82;
         rightLeg.hip.rotation.x *= 0.82;
@@ -184,7 +186,8 @@ window.AhaanModel = {
         rightLeg.knee.rotation.x *= 0.82;
         leftArm.arm.rotation.x *= 0.82;
         wavingArm.arm.rotation.x *= 0.82;
-        rig.position.y += (-6.95 - rig.position.y) * 0.2;
+        torso.position.y *= 0.82;
+        head.position.y *= 0.82;
       }
     }
 
