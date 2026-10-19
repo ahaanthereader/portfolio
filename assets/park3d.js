@@ -957,8 +957,8 @@
       const landingPadMat = new T.MeshStandardMaterial({ color: 0x118ab2, roughness: 0.7 });
       const steelMat = new T.MeshStandardMaterial({ color: 0xa8b2ba, metalness: 0.85, roughness: 0.25 });
       const chainMat = new T.MeshStandardMaterial({ color: 0xdde2e6, metalness: 0.85, roughness: 0.25 });
-      const swingSeatMatA = new T.MeshStandardMaterial({ color: 0x073b4c, roughness: 0.5 });
-      const swingSeatMatB = new T.MeshStandardMaterial({ color: 0xff5964, roughness: 0.5 });
+      const swingSeatMatA = new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.45 }); // Vivid cherry red
+      const swingSeatMatB = new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 }); // Azure blue
       const mulchMat = new T.MeshStandardMaterial({ color: 0x5a3825, roughness: 0.95 });
       const trampPadMat = new T.MeshStandardMaterial({ color: 0x06d6a0, roughness: 0.45 });
       const trampMatBlack = new T.MeshStandardMaterial({ color: 0x1a211e, roughness: 0.95 });
@@ -1038,62 +1038,74 @@
       // ------------------------------------------
       // 2. Cedar Swing Set (North-East Lawn: x = 3.2, z = -2.8)
       // ------------------------------------------
+      // 2. Cedar A-Frame Swing Set (East Lawn: x = 3.2, z = -2.8)
+      // ------------------------------------------
       const swingGroup = new T.Group();
       swingGroup.position.set(3.2, 0.45, -2.8);
       playGroup.add(swingGroup);
 
       // Soft cedar mulch safety bed
-      const mulchBed = new T.Mesh(new T.BoxGeometry(2.8, 0.03, 2.4), mulchMat);
+      const mulchBed = new T.Mesh(new T.BoxGeometry(6.4, 0.03, 5.2), mulchMat);
       mulchBed.position.set(0, 0.015, 0);
       mulchBed.receiveShadow = true;
       swingGroup.add(mulchBed);
       if (walkables) walkables.push(mulchBed);
 
-      // A-Frame legs on left (x = -1.1) and right (x = 1.1)
-      [-1.1, 1.1].forEach(ax => {
-        [-0.85, 0.85].forEach(az => {
-          const leg = new T.Mesh(new T.CylinderGeometry(0.045, 0.055, 2.45, 8), cedarMat);
-          leg.position.set(ax, 1.18, az * 0.45);
-          leg.rotation.x = (az > 0 ? -1 : 1) * 0.32;
+      // Cedar A-Frame upright legs on left (x = -2.5) and right (x = 2.5)
+      const legHeight = 8.2;
+      [-2.5, 2.5].forEach(ax => {
+        [-1.8, 1.8].forEach(az => {
+          const leg = new T.Mesh(new T.CylinderGeometry(0.09, 0.11, legHeight, 10), cedarMat);
+          leg.position.set(ax, legHeight * 0.48, az * 0.45);
+          leg.rotation.x = (az > 0 ? -1 : 1) * 0.25;
           leg.castShadow = true;
           swingGroup.add(leg);
         });
-        const spreader = new T.Mesh(new T.BoxGeometry(0.06, 0.06, 0.82), cedarMat);
-        spreader.position.set(ax, 0.85, 0);
+        const spreader = new T.Mesh(new T.BoxGeometry(0.12, 0.12, 2.1), cedarMat);
+        spreader.position.set(ax, 2.6, 0);
         swingGroup.add(spreader);
       });
 
-      // Top horizontal crossbeam
-      const crossbeam = new T.Mesh(new T.CylinderGeometry(0.065, 0.065, 2.4, 8), cedarMat);
-      crossbeam.position.set(0, 2.22, 0);
+      // Top horizontal crossbeam at y = 7.60
+      const crossbeam = new T.Mesh(new T.CylinderGeometry(0.12, 0.12, 5.4, 12), cedarMat);
+      crossbeam.position.set(0, 7.60, 0);
       crossbeam.rotation.z = Math.PI / 2;
       crossbeam.castShadow = true;
       swingGroup.add(crossbeam);
 
-      // Left Swing: Ahaan's interactive swing (x = -0.45)
+      // Left Swing: Ahaan's interactive swing (x = -1.15)
+      const swingChainLen = 4.8;
       swingPivot = new T.Group();
-      swingPivot.position.set(-0.45, 2.20, 0);
-      [-0.20, 0.20].forEach(cx => {
-        const chain = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 1.4, 6), chainMat);
-        chain.position.set(cx, -0.7, 0);
+      swingPivot.position.set(-1.15, 7.55, 0);
+      [-0.48, 0.48].forEach(cx => {
+        const chain = new T.Mesh(new T.CylinderGeometry(0.016, 0.016, swingChainLen, 6), chainMat);
+        chain.position.set(cx, -swingChainLen * 0.5, 0);
         swingPivot.add(chain);
+
+        const bolt = new T.Mesh(new T.CylinderGeometry(0.024, 0.024, 0.12, 6), steelMat);
+        bolt.position.set(cx, -swingChainLen + 0.05, 0);
+        swingPivot.add(bolt);
       });
-      const seatA = new T.Mesh(new T.BoxGeometry(0.46, 0.04, 0.22), swingSeatMatA);
-      seatA.position.set(0, -1.4, 0);
+      const seatA = new T.Mesh(new T.BoxGeometry(1.24, 0.09, 0.60), swingSeatMatA);
+      seatA.position.set(0, -swingChainLen, 0);
       seatA.castShadow = true;
       swingPivot.add(seatA);
       swingGroup.add(swingPivot);
 
-      // Right Swing: Companion swing gently swaying in breeze (x = 0.45)
+      // Right Swing: Companion swing gently swaying in breeze (x = 1.15)
       companionSwingPivot = new T.Group();
-      companionSwingPivot.position.set(0.45, 2.20, 0);
-      [-0.20, 0.20].forEach(cx => {
-        const chain = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 1.4, 6), chainMat);
-        chain.position.set(cx, -0.7, 0);
+      companionSwingPivot.position.set(1.15, 7.55, 0);
+      [-0.48, 0.48].forEach(cx => {
+        const chain = new T.Mesh(new T.CylinderGeometry(0.016, 0.016, swingChainLen, 6), chainMat);
+        chain.position.set(cx, -swingChainLen * 0.5, 0);
         companionSwingPivot.add(chain);
+
+        const bolt = new T.Mesh(new T.CylinderGeometry(0.024, 0.024, 0.12, 6), steelMat);
+        bolt.position.set(cx, -swingChainLen + 0.05, 0);
+        companionSwingPivot.add(bolt);
       });
-      const seatB = new T.Mesh(new T.BoxGeometry(0.46, 0.04, 0.22), swingSeatMatB);
-      seatB.position.set(0, -1.4, 0);
+      const seatB = new T.Mesh(new T.BoxGeometry(1.24, 0.09, 0.60), swingSeatMatB);
+      seatB.position.set(0, -swingChainLen, 0);
       seatB.castShadow = true;
       companionSwingPivot.add(seatB);
       swingGroup.add(companionSwingPivot);
@@ -2222,9 +2234,9 @@
       {
         id: "swing",
         name: "Cedar Swings",
-        x: 3.2,
-        z: -2.8,
-        approachRadius: 2.8,
+        x: 2.15,
+        z: -1.5,
+        approachRadius: 3.5,
         actionLabel: "Swing! 🪁",
         promptText: "Press Enter to Swing! 🪁",
         onActivate: () => startPlayActivity("swing")
@@ -2393,14 +2405,14 @@
         actionCamPos.set(-2.6 + 6.2, 5.5, -2.4 + 7.5);
         sayAhaan("Let us slide! 🛝", "Climb up to the top!", "🛝", "Playground Slide");
       } else if (type === "swing") {
-        targetPos = new T.Vector3(2.75, rigBaseY, -2.3);
-        marker.position.set(2.75, 0.52, -2.3);
+        targetPos = new T.Vector3(2.05, rigBaseY, -1.6);
+        marker.position.set(2.05, 0.52, -1.6);
         markerMat.opacity = 0.95;
-        swingAngle = 0.25;
-        swingVelocity = 1.2;
+        swingAngle = 0.35;
+        swingVelocity = 1.4;
         cameraMode = "action";
-        actionCamTarget.set(2.75, 1.8, -2.8);
-        actionCamPos.set(2.75 - 6.8, 5.4, -2.8 + 6.8);
+        actionCamTarget.set(2.05, 4.3, -2.8);
+        actionCamPos.set(2.05 - 10.2, 5.8, -2.8 + 10.2);
         sayAhaan("Let us swing! 🪁", "Pump legs to touch the sky!", "🪁", "Cedar Swings");
       } else if (type === "trampoline") {
         targetPos = new T.Vector3(-2.95, rigBaseY, 0.2);
@@ -2452,7 +2464,8 @@
       }
 
       if (A.resetLimbs) A.resetLimbs();
-      A.rig.scale.set(1, 1, 1);
+      if (A.rig.parent !== scene) scene.add(A.rig);
+      A.rig.scale.setScalar(ahaanScale);
       A.rig.rotation.set(0, 0, 0);
       A.rig.position.y = rigBaseY;
 
@@ -2460,7 +2473,7 @@
         A.rig.position.set(-2.95, rigBaseY, 0.2);
         if (trampMat) trampMat.position.y = 0.54;
       } else if (prev === "swing") {
-        A.rig.position.set(2.75, rigBaseY, -2.3);
+        A.rig.position.set(2.05, rigBaseY, -1.6);
         if (swingPivot) swingPivot.rotation.x = 0;
       } else if (prev === "slide") {
         A.rig.position.set(-2.6, rigBaseY, -1.1);
@@ -2592,23 +2605,38 @@
       } else if (currentActivity === "swing") {
         // Phase 0: Approach swing
         if (activityPhase === 0) {
-          const dist = Math.hypot(A.rig.position.x - 2.75, A.rig.position.z - (-2.3));
-          if (dist < 0.65 || !targetPos) {
+          const dist = Math.hypot(A.rig.position.x - 2.05, A.rig.position.z - (-1.6));
+          if (dist < 0.75 || !targetPos) {
             activityPhase = 1;
             activityTimer = 0;
             targetPos = null;
             isWalking = false;
             markerMat.opacity = 0;
-            A.rig.position.set(2.75, rigBaseY, -2.3);
-            A.rig.rotation.y = 0;
+
+            // Mount Ahaan directly onto swingPivot seat
+            swingPivot.add(A.rig);
+            A.rig.position.set(0, -2.28, 0.04);
+            A.rig.rotation.set(0, 0, 0);
+            A.rig.scale.setScalar(ahaanScale);
+
+            // Set sitting posture
+            A.leftLeg.hip.rotation.set(-1.45, 0, -0.04);
+            A.rightLeg.hip.rotation.set(-1.45, 0, 0.04);
+            A.leftLeg.knee.rotation.set(0.90, 0, 0);
+            A.rightLeg.knee.rotation.set(0.90, 0, 0);
+            A.leftArm.arm.rotation.set(-1.15, 0, 0.30);
+            A.wavingArm.arm.rotation.set(-1.15, 0, -0.30);
+            A.leftArm.elbow.rotation.set(0.60, 0, 0);
+            A.wavingArm.elbow.rotation.set(0.60, 0, 0);
+            A.head.rotation.set(-0.15, 0, 0);
           }
         }
-        // Phase 1: Real pendulum swinging physics
+        // Phase 1: Real pendulum swinging physics with seated Ahaan
         else if (activityPhase === 1) {
           activityTimer += dt;
-          const swingL = 1.4;
+          const swingL = 4.8;
           const swingG = 9.8;
-          const swingDamping = 0.25;
+          const swingDamping = 0.18;
 
           const angularAcc = -(swingG / swingL) * Math.sin(swingAngle) - swingDamping * swingVelocity;
           swingVelocity += angularAcc * dt;
@@ -2616,36 +2644,35 @@
 
           if (swingPivot) swingPivot.rotation.x = swingAngle;
 
-          const py = 2.65, pz = -2.8;
-          const seatY = py - Math.cos(swingAngle) * swingL;
-          const seatZ = pz + Math.sin(swingAngle) * swingL;
-
-          A.rig.position.set(2.75, seatY - 0.22, seatZ);
-          A.rig.rotation.x = swingAngle;
-          A.rig.rotation.y = 0;
-          A.rig.scale.set(1, 1, 1);
-
           // Leg-pumping animation based on motion direction
-          if (swingVelocity > 0.2) {
-            A.leftLeg.hip.rotation.x = -1.45;
-            A.rightLeg.hip.rotation.x = -1.45;
-            A.leftLeg.knee.rotation.x = 0.05;
-            A.rightLeg.knee.rotation.x = 0.05;
-          } else if (swingVelocity < -0.2) {
-            A.leftLeg.hip.rotation.x = -0.65;
-            A.rightLeg.hip.rotation.x = -0.65;
-            A.leftLeg.knee.rotation.x = 1.05;
-            A.rightLeg.knee.rotation.x = 1.05;
+          if (swingVelocity > 0.25) {
+            A.leftLeg.hip.rotation.x = -1.55;
+            A.rightLeg.hip.rotation.x = -1.55;
+            A.leftLeg.knee.rotation.x = 0.20;
+            A.rightLeg.knee.rotation.x = 0.20;
+          } else if (swingVelocity < -0.25) {
+            A.leftLeg.hip.rotation.x = -1.25;
+            A.rightLeg.hip.rotation.x = -1.25;
+            A.leftLeg.knee.rotation.x = 1.35;
+            A.rightLeg.knee.rotation.x = 1.35;
+          } else {
+            A.leftLeg.hip.rotation.x = -1.40;
+            A.rightLeg.hip.rotation.x = -1.40;
+            A.leftLeg.knee.rotation.x = 0.90;
+            A.rightLeg.knee.rotation.x = 0.90;
           }
 
-          // Hands gripping chains
-          A.leftArm.arm.rotation.x = -1.15;
-          A.wavingArm.arm.rotation.x = -1.15;
-          A.leftArm.arm.rotation.z = 0.25;
-          A.wavingArm.arm.rotation.z = -0.25;
+          // Hands securely gripping swing chains at chest height
+          A.leftArm.arm.rotation.set(-1.15, 0, 0.30);
+          A.wavingArm.arm.rotation.set(-1.15, 0, -0.30);
+          A.leftArm.elbow.rotation.set(0.60, 0, 0);
+          A.wavingArm.elbow.rotation.set(0.60, 0, 0);
+
+          // Head looks forward into the wind
+          A.head.rotation.set(-0.15, 0, 0);
 
           // Breeze sound at high velocity
-          if (Math.abs(swingAngle) < 0.18 && Math.abs(swingVelocity) > 2.0) {
+          if (Math.abs(swingAngle) < 0.20 && Math.abs(swingVelocity) > 2.0) {
             const nowTime = performance.now();
             if (nowTime - lastBreezeSoundTime > 650) {
               lastBreezeSoundTime = nowTime;
@@ -2653,10 +2680,10 @@
             }
           }
 
-          // Apex chime
+          // Apex chime on high arc
           if (Math.abs(swingAngle) > 0.65 && (activityTimer - lastApexChime > 0.85)) {
             lastApexChime = activityTimer;
-            playSound("chime");
+            playSound("bell");
           }
         }
       } else if (currentActivity === "trampoline") {
@@ -2707,7 +2734,11 @@
             trampY += trampVy * dt;
 
             const stretch = Math.min(0.2, Math.max(0, trampVy / 12) * 0.2);
-            A.rig.scale.set(1 - stretch * 0.4, 1 + stretch * 0.6, 1 - stretch * 0.4);
+            A.rig.scale.set(
+              ahaanScale * (1 - stretch * 0.4),
+              ahaanScale * (1 + stretch * 0.6),
+              ahaanScale * (1 - stretch * 0.4)
+            );
 
             A.leftArm.arm.rotation.z = 2.0;
             A.wavingArm.arm.rotation.z = -2.0;
@@ -2742,7 +2773,11 @@
             if (trampMat) trampMat.position.y = 0.54 - trampDeflection;
 
             const squash = Math.min(0.35, trampDeflection * 1.6);
-            A.rig.scale.set(1 + squash * 0.7, 1 - squash * 0.85, 1 + squash * 0.7);
+            A.rig.scale.set(
+              ahaanScale * (1 + squash * 0.7),
+              ahaanScale * (1 - squash * 0.85),
+              ahaanScale * (1 + squash * 0.7)
+            );
             A.rig.rotation.x = 0;
 
             A.leftLeg.knee.rotation.x = squash * 4.5;
@@ -3348,7 +3383,9 @@
         wake();
       },
       getCurrentActivity: () => currentActivity,
-      getCurrentNearbyItem: () => currentNearbyItem
+      getCurrentNearbyItem: () => currentNearbyItem,
+      getA: () => A,
+      getSwingPivot: () => swingPivot
     };
 
     hero.classList.add("park-ready");
