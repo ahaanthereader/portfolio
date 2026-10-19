@@ -4,11 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>My Library · Ahaan's World</title>
-<meta name="description" content="My Library — What I've borrowed lately." />
+<meta name="description" content="My Library — 3D Art Book Shelf and borrowed books." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="src/shaders/threeui.css" />
 <link rel="stylesheet" href="assets/site.css" />
 </head>
 <body class="page-library fit-screen">
@@ -38,16 +39,53 @@
     <div class="sec-head">
       <div class="eyebrow">My Second Home</div>
       <h2>At the library 📚</h2>
-      <p>These are the books I have checked out right now — a whole stack about countries of the world! 🌍</p>
+      <p>Explore the 3D art book shelf or see my borrowed country books! 🌍</p>
+      <div class="lib-tabs" role="tablist" aria-label="Library Views">
+        <button type="button" class="lib-tab active" role="tab" id="tabShelfBtn" aria-selected="true" aria-controls="panelShelf">
+          🏛️ 3D Art Book Shelf (Ashen Press)
+        </button>
+        <button type="button" class="lib-tab" role="tab" id="tabCheckoutsBtn" aria-selected="false" aria-controls="panelCheckouts">
+          📋 My Checkouts (<span id="statTabBooks">7</span>)
+        </button>
+      </div>
     </div>
-    <div class="lib-card">
-      <div class="head"><span>📚 My Checkouts</span><span class="num">Ahaan</span></div>
-      <div class="lib-rows" id="libRows"><!-- filled by JS --></div>
+
+    <!-- Tab 1: 3D Art Book Shelf (Ashen Press from ThreeUI) -->
+    <div class="tab-panel active" id="panelShelf" role="tabpanel" aria-labelledby="tabShelfBtn">
+      <div class="shader-frame">
+        <div
+          class="threeui-background ashen-press"
+          role="group"
+          aria-label="Interactive Ashen Press art book shelf"
+          data-state="ready"
+          style="position: relative; overflow: hidden; background: #c6ae8e; pointer-events: auto; width: 100%; height: 100%;"
+        >
+          <iframe
+            id="ashenFrame"
+            title="Ashen Press — The Art Book Shelf"
+            src="src/shaders/ashen-press/sources/ashen-press.html"
+            sandbox="allow-scripts"
+            loading="eager"
+            style="position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; background: #c6ae8e; opacity: 1; pointer-events: auto;"
+          ></iframe>
+        </div>
+      </div>
+      <div class="shelf-hint-bar">
+        <span>💡 Tap any volume to open detail view · Drag volume to inspect in 3D · Press Esc to return</span>
+      </div>
     </div>
-    <div class="lib-stats">
-      <div class="lib-stat"><div class="n" id="statBooks">—</div><div class="l">Books Out Now</div></div>
-      <div class="lib-stat"><div class="n" id="statVisits">—</div><div class="l">Renewals Each</div></div>
-      <div class="lib-stat"><div class="n" id="statGenre">—</div><div class="l">Favorite Topic</div></div>
+
+    <!-- Tab 2: Checkouts and Stats -->
+    <div class="tab-panel" id="panelCheckouts" role="tabpanel" aria-labelledby="tabCheckoutsBtn" hidden>
+      <div class="lib-card">
+        <div class="head"><span>📚 My Checkouts</span><span class="num">Ahaan</span></div>
+        <div class="lib-rows" id="libRows"><!-- filled by JS --></div>
+      </div>
+      <div class="lib-stats">
+        <div class="lib-stat"><div class="n" id="statBooks">—</div><div class="l">Books Out Now</div></div>
+        <div class="lib-stat"><div class="n" id="statVisits">—</div><div class="l">Renewals Each</div></div>
+        <div class="lib-stat"><div class="n" id="statGenre">—</div><div class="l">Favorite Topic</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -59,7 +97,6 @@
     <p>Built with curiosity, books, and a really good swing.</p>
     <div class="links">
       <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
-      <!-- Add real links here, e.g. a reading log -->
     </div>
     <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
   </div>
