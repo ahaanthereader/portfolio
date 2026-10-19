@@ -84,10 +84,79 @@
     const mapGroup = new T.Group();
     scene.add(mapGroup);
 
-    // Surrounding grassy terrain
+    // Procedural painterly meadow texture (clovers, grass blades, buttercups)
+    function createMeadowTexture(T) {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+
+      // Deep, rich grass gradient base
+      const bg = g.createLinearGradient(0, 0, 512, 512);
+      bg.addColorStop(0, "#9fc586");
+      bg.addColorStop(0.5, "#8db673");
+      bg.addColorStop(1, "#7ea964");
+      g.fillStyle = bg;
+      g.fillRect(0, 0, 512, 512);
+
+      // Subtle organic soil and lawn dappling
+      for (let i = 0; i < 450; i++) {
+        const x = Math.random() * 512, y = Math.random() * 512;
+        const rad = 2 + Math.random() * 5;
+        g.fillStyle = Math.random() > 0.5 ? "rgba(105, 155, 75, 0.3)" : "rgba(165, 205, 130, 0.3)";
+        g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
+      }
+
+      // 3-Lobed clover clusters
+      for (let i = 0; i < 95; i++) {
+        const cx = Math.random() * 512, cy = Math.random() * 512;
+        const cRad = 3 + Math.random() * 3.5;
+        g.fillStyle = Math.random() > 0.3 ? "#4d7e35" : "#3d6b28";
+        for (let lobe = 0; lobe < 3; lobe++) {
+          const ang = (lobe * Math.PI * 2) / 3;
+          g.beginPath();
+          g.arc(cx + Math.cos(ang) * cRad * 0.7, cy + Math.sin(ang) * cRad * 0.7, cRad * 0.65, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = "rgba(180, 225, 150, 0.45)";
+        g.beginPath(); g.arc(cx, cy, cRad * 0.28, 0, Math.PI * 2); g.fill();
+      }
+
+      // Fine botanical grass blades
+      g.strokeStyle = "rgba(60, 105, 40, 0.45)";
+      g.lineWidth = 1.3;
+      for (let i = 0; i < 350; i++) {
+        const gx = Math.random() * 512, gy = Math.random() * 512;
+        g.beginPath();
+        g.moveTo(gx, gy);
+        g.quadraticCurveTo(gx + (Math.random() - 0.5) * 8, gy - 6 - Math.random() * 8, gx + (Math.random() - 0.5) * 12, gy - 12);
+        g.stroke();
+      }
+
+      // Wildflower specks (daisy white and sunny yellow buttercups)
+      for (let i = 0; i < 50; i++) {
+        const bx = Math.random() * 512, by = Math.random() * 512;
+        const isYellow = Math.random() > 0.4;
+        g.fillStyle = isYellow ? "#ffd54f" : "#ffffff";
+        g.beginPath(); g.arc(bx, by, 2.5, 0, Math.PI * 2); g.fill();
+        g.fillStyle = "#ff9800";
+        g.beginPath(); g.arc(bx, by, 1.0, 0, Math.PI * 2); g.fill();
+      }
+
+      const tex = new T.CanvasTexture(c);
+      tex.encoding = T.sRGBEncoding;
+      tex.wrapS = tex.wrapT = T.RepeatWrapping;
+      tex.repeat.set(14, 14);
+      return tex;
+    }
+
+    // Surrounding grassy terrain with rich clover meadow texture
     const groundGeo = new T.PlaneGeometry(180, 180, 48, 48);
     groundGeo.rotateX(-Math.PI / 2);
-    const groundMat = new T.MeshStandardMaterial({ color: 0xb5cca8, roughness: 0.95 });
+    const groundMat = new T.MeshStandardMaterial({
+      color: 0xffffff,
+      map: createMeadowTexture(T),
+      roughness: 0.9
+    });
     const ground = new T.Mesh(groundGeo, groundMat);
     ground.receiveShadow = true;
     ground.position.y = 0;
@@ -138,6 +207,17 @@
     // 3D Nature: Lush Trees, Rocks & Wildflowers
     // ==========================================
     buildNature(mapGroup, T);
+
+    // ==========================================
+    // 3D Storytelling Reading Props (Arkansas)
+    // ==========================================
+    buildStoryProps(mapGroup, T, walkableSurfaces);
+
+    // ==========================================
+    // 3D Sky: Storybook Clouds & Sunbeams
+    // ==========================================
+    const clouds = buildClouds(scene, T);
+    buildSunbeams(scene, T);
 
     function buildPaths(parent, states, T, walkables) {
       const pathMat = new T.MeshStandardMaterial({ color: 0xdfceb0, roughness: 0.9, flatShading: true });
@@ -232,6 +312,265 @@
       }
       makeBridge(6.8, -3.2, -0.42);
       makeBridge(8.2, 4.4, 0.46);
+
+      // Floating water lily pads and pink lotus flowers
+      const lilyGeo = new T.CircleGeometry(0.55, 14);
+      lilyGeo.rotateX(-Math.PI / 2);
+      const lilyMat = new T.MeshStandardMaterial({ color: 0x3d7a42, roughness: 0.6 });
+      const lotusMat = new T.MeshStandardMaterial({ color: 0xf498b8, roughness: 0.5 });
+      const lilyPositions = [
+        [6.8, -10.5], [7.6, -7.0], [7.2, 0.5], [8.0, 9.5], [7.4, 15.0]
+      ];
+      lilyPositions.forEach(([lx, lz]) => {
+        const pad = new T.Mesh(lilyGeo, lilyMat);
+        pad.position.set(lx, 0.17, lz);
+        parent.add(pad);
+        const flower = new T.Mesh(new T.ConeGeometry(0.2, 0.28, 6), lotusMat);
+        flower.position.set(lx, 0.32, lz);
+        parent.add(flower);
+      });
+
+      // Wooden river dock / pier on the Arkansas riverbank
+      const dock = new T.Group();
+      dock.position.set(5.4, 0.35, -0.5);
+      const dockMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
+      const pier = new T.Mesh(new T.BoxGeometry(2.4, 0.14, 1.6), dockMat);
+      dock.add(pier);
+      if (walkables) walkables.push(pier);
+      [-1.1, 1.1].forEach(px => {
+        const post = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 0.6, 8), dockMat);
+        post.position.set(px, 0.3, 0.7);
+        dock.add(post);
+      });
+      parent.add(dock);
+    }
+
+    function buildStoryProps(parent, T, walkables) {
+      const storyGroup = new T.Group();
+      parent.add(storyGroup);
+
+      // 1. Gingham Picnic Reading Blanket
+      const blanketCanvas = document.createElement("canvas");
+      blanketCanvas.width = 128; blanketCanvas.height = 128;
+      const bg = blanketCanvas.getContext("2d");
+      bg.fillStyle = "#fff8f0";
+      bg.fillRect(0, 0, 128, 128);
+      bg.fillStyle = "rgba(215, 65, 80, 0.75)";
+      for (let i = 0; i < 128; i += 32) {
+        bg.fillRect(i, 0, 16, 128);
+        bg.fillRect(0, i, 128, 16);
+      }
+      const blanketTex = new T.CanvasTexture(blanketCanvas);
+      blanketTex.encoding = T.sRGBEncoding;
+      blanketTex.wrapS = blanketTex.wrapT = T.RepeatWrapping;
+      blanketTex.repeat.set(4, 3);
+
+      const blanketMat = new T.MeshStandardMaterial({ map: blanketTex, roughness: 0.9 });
+      const blanket = new T.Mesh(new T.BoxGeometry(3.6, 0.05, 2.6), blanketMat);
+      blanket.position.set(2.4, 0.46, 1.4);
+      blanket.receiveShadow = true;
+      storyGroup.add(blanket);
+      if (walkables) walkables.push(blanket);
+
+      // 2. Open Hardcover Storybook
+      const bookGroup = new T.Group();
+      bookGroup.position.set(2.0, 0.50, 1.2);
+      bookGroup.rotation.y = -0.25;
+      const coverMat = new T.MeshStandardMaterial({ color: 0x1d3557, roughness: 0.7 });
+      const pagesMat = new T.MeshStandardMaterial({ color: 0xfffaee, roughness: 0.8 });
+      const cover = new T.Mesh(new T.BoxGeometry(1.2, 0.04, 0.85), coverMat);
+      bookGroup.add(cover);
+      [-0.28, 0.28].forEach(px => {
+        const page = new T.Mesh(new T.BoxGeometry(0.52, 0.03, 0.78), pagesMat);
+        page.position.set(px, 0.03, 0);
+        bookGroup.add(page);
+      });
+      const ribbon = new T.Mesh(new T.BoxGeometry(0.08, 0.02, 0.95), new T.MeshStandardMaterial({ color: 0xe63946 }));
+      ribbon.position.set(0, 0.04, 0.08);
+      bookGroup.add(ribbon);
+      storyGroup.add(bookGroup);
+
+      // 3. Adventure Journal & Pen
+      const journalGroup = new T.Group();
+      journalGroup.position.set(3.3, 0.50, 1.8);
+      journalGroup.rotation.y = 0.35;
+      const journalMat = new T.MeshStandardMaterial({ color: 0x7c4928, roughness: 0.7 });
+      const journal = new T.Mesh(new T.BoxGeometry(0.7, 0.06, 0.95), journalMat);
+      journalGroup.add(journal);
+      const pen = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 0.7, 8), new T.MeshStandardMaterial({ color: 0x222222, metalness: 0.8, roughness: 0.2 }));
+      pen.rotation.z = Math.PI / 2;
+      pen.position.set(0, 0.045, 0.55);
+      journalGroup.add(pen);
+      storyGroup.add(journalGroup);
+
+      // 4. Stargazing Telescope on Wooden Tripod
+      const teleGroup = new T.Group();
+      teleGroup.position.set(-2.8, 0.45, 2.0);
+      const woodMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
+      const brassMat = new T.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
+      for (let leg = 0; leg < 3; leg++) {
+        const ang = (leg * Math.PI * 2) / 3;
+        const pole = new T.Mesh(new T.CylinderGeometry(0.04, 0.05, 1.9, 8), woodMat);
+        pole.position.set(Math.cos(ang) * 0.45, 0.9, Math.sin(ang) * 0.45);
+        pole.rotation.x = Math.sin(ang) * 0.25;
+        pole.rotation.z = -Math.cos(ang) * 0.25;
+        pole.castShadow = true;
+        teleGroup.add(pole);
+      }
+      const mount = new T.Mesh(new T.CylinderGeometry(0.12, 0.14, 0.25, 10), brassMat);
+      mount.position.y = 1.82;
+      teleGroup.add(mount);
+      const tubeGroup = new T.Group();
+      tubeGroup.position.set(0, 1.95, 0);
+      tubeGroup.rotation.y = -0.5;
+      tubeGroup.rotation.x = -0.55;
+      const tube = new T.Mesh(new T.CylinderGeometry(0.1, 0.16, 2.2, 14), brassMat);
+      tube.castShadow = true;
+      tubeGroup.add(tube);
+      const lensRing = new T.Mesh(new T.TorusGeometry(0.17, 0.03, 8, 16), brassMat);
+      lensRing.position.y = 1.1;
+      tubeGroup.add(lensRing);
+      teleGroup.add(tubeGroup);
+      storyGroup.add(teleGroup);
+
+      // 5. Picnic Basket with Shiny Red Apple
+      const basketGroup = new T.Group();
+      basketGroup.position.set(1.5, 0.46, 2.2);
+      const wickerMat = new T.MeshStandardMaterial({ color: 0xb58249, roughness: 0.9 });
+      const basket = new T.Mesh(new T.BoxGeometry(0.85, 0.55, 0.65), wickerMat);
+      basket.position.y = 0.28;
+      basket.castShadow = true;
+      basketGroup.add(basket);
+      const handle = new T.Mesh(new T.TorusGeometry(0.38, 0.04, 8, 16, Math.PI), wickerMat);
+      handle.position.y = 0.55;
+      basketGroup.add(handle);
+      const apple = new T.Mesh(new T.SphereGeometry(0.12, 10, 8), new T.MeshStandardMaterial({ color: 0xd90429, roughness: 0.4 }));
+      apple.position.set(0.65, 0.12, -0.2);
+      apple.castShadow = true;
+      basketGroup.add(apple);
+      storyGroup.add(basketGroup);
+
+      // 6. Garden Lantern
+      const lanternGroup = new T.Group();
+      lanternGroup.position.set(-2.0, 0.45, -1.6);
+      const metalMat = new T.MeshStandardMaterial({ color: 0x333333, metalness: 0.6, roughness: 0.4 });
+      const baseLantern = new T.Mesh(new T.CylinderGeometry(0.2, 0.24, 0.1, 8), metalMat); baseLantern.position.y = 0.05;
+      const capLantern = new T.Mesh(new T.ConeGeometry(0.26, 0.22, 8), metalMat); capLantern.position.y = 0.7;
+      const glass = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.5, 8), new T.MeshStandardMaterial({ color: 0xffd166, roughness: 0.2, emissive: 0xffaa00, emissiveIntensity: 0.4 }));
+      glass.position.y = 0.35;
+      lanternGroup.add(baseLantern, glass, capLantern);
+      storyGroup.add(lanternGroup);
+
+      // 7. Dandelions with Leaves (like the reference photo!)
+      function createDandelion(x, z, scale) {
+        const dand = new T.Group();
+        dand.position.set(x, 0.45, z);
+        const stemMat = new T.MeshStandardMaterial({ color: 0x5a8a42, roughness: 0.8 });
+        const stem = new T.Mesh(new T.CylinderGeometry(0.04 * scale, 0.04 * scale, 1.1 * scale, 8), stemMat);
+        stem.position.y = 0.55 * scale;
+        dand.add(stem);
+        const headMat = new T.MeshStandardMaterial({ color: 0xffd000, roughness: 0.9, flatShading: true });
+        const blossom = new T.Mesh(new T.SphereGeometry(0.3 * scale, 10, 8), headMat);
+        blossom.position.y = 1.15 * scale;
+        dand.add(blossom);
+        for (let l = 0; l < 4; l++) {
+          const lang = (l * Math.PI) / 2;
+          const leaf = new T.Mesh(new T.BoxGeometry(0.18 * scale, 0.03, 0.65 * scale), stemMat);
+          leaf.position.set(Math.cos(lang) * 0.3 * scale, 0.05, Math.sin(lang) * 0.3 * scale);
+          leaf.rotation.y = lang;
+          leaf.rotation.x = 0.2;
+          dand.add(leaf);
+        }
+        storyGroup.add(dand);
+      }
+      createDandelion(-3.4, 3.8, 1.2);
+      createDandelion(-3.8, 4.4, 0.9);
+      createDandelion(3.8, 3.6, 1.1);
+      createDandelion(4.4, 4.2, 0.85);
+    }
+
+    function buildClouds(scene, T) {
+      const cloudsGroup = new T.Group();
+      scene.add(cloudsGroup);
+
+      const cloudMat = new T.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.85,
+        flatShading: true
+      });
+      const shadowMat = new T.MeshBasicMaterial({
+        color: 0x1a3320,
+        transparent: true,
+        opacity: 0.16,
+        depthWrite: false
+      });
+      const shadowGeo = new T.CircleGeometry(3.5, 16);
+      shadowGeo.rotateX(-Math.PI / 2);
+
+      const clouds = [];
+      const cloudConfigs = [
+        { x: -30, y: 20, z: -26, s: 0.95, speed: 0.35 },
+        { x: 25, y: 21, z: -25, s: 1.05, speed: 0.4 },
+        { x: -4, y: 22, z: -28, s: 1.2, speed: 0.3 },
+        { x: 36, y: 19, z: -22, s: 0.85, speed: 0.42 },
+        { x: -36, y: 19, z: -18, s: 0.85, speed: 0.38 }
+      ];
+
+      cloudConfigs.forEach(cfg => {
+        const cGroup = new T.Group();
+        cGroup.position.set(cfg.x, cfg.y, cfg.z);
+        cGroup.userData = { speed: cfg.speed, baseZ: cfg.z };
+
+        // Fluffy cumulus cloud lobes
+        const s0 = new T.Mesh(new T.SphereGeometry(2.4 * cfg.s, 10, 8), cloudMat);
+        s0.castShadow = true;
+        cGroup.add(s0);
+        const s1 = new T.Mesh(new T.SphereGeometry(1.7 * cfg.s, 8, 7), cloudMat);
+        s1.position.set(-1.8 * cfg.s, -0.2 * cfg.s, 0.4 * cfg.s);
+        s1.castShadow = true;
+        cGroup.add(s1);
+        const s2 = new T.Mesh(new T.SphereGeometry(1.9 * cfg.s, 8, 7), cloudMat);
+        s2.position.set(2.0 * cfg.s, -0.2 * cfg.s, -0.3 * cfg.s);
+        s2.castShadow = true;
+        cGroup.add(s2);
+        const s3 = new T.Mesh(new T.SphereGeometry(1.5 * cfg.s, 8, 7), cloudMat);
+        s3.position.set(0.4 * cfg.s, 1.2 * cfg.s, 0.2 * cfg.s);
+        s3.castShadow = true;
+        cGroup.add(s3);
+
+        // Ground shadow oval moving with cloud
+        const shadow = new T.Mesh(shadowGeo, shadowMat);
+        shadow.scale.set(cfg.s * 1.2, 1, cfg.s * 0.85);
+        shadow.position.set(0, -cfg.y + 0.22, 1.2);
+        cGroup.add(shadow);
+
+        cloudsGroup.add(cGroup);
+        clouds.push(cGroup);
+      });
+
+      return clouds;
+    }
+
+    function buildSunbeams(scene, T) {
+      const beamsGroup = new T.Group();
+      scene.add(beamsGroup);
+
+      const beamMat = new T.MeshBasicMaterial({
+        color: 0xfff6dc,
+        transparent: true,
+        opacity: 0.08,
+        side: T.DoubleSide,
+        depthWrite: false,
+        blending: T.AdditiveBlending
+      });
+
+      [-16, -7, 3, 14].forEach((bx, i) => {
+        const beam = new T.Mesh(new T.PlaneGeometry(5 + i, 45), beamMat);
+        beam.position.set(bx, 8, -2);
+        beam.rotation.z = -0.45;
+        beam.rotation.x = 0.35;
+        beamsGroup.add(beam);
+      });
     }
 
     function buildNature(parent, T) {
@@ -790,6 +1129,14 @@
 
       // Update camera in top view
       updateCameraPosition();
+
+      // Drift storybook clouds if motion is allowed
+      if (!calm() && clouds) {
+        clouds.forEach(cl => {
+          cl.position.x += cl.userData.speed * dt;
+          if (cl.position.x > 75) cl.position.x = -75;
+        });
+      }
 
       render();
 
