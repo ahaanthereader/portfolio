@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap');
+
   /* ============ Design tokens ============ */
   :root {
     --paper: #f7efe1;        /* parchment background */
@@ -32,6 +34,79 @@
     line-height: 1.6;
     overflow-x: hidden;
   }
+
+  /* ============ Botanical Sketchbook Theme (All pages except Home) ============ */
+  body:not(.page-home) {
+    --paper: #ece7dc;
+    --paper-2: #f6f1e7;
+    --ink: #2b2721;
+    --ink-soft: rgba(43, 39, 33, 0.72);
+    --line: rgba(43, 39, 33, 0.15);
+    --earth: #9a6a3e;
+    --forest: #3c5d46;
+    --forest-d: #2a4532;
+    --gold: #b38b4d;
+    --terra: #9a6a3e;
+    --shadow: 0 10px 30px rgba(43, 39, 33, 0.12);
+    --shadow-sm: 0 4px 14px rgba(43, 39, 33, 0.08);
+
+    font-family: 'Newsreader', "New York", Georgia, serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+    background-color: #ece7dc;
+    background-image: url('../public/landing-pages/meng-to-sketchbook/bg-wash.jpg');
+    background-position: center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+
+  body:not(.page-home) h1,
+  body:not(.page-home) h2,
+  body:not(.page-home) h3,
+  body:not(.page-home) .brand,
+  body:not(.page-home) .sec-head h2 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    letter-spacing: 0.01em;
+  }
+
+  body:not(.page-home) .nav {
+    background: rgba(236, 231, 220, 0.88);
+    border-bottom-color: rgba(43, 39, 33, 0.12);
+    backdrop-filter: blur(12px);
+  }
+
+  body:not(.page-home) .brand {
+    font-size: 1.55rem;
+    letter-spacing: 0.02em;
+  }
+
+  body:not(.page-home) .eyebrow {
+    color: var(--earth);
+    letter-spacing: 0.18em;
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 700;
+  }
+
+  body:not(.page-home) .nav-links a,
+  body:not(.page-home) .nav-gbtn {
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  body:not(.page-home) .spot,
+  body:not(.page-home) .lib-card,
+  body:not(.page-home) .reader-card,
+  body:not(.page-home) .quiz-card,
+  body:not(.page-home) .geo-card,
+  body:not(.page-home) .studio,
+  body:not(.page-home) .card,
+  body:not(.page-home) .reading-now {
+    border-color: rgba(43, 39, 33, 0.15);
+    background: #f6f1e7;
+    box-shadow: 0 10px 30px rgba(43, 39, 33, 0.10);
+  }
+
   h1, h2, h3 { font-family: "Fraunces", serif; line-height: 1.1; margin: 0 0 .4em; }
   a { color: var(--forest-d); }
   img { max-width: 100%; display: block; }
@@ -1086,14 +1161,14 @@
     .home-hero { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: 1fr; }
     .hero-copy { grid-row: 1; align-self: start; }
     .ahaan-figure { grid-column: 2; grid-row: 1; align-self: end; height: 100%; margin: 0 4px 0 0; }
-    .candy-blanket { grid-column: 3; grid-row: 1; align-self: center; width: 268px; margin: 40px max(16px, calc((100vw - var(--maxw)) / 2 + 22px)) 0 8px; padding: 8px 8px 6px; }
+    .candy-blanket { grid-column: 3; grid-row: 1; align-self: center; width: clamp(272px, 22vw, 308px); margin: 40px max(16px, calc((100vw - var(--maxw)) / 2 + 22px)) 0 8px; padding: 8px 8px 6px; }
     .candy-shelf { flex-direction: column; }
     .candy-group { flex: none; padding: 6px 2px 4px; }
     .candy-group + .candy-group { border-left: 0; border-top: 1px solid rgba(58,46,33,.12); }
-    .candy-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .candy-art { width: 46px; height: 46px; }
-    .candy-art svg { width: 36px; height: 36px; }
-    .candy-label { font-size: .7rem; }
+    .candy-row { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+    .candy-art { width: 44px; height: 44px; }
+    .candy-art svg { width: 34px; height: 34px; }
+    .candy-label { font-size: .68rem; }
   }
   /* ---- see-through sweets tray: light tint, little blur, labels kept readable ---- */
   .candy-blanket { background-color: rgba(255,252,246,.22); background-image: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.06)); -webkit-backdrop-filter: blur(5px) saturate(1.15); backdrop-filter: blur(5px) saturate(1.15); border-color: rgba(255,255,255,.6); box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 14px 34px rgba(25,55,30,.14); }
@@ -1115,13 +1190,23 @@
   .comic-bubble { transform: translate(-100%, 0) rotate(-2deg); }
   .comic-bubble::after { top: -13px; bottom: auto; right: 22px; transform: rotate(225deg) skew(12deg, 12deg); }
 
-  /* ============ Inner pages: blue watercolor wash on paper ============ */
-  body:not(.page-home), body.page-bells { background-color: #f3f6f6; background-image: url("paper-wash.svg"); background-size: cover; background-position: center top; background-attachment: fixed; }
-  body:not(.page-home) .nav { background: rgba(250,252,252,.72); }
+  /* ============ Inner pages: botanical sketchbook wash on paper ============ */
+  body:not(.page-home), body.page-bells {
+    background-color: #ece7dc;
+    background-image: url('../public/landing-pages/meng-to-sketchbook/bg-wash.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+  }
+  body:not(.page-home) .nav {
+    background: rgba(236, 231, 220, 0.90);
+    border-bottom: 1px solid rgba(43, 39, 33, 0.12);
+    backdrop-filter: blur(12px);
+  }
   #doors::before { opacity: .2; }
 
-  /* ============ Footer: light frosted paper that sits on the blue watercolor ============ */
-  footer { background: rgba(255,255,255,.5); color: var(--ink); padding: 30px 22px 26px; border-top: 1px solid rgba(47,127,207,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  /* ============ Footer: warm parchment that sits on the botanical paper wash ============ */
+  footer { background: rgba(246, 241, 231, 0.85); color: var(--ink); padding: 30px 22px 26px; border-top: 1px solid rgba(43, 39, 33, 0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.8); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   footer h2 { color: var(--ink); font-size: clamp(1.25rem, 2.6vw, 1.6rem); font-weight: 700; margin-bottom: .2em; }
   footer p { color: var(--ink-soft); font-weight: 600; margin: 0; }
   footer .links { margin-top: 10px; color: var(--ink-soft); }
