@@ -101,7 +101,7 @@ window.AhaanModel = {
 
     // 3D Sculpted Hair cap and natural fringe
     const cap = part(new T.SphereGeometry(1, 40, 28, 0, Math.PI * 2, 0, 1.78), hair, 0, 0.07, -0.05, 1.03, 1.15, 1.06);
-    cap.rotation.x = -0.48; head.add(cap);
+    cap.rotation.x = -0.36; head.add(cap);
     head.add(part(sphere, hair, 0, 0.08, -0.26, 0.97, 1.06, 0.84));
 
     // Hair clumps for dimensional child haircut
@@ -128,37 +128,110 @@ window.AhaanModel = {
       if (Math.cos(phi) > 0.55 && theta > 0.95) continue;
       clump(theta, phi + (hr() - 0.5) * 0.3, false);
     }
-    for (let k = 0; k < 14; k++) clump(0.86 + hr() * 0.2, -0.75 + k * 0.11, true); // forward fringe
+    for (let k = 0; k < 14; k++) clump(0.66 + hr() * 0.12, -0.75 + k * 0.11, true); // forward fringe
 
     // ---- Mapped Cartoon Face Texture from Ahaan's Photo ----
-    const faceTex = new T.TextureLoader().load("assets/ahaan-face.png");
+    const faceTex = new T.TextureLoader().load("assets/ahaan-face.png", () => {
+      faceMat.needsUpdate = true;
+    });
     faceTex.encoding = T.sRGBEncoding;
     const faceMat = new T.MeshStandardMaterial({
       map: faceTex,
       transparent: true,
-      roughness: 0.6,
-      metalness: 0.05,
-      alphaTest: 0.05
+      roughness: 0.55,
+      metalness: 0.02,
+      alphaTest: 0.02,
+      side: T.DoubleSide
     });
-    // Curved face shield matching skull curvature
-    const faceGeo = new T.CylinderGeometry(0.92, 0.94, 1.5, 32, 1, true, -Math.PI * 0.38, Math.PI * 0.76);
-    faceGeo.rotateY(Math.PI);
+    // Curved face shield matching skull curvature facing forward (+Z)
+    const faceGeo = new T.CylinderGeometry(0.92, 0.94, 1.45, 32, 1, true, -Math.PI * 0.35, Math.PI * 0.70);
     const faceMesh = new T.Mesh(faceGeo, faceMat);
-    faceMesh.position.set(0, -0.06, 0.06);
-    faceMesh.scale.set(1.01, 1.02, 1.01);
+    faceMesh.position.set(0, -0.05, 0.03);
+    faceMesh.scale.set(1.025, 1.02, 1.025);
     head.add(faceMesh);
 
-    // Dynamic eyes & brows reference for cursor tracking
+    // ---- Expressive 3D Facial Features matching Ahaan's photo ----
+    const whiteMat = mat(0xffffff, 0.2);
+    const darkEyeMat = mat(0x1a1008, 0.3);
+    const pupilMat = mat(0x0a0604, 0.1);
+    const browMat = mat(0x1e1510, 0.85);
+    const lipMat = mat(0x8a3832, 0.6);
+    const mouthInsideMat = mat(0x421216, 0.7);
+    const cheekMat = new T.MeshBasicMaterial({ color: 0xd96655, transparent: true, opacity: 0.3 });
+
     const eyes = [], brows = [];
     [-1, 1].forEach(s => {
-      const eye = new T.Group(); eye.position.set(s * 0.335, 0.05, 0.88); head.add(eye);
-      const iris = new T.Group(); iris.position.set(0, 0, 0.02); eye.add(iris);
+      // Almond eye socket group
+      const eye = new T.Group();
+      eye.position.set(s * 0.32, 0.05, 0.89);
+      eye.rotation.y = s * 0.18; // Contoured to head curve
+      eye.rotation.z = -s * 0.05; // Gentle almond slant
+      head.add(eye);
+
+      // Sclera (eye white)
+      const sclera = part(sphere, whiteMat, 0, 0, 0, 0.13, 0.10, 0.035);
+      eye.add(sclera);
+
+      // Iris & Pupil with catchlight
+      const iris = new T.Group();
+      iris.position.set(0, 0, 0.025);
+      const irisMesh = part(sphere, darkEyeMat, 0, 0, 0, 0.075, 0.075, 0.02);
+      const pupil = part(sphere, pupilMat, 0, 0, 0.01, 0.045, 0.045, 0.015);
+      const catchlight = part(sphere, whiteMat, 0.022, 0.022, 0.018, 0.018, 0.018, 0.01);
+      iris.add(irisMesh);
+      iris.add(pupil);
+      iris.add(catchlight);
+      eye.add(iris);
       eyes.push({ eye, iris });
-      const brow = new T.Group(); brow.position.set(s * 0.36, 0.31, 0.88); head.add(brow);
+
+      // Upper eyelid line
+      const lid = part(new T.TorusGeometry(0.12, 0.018, 8, 16, Math.PI * 0.8), browMat, 0, 0.03, 0.02);
+      lid.rotation.z = Math.PI * 0.1;
+      eye.add(lid);
+
+      // Arched dark eyebrow
+      const brow = new T.Group();
+      brow.position.set(s * 0.33, 0.25, 0.90);
+      brow.rotation.y = s * 0.22;
+      brow.rotation.z = -s * 0.12; // Friendly natural arch
+      const browMesh = part(new T.CapsuleGeometry(0.032, 0.22, 4, 10), browMat, 0, 0, 0);
+      browMesh.rotation.z = Math.PI / 2;
+      browMesh.scale.set(1, 1, 0.5);
+      brow.add(browMesh);
+      head.add(brow);
       brows.push(brow);
+
+      // Cute rosy cheek
+      const cheek = part(sphere, cheekMat, s * 0.52, -0.16, 0.82, 0.14, 0.09, 0.04);
+      head.add(cheek);
     });
 
-    const mouth = new T.Group(); mouth.position.set(0, -0.47, 0.9); head.add(mouth);
+    // Cute child nose
+    const nose = part(new T.CapsuleGeometry(0.05, 0.08, 6, 12), skinD, 0, -0.10, 0.96);
+    nose.rotation.x = 0.3;
+    head.add(nose);
+
+    // Warm cheerful open smile
+    const mouth = new T.Group();
+    mouth.position.set(0, -0.28, 0.92);
+    mouth.rotation.x = 0.15; // Angled for top-down visibility
+
+    // Mouth cavity
+    const mouthCavity = part(new T.CylinderGeometry(0.16, 0.06, 0.12, 16, 1, false, 0, Math.PI), mouthInsideMat, 0, 0, 0);
+    mouthCavity.rotation.z = Math.PI;
+    mouthCavity.scale.set(1.1, 0.8, 0.5);
+    mouth.add(mouthCavity);
+
+    // Top teeth crescent
+    const teeth = part(new T.BoxGeometry(0.18, 0.035, 0.03), whiteMat, 0, 0.025, 0.02);
+    mouth.add(teeth);
+
+    // Friendly curved lower lip
+    const lip = part(new T.TorusGeometry(0.13, 0.022, 8, 20, Math.PI * 0.9), lipMat, 0, 0.02, 0.03);
+    lip.rotation.z = Math.PI * 1.05;
+    mouth.add(lip);
+
+    head.add(mouth);
 
     rig.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
     const b3 = new T.Box3().setFromObject(rig);
