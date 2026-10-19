@@ -54,3 +54,25 @@ All agents must use Simplified Technical English (STE) for:
 - **Integrity**:
   - Preserve all existing comments and documentation that are unrelated to new changes.
   - Keep all code modular, accessible, and lightweight.
+
+---
+
+## 3. Parallel Task Execution
+
+- **Parallel Work**: Maximize parallel execution for all tasks.
+- **Task Decomposition**: Divide large tasks into independent, small units of work.
+- **Concurrent Subagents**: Launch subagents concurrently to handle independent tasks in parallel.
+- **Tool Concurrency**: Execute independent tool calls concurrently rather than serially.
+- **No Unnecessary Waiting**: Do not wait for unrelated tasks before starting the next task.
+
+---
+
+## 4. Git Worktree Workflow
+
+- **Isolated Workspaces**: Always use Git worktrees for feature development and experiments.
+- **Clean Main Tree**: Keep the primary working tree clean and synchronized with `main`.
+- **Worktree Directory**: Store worktrees in the `.worktrees/` directory at the project root.
+- **Git Ignore**: Ensure `.worktrees/` is listed in `.gitignore`.
+- **Create Worktree**: Use `git worktree add .worktrees/<branch-name> -b <branch-name>` for new tasks.
+- **Work Off Worktree**: Perform edits, tests, and commits inside the designated worktree path.
+- **Cleanup**: Remove the worktree with `git worktree remove` after merging the branch.
