@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doors of the World · Ahaan's World</title>
+<meta name="description" content="Doors of the World — Open a door, collect a country card." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-doors">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-read">📚 Read</button>
+        <div class="nav-pop" id="ng-read"><a href="reading.html">Reading Nook</a><a href="kindle.html">Kindle</a><a href="library.html">Library</a><a href="story.html">Story Studio</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn is-current" aria-expanded="false" aria-controls="ng-explore">🧭 Explore</button>
+        <div class="nav-pop" id="ng-explore"><a href="geography.html">Geography</a><a href="quiz.html">Capitals Quiz</a><a href="doors.html" aria-current="page">Doors of the World</a><a href="bells.html">Bells of the World</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-play">🎈 Play</button>
+        <div class="nav-pop" id="ng-play"><a href="swing.html">The Swing</a><a href="games.html">Games</a><a href="music.html">Music</a><a href="movies.html">Movies</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-mine">⭐ My stuff</button>
+        <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="doors">
+  <div class="wrap">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <filter id="dow-wc" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    </svg>
+    <div class="sec-head">
+      <div class="eyebrow">Wisdom from Everywhere</div>
+      <h2>Doors of the World 🚪</h2>
+      <p>Every country is a door. Open one to read a real saying from that place.</p>
+    </div>
+    <div class="dow-doors" id="dowDoors" role="group" aria-label="Doors of the world"></div>
+    <p class="dow-count" id="dowCount" aria-live="polite"></p>
+    <article class="dow-card" id="dowPanel" role="region" aria-live="polite" aria-label="Country card" hidden>
+      <header class="dow-card-top">
+        <span class="dow-flag" id="dowFlag" aria-hidden="true"></span>
+        <div class="dow-card-id"><div class="dow-card-num" id="dowNum"></div><h3 id="dowName"></h3></div>
+        <span class="dow-new" id="dowNew" hidden>New card!</span>
+      </header>
+      <dl class="dow-stats" id="dowStats"></dl>
+      <h4 class="dow-h">Cool facts</h4>
+      <ul class="dow-facts" id="dowFacts"></ul>
+      <div class="dow-words">
+        <div class="dow-h">Words to grow on</div>
+        <div class="dow-script" id="dowScript"></div>
+        <div class="dow-en" id="dowEn"></div>
+        <div class="dow-note" id="dowNote"></div>
+        <div class="dow-why" id="dowWhy"></div>
+      </div>
+      <button type="button" class="dow-close" id="dowClose">Close the door</button>
+    </article>
+    <div class="dow-sound">
+      <button type="button" class="dow-toggle" id="dowToggle" aria-pressed="false">🔔 Soft chime: off</button>
+      <label class="dow-vol">Volume <input type="range" id="dowVol" min="0" max="100" value="50" aria-label="Chime volume"></label>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/audio.js"></script>
+<script src="assets/doors.js"></script>
+<script src="assets/brush-wc.js"></script>
+</body>
+</html>

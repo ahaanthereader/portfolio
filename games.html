@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Games · Ahaan's World</title>
+<meta name="description" content="Games — Memory Match, Tic-Tac-Toe and more." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-games fit-screen">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-read">📚 Read</button>
+        <div class="nav-pop" id="ng-read"><a href="reading.html">Reading Nook</a><a href="kindle.html">Kindle</a><a href="library.html">Library</a><a href="story.html">Story Studio</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-explore">🧭 Explore</button>
+        <div class="nav-pop" id="ng-explore"><a href="geography.html">Geography</a><a href="quiz.html">Capitals Quiz</a><a href="doors.html">Doors of the World</a><a href="bells.html">Bells of the World</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn is-current" aria-expanded="false" aria-controls="ng-play">🎈 Play</button>
+        <div class="nav-pop" id="ng-play"><a href="swing.html">The Swing</a><a href="games.html" aria-current="page">Games</a><a href="music.html">Music</a><a href="movies.html">Movies</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-mine">⭐ My stuff</button>
+        <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="games">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Arcade</div>
+      <h2>Game zone 🎮</h2>
+      <p>Pick a game and play! Match the pairs, beat the computer, or catch the stars.</p>
+    </div>
+
+    <div class="game-tabs" id="gameTabs">
+      <button class="game-tab active" data-game="memory">🧩 Memory Match</button>
+      <button class="game-tab" data-game="ttt">⭕ Tic-Tac-Toe</button>
+      <button class="game-tab" data-game="catch">⭐ Catch the Star</button>
+      <button class="game-tab" data-game="math">➗ Math Dash</button>
+    </div>
+
+    <!-- Memory Match -->
+    <div class="game-panel" id="game-memory">
+      <div class="game-bar">
+        <span id="memMoves">Moves: 0</span>
+        <span id="memMsg">Find all the matching pairs!</span>
+        <button class="sbtn" id="memNew">🔄 New game</button>
+      </div>
+      <div class="mem-grid" id="memGrid"></div>
+    </div>
+
+    <!-- Tic-Tac-Toe -->
+    <div class="game-panel" id="game-ttt" hidden>
+      <div class="game-bar">
+        <span id="tttMsg">Your turn! You are 🦊</span>
+        <button class="sbtn" id="tttNew">🔄 New game</button>
+      </div>
+      <div class="ttt-board" id="tttBoard"></div>
+    </div>
+
+    <!-- Catch the Star -->
+    <div class="game-panel" id="game-catch" hidden>
+      <div class="game-bar">
+        <span id="catchScore">Score: 0</span>
+        <span id="catchTime">Tap start!</span>
+        <button class="sbtn read" id="catchStart">▶ Start</button>
+      </div>
+      <div class="catch-arena" id="catchArena"><div class="catch-hint">Tap ▶ Start, then catch the ⭐ as fast as you can!</div></div>
+    </div>
+
+    <!-- Math Dash -->
+    <div class="game-panel" id="game-math" hidden>
+      <div class="game-bar">
+        <span id="mathScore">Score: 0</span>
+        <span id="mathTime">Tap start!</span>
+        <button class="sbtn read" id="mathStart">▶ Start</button>
+      </div>
+      <div class="math-modes" id="mathModes">
+        <button class="math-mode active" data-mode="mix">🎲 Mixed</button>
+        <button class="math-mode" data-mode="add">➕ Add</button>
+        <button class="math-mode" data-mode="sub">➖ Subtract</button>
+        <button class="math-mode" data-mode="mul">✖️ Multiply</button>
+        <button class="math-mode" data-mode="div">➗ Divide</button>
+      </div>
+      <div class="math-stage">
+        <div class="math-q" id="mathQ">Pick a mode, then tap Start! 🎯</div>
+        <div class="math-opts" id="mathOpts"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/games.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Story Studio · Ahaan's World</title>
+<meta name="description" content="Story Studio — Write and draw your own book." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+<link rel="stylesheet" href="assets/fit-story.css" />
+</head>
+<body class="page-story fit-screen">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-group"><button type="button" class="nav-gbtn is-current" aria-expanded="false" aria-controls="ng-read">📚 Read</button>
+        <div class="nav-pop" id="ng-read"><a href="reading.html">Reading Nook</a><a href="kindle.html">Kindle</a><a href="library.html">Library</a><a href="story.html" aria-current="page">Story Studio</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-explore">🧭 Explore</button>
+        <div class="nav-pop" id="ng-explore"><a href="geography.html">Geography</a><a href="quiz.html">Capitals Quiz</a><a href="doors.html">Doors of the World</a><a href="bells.html">Bells of the World</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-play">🎈 Play</button>
+        <div class="nav-pop" id="ng-play"><a href="swing.html">The Swing</a><a href="games.html">Games</a><a href="music.html">Music</a><a href="movies.html">Movies</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-mine">⭐ My stuff</button>
+        <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="story">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Story Studio</div>
+      <h2>Write your own storybook ✍️</h2>
+      <p>Give your book a title, add pages, pick a sticker for each one — then flip through it like a real book. It saves automatically!</p>
+    </div>
+
+    <div class="studio">
+      <!-- EDIT MODE -->
+      <div class="studio-edit" id="studioEdit">
+        <input class="story-title-input" id="storyTitle" type="text" placeholder="✏️ My Story Title…" maxlength="60" />
+
+        <div class="starter-row">
+          <span class="starter-label">Need an idea? Try a story starter:</span>
+          <div class="starters" id="starters"><!-- filled by JS --></div>
+        </div>
+
+        <div class="page-editor">
+          <div class="page-editor-top">
+            <span id="pageLabel">Page 1</span>
+            <span class="sticker-hint">Pick a sticker →</span>
+          </div>
+          <div class="sticker-row" id="stickerRow"><!-- filled by JS --></div>
+          <div class="page-write">
+            <div class="page-sticker" id="pageSticker">🌟</div>
+            <textarea id="pageText" placeholder="Once upon a time…" rows="5"></textarea>
+          </div>
+        </div>
+
+        <div class="studio-controls">
+          <button class="sbtn" id="prevPg">◀ Page</button>
+          <button class="sbtn" id="delPg">🗑 Delete</button>
+          <button class="sbtn add" id="addPg">＋ Add Page</button>
+          <button class="sbtn" id="nextPg">Page ▶</button>
+          <span class="studio-spacer"></span>
+          <button class="sbtn read" id="readBook">📖 Read my book</button>
+          <button class="sbtn" id="newBook">🆕 New</button>
+        </div>
+        <div class="save-note" id="saveNote">Saved ✓</div>
+      </div>
+
+      <!-- READ MODE -->
+      <div class="studio-read" id="studioRead" hidden>
+        <div class="storybook" id="storybook">
+          <div class="sb-sticker" id="sbSticker"></div>
+          <div class="sb-text" id="sbText"></div>
+          <div class="sb-pagenum" id="sbPageNum"></div>
+        </div>
+        <div class="sb-controls">
+          <button class="sbtn" id="sbPrev">◀ Turn back</button>
+          <button class="sbtn read" id="backToEdit">✏️ Keep writing</button>
+          <button class="sbtn" id="sbNext">Turn page ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/story.js"></script>
+</body>
+</html>

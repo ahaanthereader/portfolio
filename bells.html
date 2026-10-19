@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bells of the World · Ahaan's World</title>
+<meta name="description" content="Bells of the World — ring a soft bell from each country and collect its stamp." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+</head>
+<body class="page-bells">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-read">📚 Read</button>
+        <div class="nav-pop" id="ng-read"><a href="reading.html">Reading Nook</a><a href="kindle.html">Kindle</a><a href="library.html">Library</a><a href="story.html">Story Studio</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn is-current" aria-expanded="false" aria-controls="ng-explore">🧭 Explore</button>
+        <div class="nav-pop" id="ng-explore"><a href="geography.html">Geography</a><a href="quiz.html">Capitals Quiz</a><a href="doors.html">Doors of the World</a><a href="bells.html" aria-current="page">Bells of the World</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-play">🎈 Play</button>
+        <div class="nav-pop" id="ng-play"><a href="swing.html">The Swing</a><a href="games.html">Games</a><a href="music.html">Music</a><a href="movies.html">Movies</a></div></div>
+      <div class="nav-group"><button type="button" class="nav-gbtn" aria-expanded="false" aria-controls="ng-mine">⭐ My stuff</button>
+        <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Floating background-music toggle -->
+
+<main id="main">
+<section id="bells" class="bel-sec">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="dow-wc" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
+  </svg>
+  <div class="wrap">
+    <div class="bel-top">
+      <div class="bel-head">
+        <div class="eyebrow">Listen to the World</div>
+        <h2>Bells of the World 🔔</h2>
+        <p>Tap a bell or its stamp to ring it and collect its card.</p>
+      </div>
+      <div class="bel-sound">
+        <button type="button" class="bel-toggle" id="belToggle" aria-pressed="false">🔔 Sound: off</button>
+        <label class="dow-vol">Volume <input type="range" id="belVol" min="0" max="100" value="50" aria-label="Bell volume"></label>
+      </div>
+    </div>
+    <div class="bel-layout">
+      <div class="bel-stage" id="belStage">
+        <svg class="bel-roof" viewBox="0 0 600 150" aria-hidden="true" focusable="false">
+          <path d="M228 40 Q300 14 372 40" fill="none" stroke="#8a5a1a" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="226" cy="40" r="6" fill="#b8432f"/><circle cx="374" cy="40" r="6" fill="#b8432f"/>
+          <path d="M212 58 Q300 20 388 58 Q418 62 442 48 Q428 74 396 76 L204 76 Q172 74 158 48 Q182 62 212 58 Z" fill="#d9a93a"/>
+          <path d="M204 76 L396 76 L392 70 Q300 52 208 70 Z" fill="#a87a1e" opacity=".7"/>
+          <rect x="218" y="76" width="164" height="12" rx="2" fill="#b8432f"/>
+          <path d="M112 112 Q300 50 488 112 Q540 118 578 96 Q556 134 502 136 L98 136 Q44 134 22 96 Q60 118 112 112 Z" fill="#e0b247"/>
+          <g stroke="#a87a1e" stroke-width="2" opacity=".5"><path d="M130 132 L215 86"/><path d="M152 132 L226 86"/><path d="M174 132 L237 86"/><path d="M196 132 L248 86"/><path d="M218 132 L259 86"/><path d="M240 132 L270 86"/><path d="M262 132 L281 86"/><path d="M284 132 L292 86"/><path d="M306 132 L303 86"/><path d="M328 132 L314 86"/><path d="M350 132 L325 86"/><path d="M372 132 L336 86"/><path d="M394 132 L347 86"/><path d="M416 132 L358 86"/><path d="M438 132 L369 86"/><path d="M460 132 L380 86"/></g>
+          <path d="M98 136 L502 136 L498 128 Q300 100 102 128 Z" fill="#a87a1e" opacity=".7"/>
+          <rect x="104" y="136" width="392" height="12" rx="2" fill="#5a3a22"/>
+        </svg>
+        <canvas id="belCanvas" class="bel-canvas" aria-hidden="true"></canvas>
+      </div>
+      <aside class="bel-words" aria-label="The word for bell in six languages">
+        <div class="bel-words-h">Bell</div>
+        <ol>
+          <li><span class="v" lang="ja">鐘</span><small>kane · Japanese</small></li>
+          <li><span class="v" lang="zh">钟</span><small>zhōng · Chinese</small></li>
+          <li><span class="v" lang="hi">घंटा</span><small>ghaṇṭā · Hindi</small></li>
+          <li><span class="v" lang="kk">қоңырау</span><small>qoñyrau · Kazakh</small></li>
+          <li><span class="v" lang="sw">kengele</span><small>Swahili</small></li>
+          <li><span class="v" lang="it">campana</span><small>Italian</small></li>
+        </ol>
+      </aside>
+    </div>
+    <div class="bel-stamps" id="belStamps" role="group" aria-label="Bell stamps"></div>
+    <p class="dow-count" id="belCount" aria-live="polite"></p>
+    <article class="dow-card" id="belPanel" role="region" aria-live="polite" aria-label="Bell stamp card" hidden>
+      <header class="dow-card-top">
+        <span class="dow-flag" id="belFlag" aria-hidden="true"></span>
+        <div class="dow-card-id"><div class="dow-card-num" id="belNum"></div><h3 id="belName"></h3></div>
+        <span class="dow-new" id="belNew" hidden>New stamp!</span>
+      </header>
+      <dl class="dow-stats" id="belStats"></dl>
+      <h4 class="dow-h">Cool facts</h4>
+      <ul class="dow-facts" id="belFacts"></ul>
+      <div class="dow-words">
+        <div class="dow-h">How it sounds</div>
+        <div class="dow-en" id="belListen"></div>
+        <div class="dow-h">The word for bell</div>
+        <div class="dow-script" id="belWord"></div>
+        <div class="dow-note" id="belSay"></div>
+      </div>
+      <button type="button" class="dow-close" id="belClose">Close the card</button>
+    </article>
+    <p class="bel-credit">Bell drawings, sounds and the swinging-string physics are made for this page. Inspired by the idea of chimes on strings.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Thanks for visiting my world! 🌍</h2>
+    <p>Built with curiosity, books, and a really good swing.</p>
+    <div class="links">
+      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <!-- Add real links here, e.g. a reading log -->
+    </div>
+    <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>
+  </div>
+</footer>
+<div class="reward-toast" id="rewardToast" hidden></div>
+
+<script src="assets/shared.js"></script>
+<script src="assets/audio.js"></script>
+<script src="assets/brush-wc.js"></script>
+<script src="assets/bells.js"></script>
+</body>
+</html>
