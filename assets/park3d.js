@@ -245,6 +245,11 @@
     const interactiveMeshes = [];
     const landmarkAnimators = [];
 
+    // Playground animation anchors
+    let swingPivot = null;
+    let companionSwingPivot = null;
+    let trampMat = null;
+
     function registerInteractive(obj, meta) {
       obj.traverse(child => {
         if (child.isMesh) {
@@ -385,6 +390,11 @@
     // 3D Storytelling Reading Props (Arkansas)
     // ==========================================
     buildStoryProps(mapGroup, T, walkableSurfaces);
+
+    // ==========================================
+    // 3D Playground Equipment (Arkansas)
+    // ==========================================
+    buildPlayground(mapGroup, T, walkableSurfaces);
 
     // ==========================================
     // 3D Sky: Storybook Clouds & Sunbeams
@@ -643,7 +653,7 @@
 
       // 4. Stargazing Brass Telescope on Tripod
       const teleGroup = new T.Group();
-      teleGroup.position.set(-2.8, 0.45, 2.0);
+      teleGroup.position.set(-2.2, 0.45, 2.6);
       const woodMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
       const brassMat = new T.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
       for (let leg = 0; leg < 3; leg++) {
@@ -687,13 +697,13 @@
             </div>
           `,
           actionLabel: "Aim Skyward",
-          x: -2.8,
-          z: 2.0,
+          x: -2.2,
+          z: 2.6,
           onInteract: triggerTele
         });
         wake();
       };
-      registerInteractive(teleGroup, { name: "Brass Telescope", x: -2.8, z: 2.0, onInteract: triggerTele });
+      registerInteractive(teleGroup, { name: "Brass Telescope", x: -2.2, z: 2.6, onInteract: triggerTele });
 
       landmarkAnimators.push((dt) => {
         if (teleTiltT > 0.001) {
@@ -838,6 +848,260 @@
           }
         }
         return active;
+      });
+    }
+
+    // ==========================================
+    // 3D Playground Equipment (Arkansas)
+    // ==========================================
+    function buildPlayground(parent, T, walkables) {
+      const playGroup = new T.Group();
+      parent.add(playGroup);
+
+      const cedarMat = new T.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.85 });
+      const canopyMat = new T.MeshStandardMaterial({ color: 0xffc837, roughness: 0.55 });
+      const slideChuteMat = new T.MeshStandardMaterial({ color: 0xef476f, roughness: 0.35 });
+      const railYellowMat = new T.MeshStandardMaterial({ color: 0xffd166, roughness: 0.4 });
+      const landingPadMat = new T.MeshStandardMaterial({ color: 0x118ab2, roughness: 0.7 });
+      const steelMat = new T.MeshStandardMaterial({ color: 0xa8b2ba, metalness: 0.85, roughness: 0.25 });
+      const chainMat = new T.MeshStandardMaterial({ color: 0xdde2e6, metalness: 0.85, roughness: 0.25 });
+      const swingSeatMatA = new T.MeshStandardMaterial({ color: 0x073b4c, roughness: 0.5 });
+      const swingSeatMatB = new T.MeshStandardMaterial({ color: 0xff5964, roughness: 0.5 });
+      const mulchMat = new T.MeshStandardMaterial({ color: 0x5a3825, roughness: 0.95 });
+      const trampPadMat = new T.MeshStandardMaterial({ color: 0x06d6a0, roughness: 0.45 });
+      const trampMatBlack = new T.MeshStandardMaterial({ color: 0x1a211e, roughness: 0.95 });
+      const netMat = new T.MeshStandardMaterial({ color: 0x223344, transparent: true, opacity: 0.22, side: T.DoubleSide });
+      const foamSleeveMat = new T.MeshStandardMaterial({ color: 0x3a86ff, roughness: 0.6 });
+
+      // ------------------------------------------
+      // 1. Playground Slide (North-West Lawn: x = -2.6, z = -3.2)
+      // ------------------------------------------
+      const slideGroup = new T.Group();
+      slideGroup.position.set(-2.6, 0.45, -3.2);
+      playGroup.add(slideGroup);
+
+      // Four cedar timber tower posts
+      [[-0.42, -0.32], [0.42, -0.32], [-0.42, 0.32], [0.42, 0.32]].forEach(([px, pz]) => {
+        const post = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 2.3, 8), cedarMat);
+        post.position.set(px, 1.15, pz);
+        post.castShadow = true;
+        slideGroup.add(post);
+      });
+
+      // Wooden tower platform deck at y = 1.6
+      const slideDeck = new T.Mesh(new T.BoxGeometry(0.96, 0.08, 0.76), cedarMat);
+      slideDeck.position.set(0, 1.6, 0);
+      slideDeck.receiveShadow = true;
+      slideGroup.add(slideDeck);
+      if (walkables) walkables.push(slideDeck);
+
+      // Pitch gable canopy roof
+      const canopy = new T.Mesh(new T.ConeGeometry(0.78, 0.52, 4), canopyMat);
+      canopy.position.set(0, 2.5, 0);
+      canopy.rotation.y = Math.PI / 4;
+      canopy.castShadow = true;
+      slideGroup.add(canopy);
+
+      // Rear ladder rungs on North side (z = -0.32)
+      for (let r = 0; r < 5; r++) {
+        const rung = new T.Mesh(new T.CylinderGeometry(0.022, 0.022, 0.68, 8), railYellowMat);
+        rung.position.set(0, 0.32 + r * 0.27, -0.32);
+        rung.rotation.z = Math.PI / 2;
+        rung.castShadow = true;
+        slideGroup.add(rung);
+      }
+
+      // Safety side rails on deck
+      [-0.42, 0.42].forEach(rx => {
+        const sideRail = new T.Mesh(new T.BoxGeometry(0.04, 0.35, 0.72), railYellowMat);
+        sideRail.position.set(rx, 1.82, 0);
+        slideGroup.add(sideRail);
+      });
+
+      // Smooth curved slide chute descending South towards the viewer (+Z)
+      const chuteCurve = new T.CatmullRomCurve3([
+        new T.Vector3(0, 1.58, 0.35),
+        new T.Vector3(0, 1.35, 0.75),
+        new T.Vector3(0, 0.75, 1.25),
+        new T.Vector3(0, 0.22, 1.65),
+        new T.Vector3(0, 0.06, 1.95)
+      ]);
+      const chute = new T.Mesh(new T.TubeGeometry(chuteCurve, 28, 0.22, 12, false), slideChuteMat);
+      chute.castShadow = true;
+      slideGroup.add(chute);
+
+      // Soft rubber landing pad at bottom of chute
+      const landingPad = new T.Mesh(new T.BoxGeometry(0.85, 0.04, 0.85), landingPadMat);
+      landingPad.position.set(0, 0.02, 2.1);
+      landingPad.receiveShadow = true;
+      slideGroup.add(landingPad);
+      if (walkables) walkables.push(landingPad);
+
+      registerInteractive(slideGroup, {
+        name: "Playground Slide",
+        activity: "slide",
+        onInteract: () => startPlayActivity("slide")
+      });
+
+      // ------------------------------------------
+      // 2. Cedar Swing Set (North-East Lawn: x = 3.2, z = -2.8)
+      // ------------------------------------------
+      const swingGroup = new T.Group();
+      swingGroup.position.set(3.2, 0.45, -2.8);
+      playGroup.add(swingGroup);
+
+      // Soft cedar mulch safety bed
+      const mulchBed = new T.Mesh(new T.BoxGeometry(2.8, 0.03, 2.4), mulchMat);
+      mulchBed.position.set(0, 0.015, 0);
+      mulchBed.receiveShadow = true;
+      swingGroup.add(mulchBed);
+      if (walkables) walkables.push(mulchBed);
+
+      // A-Frame legs on left (x = -1.1) and right (x = 1.1)
+      [-1.1, 1.1].forEach(ax => {
+        [-0.85, 0.85].forEach(az => {
+          const leg = new T.Mesh(new T.CylinderGeometry(0.045, 0.055, 2.45, 8), cedarMat);
+          leg.position.set(ax, 1.18, az * 0.45);
+          leg.rotation.x = (az > 0 ? -1 : 1) * 0.32;
+          leg.castShadow = true;
+          swingGroup.add(leg);
+        });
+        const spreader = new T.Mesh(new T.BoxGeometry(0.06, 0.06, 0.82), cedarMat);
+        spreader.position.set(ax, 0.85, 0);
+        swingGroup.add(spreader);
+      });
+
+      // Top horizontal crossbeam
+      const crossbeam = new T.Mesh(new T.CylinderGeometry(0.065, 0.065, 2.4, 8), cedarMat);
+      crossbeam.position.set(0, 2.22, 0);
+      crossbeam.rotation.z = Math.PI / 2;
+      crossbeam.castShadow = true;
+      swingGroup.add(crossbeam);
+
+      // Left Swing: Ahaan's interactive swing (x = -0.45)
+      swingPivot = new T.Group();
+      swingPivot.position.set(-0.45, 2.20, 0);
+      [-0.20, 0.20].forEach(cx => {
+        const chain = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 1.4, 6), chainMat);
+        chain.position.set(cx, -0.7, 0);
+        swingPivot.add(chain);
+      });
+      const seatA = new T.Mesh(new T.BoxGeometry(0.46, 0.04, 0.22), swingSeatMatA);
+      seatA.position.set(0, -1.4, 0);
+      seatA.castShadow = true;
+      swingPivot.add(seatA);
+      swingGroup.add(swingPivot);
+
+      // Right Swing: Companion swing gently swaying in breeze (x = 0.45)
+      companionSwingPivot = new T.Group();
+      companionSwingPivot.position.set(0.45, 2.20, 0);
+      [-0.20, 0.20].forEach(cx => {
+        const chain = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 1.4, 6), chainMat);
+        chain.position.set(cx, -0.7, 0);
+        companionSwingPivot.add(chain);
+      });
+      const seatB = new T.Mesh(new T.BoxGeometry(0.46, 0.04, 0.22), swingSeatMatB);
+      seatB.position.set(0, -1.4, 0);
+      seatB.castShadow = true;
+      companionSwingPivot.add(seatB);
+      swingGroup.add(companionSwingPivot);
+
+      registerInteractive(swingGroup, {
+        name: "Playground Swings",
+        activity: "swing",
+        onInteract: () => startPlayActivity("swing")
+      });
+
+      // ------------------------------------------
+      // 3. Backyard Trampoline (West Lawn: x = -4.3, z = 0.2)
+      // ------------------------------------------
+      const trampGroup = new T.Group();
+      trampGroup.position.set(-4.3, 0.45, 0.2);
+      playGroup.add(trampGroup);
+
+      // Steel circular frame ring
+      const frameRing = new T.Mesh(new T.TorusGeometry(1.35, 0.045, 8, 32), steelMat);
+      frameRing.position.y = 0.55;
+      frameRing.rotation.x = Math.PI / 2;
+      frameRing.castShadow = true;
+      trampGroup.add(frameRing);
+
+      // Four U-shaped support legs
+      for (let leg = 0; leg < 4; leg++) {
+        const lang = (leg * Math.PI) / 2 + Math.PI / 4;
+        const lx = Math.cos(lang) * 1.25, lz = Math.sin(lang) * 1.25;
+        const post = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 0.55, 8), steelMat);
+        post.position.set(lx, 0.275, lz);
+        post.castShadow = true;
+        trampGroup.add(post);
+      }
+
+      // Spring safety cover pad
+      const springPad = new T.Mesh(new T.TorusGeometry(1.24, 0.12, 8, 32), trampPadMat);
+      springPad.position.y = 0.56;
+      springPad.rotation.x = Math.PI / 2;
+      springPad.castShadow = true;
+      trampGroup.add(springPad);
+
+      // Bounce jump mat
+      trampMat = new T.Mesh(new T.CylinderGeometry(1.12, 1.12, 0.03, 24), trampMatBlack);
+      trampMat.position.y = 0.54;
+      trampMat.receiveShadow = true;
+      trampGroup.add(trampMat);
+      if (walkables) walkables.push(trampMat);
+
+      // 4 Enclosure safety poles
+      for (let p = 0; p < 4; p++) {
+        const pang = (p * Math.PI) / 2 + Math.PI / 4;
+        const px = Math.cos(pang) * 1.34, pz = Math.sin(pang) * 1.34;
+        const pole = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 1.35, 8), foamSleeveMat);
+        pole.position.set(px, 1.22, pz);
+        pole.castShadow = true;
+        trampGroup.add(pole);
+      }
+
+      // Safety enclosure net with front entrance gap
+      const netMesh = new T.Mesh(new T.CylinderGeometry(1.32, 1.32, 1.3, 24, 1, true, 0.4, Math.PI * 1.7), netMat);
+      netMesh.position.y = 1.2;
+      trampGroup.add(netMesh);
+
+      // 2-step access ladder on East side (towards Arkansas center)
+      const trampLadder = new T.Group();
+      trampLadder.position.set(1.35, 0.27, 0);
+      trampLadder.rotation.z = -0.28;
+      [-0.14, 0.14].forEach(lz => {
+        const side = new T.Mesh(new T.CylinderGeometry(0.02, 0.02, 0.62, 6), steelMat);
+        side.position.set(0, 0, lz);
+        trampLadder.add(side);
+      });
+      for (let r = -0.14; r <= 0.14; r += 0.28) {
+        const rung = new T.Mesh(new T.CylinderGeometry(0.015, 0.015, 0.28, 6), steelMat);
+        rung.position.set(0, r, 0);
+        rung.rotation.x = Math.PI / 2;
+        trampLadder.add(rung);
+      }
+      trampGroup.add(trampLadder);
+
+      registerInteractive(trampGroup, {
+        name: "Spring Trampoline",
+        activity: "trampoline",
+        onInteract: () => startPlayActivity("trampoline")
+      });
+
+      // Ambient companion swing motion in breeze
+      landmarkAnimators.push((dt) => {
+        if (companionSwingPivot) {
+          if (!calm()) {
+            companionSwingPivot.rotation.x = Math.sin(performance.now() * 0.0018) * 0.08;
+          } else {
+            companionSwingPivot.rotation.x = 0;
+          }
+        }
+        if (currentActivity !== "swing" && swingPivot && Math.abs(swingPivot.rotation.x) > 0.001) {
+          swingPivot.rotation.x *= Math.max(0, 1 - dt * 3.5);
+          return true;
+        }
+        return false;
       });
     }
 
@@ -1693,8 +1957,7 @@
       }
     }
 
-    function greetRandom(isInitial) {
-      const item = pickRandomGreeting();
+    function sayAhaan(greeting, sub, flag, lang) {
       const bubble = document.getElementById("ahaanBubble");
       const flagEl = document.getElementById("abFlag");
       const miniFlagEl = document.getElementById("abMiniFlag");
@@ -1702,16 +1965,23 @@
       const subEl = document.getElementById("abSub");
       const langEl = document.getElementById("abLang");
 
-      if (flagEl) flagEl.textContent = item.flag;
-      if (miniFlagEl) miniFlagEl.textContent = item.flag;
-      if (greetEl) greetEl.textContent = item.greeting;
-      if (subEl) subEl.textContent = item.sub;
-      if (langEl) langEl.textContent = `${item.lang} · ${item.country}`;
+      if (flagEl) flagEl.textContent = flag || "🎈";
+      if (miniFlagEl) miniFlagEl.textContent = flag || "🎈";
+      if (greetEl) greetEl.textContent = greeting;
+      if (subEl) subEl.textContent = sub || "";
+      if (langEl) langEl.textContent = lang || "Playground";
 
       if (bubble) {
         bubble.classList.remove("is-compact", "is-walking");
         bubble.classList.add("is-visible");
       }
+      updateBubblePosition();
+      wake();
+    }
+
+    function greetRandom(isInitial) {
+      const item = pickRandomGreeting();
+      sayAhaan(item.greeting, item.sub, item.flag, `${item.lang} · ${item.country}`);
 
       // Start arm wave animation on character model
       if (A.startWave) {
@@ -1724,13 +1994,11 @@
         playSound(item.sound || "chime");
       }
 
-      updateBubblePosition();
-      wake();
-
       // Compact the bubble after idle period
       clearTimeout(bubbleHideTimer);
       bubbleHideTimer = setTimeout(() => {
-        if (bubble && !isWalking) {
+        const bubble = document.getElementById("ahaanBubble");
+        if (bubble && !isWalking && !currentActivity) {
           bubble.classList.add("is-compact");
         }
       }, 8500);
@@ -1740,7 +2008,17 @@
     registerInteractive(A.rig, {
       name: "Ahaan",
       onInteract() {
-        greetRandom(false);
+        if (currentActivity) {
+          if (currentActivity === "slide") {
+            sayAhaan("Wheeeee! 🛝", "I love sliding down!", "🛝", "Playground Slide");
+          } else if (currentActivity === "swing") {
+            sayAhaan("Flying high! 🎈", "Look at the big blue sky!", "🎈", "Cedar Swing Set");
+          } else if (currentActivity === "trampoline") {
+            sayAhaan("Boing boing! 🤸", "Jumping to the stars!", "🤸", "Spring Trampoline");
+          }
+        } else {
+          greetRandom(false);
+        }
       }
     });
 
@@ -1765,6 +2043,300 @@
     const walkSpeed = 6.8;
     const keys = { up: false, down: false, left: false, right: false };
     let currentStateId = "AR";
+
+    // ==========================================
+    // Playground Activities State & Controls
+    // ==========================================
+    let currentActivity = null; // null | "slide" | "swing" | "trampoline"
+    let activityPhase = 0;      // 0 = approach, 1 = climb/mount, 2 = play, 3 = exit
+    let activityTimer = 0;
+    let lastApexChime = 0;
+
+    function startPlayActivity(type) {
+      if (currentActivity) stopPlayActivity();
+      currentActivity = type;
+      activityPhase = 0;
+      activityTimer = 0;
+      lastApexChime = 0;
+
+      if (type === "slide") {
+        targetPos = new T.Vector3(-2.6, rigBaseY, -3.8);
+        marker.position.set(-2.6, 0.52, -3.8);
+        markerMat.opacity = 0.95;
+        sayAhaan("Let's go slide! 🛝", "Climbing up to the top!", "🛝", "Playground Slide");
+      } else if (type === "swing") {
+        targetPos = new T.Vector3(2.75, rigBaseY, -2.3);
+        marker.position.set(2.75, 0.52, -2.3);
+        markerMat.opacity = 0.95;
+        sayAhaan("Let's go swing! 🎈", "Running to the swings!", "🎈", "Cedar Swing Set");
+      } else if (type === "trampoline") {
+        targetPos = new T.Vector3(-2.95, rigBaseY, 0.2);
+        marker.position.set(-2.95, 0.52, 0.2);
+        markerMat.opacity = 0.95;
+        sayAhaan("Trampoline time! 🤸", "Heading over to bounce!", "🤸", "Spring Trampoline");
+      }
+      wake();
+    }
+
+    function stopPlayActivity() {
+      if (!currentActivity) return;
+      const prev = currentActivity;
+      currentActivity = null;
+      activityPhase = 0;
+      activityTimer = 0;
+
+      if (A.resetLimbs) A.resetLimbs();
+      A.rig.position.y = rigBaseY;
+      A.rig.rotation.x = 0;
+      A.rig.rotation.z = 0;
+
+      if (prev === "trampoline") {
+        A.rig.position.set(-2.95, rigBaseY, 0.2);
+        if (trampMat) trampMat.position.y = 0.54;
+      } else if (prev === "swing") {
+        A.rig.position.set(2.75, rigBaseY, -2.3);
+        if (swingPivot) swingPivot.rotation.x = 0;
+      } else if (prev === "slide") {
+        A.rig.position.set(-2.6, rigBaseY, -1.1);
+      }
+      wake();
+    }
+
+    function updatePlayActivity(dt) {
+      if (!currentActivity) return;
+
+      if (currentActivity === "slide") {
+        // Phase 0: Approach ladder at (-2.6, -3.8)
+        if (activityPhase === 0) {
+          const dist = Math.hypot(A.rig.position.x - (-2.6), A.rig.position.z - (-3.8));
+          if (dist < 0.65 || !targetPos) {
+            activityPhase = 1;
+            activityTimer = 0;
+            targetPos = null;
+            isWalking = false;
+            markerMat.opacity = 0;
+            A.rig.position.set(-2.6, rigBaseY, -3.8);
+            A.rig.rotation.y = 0; // Face South
+          }
+        }
+        // Phase 1: Climb ladder up to platform
+        else if (activityPhase === 1) {
+          activityTimer += dt;
+          const climbDuration = calm() ? 1.6 : 1.1;
+          const t = Math.min(1, activityTimer / climbDuration);
+          A.rig.position.set(-2.6, rigBaseY + t * 1.55, -3.8 + t * 0.6);
+          A.rig.rotation.y = 0;
+
+          // Limb climbing motions
+          const cycle = t * Math.PI * 4;
+          A.leftLeg.hip.rotation.x = Math.sin(cycle) * 0.45;
+          A.rightLeg.hip.rotation.x = -Math.sin(cycle) * 0.45;
+          A.leftLeg.knee.rotation.x = Math.max(0, Math.sin(cycle) * 0.6);
+          A.rightLeg.knee.rotation.x = Math.max(0, -Math.sin(cycle) * 0.6);
+          A.leftArm.arm.rotation.x = -1.2 + Math.cos(cycle) * 0.4;
+          A.wavingArm.arm.rotation.x = -1.2 - Math.cos(cycle) * 0.4;
+
+          if (t >= 1) {
+            activityPhase = 2;
+            activityTimer = 0;
+            A.rig.position.set(-2.6, rigBaseY + 1.55, -3.2);
+            // Sit down ready to slide
+            A.leftLeg.hip.rotation.x = -1.4;
+            A.rightLeg.hip.rotation.x = -1.4;
+            A.leftLeg.knee.rotation.x = 0.2;
+            A.rightLeg.knee.rotation.x = 0.2;
+            A.leftArm.arm.rotation.x = -0.6;
+            A.wavingArm.arm.rotation.x = -0.6;
+          }
+        }
+        // Phase 2: Pause at top
+        else if (activityPhase === 2) {
+          activityTimer += dt;
+          if (activityTimer >= 0.5) {
+            activityPhase = 3;
+            activityTimer = 0;
+            playSound("wind");
+            sayAhaan("Wheeeee! 🛝", "That was fast!", "🛝", "Playground Slide");
+          }
+        }
+        // Phase 3: Slide down chute (+Z direction)
+        else if (activityPhase === 3) {
+          activityTimer += dt;
+          const slideDuration = calm() ? 1.8 : 1.1;
+          const st = Math.min(1, activityTimer / slideDuration);
+
+          const startZ = -2.85, endZ = -1.25;
+          const curZ = startZ + st * (endZ - startZ);
+          const hFactor = Math.pow(1 - st, 1.8);
+          A.rig.position.set(-2.6, rigBaseY + hFactor * 1.55, curZ);
+          A.rig.rotation.y = 0;
+
+          // Joyful hands in air
+          A.leftArm.arm.rotation.z = 2.4;
+          A.wavingArm.arm.rotation.z = -2.4;
+          const armWave = calm() ? 0 : Math.sin(activityTimer * 14) * 0.2;
+          A.leftArm.arm.rotation.x = -1.8 + armWave;
+          A.wavingArm.arm.rotation.x = -1.8 + armWave;
+          A.leftLeg.hip.rotation.x = -1.3;
+          A.rightLeg.hip.rotation.x = -1.3;
+
+          if (st >= 1) {
+            activityPhase = 4;
+            activityTimer = 0;
+            if (A.resetLimbs) A.resetLimbs();
+            A.rig.position.set(-2.6, rigBaseY, -1.1);
+            A.rig.rotation.y = 0;
+          }
+        }
+        // Phase 4: Landing hop
+        else if (activityPhase === 4) {
+          activityTimer += dt;
+          const hopTime = 0.65;
+          const hopProgress = Math.min(1, activityTimer / hopTime);
+          const hopHeight = Math.sin(hopProgress * Math.PI) * 0.35;
+          A.rig.position.set(-2.6, rigBaseY + hopHeight, -1.1);
+          if (activityTimer >= hopTime) {
+            stopPlayActivity();
+            sayAhaan("That was fun! ✨", "Tap anywhere to walk or play again.", "🛝", "Playground");
+          }
+        }
+      } else if (currentActivity === "swing") {
+        // Phase 0: Approach swing at (2.75, -2.3)
+        if (activityPhase === 0) {
+          const dist = Math.hypot(A.rig.position.x - 2.75, A.rig.position.z - (-2.3));
+          if (dist < 0.65 || !targetPos) {
+            activityPhase = 1;
+            activityTimer = 0;
+            targetPos = null;
+            isWalking = false;
+            markerMat.opacity = 0;
+            A.rig.position.set(2.75, rigBaseY, -2.3);
+            A.rig.rotation.y = 0; // Face South
+          }
+        }
+        // Phase 1: Swinging in pendulum arc
+        else if (activityPhase === 1) {
+          activityTimer += dt;
+          const maxAng = calm() ? 0.22 : 0.58;
+          const spd = calm() ? 2.2 : 3.4;
+          const ramp = Math.min(1, activityTimer / 1.8);
+          const swingAng = Math.sin(activityTimer * spd) * maxAng * ramp;
+
+          if (swingPivot) swingPivot.rotation.x = swingAng;
+
+          const L = 1.4;
+          const py = 2.65, pz = -2.8;
+          const seatY = py - Math.cos(swingAng) * L;
+          const seatZ = pz + Math.sin(swingAng) * L;
+
+          A.rig.position.set(2.75, seatY - 0.22, seatZ);
+          A.rig.rotation.x = swingAng;
+          A.rig.rotation.y = 0;
+
+          // Sitting pose with dynamic leg kicking
+          const kick = Math.sin(activityTimer * spd);
+          A.leftLeg.hip.rotation.x = -1.1 - kick * 0.35;
+          A.rightLeg.hip.rotation.x = -1.1 - kick * 0.35;
+          A.leftLeg.knee.rotation.x = 0.6 - kick * 0.45;
+          A.rightLeg.knee.rotation.x = 0.6 - kick * 0.45;
+
+          // Hands holding chains
+          A.leftArm.arm.rotation.x = -1.1;
+          A.wavingArm.arm.rotation.x = -1.1;
+          A.leftArm.arm.rotation.z = 0.25;
+          A.wavingArm.arm.rotation.z = -0.25;
+
+          // Audio chime on forward apex
+          if (Math.abs(swingAng) > maxAng * 0.85 && (activityTimer - lastApexChime > 0.85)) {
+            lastApexChime = activityTimer;
+            playSound("chime");
+          }
+
+          if (activityTimer > 4.2 && activityTimer < 4.4) {
+            sayAhaan("Look how high! 🎈", "I can swing into the sky!", "🎈", "Cedar Swing Set");
+          }
+        }
+      } else if (currentActivity === "trampoline") {
+        // Phase 0: Approach access ladder at (-2.95, 0.2)
+        if (activityPhase === 0) {
+          const dist = Math.hypot(A.rig.position.x - (-2.95), A.rig.position.z - 0.2);
+          if (dist < 0.65 || !targetPos) {
+            activityPhase = 1;
+            activityTimer = 0;
+            targetPos = null;
+            isWalking = false;
+            markerMat.opacity = 0;
+            A.rig.position.set(-2.95, rigBaseY, 0.2);
+            A.rig.rotation.y = 0;
+          }
+        }
+        // Phase 1: Hop onto trampoline mat
+        else if (activityPhase === 1) {
+          activityTimer += dt;
+          const hopTime = 0.55;
+          const t = Math.min(1, activityTimer / hopTime);
+          const curX = -2.95 + t * (-4.3 - (-2.95));
+          const arcY = Math.sin(t * Math.PI) * 0.45;
+          A.rig.position.set(curX, rigBaseY + t * 0.54 + arcY, 0.2);
+          A.rig.rotation.y = 0;
+
+          if (t >= 1) {
+            activityPhase = 2;
+            activityTimer = 0;
+            A.rig.position.set(-4.3, rigBaseY + 0.54, 0.2);
+            sayAhaan("Boing! Boing! 🤸", "I can touch the clouds!", "🤸", "Spring Trampoline");
+          }
+        }
+        // Phase 2: Bouncing rhythm on mat
+        else if (activityPhase === 2) {
+          activityTimer += dt;
+          const freq = calm() ? 2.5 : 3.6;
+          const maxJump = calm() ? 0.45 : 1.55;
+          const cycle = (activityTimer * freq) % (Math.PI * 2);
+          const sinCycle = Math.sin(cycle);
+
+          A.rig.position.set(-4.3, A.rig.position.y, 0.2);
+          A.rig.rotation.y = 0;
+
+          if (sinCycle < 0) {
+            // Mat compression & landing crouch
+            const sag = -sinCycle * 0.12;
+            if (trampMat) trampMat.position.y = 0.54 - sag;
+            A.rig.position.y = rigBaseY + 0.54 - sag;
+
+            A.leftLeg.knee.rotation.x = sag * 6;
+            A.rightLeg.knee.rotation.x = sag * 6;
+            A.leftLeg.hip.rotation.x = -sag * 3;
+            A.rightLeg.hip.rotation.x = -sag * 3;
+            A.leftArm.arm.rotation.x = 0.4;
+            A.wavingArm.arm.rotation.x = 0.4;
+            A.leftArm.arm.rotation.z = 0.2;
+            A.wavingArm.arm.rotation.z = -0.2;
+          } else {
+            // Airborne launch
+            if (trampMat) trampMat.position.y = 0.54;
+            const jumpH = sinCycle * maxJump;
+            A.rig.position.y = rigBaseY + 0.54 + jumpH;
+
+            // Star jump pose in air
+            const spread = Math.sin(cycle);
+            A.leftArm.arm.rotation.z = 1.9 + spread * 0.35;
+            A.wavingArm.arm.rotation.z = -1.9 - spread * 0.35;
+            A.leftArm.arm.rotation.x = -0.3;
+            A.wavingArm.arm.rotation.x = -0.3;
+            A.leftLeg.hip.rotation.z = -0.25 * spread;
+            A.rightLeg.hip.rotation.z = 0.25 * spread;
+            A.leftLeg.knee.rotation.x = 0;
+            A.rightLeg.knee.rotation.x = 0;
+
+            if (cycle < 0.2 && (activityTimer - lastApexChime > 0.55)) {
+              lastApexChime = activityTimer;
+              playSound("bell");
+            }
+          }
+        }
+      }
+    }
 
     // ==========================================
     // Top-View Camera & Interactive Controls
@@ -1889,6 +2461,9 @@
           const hit = intHits[0];
           const data = hit.object.userData;
           if (data && data.onInteract) {
+            if (currentActivity && (!data.activity || data.activity !== currentActivity)) {
+              stopPlayActivity();
+            }
             data.onInteract();
             if (typeof data.x === "number" && typeof data.z === "number") {
               targetPos = new T.Vector3(data.x, rigBaseY, data.z);
@@ -1904,6 +2479,7 @@
         const hits = raycaster.intersectObjects(walkableSurfaces);
         if (hits.length > 0) {
           const hit = hits[0];
+          if (currentActivity) stopPlayActivity();
           targetPos = new T.Vector3(hit.point.x, rigBaseY, hit.point.z);
           marker.position.set(hit.point.x, 0.52, hit.point.z);
           markerMat.opacity = 0.95;
@@ -1947,6 +2523,7 @@
 
       if (handled) {
         if (isDown) e.preventDefault(); // Stop window scroll
+        if (isDown && currentActivity) stopPlayActivity();
         targetPos = null;
         wake();
       }
@@ -2120,7 +2697,7 @@
       }
 
       // Smoothly rotate Ahaan towards heading
-      if (isWalking) {
+      if (isWalking && (!currentActivity || activityPhase === 0)) {
         const curRot = A.rig.rotation.y;
         let diff = ahaanAngle - curRot;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -2134,11 +2711,23 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (A.updateWave) wavingActive = A.updateWave(dt, isWalking, calm());
+      if (A.updateWave && (!currentActivity || activityPhase === 0)) {
+        wavingActive = A.updateWave(dt, isWalking, calm());
+      }
 
       // Update leg and arm walk cycle
-      if (A.updateWalk) A.updateWalk(isWalking, 8.5, dt);
-      A.rig.position.y = rigBaseY; // Lock vertical baseline
+      if (A.updateWalk && (!currentActivity || activityPhase === 0)) {
+        A.updateWalk(isWalking, 8.5, dt);
+      }
+
+      // Update playground activity
+      if (currentActivity) {
+        updatePlayActivity(dt);
+      }
+
+      if (!currentActivity || activityPhase === 0) {
+        A.rig.position.y = rigBaseY; // Lock vertical baseline
+      }
 
       // Track speech bubble above Ahaan and update walk state
       updateBubblePosition();
@@ -2173,7 +2762,7 @@
 
       render();
 
-      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0) {
+      if (isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -2225,7 +2814,10 @@
       STATES,
       openDiscoveryModal,
       closeDiscoveryModal,
-      playSound
+      playSound,
+      startPlayActivity,
+      stopPlayActivity,
+      getCurrentActivity: () => currentActivity
     };
 
     hero.classList.add("park-ready");
