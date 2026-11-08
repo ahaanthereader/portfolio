@@ -2828,7 +2828,7 @@
 
     function updateCameraPosition(dt) {
       let desiredTarget, desiredPos;
-      if (cameraMode === "action" || cameraMode === "landmark") {
+      if (cameraMode === "action" || cameraMode === "landmark" || cameraMode === "custom") {
         desiredTarget = actionCamTarget;
         desiredPos = actionCamPos;
       } else {
@@ -3395,7 +3395,17 @@
       getCurrentActivity: () => currentActivity,
       getCurrentNearbyItem: () => currentNearbyItem,
       getA: () => A,
-      getSwingPivot: () => swingPivot
+      getSwingPivot: () => swingPivot,
+      setCustomCamera: (pos, target) => {
+        if (pos && target) {
+          cameraMode = "custom";
+          actionCamPos.set(pos.x, pos.y, pos.z);
+          actionCamTarget.set(target.x, target.y, target.z);
+        } else {
+          cameraMode = "normal";
+        }
+        wake();
+      }
     };
 
     hero.classList.add("park-ready");
