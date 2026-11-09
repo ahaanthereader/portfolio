@@ -81,10 +81,33 @@
     <div class="ab-tail" aria-hidden="true"></div>
   </div>
   <div class="ahaan-figure" id="ahaanFigure" role="img" aria-label="A 3D cartoon of Ahaan standing in the park. He looks toward your pointer, waves when you tap him, and eats the sweet you pick." title="Tap to say hi!"></div>
-  <div class="candy-blanket">
-    <h2 class="candy-title">Pick a sweet</h2>
-    <nav class="candy-shelf" id="candyShelf" aria-label="All pages" tabindex="-1"></nav>
-  </div>
+
+  <!-- Docked Storybook Navigation Drawer -->
+  <aside class="candy-drawer" id="candyDrawer" aria-label="Storybook directory">
+    <button type="button" class="candy-toggle-btn" id="candyToggleBtn" aria-expanded="false" aria-controls="candyBlanket" title="Explore pages directory">
+      <span class="candy-toggle-icon" aria-hidden="true">🍬</span>
+      <span class="candy-toggle-label">Pages</span>
+      <span class="candy-toggle-arrow" aria-hidden="true">◀</span>
+    </button>
+    <div class="candy-blanket" id="candyBlanket" role="region" aria-label="Storybook pages directory" aria-hidden="true">
+      <div class="candy-drawer-header">
+        <div class="candy-drawer-title-wrap">
+          <span class="candy-drawer-icon" aria-hidden="true">🎨</span>
+          <div>
+            <h2 class="candy-title">Pick a Sweet</h2>
+            <div class="candy-drawer-sub">16 Storybook Adventures</div>
+          </div>
+        </div>
+        <button type="button" class="candy-close-btn" id="candyCloseBtn" aria-label="Close pages panel">✕</button>
+      </div>
+      <nav class="candy-shelf" id="candyShelf" aria-label="All pages" tabindex="-1"></nav>
+      <div class="candy-drawer-footer">
+        <span class="candy-footer-leaf" aria-hidden="true">🌿</span>
+        <span class="candy-footer-hint">Singapore Sketchbook Collection</span>
+      </div>
+    </div>
+    <div class="candy-drawer-backdrop" id="candyBackdrop" aria-hidden="true"></div>
+  </aside>
   <!-- Interactive Action Prompt (Approaching playground or landmarks) -->
   <div class="action-prompt" id="actionPrompt" role="region" aria-live="polite" hidden>
     <button type="button" class="action-prompt-btn" id="actionPromptBtn">
