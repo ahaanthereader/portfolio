@@ -133,8 +133,8 @@
 
     const scene = new T.Scene();
     // Warm watercolor parchment horizon (matching Singapore Sketchbook wash)
-    const HORIZON = new T.Color("#f6f2e8");
-    scene.fog = new T.Fog(HORIZON, 48, 145);
+    const HORIZON = new T.Color("#ece7dc");
+    scene.fog = new T.Fog(HORIZON, 36, 120);
 
     const camera = new T.PerspectiveCamera(40, 1, 0.1, 450);
 
@@ -142,17 +142,17 @@
     scene.add(new T.Mesh(new T.SphereGeometry(200, 32, 16), new T.ShaderMaterial({
       side: T.BackSide, depthWrite: false, fog: false,
       uniforms: {
-        top: { value: new T.Color("#568cbd") },       // Soft cerulean watercolor wash
-        mid: { value: new T.Color("#8fb5d6") },       // Muted sky wash
-        bottom: { value: new T.Color("#f6f2e8") }     // Warm parchment linen horizon
+        top: { value: new T.Color("#628ea6") },       // Cerulean ink wash
+        mid: { value: new T.Color("#a2c0d6") },       // Soft sky wash
+        bottom: { value: new T.Color("#ece7dc") }     // Warm parchment paper horizon
       },
       vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
       fragmentShader: "uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP; void main(){ float h = vP.y; vec3 c = h > 0.05 ? mix(mid, top, smoothstep(0.05, 0.55, h)) : mix(bottom, mid, smoothstep(-0.04, 0.05, h)); gl_FragColor = vec4(c, 1.0);\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}"
     })));
 
     // ---- Lighting: Warm Golden Watercolor Sun & Ambient Meadow Bounce ----
-    scene.add(new T.HemisphereLight(0xfdfbf5, 0x7a8e68, 1.10));
-    const sun = new T.DirectionalLight(0xfff5e2, 1.48);
+    scene.add(new T.HemisphereLight(0xfcf8ee, 0x8a997d, 1.15));
+    const sun = new T.DirectionalLight(0xfff5e2, 1.35);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
@@ -161,7 +161,7 @@
     scene.add(sun);
 
     // Warm golden rim light for specular depth on trees and landmarks
-    const rimSun = new T.DirectionalLight(0xffdfb0, 0.45);
+    const rimSun = new T.DirectionalLight(0xf2e0c9, 0.40);
     rimSun.position.set(30, 24, -32);
     scene.add(rimSun);
 
@@ -313,15 +313,15 @@
       c.width = 512; c.height = 512;
       const g = c.getContext("2d");
 
-      // Warm linen / paper wash base
-      g.fillStyle = "#f6f2e8";
+      // Warm linen / paper wash base (Singapore Sketchbook paper ground)
+      g.fillStyle = "#ece7dc";
       g.fillRect(0, 0, 512, 512);
 
       // Soft sage and olive watercolor washes
       const bg = g.createRadialGradient(256, 256, 60, 256, 256, 360);
-      bg.addColorStop(0, "rgba(142, 182, 126, 0.72)");
-      bg.addColorStop(0.65, "rgba(125, 166, 110, 0.68)");
-      bg.addColorStop(1, "rgba(110, 150, 95, 0.62)");
+      bg.addColorStop(0, "rgba(128, 162, 116, 0.72)");
+      bg.addColorStop(0.65, "rgba(110, 144, 98, 0.68)");
+      bg.addColorStop(1, "rgba(94, 126, 84, 0.62)");
       g.fillStyle = bg;
       g.fillRect(0, 0, 512, 512);
 
@@ -329,7 +329,7 @@
       for (let i = 0; i < 400; i++) {
         const x = Math.random() * 512, y = Math.random() * 512;
         const rad = 1.5 + Math.random() * 3.5;
-        g.fillStyle = Math.random() > 0.5 ? "rgba(95, 138, 80, 0.18)" : "rgba(235, 226, 206, 0.22)";
+        g.fillStyle = Math.random() > 0.5 ? "rgba(95, 138, 80, 0.18)" : "rgba(236, 231, 220, 0.28)";
         g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
       }
 
@@ -378,7 +378,7 @@
     const groundMat = new T.MeshStandardMaterial({
       color: 0xffffff,
       map: createMeadowTexture(T),
-      roughness: 0.92
+      roughness: 0.94
     });
     const ground = new T.Mesh(groundGeo, groundMat);
     ground.receiveShadow = true;
@@ -391,7 +391,7 @@
       const tileGeo = new T.CylinderGeometry(st.rad, st.rad * 1.04, 0.45, 36);
       const tileMat = new T.MeshStandardMaterial({
         color: st.color,
-        roughness: 0.75,
+        roughness: 0.88,
         flatShading: true
       });
       const tile = new T.Mesh(tileGeo, tileMat);
@@ -401,10 +401,10 @@
       mapGroup.add(tile);
       stateMeshes.push(tile);
 
-      // Elevated white border ring with warm golden bevel inlay
+      // Elevated cotton paper border ring with antique gold leaf inlay
       const ringGeo = new T.RingGeometry(st.rad * 0.97, st.rad * 1.04, 44);
       ringGeo.rotateX(-Math.PI / 2);
-      const ringMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.90 });
+      const ringMat = new T.MeshBasicMaterial({ color: 0xfcf9f2, transparent: true, opacity: 0.92 });
       const ring = new T.Mesh(ringGeo, ringMat);
       ring.position.set(st.x, 0.48, st.z);
       mapGroup.add(ring);
@@ -412,9 +412,9 @@
       const goldRingGeo = new T.RingGeometry(st.rad * 0.93, st.rad * 0.97, 44);
       goldRingGeo.rotateX(-Math.PI / 2);
       const goldRingMat = new T.MeshStandardMaterial({
-        color: 0xd4af37,
-        metalness: 0.85,
-        roughness: 0.25
+        color: 0xc8a64d,
+        metalness: 0.40,
+        roughness: 0.60
       });
       const goldRing = new T.Mesh(goldRingGeo, goldRingMat);
       goldRing.position.set(st.x, 0.47, st.z);
@@ -536,9 +536,9 @@
     buildSunbeams(scene, T);
 
     function buildPaths(parent, states, T, walkables) {
-      const pathMat = new T.MeshStandardMaterial({ color: 0xdfceb0, roughness: 0.9, flatShading: true });
-      const curbMat = new T.MeshStandardMaterial({ color: 0xbeaa86, roughness: 0.85 });
-      const stoneMat = new T.MeshStandardMaterial({ color: 0xf6eee0, roughness: 0.8 });
+      const pathMat = new T.MeshStandardMaterial({ color: 0xdcd0b6, roughness: 0.94, flatShading: true });
+      const curbMat = new T.MeshStandardMaterial({ color: 0xbfae8e, roughness: 0.90 });
+      const stoneMat = new T.MeshStandardMaterial({ color: 0xf4ece0, roughness: 0.88 });
 
       function addSegment(x1, z1, x2, z2, width, hasSteps) {
         const dx = x2 - x1, dz = z2 - z1;
@@ -599,11 +599,11 @@
       riverGeo.computeVertexNormals();
 
       const riverMat = new T.MeshStandardMaterial({
-        color: 0x3d90cb,
-        roughness: 0.16,
-        metalness: 0.28,
+        color: 0x588aa2,
+        roughness: 0.35,
+        metalness: 0.08,
         transparent: true,
-        opacity: 0.92
+        opacity: 0.88
       });
       const river = new T.Mesh(riverGeo, riverMat);
       river.position.y = 0.14;
@@ -693,9 +693,9 @@
       const waterGeo = new T.RingGeometry(canalInnerR, canalOuterR, 64);
       waterGeo.rotateX(-Math.PI / 2);
       const waterMat = new T.MeshStandardMaterial({
-        color: 0x4287a5,
-        roughness: 0.18,
-        metalness: 0.22,
+        color: 0x54869e,
+        roughness: 0.35,
+        metalness: 0.08,
         transparent: true,
         opacity: 0.88
       });
@@ -772,22 +772,22 @@
       lazyRiverInflatable = new T.Group();
       lazyRiverInflatable.position.set(canalMidR, 0.22, 0);
 
-      // Ring body
+      // Ring body: unbleached cotton canvas with hand-painted watercolor stripes
       const tubeMat = new T.MeshStandardMaterial({
-        color: 0xff6b8b, // Pastel coral pink
-        roughness: 0.35,
-        metalness: 0.05
+        color: 0xe8e0d4, // Natural canvas
+        roughness: 0.88,
+        metalness: 0.02
       });
       const tubeMesh = new T.Mesh(new T.TorusGeometry(0.85, 0.26, 16, 32), tubeMat);
       tubeMesh.rotation.x = Math.PI / 2;
       tubeMesh.castShadow = true;
       lazyRiverInflatable.add(tubeMesh);
 
-      // Decorative colorful stripes around tube
-      const stripeColors = [0xffd166, 0x06d6a0, 0x118ab2, 0xffffff, 0xffbe0b];
+      // Decorative hand-painted watercolor stripes around tube (terracotta, sage, slate)
+      const stripeColors = [0x9e5445, 0x567b55, 0x587a8e, 0xc8a265];
       for (let st = 0; st < 8; st++) {
         const sang = (st / 8) * Math.PI * 2;
-        const stripeMat = new T.MeshStandardMaterial({ color: stripeColors[st % stripeColors.length], roughness: 0.4 });
+        const stripeMat = new T.MeshStandardMaterial({ color: stripeColors[st % stripeColors.length], roughness: 0.85 });
         const sprinkle = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 0.18, 6), stripeMat);
         sprinkle.position.set(Math.cos(sang) * 0.85, 0.24, Math.sin(sang) * 0.85);
         sprinkle.rotation.z = Math.PI / 2;
@@ -1181,20 +1181,20 @@
       const playGroup = new T.Group();
       parent.add(playGroup);
 
-      const cedarMat = new T.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.85 });
-      const canopyMat = new T.MeshStandardMaterial({ color: 0xffc837, roughness: 0.55 });
-      const slideChuteMat = new T.MeshStandardMaterial({ color: 0xef476f, roughness: 0.35 });
-      const railYellowMat = new T.MeshStandardMaterial({ color: 0xffd166, roughness: 0.4 });
-      const landingPadMat = new T.MeshStandardMaterial({ color: 0x118ab2, roughness: 0.7 });
-      const steelMat = new T.MeshStandardMaterial({ color: 0xa8b2ba, metalness: 0.85, roughness: 0.25 });
-      const chainMat = new T.MeshStandardMaterial({ color: 0xdde2e6, metalness: 0.85, roughness: 0.25 });
-      const swingSeatMatA = new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.45 }); // Vivid cherry red
-      const swingSeatMatB = new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 }); // Azure blue
-      const mulchMat = new T.MeshStandardMaterial({ color: 0x5a3825, roughness: 0.95 });
-      const trampPadMat = new T.MeshStandardMaterial({ color: 0x06d6a0, roughness: 0.45 });
-      const trampMatBlack = new T.MeshStandardMaterial({ color: 0x1a211e, roughness: 0.95 });
-      const netMat = new T.MeshStandardMaterial({ color: 0x223344, transparent: true, opacity: 0.22, side: T.DoubleSide });
-      const foamSleeveMat = new T.MeshStandardMaterial({ color: 0x3a86ff, roughness: 0.6 });
+      const cedarMat = new T.MeshStandardMaterial({ color: 0x7a5a3e, roughness: 0.90 });
+      const canopyMat = new T.MeshStandardMaterial({ color: 0x9b6842, roughness: 0.88 }); // Terracotta artist canvas
+      const slideChuteMat = new T.MeshStandardMaterial({ color: 0x486478, roughness: 0.55, metalness: 0.20 }); // Slate blue metal
+      const railYellowMat = new T.MeshStandardMaterial({ color: 0xc8a265, roughness: 0.65 }); // Antique brass
+      const landingPadMat = new T.MeshStandardMaterial({ color: 0x567862, roughness: 0.90 }); // Forest moss mulch
+      const steelMat = new T.MeshStandardMaterial({ color: 0x767066, metalness: 0.70, roughness: 0.40 });
+      const chainMat = new T.MeshStandardMaterial({ color: 0x58544c, metalness: 0.75, roughness: 0.35 });
+      const swingSeatMatA = new T.MeshStandardMaterial({ color: 0x2b3e50, roughness: 0.88 }); // Deep indigo artist canvas
+      const swingSeatMatB = new T.MeshStandardMaterial({ color: 0x7a483a, roughness: 0.88 }); // Terracotta canvas
+      const mulchMat = new T.MeshStandardMaterial({ color: 0x6e523e, roughness: 0.95 });
+      const trampPadMat = new T.MeshStandardMaterial({ color: 0x4c6a56, roughness: 0.90 }); // Sage canvas padding
+      const trampMatBlack = new T.MeshStandardMaterial({ color: 0x26332c, roughness: 0.95 }); // Deep woven charcoal mat
+      const netMat = new T.MeshStandardMaterial({ color: 0x2b3831, transparent: true, opacity: 0.18, side: T.DoubleSide });
+      const foamSleeveMat = new T.MeshStandardMaterial({ color: 0x5a7566, roughness: 0.85 }); // Muted moss sleeve
 
       // ------------------------------------------
       // 1. Playground Slide (North-West Lawn: x = -2.6, z = -3.2)
@@ -1527,20 +1527,20 @@
     }
 
     function buildNature(parent, T) {
-      const barkMat = new T.MeshStandardMaterial({ color: 0x5a3821, roughness: 0.9 });
+      const barkMat = new T.MeshStandardMaterial({ color: 0x544234, roughness: 0.92 });
       const foliageMats = [
-        new T.MeshStandardMaterial({ color: 0x488338, roughness: 0.8 }),
-        new T.MeshStandardMaterial({ color: 0x3d742e, roughness: 0.8 }),
-        new T.MeshStandardMaterial({ color: 0x569642, roughness: 0.8 }),
-        new T.MeshStandardMaterial({ color: 0x27532a, roughness: 0.85 }), // pine dark green
-        new T.MeshStandardMaterial({ color: 0xf2a4b4, roughness: 0.75 }), // cherry blossom pink
-        new T.MeshStandardMaterial({ color: 0xf5cb56, roughness: 0.75 })  // golden maple
+        new T.MeshStandardMaterial({ color: 0x5b7e54, roughness: 0.92 }), // Soft sage watercolor
+        new T.MeshStandardMaterial({ color: 0x496745, roughness: 0.92 }), // Olive botanical wash
+        new T.MeshStandardMaterial({ color: 0x688d5e, roughness: 0.92 }), // Warm meadow green
+        new T.MeshStandardMaterial({ color: 0x324f3b, roughness: 0.94 }), // Deep spruce pine
+        new T.MeshStandardMaterial({ color: 0xdfbfbc, roughness: 0.90 }), // Muted plumeria blush
+        new T.MeshStandardMaterial({ color: 0xbfa258, roughness: 0.90 })  // Golden ochre foliage
       ];
-      const rockMat = new T.MeshStandardMaterial({ color: 0x939a95, roughness: 0.85, flatShading: true });
+      const rockMat = new T.MeshStandardMaterial({ color: 0x8a877e, roughness: 0.92, flatShading: true });
       const flowerMats = [
-        new T.MeshBasicMaterial({ color: 0xffffff }),
-        new T.MeshBasicMaterial({ color: 0xffd13b }),
-        new T.MeshBasicMaterial({ color: 0xb59dd6 })
+        new T.MeshStandardMaterial({ color: 0xfcf8ee, roughness: 0.88 }), // Warm cream plumeria
+        new T.MeshStandardMaterial({ color: 0xd9b24e, roughness: 0.88 }), // Soft golden ochre
+        new T.MeshStandardMaterial({ color: 0xbfa8cc, roughness: 0.88 })  // Muted lavender orchid
       ];
 
       function createOak(x, z, scale, matIdx) {
