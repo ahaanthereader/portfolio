@@ -800,26 +800,16 @@
   .ahaan-figure { grid-column: 2; grid-row: 1 / span 2; justify-self: end; align-self: end; position: relative; width: min(360px, 34vw); height: min(560px, 64vh); margin-right: max(4vw, 24px); cursor: pointer; }
   .ahaan-figure canvas { display: block; width: 100%; height: 100%; }
   .ahaan-figure.no-3d { visibility: hidden; }
-  .candy-blanket { grid-column: 1 / -1; grid-row: 3; width: min(var(--maxw), calc(100% - 32px)); margin: 0 auto 22px; padding: 12px 14px 8px; border-radius: 16px; border: 1px solid rgba(255,255,255,.6); box-shadow: 0 10px 30px rgba(30,60,30,.14); background-color: rgba(255,251,244,.78); background-image: repeating-conic-gradient(rgba(242,139,130,.10) 0 25%, transparent 0 50%); background-size: 26px 26px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
-  .candy-blanket:focus-within { box-shadow: 0 10px 30px rgba(30,60,30,.14), 0 0 0 3px rgba(255,255,255,.8); }
-  .candy-title { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.05rem; text-align: center; color: var(--ink); margin: 0 0 4px; }
-  .candy-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 2px 6px; outline: none; }
-  .candy { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border-radius: 12px; color: var(--ink); text-decoration: none; transition: transform .24s ease-out, background .24s ease-out; }
-  .candy:hover { transform: translateY(-2px); background: rgba(255,255,255,.7); }
-  .candy:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-  .candy-art svg { display: block; width: 50px; height: 50px; filter: drop-shadow(0 3px 3px rgba(58,46,33,.18)); }
-  .candy-label { font-size: .78rem; font-weight: 800; line-height: 1.15; text-align: center; }
   .candy-fly { position: fixed; z-index: 90; pointer-events: none; transition: transform .65s cubic-bezier(.45,.05,.4,1), opacity .25s ease; }
   .candy-fly svg { display: block; width: 100%; height: 100%; }
   .nom { position: fixed; z-index: 91; transform: translate(-50%, -150%); pointer-events: none; padding: 4px 12px; border-radius: 12px; background: #fffaf0; color: var(--ink); box-shadow: var(--shadow-sm); font-family: "Fraunces", serif; font-weight: 900; font-size: 1.3rem; }
   @media (max-width: 860px) {
-    .home-hero { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; min-height: auto; padding-top: 100px; }
+    .home-hero { grid-template-columns: 1fr; grid-template-rows: auto auto auto; min-height: auto; padding-top: 100px; }
     .hero-copy { padding: 0 22px; }
     .hero-chips { grid-column: 1; grid-row: 2; justify-self: start; margin: 18px 22px 0; grid-auto-flow: column; overflow-x: auto; max-width: calc(100vw - 44px); }
     .ahaan-figure { grid-column: 1; grid-row: 3; justify-self: center; width: 240px; height: 380px; margin: 0; }
-    .candy-blanket { grid-row: 4; }
   }
-  @media (prefers-reduced-motion: reduce) { .candy, .hero-btn { transition: none; } .candy:hover, .hero-btn:hover { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .hero-btn { transition: none; } .hero-btn:hover { transform: none; } }
 
   /* ============ Grouped nav (all pages) ============ */
   .nav-links { gap: 4px; flex-wrap: nowrap; }
@@ -874,33 +864,7 @@
     .page-home footer { display: none; }
     .home-hero { height: 100vh; height: 100dvh; min-height: 0; padding-top: 96px; }
     .ahaan-figure { height: 100%; width: auto; aspect-ratio: 9 / 14; max-width: 34vw; }
-    .candy-blanket { margin-bottom: 16px; padding: 10px 12px 6px; }
-    .candy-title { display: none; }
-    .candy-shelf { grid-template-columns: repeat(15, minmax(0, 1fr)); }
-    .candy-art svg { width: 42px; height: 42px; }
-    .candy-label { font-size: .72rem; }
   }
-
-  /* ============ Home: candy tray (frosted glass, grouped like the site) ============ */
-  .candy-blanket { padding: 8px 10px 6px; border-radius: 22px; border: 1px solid rgba(255,255,255,.75); background-color: rgba(255,252,246,.6); background-image: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.12)); background-size: auto; box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 18px 40px rgba(25,55,30,.18); -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2); }
-  .candy-title { display: none; }
-  .candy-shelf { display: flex; gap: 0; }
-  .candy-group { flex: var(--n) 1 0; min-width: 0; padding: 2px 6px; }
-  .candy-group + .candy-group { border-left: 1px solid rgba(58,46,33,.12); }
-  .candy-glabel { margin: 2px 0 2px; text-align: center; color: var(--ink-soft); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-  .candy-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px; }
-  .candy { padding: 4px 2px; border-radius: 14px; }
-  .candy:hover { transform: none; background: rgba(255,255,255,.5); }
-  .candy-art { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 50% 42%, rgba(255,255,255,.95), rgba(255,255,255,.4) 68%, transparent 70%); }
-  .candy-art svg { width: 42px; height: 42px; filter: drop-shadow(0 4px 4px rgba(58,46,33,.18)); transition: transform .24s ease-out; }
-  .candy:hover .candy-art svg, .candy:focus-visible .candy-art svg { transform: translateY(-3px) rotate(-6deg) scale(1.06); }
-  .candy-label { max-width: 100%; font-size: .76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  @media (max-width: 860px) {
-    .candy-shelf { flex-wrap: wrap; }
-    .candy-group { flex: 1 1 45%; }
-    .candy-group + .candy-group { border-left: 0; }
-  }
-  @media (prefers-reduced-motion: reduce) { .candy-art svg { transition: none; } .candy:hover .candy-art svg, .candy:focus-visible .candy-art svg { transform: none; } }
 
   /* ============ Cards as dialogs (Doors, Bells) ============ */
   .card-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(40,30,20,.32); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
@@ -1154,62 +1118,376 @@
     }
   }
 
-  /* ============ Home: vertical sweets tray to the right of Ahaan (laptop and up) ============ */
+  /* ============ Home: Two-column hero layout with unobstructed 3D park canvas ============ */
   @media (min-width: 861px) and (min-height: 480px) {
-    .home-hero { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: 1fr; }
-    .hero-copy { grid-row: 1; align-self: start; }
-    .ahaan-figure { grid-column: 2; grid-row: 1; align-self: end; height: 100%; margin: 0 4px 0 0; }
-    .candy-blanket { grid-column: 3; grid-row: 1; align-self: center; width: clamp(272px, 22vw, 308px); margin: 40px max(16px, calc((100vw - var(--maxw)) / 2 + 22px)) 0 8px; padding: 8px 8px 6px; }
-    .candy-shelf { flex-direction: column; }
-    .candy-group { flex: none; padding: 6px 2px 4px; }
-    .candy-group + .candy-group { border-left: 0; border-top: 1px solid rgba(58,46,33,.12); }
-    .candy-row { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
-    .candy-art { width: 44px; height: 44px; }
-    .candy-art svg { width: 34px; height: 34px; }
-    .candy-label { font-size: .68rem; }
+    .home-hero {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: 1fr;
+    }
+    .hero-copy {
+      grid-row: 1;
+      align-self: start;
+    }
+    .ahaan-figure {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: end;
+      height: 100%;
+      margin: 0 40px 0 0;
+    }
   }
-  /* ---- Rich frosted glassmorphic confectionery shelf with golden trim ---- */
+
+  /* ============ Side Navigation Drawer: Singapore Sketchbook Confectionery Tray ============ */
+  .candy-drawer {
+    position: fixed;
+    top: 76px;
+    right: 0;
+    bottom: 16px;
+    width: clamp(310px, 24vw, 350px);
+    z-index: 85;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .candy-drawer.is-open {
+    transform: translateX(0);
+  }
+
+  /* Floating toggle button tab on the right side */
+  .candy-toggle-btn {
+    pointer-events: auto;
+    position: absolute;
+    right: 100%;
+    top: 36px;
+    background: rgba(253, 250, 244, 0.94);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(251, 246, 236, 0.92) 100%);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(212, 175, 55, 0.55);
+    border-right: none;
+    border-radius: 24px 0 0 24px;
+    padding: 10px 14px 10px 15px;
+    box-shadow: -6px 8px 22px rgba(45, 35, 20, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    color: #38281a;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  }
+  .candy-toggle-btn:hover {
+    background: #ffffff;
+    box-shadow: -8px 10px 26px rgba(45, 35, 20, 0.2);
+    color: #1a120b;
+  }
+  .candy-toggle-btn:focus-visible {
+    outline: 3px solid #d4af37;
+    outline-offset: 2px;
+  }
+  .candy-toggle-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+  .candy-toggle-label {
+    letter-spacing: 0.02em;
+  }
+  .candy-toggle-arrow {
+    font-size: 0.72rem;
+    color: #8c6a38;
+    display: inline-block;
+    transition: transform 0.28s ease;
+  }
+  .candy-drawer.is-open .candy-toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* Blanket / Panel (Singapore Sketchbook warm parchment glass texture) */
   .candy-blanket {
-    background-color: rgba(255, 253, 248, 0.82);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(254, 250, 242, 0.78) 100%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
-    border: 1.5px solid rgba(212, 175, 55, 0.42);
-    border-radius: 26px;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), inset 0 -1px 0 rgba(212, 175, 55, 0.18), 0 24px 54px -10px rgba(24, 44, 68, 0.18), 0 4px 16px rgba(0, 0, 0, 0.05);
+    pointer-events: auto;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100vh - 96px);
+    margin: 0;
+    padding: 12px 14px 10px;
+    border-radius: 24px 0 0 24px;
+    background-color: rgba(253, 250, 244, 0.92);
+    background-image: linear-gradient(180deg, rgba(255, 253, 248, 0.96) 0%, rgba(251, 246, 236, 0.88) 100%);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+    border: 1.5px solid rgba(212, 175, 55, 0.48);
+    border-right: none;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), inset 0 0 0 1px rgba(255, 255, 255, 0.6), -10px 18px 46px rgba(45, 35, 20, 0.16);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+  }
+  .candy-blanket:focus-within {
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.98), -10px 18px 46px rgba(45, 35, 20, 0.16), 0 0 0 2px rgba(212, 175, 55, 0.6);
+  }
+
+  /* Custom sensory-friendly scrollbar */
+  .candy-blanket::-webkit-scrollbar {
+    width: 6px;
+  }
+  .candy-blanket::-webkit-scrollbar-track {
+    background: rgba(212, 175, 55, 0.08);
+    border-radius: 3px;
+  }
+  .candy-blanket::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.45);
+    border-radius: 3px;
+  }
+  .candy-blanket::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.7);
+  }
+
+  /* Drawer Header */
+  .candy-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.32);
+    flex-shrink: 0;
+  }
+  .candy-drawer-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .candy-drawer-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .candy-title {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #2b2219;
+    margin: 0;
+    line-height: 1.15;
+  }
+  .candy-drawer-sub {
+    font-family: "Fredoka", sans-serif;
+    font-size: 0.72rem;
+    color: #755f4c;
+    margin-top: 1px;
+    font-weight: 600;
+  }
+  .candy-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background: rgba(255, 255, 255, 0.85);
+    color: #4a3827;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.18s, transform 0.16s;
+  }
+  .candy-close-btn:hover {
+    background: #ffffff;
+    transform: scale(1.08);
+  }
+  .candy-close-btn:focus-visible {
+    outline: 2px solid #d4af37;
+    outline-offset: 2px;
+  }
+
+  /* Shelf Navigation list */
+  .candy-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    outline: none;
+    flex: 1 1 auto;
+  }
+  .candy-group {
+    padding: 4px 0 3px;
+  }
+  .candy-group + .candy-group {
+    border-top: 1px solid rgba(212, 175, 55, 0.25);
   }
   .candy-glabel {
     font-family: "Fraunces", Georgia, serif;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #654321;
-    text-shadow: none;
-    margin: 4px 0 3px;
+    color: #523e2b;
+    margin: 2px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  .candy-glabel::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.4), transparent);
+  }
+  .candy-row {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: 3px;
+  }
+
+  /* Individual Candy Card Link */
   .candy {
-    border-radius: 14px;
-    transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), background 0.18s ease, box-shadow 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 2px;
+    border-radius: 12px;
+    color: #2b2219;
+    text-decoration: none;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), background 0.2s ease, box-shadow 0.2s ease;
   }
   .candy:hover {
-    background: rgba(255, 255, 255, 0.92);
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.24);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.22);
   }
-  .candy-label {
-    color: #1a2c3f;
-    font-family: "Fredoka", sans-serif;
-    font-weight: 700;
-    font-size: 0.72rem;
-    text-shadow: none;
-  }
-  .candy-group + .candy-group {
-    border-color: rgba(212, 175, 55, 0.28);
+  .candy:focus-visible {
+    outline: 3px solid #d4af37;
+    outline-offset: 2px;
   }
   .candy-art {
-    background: radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.5) 68%, transparent 72%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 45% 35%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.5) 65%, transparent 72%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(45, 35, 20, 0.12);
+    transition: transform 0.2s ease;
+  }
+  .candy-art svg {
+    display: block;
+    width: 42px;
+    height: 42px;
+    filter: drop-shadow(0 2px 3px rgba(45, 35, 20, 0.15));
+    transition: transform 0.2s ease;
+  }
+  .candy:hover .candy-art svg,
+  .candy:focus-visible .candy-art svg {
+    transform: scale(1.08) rotate(3deg);
+  }
+  .candy-label {
+    font-family: "Fredoka", sans-serif;
+    font-size: 0.70rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    color: #2b2219;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Drawer Footer */
+  .candy-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding-top: 6px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(212, 175, 55, 0.25);
+    color: #7a6652;
+    font-size: 0.70rem;
+    font-weight: 600;
+    font-family: "Fredoka", sans-serif;
+    flex-shrink: 0;
+  }
+
+  /* Backdrop for mobile */
+  .candy-drawer-backdrop {
+    display: none;
+  }
+
+  /* Mobile responsiveness (< 860px) */
+  @media (max-width: 860px) {
+    .candy-drawer {
+      top: 0;
+      bottom: 0;
+      width: min(340px, 86vw);
+      z-index: 95;
+    }
+    .candy-blanket {
+      max-height: 100%;
+      border-radius: 20px 0 0 20px;
+      padding: 16px 14px 14px;
+    }
+    .candy-toggle-btn {
+      position: fixed;
+      right: 0;
+      top: 120px;
+      z-index: 90;
+    }
+    .candy-drawer.is-open .candy-toggle-btn {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .candy-drawer-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 94;
+      background: rgba(28, 22, 16, 0.4);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+    .candy-drawer.is-open ~ .candy-drawer-backdrop,
+    .candy-drawer.is-open .candy-drawer-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .candy-row {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .candy-drawer,
+    .candy-toggle-arrow,
+    .candy,
+    .candy-art svg {
+      transition: none !important;
+    }
+    .candy:hover {
+      transform: none !important;
+    }
+    .candy:hover .candy-art svg {
+      transform: none !important;
+    }
+  }
+  html[data-motion="off"] .candy-drawer,
+  html[data-motion="off"] .candy-toggle-arrow,
+  html[data-motion="off"] .candy,
+  html[data-motion="off"] .candy-art svg {
+    transition: none !important;
+  }
+  html[data-motion="off"] .candy:hover {
+    transform: none !important;
+  }
+  html[data-motion="off"] .candy:hover .candy-art svg {
+    transform: none !important;
   }
 
   /* ============ Comic moments when Ahaan eats a sweet ============ */

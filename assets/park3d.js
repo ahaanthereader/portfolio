@@ -103,8 +103,15 @@
     if (window.THREE) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js";
-      s.onload = resolve; s.onerror = () => reject(new Error("three.js failed to load"));
+      s.src = "assets/three.min.js";
+      s.onload = resolve;
+      s.onerror = () => {
+        const s2 = document.createElement("script");
+        s2.src = "https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js";
+        s2.onload = resolve;
+        s2.onerror = () => reject(new Error("three.js failed to load"));
+        document.head.appendChild(s2);
+      };
       document.head.appendChild(s);
     });
   }
@@ -125,26 +132,27 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
     const scene = new T.Scene();
-    const HORIZON = new T.Color("#dbeaf2");
-    scene.fog = new T.Fog(HORIZON, 60, 200);
+    // Warm watercolor parchment horizon (matching Singapore Sketchbook wash)
+    const HORIZON = new T.Color("#f6f2e8");
+    scene.fog = new T.Fog(HORIZON, 48, 145);
 
     const camera = new T.PerspectiveCamera(40, 1, 0.1, 450);
 
-    // ---- Sky Dome ----
+    // ---- Sky Dome: Soft Watercolor Wash Gradient ----
     scene.add(new T.Mesh(new T.SphereGeometry(200, 32, 16), new T.ShaderMaterial({
       side: T.BackSide, depthWrite: false, fog: false,
       uniforms: {
-        top: { value: new T.Color("#1f73c7") },
-        mid: { value: new T.Color("#6bb2e8") },
-        bottom: { value: HORIZON }
+        top: { value: new T.Color("#568cbd") },       // Soft cerulean watercolor wash
+        mid: { value: new T.Color("#8fb5d6") },       // Muted sky wash
+        bottom: { value: new T.Color("#f6f2e8") }     // Warm parchment linen horizon
       },
       vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
       fragmentShader: "uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP; void main(){ float h = vP.y; vec3 c = h > 0.05 ? mix(mid, top, smoothstep(0.05, 0.55, h)) : mix(bottom, mid, smoothstep(-0.04, 0.05, h)); gl_FragColor = vec4(c, 1.0);\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}"
     })));
 
-    // ---- Lighting ----
-    scene.add(new T.HemisphereLight(0xe8f4ff, 0x6e8a56, 1.0));
-    const sun = new T.DirectionalLight(0xfff8e8, 1.55);
+    // ---- Lighting: Warm Golden Watercolor Sun & Ambient Meadow Bounce ----
+    scene.add(new T.HemisphereLight(0xfdfbf5, 0x7a8e68, 1.10));
+    const sun = new T.DirectionalLight(0xfff5e2, 1.48);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
@@ -153,12 +161,9 @@
     scene.add(sun);
 
     // Warm golden rim light for specular depth on trees and landmarks
-    const rimSun = new T.DirectionalLight(0xffdfa9, 0.45);
+    const rimSun = new T.DirectionalLight(0xffdfb0, 0.45);
     rimSun.position.set(30, 24, -32);
     scene.add(rimSun);
-
-    // Storybook atmospheric horizon depth fog
-    scene.fog = new T.Fog(0xdff0fa, 52, 125);
 
     // ==========================================
     // 3D Arkansas & Neighboring States Map Data
@@ -170,14 +175,14 @@
         city: "Little Rock",
         capital: "Little Rock",
         motto: "The Natural State",
-        color: 0x5a9e4d,
+        color: 0x648f5e, // Soft sage watercolor
         x: 0,
         z: 0,
         rad: 6.2,
         icon: "⭐",
         fact: "Arkansas has diamond fields, sparkling quartz crystal mines, and emerald forests.",
         extra: "Ahaan's Home Base: The picnic blanket and open storybook where adventures begin.",
-        actionLabel: "Open Reading Nook"
+        actionLabel: "Read Storybook 📖"
       },
       {
         id: "MO",
@@ -185,14 +190,14 @@
         city: "St. Louis",
         capital: "Jefferson City",
         motto: "Show-Me State",
-        color: 0x4d8a54,
+        color: 0x587e5e, // Muted woodland watercolor
         x: 0,
         z: -25.5,
         rad: 6.4,
         icon: "🏛️",
         fact: "The St. Louis Gateway Arch is 630 feet tall. It is the tallest human-made monument in the United States!",
         extra: "Explorers Meriwether Lewis and William Clark began their historic journey west from here in 1804.",
-        actionLabel: "Glow Gateway Arch"
+        actionLabel: "Light Gateway Arch 🏛️"
       },
       {
         id: "TN",
@@ -200,14 +205,14 @@
         city: "Nashville",
         capital: "Nashville",
         motto: "Volunteer State",
-        color: 0x487d85,
+        color: 0x527785, // Dusty indigo-teal watercolor
         x: 24.5,
         z: -10.5,
         rad: 6.0,
         icon: "🎶",
         fact: "Nashville is known as Music City! Tennessee is famous for bluegrass tunes and the Great Smoky Mountains.",
         extra: "Acoustic guitars, banjos, and fiddles fill the mountain air with cheerful melodies.",
-        actionLabel: "Strum Acoustic Guitar"
+        actionLabel: "Strum Bluegrass Guitar 🎶"
       },
       {
         id: "MS",
@@ -215,14 +220,14 @@
         city: "Jackson",
         capital: "Jackson",
         motto: "Magnolia State",
-        color: 0x498a67,
+        color: 0x4e826b, // Bayou moss watercolor
         x: 23.5,
         z: 13.5,
         rad: 6.0,
         icon: "🌊",
         fact: "The Mississippi River flows all the way south to the Gulf of Mexico. White magnolia blossoms grow here.",
         extra: "Warm river breezes carry the scent of sweet magnolias as river barges float past.",
-        actionLabel: "Sweep River Beacon"
+        actionLabel: "Sweep River Beacon 🌊"
       },
       {
         id: "LA",
@@ -230,14 +235,14 @@
         city: "Baton Rouge",
         capital: "Baton Rouge",
         motto: "Pelican State",
-        color: 0x3d7b73,
+        color: 0x467570, // Celadon wetland watercolor
         x: 0,
         z: 25.5,
         rad: 6.4,
         icon: "🌿",
         fact: "Louisiana has rich bayous and wetland habitats. Pelican birds glide in the water beside historic riverboats.",
         extra: "The red paddle wheel splashes water as the boat cruises past Spanish moss and cypress trees.",
-        actionLabel: "Ring Riverboat Bell"
+        actionLabel: "Ring Riverboat Bell 🔔"
       },
       {
         id: "TX",
@@ -245,14 +250,14 @@
         city: "Austin",
         capital: "Austin",
         motto: "The Lone Star State",
-        color: 0xa4793f,
+        color: 0xa87c4f, // Terracotta sand watercolor
         x: -25.0,
         z: 13.0,
         rad: 7.0,
         icon: "🤠",
         fact: "Texas is famous for wide open prairies and big starry skies. Bluebonnet wildflowers bloom across hills each spring.",
         extra: "On clear nights, you can see constellations and shooting stars sparkling across the big open sky.",
-        actionLabel: "Spin Lone Star"
+        actionLabel: "Spin Lone Star ⭐"
       },
       {
         id: "OK",
@@ -260,19 +265,30 @@
         city: "Oklahoma City",
         capital: "Oklahoma City",
         motto: "Sooner State",
-        color: 0x9c5f42,
+        color: 0x98654a, // Sienna ochre watercolor
         x: -25.0,
         z: -13.0,
         rad: 6.2,
         icon: "🌻",
         fact: "Strong prairie winds sweep across the plains. Giant wind turbines capture the breeze to create clean electricity.",
         extra: "Golden tallgrass prairie grasses wave gently like ocean ripples under the sunny sky.",
-        actionLabel: "Spin Wind Turbine"
+        actionLabel: "Spin Wind Turbine 🌬️"
       }
     ];
 
     const interactiveMeshes = [];
     const landmarkAnimators = [];
+
+    // Living breeze animation arrays
+    const windTrees = [];
+    const windGrassTufts = [];
+    const windFlowers = [];
+
+    // Lazy River floating state
+    let lazyRiverAngle = 0.1;
+    let lazyRiverSpeed = 0.35;
+    let lazyRiverInflatable = null;
+    let lazyRiverWater = null;
 
     // Playground animation anchors
     let swingPivot = null;
@@ -291,78 +307,78 @@
     const mapGroup = new T.Group();
     scene.add(mapGroup);
 
-    // Procedural painterly meadow texture (clovers, grass blades, buttercups)
+    // Procedural watercolor meadow wash texture (Singapore Sketchbook aesthetic)
     function createMeadowTexture(T) {
       const c = document.createElement("canvas");
       c.width = 512; c.height = 512;
       const g = c.getContext("2d");
 
-      // Deep, rich grass gradient base
-      const bg = g.createLinearGradient(0, 0, 512, 512);
-      bg.addColorStop(0, "#9fc586");
-      bg.addColorStop(0.5, "#8db673");
-      bg.addColorStop(1, "#7ea964");
+      // Warm linen / paper wash base
+      g.fillStyle = "#f6f2e8";
+      g.fillRect(0, 0, 512, 512);
+
+      // Soft sage and olive watercolor washes
+      const bg = g.createRadialGradient(256, 256, 60, 256, 256, 360);
+      bg.addColorStop(0, "rgba(142, 182, 126, 0.72)");
+      bg.addColorStop(0.65, "rgba(125, 166, 110, 0.68)");
+      bg.addColorStop(1, "rgba(110, 150, 95, 0.62)");
       g.fillStyle = bg;
       g.fillRect(0, 0, 512, 512);
 
-      // Subtle organic soil and lawn dappling
-      for (let i = 0; i < 450; i++) {
+      // Watercolor pigment granulation (natural speckle)
+      for (let i = 0; i < 400; i++) {
         const x = Math.random() * 512, y = Math.random() * 512;
-        const rad = 2 + Math.random() * 5;
-        g.fillStyle = Math.random() > 0.5 ? "rgba(105, 155, 75, 0.3)" : "rgba(165, 205, 130, 0.3)";
+        const rad = 1.5 + Math.random() * 3.5;
+        g.fillStyle = Math.random() > 0.5 ? "rgba(95, 138, 80, 0.18)" : "rgba(235, 226, 206, 0.22)";
         g.beginPath(); g.arc(x, y, rad, 0, Math.PI * 2); g.fill();
       }
 
-      // 3-Lobed clover clusters
-      for (let i = 0; i < 95; i++) {
+      // Painterly botanical clover tri-leaves with soft ink contour
+      for (let i = 0; i < 75; i++) {
         const cx = Math.random() * 512, cy = Math.random() * 512;
-        const cRad = 3 + Math.random() * 3.5;
-        g.fillStyle = Math.random() > 0.3 ? "#4d7e35" : "#3d6b28";
+        const cRad = 2.5 + Math.random() * 3.0;
+        g.fillStyle = Math.random() > 0.3 ? "rgba(68, 112, 56, 0.45)" : "rgba(82, 128, 68, 0.40)";
         for (let lobe = 0; lobe < 3; lobe++) {
           const ang = (lobe * Math.PI * 2) / 3;
           g.beginPath();
-          g.arc(cx + Math.cos(ang) * cRad * 0.7, cy + Math.sin(ang) * cRad * 0.7, cRad * 0.65, 0, Math.PI * 2);
+          g.arc(cx + Math.cos(ang) * cRad * 0.7, cy + Math.sin(ang) * cRad * 0.7, cRad * 0.62, 0, Math.PI * 2);
           g.fill();
         }
-        g.fillStyle = "rgba(180, 225, 150, 0.45)";
-        g.beginPath(); g.arc(cx, cy, cRad * 0.28, 0, Math.PI * 2); g.fill();
       }
 
-      // Fine botanical grass blades
-      g.strokeStyle = "rgba(60, 105, 40, 0.45)";
-      g.lineWidth = 1.3;
-      for (let i = 0; i < 350; i++) {
+      // Fine botanical grass strokes
+      g.strokeStyle = "rgba(75, 118, 62, 0.32)";
+      g.lineWidth = 1.1;
+      for (let i = 0; i < 280; i++) {
         const gx = Math.random() * 512, gy = Math.random() * 512;
         g.beginPath();
         g.moveTo(gx, gy);
-        g.quadraticCurveTo(gx + (Math.random() - 0.5) * 8, gy - 6 - Math.random() * 8, gx + (Math.random() - 0.5) * 12, gy - 12);
+        g.quadraticCurveTo(gx + (Math.random() - 0.5) * 6, gy - 6 - Math.random() * 6, gx + (Math.random() - 0.5) * 10, gy - 10);
         g.stroke();
       }
 
-      // Wildflower specks (daisy white and sunny yellow buttercups)
-      for (let i = 0; i < 50; i++) {
+      // Soft wildflower specks (white chamomile and warm tea buttercups)
+      for (let i = 0; i < 40; i++) {
         const bx = Math.random() * 512, by = Math.random() * 512;
-        const isYellow = Math.random() > 0.4;
-        g.fillStyle = isYellow ? "#ffd54f" : "#ffffff";
-        g.beginPath(); g.arc(bx, by, 2.5, 0, Math.PI * 2); g.fill();
-        g.fillStyle = "#ff9800";
-        g.beginPath(); g.arc(bx, by, 1.0, 0, Math.PI * 2); g.fill();
+        const isYellow = Math.random() > 0.45;
+        g.fillStyle = isYellow ? "rgba(245, 203, 86, 0.75)" : "rgba(255, 252, 245, 0.85)";
+        g.beginPath(); g.arc(bx, by, 2.2, 0, Math.PI * 2); g.fill();
       }
 
       const tex = new T.CanvasTexture(c);
       tex.encoding = T.sRGBEncoding;
       tex.wrapS = tex.wrapT = T.RepeatWrapping;
-      tex.repeat.set(14, 14);
+      tex.repeat.set(12, 12);
       return tex;
     }
 
-    // Surrounding grassy terrain with rich clover meadow texture
+    // Surrounding grassy terrain with watercolor paper wash
     const groundGeo = new T.PlaneGeometry(180, 180, 48, 48);
     groundGeo.rotateX(-Math.PI / 2);
     const groundMat = new T.MeshStandardMaterial({
       color: 0xffffff,
       map: createMeadowTexture(T),
-      roughness: 0.9
+      roughness: 0.92
     });
     const ground = new T.Mesh(groundGeo, groundMat);
     ground.receiveShadow = true;
@@ -415,6 +431,11 @@
     // 3D Mississippi River & Footbridges
     // ==========================================
     buildRiver(mapGroup, T, walkableSurfaces);
+
+    // ==========================================
+    // 3D Circular Lazy River & Float Dock
+    // ==========================================
+    buildLazyRiver(mapGroup, T, walkableSurfaces);
 
     // ==========================================
     // 3D Connecting Trails & Roads
@@ -654,6 +675,180 @@
         dock.add(post);
       });
       parent.add(dock);
+    }
+
+    // ==========================================
+    // 3D Circular Lazy River around Arkansas
+    // ==========================================
+    function buildLazyRiver(parent, T, walkables) {
+      const riverGroup = new T.Group();
+      parent.add(riverGroup);
+
+      // Lazy river circular canal (R = 8.8m, width 2.6m from r=7.5m to r=10.1m)
+      const canalInnerR = 7.5;
+      const canalOuterR = 10.1;
+      const canalMidR = (canalInnerR + canalOuterR) / 2; // 8.8m
+
+      // Water surface ring
+      const waterGeo = new T.RingGeometry(canalInnerR, canalOuterR, 64);
+      waterGeo.rotateX(-Math.PI / 2);
+      const waterMat = new T.MeshStandardMaterial({
+        color: 0x4287a5,
+        roughness: 0.18,
+        metalness: 0.22,
+        transparent: true,
+        opacity: 0.88
+      });
+      lazyRiverWater = new T.Mesh(waterGeo, waterMat);
+      lazyRiverWater.position.y = 0.16;
+      riverGroup.add(lazyRiverWater);
+
+      // Pebble riverbanks along inner and outer canal perimeters
+      const pebbleMat = new T.MeshStandardMaterial({ color: 0x8f7d6a, roughness: 0.9 });
+      const sandMat = new T.MeshStandardMaterial({ color: 0xd8caa8, roughness: 0.95 });
+      [canalInnerR, canalOuterR].forEach((r, idx) => {
+        const bankGeo = new T.RingGeometry(r - 0.25, r + 0.25, 48);
+        bankGeo.rotateX(-Math.PI / 2);
+        const bank = new T.Mesh(bankGeo, idx === 0 ? pebbleMat : sandMat);
+        bank.position.y = 0.20;
+        riverGroup.add(bank);
+      });
+
+      // River stones scattered along the banks
+      for (let s = 0; s < 28; s++) {
+        const ang = (s / 28) * Math.PI * 2;
+        const rad = (s % 2 === 0 ? canalInnerR - 0.15 : canalOuterR + 0.15) + (Math.sin(s * 7) * 0.2);
+        const stone = new T.Mesh(
+          new T.DodecahedronGeometry(0.18 + (s % 3) * 0.08, 0),
+          pebbleMat
+        );
+        stone.position.set(Math.cos(ang) * rad, 0.24, Math.sin(ang) * rad);
+        stone.scale.set(1.2, 0.6, 1.0);
+        stone.castShadow = true;
+        riverGroup.add(stone);
+      }
+
+      // Wooden river float dock on Arkansas bank (East side: x = 7.0, z = 0.8)
+      const dockGroup = new T.Group();
+      dockGroup.position.set(7.0, 0.28, 0.8);
+      const woodMat = new T.MeshStandardMaterial({ color: 0x734826, roughness: 0.85 });
+      const dockPier = new T.Mesh(new T.BoxGeometry(2.0, 0.12, 2.2), woodMat);
+      dockPier.castShadow = true;
+      dockPier.receiveShadow = true;
+      dockGroup.add(dockPier);
+      if (walkables) walkables.push(dockPier);
+
+      // Dock mooring post
+      const post = new T.Mesh(new T.CylinderGeometry(0.08, 0.08, 0.75, 8), woodMat);
+      post.position.set(0.85, 0.35, 0.85);
+      post.castShadow = true;
+      dockGroup.add(post);
+
+      // Signpost: "Lazy River Float 🍩"
+      const signCanvas = document.createElement("canvas");
+      signCanvas.width = 160; signCanvas.height = 64;
+      const sg = signCanvas.getContext("2d");
+      sg.fillStyle = "#f6f2e8";
+      sg.fillRect(0, 0, 160, 64);
+      sg.strokeStyle = "#8a5830"; sg.lineWidth = 4;
+      sg.strokeRect(4, 4, 152, 56);
+      sg.fillStyle = "#3a2618";
+      sg.font = "bold 18px sans-serif";
+      sg.textAlign = "center";
+      sg.fillText("🍩 Lazy River", 80, 28);
+      sg.font = "14px sans-serif";
+      sg.fillText("Hop in & Float!", 80, 48);
+      const signTex = new T.CanvasTexture(signCanvas);
+      const signBoard = new T.Mesh(
+        new T.PlaneGeometry(1.2, 0.48),
+        new T.MeshBasicMaterial({ map: signTex, side: T.DoubleSide })
+      );
+      signBoard.position.set(0.4, 0.85, 0.85);
+      signBoard.rotation.y = -Math.PI / 4;
+      dockGroup.add(signBoard);
+      riverGroup.add(dockGroup);
+
+      // Cheerful circular inflatable tube (doughnut swim ring)
+      lazyRiverInflatable = new T.Group();
+      lazyRiverInflatable.position.set(canalMidR, 0.22, 0);
+
+      // Ring body
+      const tubeMat = new T.MeshStandardMaterial({
+        color: 0xff6b8b, // Pastel coral pink
+        roughness: 0.35,
+        metalness: 0.05
+      });
+      const tubeMesh = new T.Mesh(new T.TorusGeometry(0.85, 0.26, 16, 32), tubeMat);
+      tubeMesh.rotation.x = Math.PI / 2;
+      tubeMesh.castShadow = true;
+      lazyRiverInflatable.add(tubeMesh);
+
+      // Decorative colorful stripes around tube
+      const stripeColors = [0xffd166, 0x06d6a0, 0x118ab2, 0xffffff, 0xffbe0b];
+      for (let st = 0; st < 8; st++) {
+        const sang = (st / 8) * Math.PI * 2;
+        const stripeMat = new T.MeshStandardMaterial({ color: stripeColors[st % stripeColors.length], roughness: 0.4 });
+        const sprinkle = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 0.18, 6), stripeMat);
+        sprinkle.position.set(Math.cos(sang) * 0.85, 0.24, Math.sin(sang) * 0.85);
+        sprinkle.rotation.z = Math.PI / 2;
+        sprinkle.rotation.y = sang;
+        lazyRiverInflatable.add(sprinkle);
+      }
+
+      // Safety grab handles on sides
+      [-1, 1].forEach(s => {
+        const handle = new T.Mesh(
+          new T.TorusGeometry(0.14, 0.025, 6, 12, Math.PI),
+          new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 })
+        );
+        handle.position.set(s * 1.05, 0.08, 0);
+        handle.rotation.z = s > 0 ? 0 : Math.PI;
+        lazyRiverInflatable.add(handle);
+      });
+
+      riverGroup.add(lazyRiverInflatable);
+
+      // 4 Arched wooden footbridges crossing over the circular lazy river
+      // Footbridges have clearance (deck arches to y = 0.85) so inflatable glides underneath!
+      const bridgeAngles = [
+        { ang: -Math.PI / 2, label: "North to Missouri", rot: 0 },
+        { ang: 0, label: "East to Mississippi", rot: Math.PI / 2 },
+        { ang: Math.PI / 2, label: "South to Louisiana", rot: 0 },
+        { ang: Math.PI, label: "West to Texas", rot: Math.PI / 2 }
+      ];
+      bridgeAngles.forEach(ba => {
+        const bx = Math.cos(ba.ang) * canalMidR;
+        const bz = Math.sin(ba.ang) * canalMidR;
+        const bridge = new T.Group();
+        bridge.position.set(bx, 0.35, bz);
+        bridge.rotation.y = ba.rot;
+
+        // Arched bridge deck
+        const bDeck = new T.Mesh(new T.BoxGeometry(2.4, 0.12, 3.8), woodMat);
+        bDeck.position.y = 0.45;
+        bDeck.castShadow = true;
+        bDeck.receiveShadow = true;
+        bridge.add(bDeck);
+        if (walkables) walkables.push(bDeck);
+
+        // Handrails
+        [-1.15, 1.15].forEach(rx => {
+          const rail = new T.Mesh(new T.BoxGeometry(0.08, 0.35, 3.8), woodMat);
+          rail.position.set(rx, 0.72, 0);
+          bridge.add(rail);
+        });
+
+        riverGroup.add(bridge);
+      });
+
+      // Register interactive float dock
+      registerInteractive(dockGroup, {
+        name: "Lazy River Float",
+        activity: "lazyriver",
+        x: 7.0,
+        z: 0.8,
+        onInteract: () => startPlayActivity("lazyriver")
+      });
     }
 
     function buildStoryProps(parent, T, walkables) {
@@ -1369,6 +1564,9 @@
         crown.add(c1, c2);
         tree.add(crown);
         parent.add(tree);
+
+        // Living breeze sway registration
+        windTrees.push({ obj: crown, speed: 1.25, phase: x * 0.4 + z * 0.3, amp: 0.055 * scale });
       }
 
       function createPine(x, z, scale) {
@@ -1391,6 +1589,9 @@
           tree.add(cone);
         });
         parent.add(tree);
+
+        // Living breeze sway registration
+        windTrees.push({ obj: tree, speed: 1.1, phase: x * 0.35 + z * 0.25, amp: 0.04 * scale });
       }
 
       function createRock(x, z, sx, sy, sz) {
@@ -1412,7 +1613,29 @@
           const f = new T.Mesh(new T.CylinderGeometry(0.1, 0.1, 0.22, 6), fMat);
           f.position.set(fx, 0.16, fz);
           parent.add(f);
+
+          // Living breeze sway registration
+          windFlowers.push({ obj: f, speed: 2.4, phase: fx * 1.8 + fz * 1.8, amp: 0.12 });
         }
+      }
+
+      // 3D watercolor grass tufts across meadow parcels and trail verges
+      const tuftMat = new T.MeshStandardMaterial({
+        color: 0x629654,
+        roughness: 0.8,
+        flatShading: true
+      });
+      function createGrassTuft(gx, gz, scale) {
+        const tuft = new T.Group();
+        tuft.position.set(gx, 0.18, gz);
+        for (let b = 0; b < 3; b++) {
+          const blade = new T.Mesh(new T.ConeGeometry(0.06 * scale, 0.45 * scale, 3), tuftMat);
+          blade.position.set((b - 1) * 0.07 * scale, 0.22 * scale, 0);
+          blade.rotation.z = (b - 1) * 0.25;
+          tuft.add(blade);
+        }
+        parent.add(tuft);
+        windGrassTufts.push({ obj: tuft, speed: 2.6, phase: gx * 1.5 + gz * 1.5, amp: 0.16 });
       }
 
       function createSignpost(x, z, label, arrow) {
@@ -1514,6 +1737,40 @@
       createFlowerPatch(16.5, 4.5, 2.6, 22);
       createFlowerPatch(0.0, -16.0, 2.5, 20);
       createFlowerPatch(0.0, 16.0, 2.5, 20);
+
+      // Scatter 3D grass tufts across meadow parcels and along trail verges
+      const tuftCoords = [
+        [-2.5, -4.8, 1.0], [2.8, -4.5, 0.9], [-4.2, -1.8, 1.1], [4.5, -1.2, 1.0],
+        [-3.8, 3.2, 0.95], [3.9, 3.8, 1.05], [-1.2, 5.2, 1.0], [1.5, -5.8, 0.9],
+        [-6.8, -8.5, 1.15], [-9.2, -12.4, 1.2], [-12.5, -14.2, 1.1], [-16.0, -18.5, 1.25],
+        [7.2, -8.2, 1.1], [11.5, -12.8, 1.2], [14.8, -15.5, 1.15], [18.2, -19.0, 1.2],
+        [8.5, 2.5, 1.05], [12.0, 5.5, 1.15], [15.5, 9.2, 1.2], [19.2, 13.5, 1.25],
+        [-7.5, 8.5, 1.1], [-11.2, 12.0, 1.15], [-14.5, 15.8, 1.2], [-18.0, 19.5, 1.25],
+        [-2.5, 12.5, 1.1], [2.2, 14.0, 1.15], [-1.8, 18.2, 1.2], [2.5, 21.5, 1.25],
+        [-22.5, -3.5, 1.2], [-25.0, 2.8, 1.25], [-20.5, 6.2, 1.1], [-18.2, -5.5, 1.15],
+        [22.5, -2.5, 1.2], [25.0, 4.5, 1.25], [21.0, 8.2, 1.1], [18.5, -4.5, 1.15]
+      ];
+      tuftCoords.forEach(([tx, tz, ts]) => createGrassTuft(tx, tz, ts));
+
+      // Living organic breeze animator: continuous swaying for trees, grass tufts, and flowers
+      landmarkAnimators.push((dt) => {
+        if (calm()) return false;
+        const t = performance.now() * 0.001;
+        for (let i = 0; i < windTrees.length; i++) {
+          const wt = windTrees[i];
+          wt.obj.rotation.z = Math.sin(t * wt.speed + wt.phase) * wt.amp;
+          wt.obj.rotation.x = Math.cos(t * wt.speed * 0.75 + wt.phase) * (wt.amp * 0.6);
+        }
+        for (let i = 0; i < windGrassTufts.length; i++) {
+          const wg = windGrassTufts[i];
+          wg.obj.rotation.z = Math.sin(t * wg.speed + wg.phase) * wg.amp;
+        }
+        for (let i = 0; i < windFlowers.length; i++) {
+          const wf = windFlowers[i];
+          wf.obj.rotation.z = Math.sin(t * wf.speed + wf.phase) * wf.amp;
+        }
+        return true; // Keep breeze motion active at 60fps
+      });
 
       // Directional trail signs on grass verges at all 6 trail exits from Arkansas
       createSignpost(-1.8, -6.6, "Missouri", "↑");
@@ -1662,10 +1919,12 @@
         const trigger = () => {
           pulseT = 1.0;
           playSound("arch");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Golden Gateway Arch! ✨", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -1712,10 +1971,12 @@
         const trigger = () => {
           spinSpeed = 8.5;
           playSound("star");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Spinning Lone Star! ⭐", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -1768,10 +2029,12 @@
         const trigger = () => {
           wobbleT = 1.0;
           playSound("guitar");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Country Acoustic Guitar! 🎸", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -1828,10 +2091,12 @@
         const trigger = () => {
           paddleBoost = 1.0;
           playSound("riverboat");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Bayou Riverboat Paddle! 🚢", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -1879,10 +2144,12 @@
         const trigger = () => {
           spinBoost = 9.0;
           playSound("wind");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Prairie Wind Turbine! 💨", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -1938,10 +2205,12 @@
         const trigger = () => {
           sweepBoost = 4.5;
           playSound("beacon");
-          openDiscoveryModal({
-            ...st,
-            onInteract: trigger
-          });
+          cameraMode = "landmark";
+          actionCamTarget.set(st.x, 2.2, st.z);
+          actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+          A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+          if (A.startWave) A.startWave();
+          sayAhaan("Gulf Beacon Lighthouse! 🌊", st.fact, st.icon || "📍", st.name);
           wake();
         };
 
@@ -2438,6 +2707,16 @@
         promptText: "Press Enter to Slide! 🛝",
         onActivate: () => startPlayActivity("slide")
       },
+      {
+        id: "lazyriver",
+        name: "Lazy River Float",
+        x: 7.0,
+        z: 0.8,
+        approachRadius: 3.5,
+        actionLabel: "Float in Lazy River! 🍩",
+        promptText: "Press Enter to Float in Lazy River! 🍩",
+        onActivate: () => startPlayActivity("lazyriver")
+      },
       // State landmarks generated dynamically from STATES
       ...STATES.map(st => ({
         id: st.id,
@@ -2446,8 +2725,8 @@
         x: st.x,
         z: st.z,
         approachRadius: st.id === "AR" ? 3.5 : st.rad * 0.95,
-        actionLabel: `Explore ${st.city}! ${st.icon}`,
-        promptText: `Press Enter to Explore ${st.city}! ${st.icon}`,
+        actionLabel: st.actionLabel || `Explore ${st.city}! ${st.icon}`,
+        promptText: `Press Enter: ${st.actionLabel || `Explore ${st.city}! ${st.icon}`}`,
         onActivate: () => exploreLandmark(st)
       }))
     ];
@@ -2492,22 +2771,25 @@
       }
     }
 
-    // Zoom into landmark and open discovery card
+    // Zoom into landmark and animate 3D landmark directly without blocking modal
     function exploreLandmark(st) {
       if (!st) return;
       if (currentActivity) stopPlayActivity();
 
-      cameraMode = "landmark";
-      actionCamTarget.set(st.x, 2.2, st.z);
-      actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
+      if (st.onInteract) {
+        st.onInteract();
+      } else {
+        cameraMode = "landmark";
+        actionCamTarget.set(st.x, 2.2, st.z);
+        actionCamPos.set(st.x + 5.5, 7.8, st.z + 11.5);
 
-      A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
-      if (A.startWave) A.startWave();
+        A.rig.rotation.y = Math.atan2(st.x - A.rig.position.x, st.z - A.rig.position.z);
+        if (A.startWave) A.startWave();
 
-      playSound("bell");
-      sayAhaan("Welcome to " + (st.city || st.name) + "! 🌍", st.fact, st.icon || "📍", st.name);
-      openDiscoveryModal(st);
-      wake();
+        playSound("bell");
+        sayAhaan("Welcome to " + (st.city || st.name) + "! 🌍", st.fact, st.icon || "📍", st.name);
+        wake();
+      }
     }
 
     // Start a playground activity
@@ -2541,21 +2823,32 @@
         marker.position.set(-2.95, 0.52, 0.2);
         markerMat.opacity = 0.95;
         trampY = 0.56;
-        trampVy = 7.2;
+        trampVy = 7.0;
         trampBounceApex = 2.4;
         trampDeflection = 0;
         trampIsFlipping = false;
         trampFlip = 0;
         cameraMode = "action";
-        actionCamTarget.set(-4.3, 2.2, 0.2);
-        actionCamPos.set(-4.3 + 6.8, 6.2, 0.2 + 8.8);
+        // Wide-angle zoomed out camera framing trampoline, ladder, full bounce arc & headroom
+        actionCamTarget.set(-4.3, 3.8, 0.2);
+        actionCamPos.set(-4.3 + 12.2, 11.2, 0.2 + 15.6);
         sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high! Press Space to jump higher!", "🤸", "Spring Trampoline");
+      } else if (type === "lazyriver") {
+        targetPos = new T.Vector3(7.0, rigBaseY, 0.8);
+        marker.position.set(7.0, 0.52, 0.8);
+        markerMat.opacity = 0.95;
+        lazyRiverAngle = 0.08;
+        lazyRiverSpeed = 0.35;
+        cameraMode = "action";
+        actionCamTarget.set(7.0, 1.8, 0.8);
+        actionCamPos.set(7.0 + 8.2, 8.5, 0.8 + 10.5);
+        sayAhaan("Lazy River Float! 🍩", "Hop into the tube and relax! Water ripples around Arkansas!", "🍩", "Lazy River");
       }
 
-      if (type === "trampoline" || type === "swing") {
+      if (type === "trampoline" || type === "swing" || type === "lazyriver") {
         if (activityHud) {
           if (actBoostLabel) {
-            actBoostLabel.textContent = type === "trampoline" ? "Bounce Higher! ⬆️" : "Swing Higher! 🪁";
+            actBoostLabel.textContent = type === "trampoline" ? "Bounce Higher! ⬆️" : (type === "swing" ? "Swing Higher! 🪁" : "Paddle Faster! 🍩");
           }
           activityHud.hidden = false;
           requestAnimationFrame(() => activityHud.classList.add("show"));
@@ -2599,21 +2892,25 @@
         if (swingPivot) swingPivot.rotation.x = 0;
       } else if (prev === "slide") {
         A.rig.position.set(-2.6, rigBaseY, -1.1);
+      } else if (prev === "lazyriver") {
+        A.rig.position.set(7.0, rigBaseY, 0.8);
+        A.rig.rotation.set(0, -Math.PI / 2, 0);
+        if (A.updateWalk) A.updateWalk(false, 0, 0);
       }
 
       sayAhaan("That was great fun! ✨", "Walk around the park to explore more.", "🎈", "Park");
       wake();
     }
 
-    // Boost bounce height or swing momentum
+    // Boost bounce height, swing momentum, or lazy river speed
     function boostCurrentActivity() {
       if (!currentActivity) return;
       if (currentActivity === "trampoline") {
-        trampBounceApex = Math.min(4.8, trampBounceApex + 0.95);
+        trampBounceApex = Math.min(4.2, trampBounceApex + 0.7);
         if (trampVy < 0) {
-          trampVy = Math.max(3.8, trampVy + 5.2);
+          trampVy = Math.max(3.8, trampVy + 4.2);
         } else {
-          trampVy = Math.max(trampVy + 3.6, Math.sqrt(2 * 17.5 * trampBounceApex));
+          trampVy = Math.min(11.5, Math.max(trampVy + 2.8, Math.sqrt(2 * 17.5 * trampBounceApex)));
         }
         trampY = Math.max(trampY, 0.56);
         playSound("bounce");
@@ -2626,6 +2923,11 @@
         if (Math.abs(swingVelocity) > 4.6) swingVelocity = Math.sign(swingVelocity) * 4.6;
         playSound("breeze");
         sayAhaan("Wheeee! Swing higher! 🪁", "Fly high into the sky!", "🪁", "Cedar Swings");
+        wake();
+      } else if (currentActivity === "lazyriver") {
+        lazyRiverSpeed = Math.min(1.2, lazyRiverSpeed + 0.35);
+        playSound("riverboat");
+        sayAhaan("Splash! Paddle faster! 🍩", "Wheee! Floating down the lazy river!", "🍩", "Lazy River");
         wake();
       }
     }
@@ -2943,6 +3245,77 @@
           A.rig.position.set(-4.3, rigBaseY + (trampY - MAT_BASE_Y) + 0.54, 0.2);
           A.rig.rotation.y = 0;
         }
+      } else if (currentActivity === "lazyriver") {
+        const canalR = 8.8;
+
+        // Phase 0: Approach wooden float dock
+        if (activityPhase === 0) {
+          const dist = Math.hypot(A.rig.position.x - 7.0, A.rig.position.z - 0.8);
+          if (dist < 0.85 || !targetPos) {
+            activityPhase = 1;
+            activityTimer = 0;
+            targetPos = null;
+            isWalking = false;
+            markerMat.opacity = 0;
+            A.rig.position.set(7.0, rigBaseY, 0.8);
+            A.rig.rotation.y = -Math.PI / 2;
+          }
+        }
+        // Phase 1: Hop into circular inflatable tube
+        else if (activityPhase === 1) {
+          activityTimer += dt;
+          const hopTime = 0.55;
+          const t = Math.min(1, activityTimer / hopTime);
+          const targetX = Math.cos(lazyRiverAngle) * canalR;
+          const targetZ = Math.sin(lazyRiverAngle) * canalR;
+          const curX = 7.0 + t * (targetX - 7.0);
+          const curZ = 0.8 + t * (targetZ - 0.8);
+          const arcY = Math.sin(t * Math.PI) * 0.45;
+          A.rig.position.set(curX, rigBaseY + arcY, curZ);
+
+          if (t >= 1) {
+            activityPhase = 2;
+            activityTimer = 0;
+            playSound("riverboat");
+            sayAhaan("Floating smoothly! 🍩", "Gentle water ripples around Arkansas!", "🍩", "Lazy River");
+          }
+        }
+        // Phase 2: Gentle circular floating along the canal
+        else if (activityPhase === 2) {
+          activityTimer += dt;
+          const baseSpd = calm() ? 0.22 : 0.38;
+          lazyRiverAngle += (baseSpd + (lazyRiverSpeed - 0.35)) * dt;
+          if (lazyRiverSpeed > 0.35) {
+            lazyRiverSpeed = Math.max(0.35, lazyRiverSpeed - dt * 0.2);
+          }
+
+          const fx = Math.cos(lazyRiverAngle) * canalR;
+          const fz = Math.sin(lazyRiverAngle) * canalR;
+          const bob = Math.sin(activityTimer * 3.0) * 0.05;
+          const waterY = 0.22 + bob;
+
+          if (lazyRiverInflatable) {
+            lazyRiverInflatable.position.set(fx, waterY, fz);
+            lazyRiverInflatable.rotation.y = -lazyRiverAngle + Math.PI / 2;
+          }
+
+          A.rig.position.set(fx, waterY + 0.12, fz);
+          A.rig.rotation.y = -lazyRiverAngle + Math.PI / 2;
+
+          // Seated pose in circular tube
+          A.leftLeg.hip.rotation.x = -1.35;
+          A.rightLeg.hip.rotation.x = -1.35;
+          A.leftLeg.knee.rotation.x = 1.45;
+          A.rightLeg.knee.rotation.x = 1.45;
+          A.leftArm.arm.rotation.x = -0.4;
+          A.wavingArm.arm.rotation.x = -0.4;
+          A.leftArm.arm.rotation.z = 0.65;
+          A.wavingArm.arm.rotation.z = -0.65;
+
+          // Camera smoothly tracks Ahaan floating in circular canal
+          actionCamTarget.set(fx, 1.8, fz);
+          actionCamPos.set(fx + Math.cos(lazyRiverAngle + 0.6) * 11.0, 8.8, fz + Math.sin(lazyRiverAngle + 0.6) * 11.0);
+        }
       }
     }
 
@@ -3145,9 +3518,13 @@
         }
       }
 
-      // Space key to boost bounce or swing
+      // Space key to boost bounce or swing or lazy river float
       if (isDown && (code === "Space" || key === " " || key === "Spacebar")) {
-        if (currentActivity === "trampoline" || currentActivity === "swing") {
+        if (discModal && !discModal.hidden) {
+          closeDiscoveryModal();
+          return;
+        }
+        if (currentActivity === "trampoline" || currentActivity === "swing" || currentActivity === "lazyriver") {
           e.preventDefault();
           boostCurrentActivity();
           return;
@@ -3158,8 +3535,13 @@
         }
       }
 
-      // Escape key to dismount from playground equipment
+      // Escape key to dismount from playground equipment or close modal
       if (isDown && (code === "Escape" || key === "Escape")) {
+        if (discModal && !discModal.hidden) {
+          e.preventDefault();
+          closeDiscoveryModal();
+          return;
+        }
         if (currentActivity) {
           e.preventDefault();
           stopPlayActivity();
@@ -3167,9 +3549,16 @@
         }
       }
 
+      // Close modal on movement keys
+      if (isDown && discModal && !discModal.hidden) {
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D"].includes(key)) {
+          closeDiscoveryModal();
+        }
+      }
+
       // Up = North (towards Missouri, -Z) or boost active equipment
       if (code === "ArrowUp" || key === "ArrowUp" || code === "KeyW" || key === "w" || key === "W") {
-        if (isDown && (currentActivity === "trampoline" || currentActivity === "swing")) {
+        if (isDown && (currentActivity === "trampoline" || currentActivity === "swing" || currentActivity === "lazyriver")) {
           e.preventDefault();
           boostCurrentActivity();
           return;
@@ -3288,8 +3677,13 @@
       if (discInteractBtn) {
         discInteractBtn.textContent = item.actionLabel ? `✨ ${item.actionLabel}` : "✨ Animate Landmark";
         discInteractBtn.onclick = () => {
+          closeDiscoveryModal();
           if (item.onInteract) item.onInteract();
         };
+      }
+
+      if (discBackdrop) {
+        discBackdrop.onclick = () => closeDiscoveryModal();
       }
 
       discBackdrop.hidden = false;
