@@ -3053,7 +3053,7 @@
             A.wavingArm.arm.rotation.set(-1.15, 0, -0.30);
             A.leftArm.elbow.rotation.set(0.60, 0, 0);
             A.wavingArm.elbow.rotation.set(0.60, 0, 0);
-            A.head.rotation.set(-0.15, 0, 0);
+            A.head.rotation.set(-0.06, 0, 0);
           }
         }
         // Phase 1: Real pendulum swinging physics with seated Ahaan
@@ -3093,8 +3093,8 @@
           A.leftArm.elbow.rotation.set(0.60, 0, 0);
           A.wavingArm.elbow.rotation.set(0.60, 0, 0);
 
-          // Head looks forward into the wind
-          A.head.rotation.set(-0.15, 0, 0);
+          // Head looks forward into the wind naturally tracking swing arc
+          A.head.rotation.set(-0.06 - swingAngle * 0.18, 0, 0);
 
           // Breeze sound at high velocity
           if (Math.abs(swingAngle) < 0.20 && Math.abs(swingVelocity) > 2.0) {

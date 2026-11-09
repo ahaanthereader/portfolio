@@ -133,9 +133,22 @@ window.AhaanModel = {
     torso.scale.z = 0.74;
     rig.add(torso);
 
-    // Neck
-    const neck = part(new T.CylinderGeometry(0.35, 0.40, 0.52, 24), skinShadowMat, 0, -1.22, 0);
+    // ==========================================
+    // 1b. Seamless Anatomical Neck & Cervical Socket
+    // ==========================================
+    // Tall neck cylinder extending deeply from inside torso up into skull cavity (height 0.96)
+    const neck = part(new T.CylinderGeometry(0.36, 0.42, 0.96, 24), skinMat, 0, -0.98, 0);
     rig.add(neck);
+
+    // Anatomical Cervical Ball Joint: seamless spherical collar bridging neck into skull base
+    const neckBall = part(new T.SphereGeometry(0.38, 24, 18), skinMat, 0, -0.74, 0);
+    neckBall.scale.set(1.02, 0.90, 1.0);
+    rig.add(neckBall);
+
+    // Posterior Nape of Neck (fills rear cervical spine transition into skull base)
+    const neckNape = part(new T.CapsuleGeometry(0.28, 0.46, 8, 16), skinMat, 0, -0.88, -0.10);
+    neckNape.rotation.x = 0.15;
+    rig.add(neckNape);
 
     // Ribbed Polo Collar
     const collarRing = part(new T.TorusGeometry(0.44, 0.10, 14, 36), mat(COLLAR, 0.82), 0, -1.46, 0.02, 1.08, 1, 0.80);
@@ -402,6 +415,18 @@ window.AhaanModel = {
     });
     const chin = part(sphere, skinMat, 0, -0.58, 0.38, 0.30, 0.24, 0.28);
     head.add(chin);
+
+    // Submental Throat Wedge (rotates with head to keep jaw-neck transition solid and closed)
+    const throat = part(new T.SphereGeometry(0.36, 24, 16), skinMat, 0, -0.65, 0.12);
+    throat.scale.set(0.92, 0.75, 1.15);
+    head.add(throat);
+
+    // Mandibular angle transition (under jaw sides bridging to neck)
+    [-1, 1].forEach(s => {
+      const jawAngle = part(new T.SphereGeometry(0.24, 16, 12), skinMat, s * 0.28, -0.56, 0.08);
+      jawAngle.scale.set(0.85, 0.85, 1.0);
+      head.add(jawAngle);
+    });
 
     // ==========================================
     // 5. 3D Sculpted Expressive Eyes & Eyelids
@@ -736,6 +761,10 @@ window.AhaanModel = {
         const bounce = Math.abs(Math.sin(walkPhase * 2)) * 0.14;
         torso.position.y = bounce;
         head.position.y = bounce;
+        neck.position.y = -0.98 + bounce;
+        neckBall.position.y = -0.74 + bounce;
+        neckNape.position.y = -0.88 + bounce;
+        collarRing.position.y = -1.46 + bounce;
 
         rig.rotation.z = Math.sin(walkPhase) * 0.025;
       } else {
@@ -747,6 +776,10 @@ window.AhaanModel = {
         wavingArm.arm.rotation.x *= 0.82;
         torso.position.y *= 0.82;
         head.position.y *= 0.82;
+        neck.position.y = -0.98 + (neck.position.y - (-0.98)) * 0.82;
+        neckBall.position.y = -0.74 + (neckBall.position.y - (-0.74)) * 0.82;
+        neckNape.position.y = -0.88 + (neckNape.position.y - (-0.88)) * 0.82;
+        collarRing.position.y = -1.46 + (collarRing.position.y - (-1.46)) * 0.82;
         rig.rotation.z *= 0.82;
 
         const breath = Math.sin(Date.now() * 0.002) * 0.015;
@@ -812,6 +845,10 @@ window.AhaanModel = {
       torso.position.set(0, 0, 0);
       head.position.set(0, 0, 0);
       head.rotation.set(-0.06, 0, 0);
+      neck.position.set(0, -0.98, 0);
+      neckBall.position.set(0, -0.74, 0);
+      neckNape.position.set(0, -0.88, -0.10);
+      collarRing.position.set(0, -1.46, 0.02);
       eyelids.forEach(lid => { lid.scale.y = 0.001; });
       isWavingActive = false;
     }
@@ -839,7 +876,7 @@ window.AhaanModel = {
     }
 
     return {
-      rig, head, torso, mouth, wavingArm, leftArm, leftLeg, rightLeg,
+      rig, head, torso, neck, neckBall, neckNape, collarRing, mouth, wavingArm, leftArm, leftLeg, rightLeg,
       updateWalk, updateBlink, startWave, stopWave, updateWave, resetLimbs,
       chomp, pose,
       footY: b3.min.y,
