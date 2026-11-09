@@ -768,40 +768,53 @@
       dockGroup.add(signBoard);
       riverGroup.add(dockGroup);
 
-      // Cheerful circular inflatable tube (doughnut swim ring)
+      // Cheerful circular inflatable tube (doughnut swim ring lounger)
       lazyRiverInflatable = new T.Group();
       lazyRiverInflatable.position.set(canalMidR, 0.22, 0);
 
       // Ring body: unbleached cotton canvas with hand-painted watercolor stripes
       const tubeMat = new T.MeshStandardMaterial({
-        color: 0xe8e0d4, // Natural canvas
+        color: 0xede6db, // Natural warm canvas
         roughness: 0.88,
         metalness: 0.02
       });
-      const tubeMesh = new T.Mesh(new T.TorusGeometry(0.85, 0.26, 16, 32), tubeMat);
+      const tubeMesh = new T.Mesh(new T.TorusGeometry(1.02, 0.32, 20, 36), tubeMat);
       tubeMesh.rotation.x = Math.PI / 2;
       tubeMesh.castShadow = true;
       lazyRiverInflatable.add(tubeMesh);
 
-      // Decorative hand-painted watercolor stripes around tube (terracotta, sage, slate)
+      // Decorative hand-painted watercolor stripes around tube (terracotta, sage, slate, ochre)
       const stripeColors = [0x9e5445, 0x567b55, 0x587a8e, 0xc8a265];
       for (let st = 0; st < 8; st++) {
         const sang = (st / 8) * Math.PI * 2;
         const stripeMat = new T.MeshStandardMaterial({ color: stripeColors[st % stripeColors.length], roughness: 0.85 });
-        const sprinkle = new T.Mesh(new T.CylinderGeometry(0.04, 0.04, 0.18, 6), stripeMat);
-        sprinkle.position.set(Math.cos(sang) * 0.85, 0.24, Math.sin(sang) * 0.85);
+        const sprinkle = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.22, 8), stripeMat);
+        sprinkle.position.set(Math.cos(sang) * 1.02, 0.30, Math.sin(sang) * 1.02);
         sprinkle.rotation.z = Math.PI / 2;
         sprinkle.rotation.y = sang;
         lazyRiverInflatable.add(sprinkle);
       }
 
-      // Safety grab handles on sides
+      // Plush headrest / backrest pillow cushion on rear rim for lazy river lounging
+      const pillowMat = new T.MeshStandardMaterial({ color: 0x9e5445, roughness: 0.88 }); // Terracotta canvas
+      const pillow = new T.Mesh(new T.CapsuleGeometry(0.18, 0.65, 8, 16), pillowMat);
+      pillow.position.set(0, 0.34, -0.96);
+      pillow.rotation.z = Math.PI / 2;
+      lazyRiverInflatable.add(pillow);
+
+      // Supportive suspended lounger seat mesh inside the tube hole
+      const seatMeshMat = new T.MeshStandardMaterial({ color: 0x2b3e50, roughness: 0.90 }); // Deep indigo canvas
+      const seatMesh = new T.Mesh(new T.CylinderGeometry(0.70, 0.62, 0.06, 24), seatMeshMat);
+      seatMesh.position.set(0, -0.06, 0);
+      lazyRiverInflatable.add(seatMesh);
+
+      // Dual white molded safety grab handles on sides
       [-1, 1].forEach(s => {
         const handle = new T.Mesh(
-          new T.TorusGeometry(0.14, 0.025, 6, 12, Math.PI),
-          new T.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 })
+          new T.TorusGeometry(0.16, 0.028, 8, 14, Math.PI),
+          new T.MeshStandardMaterial({ color: 0xfcf8ee, roughness: 0.5 })
         );
-        handle.position.set(s * 1.05, 0.08, 0);
+        handle.position.set(s * 1.26, 0.16, 0);
         handle.rotation.z = s > 0 ? 0 : Math.PI;
         lazyRiverInflatable.add(handle);
       });
@@ -809,7 +822,7 @@
       riverGroup.add(lazyRiverInflatable);
 
       // 4 Arched wooden footbridges crossing over the circular lazy river
-      // Footbridges have clearance (deck arches to y = 0.85) so inflatable glides underneath!
+      // High parabolic arch (clearance y = 2.42m) gives generous open headroom for floating underneath!
       const bridgeAngles = [
         { ang: -Math.PI / 2, label: "North to Missouri", rot: 0 },
         { ang: 0, label: "East to Mississippi", rot: Math.PI / 2 },
@@ -820,22 +833,55 @@
         const bx = Math.cos(ba.ang) * canalMidR;
         const bz = Math.sin(ba.ang) * canalMidR;
         const bridge = new T.Group();
-        bridge.position.set(bx, 0.35, bz);
+        bridge.position.set(bx, 0, bz);
         bridge.rotation.y = ba.rot;
 
-        // Arched bridge deck
-        const bDeck = new T.Mesh(new T.BoxGeometry(2.4, 0.12, 3.8), woodMat);
-        bDeck.position.y = 0.45;
-        bDeck.castShadow = true;
-        bDeck.receiveShadow = true;
-        bridge.add(bDeck);
-        if (walkables) walkables.push(bDeck);
+        // Multi-segment parabolic arched bridge deck
+        const segs = 9;
+        const totalSpan = 4.6; // spanning radial canal width
+        for (let i = 0; i < segs; i++) {
+          const t0 = i / segs;
+          const t1 = (i + 1) / segs;
+          const z0 = -totalSpan * 0.5 + t0 * totalSpan;
+          const z1 = -totalSpan * 0.5 + t1 * totalSpan;
+          const zmid = (z0 + z1) * 0.5;
+          const arch0 = 0.48 + 1.85 * (1 - Math.pow(z0 / (totalSpan * 0.5), 2));
+          const arch1 = 0.48 + 1.85 * (1 - Math.pow(z1 / (totalSpan * 0.5), 2));
+          const ymid = (arch0 + arch1) * 0.5;
+          const dz = z1 - z0;
+          const dy = arch1 - arch0;
+          const segLen = Math.hypot(dz, dy);
+          const segSlope = Math.atan2(dy, dz);
 
-        // Handrails
-        [-1.15, 1.15].forEach(rx => {
-          const rail = new T.Mesh(new T.BoxGeometry(0.08, 0.35, 3.8), woodMat);
-          rail.position.set(rx, 0.72, 0);
-          bridge.add(rail);
+          const plank = new T.Mesh(new T.BoxGeometry(2.3, 0.11, segLen * 1.03), woodMat);
+          plank.position.set(0, ymid, zmid);
+          plank.rotation.x = -segSlope;
+          plank.castShadow = true;
+          plank.receiveShadow = true;
+          bridge.add(plank);
+          if (walkables) walkables.push(plank);
+
+          // Arched balustrade handrails along both sides of deck
+          [-1.12, 1.12].forEach(rx => {
+            const railSeg = new T.Mesh(new T.BoxGeometry(0.07, 0.28, segLen * 1.02), woodMat);
+            railSeg.position.set(rx, ymid + 0.32, zmid);
+            railSeg.rotation.x = -segSlope;
+            bridge.add(railSeg);
+
+            if (i % 2 === 0) {
+              const post = new T.Mesh(new T.CylinderGeometry(0.045, 0.05, 0.48, 6), woodMat);
+              post.position.set(rx, ymid + 0.22, zmid);
+              bridge.add(post);
+            }
+          });
+        }
+
+        // Stone / timber abutment piers at the two water banks
+        [-totalSpan * 0.48, totalSpan * 0.48].forEach(pz => {
+          const abutment = new T.Mesh(new T.BoxGeometry(2.35, 0.65, 0.42), woodMat);
+          abutment.position.set(0, 0.28, pz);
+          abutment.castShadow = true;
+          bridge.add(abutment);
         });
 
         riverGroup.add(bridge);
@@ -3261,7 +3307,7 @@
             A.rig.rotation.y = -Math.PI / 2;
           }
         }
-        // Phase 1: Hop into circular inflatable tube
+        // Phase 1: Hop onto circular inflatable tube
         else if (activityPhase === 1) {
           activityTimer += dt;
           const hopTime = 0.55;
@@ -3276,11 +3322,17 @@
           if (t >= 1) {
             activityPhase = 2;
             activityTimer = 0;
+            if (lazyRiverInflatable) {
+              lazyRiverInflatable.add(A.rig);
+              A.rig.position.set(0, 1.48, -0.52);
+              A.rig.rotation.set(-0.36, 0, 0);
+              A.rig.scale.setScalar(ahaanScale);
+            }
             playSound("riverboat");
             sayAhaan("Floating smoothly! 🍩", "Gentle water ripples around Arkansas!", "🍩", "Lazy River");
           }
         }
-        // Phase 2: Gentle circular floating along the canal
+        // Phase 2: Gentle circular floating along the canal on top of the tube
         else if (activityPhase === 2) {
           activityTimer += dt;
           const baseSpd = calm() ? 0.22 : 0.38;
@@ -3291,30 +3343,47 @@
 
           const fx = Math.cos(lazyRiverAngle) * canalR;
           const fz = Math.sin(lazyRiverAngle) * canalR;
-          const bob = Math.sin(activityTimer * 3.0) * 0.05;
+          const bob = Math.sin(activityTimer * 2.8) * 0.04;
+          const roll = Math.sin(activityTimer * 1.6) * 0.035;
+          const pitch = Math.cos(activityTimer * 2.2) * 0.025;
           const waterY = 0.22 + bob;
 
           if (lazyRiverInflatable) {
             lazyRiverInflatable.position.set(fx, waterY, fz);
             lazyRiverInflatable.rotation.y = -lazyRiverAngle + Math.PI / 2;
+            lazyRiverInflatable.rotation.z = roll;
+            lazyRiverInflatable.rotation.x = pitch;
+
+            // Ensure Ahaan is mounted on top of the inflatable tube
+            if (A.rig.parent !== lazyRiverInflatable) {
+              lazyRiverInflatable.add(A.rig);
+              A.rig.scale.setScalar(ahaanScale);
+            }
+            // Position Ahaan lounging comfortably on top of the tube
+            A.rig.position.set(0, 1.48, -0.52);
+            A.rig.rotation.set(-0.36, 0, 0);
           }
 
-          A.rig.position.set(fx, waterY + 0.12, fz);
-          A.rig.rotation.y = -lazyRiverAngle + Math.PI / 2;
+          // Relaxed sunbather lazy river posture:
+          // Legs kicked forward resting over the front tube cushion into the breeze
+          const legKick = Math.sin(activityTimer * 3.0) * 0.05;
+          A.leftLeg.hip.rotation.set(-1.24 + legKick, 0, -0.10);
+          A.rightLeg.hip.rotation.set(-1.24 - legKick, 0, 0.10);
+          A.leftLeg.knee.rotation.set(0.42, 0, 0);
+          A.rightLeg.knee.rotation.set(0.42, 0, 0);
 
-          // Seated pose in circular tube
-          A.leftLeg.hip.rotation.x = -1.35;
-          A.rightLeg.hip.rotation.x = -1.35;
-          A.leftLeg.knee.rotation.x = 1.45;
-          A.rightLeg.knee.rotation.x = 1.45;
-          A.leftArm.arm.rotation.x = -0.4;
-          A.wavingArm.arm.rotation.x = -0.4;
-          A.leftArm.arm.rotation.z = 0.65;
-          A.wavingArm.arm.rotation.z = -0.65;
+          // Arms resting comfortably on the sides of the inflatable ring
+          A.leftArm.arm.rotation.set(-0.18, 0, 0.76);
+          A.wavingArm.arm.rotation.set(-0.18, 0, -0.76);
+          A.leftArm.elbow.rotation.set(0.62, 0, 0);
+          A.wavingArm.elbow.rotation.set(0.62, 0, 0);
+
+          // Head tilted naturally in line with relaxed spine
+          A.head.rotation.set(-0.06, 0, 0);
 
           // Camera smoothly tracks Ahaan floating in circular canal
-          actionCamTarget.set(fx, 1.8, fz);
-          actionCamPos.set(fx + Math.cos(lazyRiverAngle + 0.6) * 11.0, 8.8, fz + Math.sin(lazyRiverAngle + 0.6) * 11.0);
+          actionCamTarget.set(fx, 1.2, fz);
+          actionCamPos.set(fx + Math.cos(lazyRiverAngle + 0.6) * 9.5, 6.8, fz + Math.sin(lazyRiverAngle + 0.6) * 9.5);
         }
       }
     }
