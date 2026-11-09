@@ -378,38 +378,43 @@ window.AhaanModel = {
     // 7. 3D Sculpted Open Smile with Teeth
     // ==========================================
     const mouth = new T.Group();
-    mouth.position.set(0, -0.34, 0.88);
-    mouth.rotation.x = 0.12; // Angled slightly for camera visibility
+    mouth.position.set(0, -0.32, 0.89);
+    mouth.rotation.x = 0.10; // Angled for camera visibility
 
-    // Deep ruby oral cavity
-    const cavity = part(new T.CylinderGeometry(0.15, 0.06, 0.10, 16, 1, false, 0, Math.PI), mat(MOUTH_IN, 0.8), 0, 0, 0);
+    // Shallow warm oral cavity
+    const cavity = part(new T.CylinderGeometry(0.16, 0.08, 0.08, 20, 1, false, 0, Math.PI), mat(0x5c1c24, 0.75), 0, 0, 0);
     cavity.rotation.z = Math.PI;
-    cavity.scale.set(1.15, 0.75, 0.55);
+    cavity.scale.set(1.40, 0.52, 0.50);
     mouth.add(cavity);
 
-    // Clean white upper teeth (with cute child center gap notch)
-    const teethLeft = part(new T.BoxGeometry(0.075, 0.038, 0.03), mat(TEETH_WHITE, 0.25), -0.042, 0.022, 0.018);
-    const teethRight = part(new T.BoxGeometry(0.075, 0.038, 0.03), mat(TEETH_WHITE, 0.25), 0.042, 0.022, 0.018);
-    mouth.add(teethLeft);
-    mouth.add(teethRight);
+    // Pearly white upper teeth curve (clean child smile arch)
+    const teeth = part(new T.BoxGeometry(0.19, 0.038, 0.024), mat(TEETH_WHITE, 0.25), 0, 0.016, 0.018);
+    teeth.scale.set(1.15, 0.70, 0.80);
+    mouth.add(teeth);
+
+    // Delicate notch between front teeth
+    const toothNotch = part(new T.BoxGeometry(0.012, 0.018, 0.03), mat(0x5c1c24, 0.8), 0, 0.010, 0.022);
+    mouth.add(toothNotch);
 
     // Soft pink tongue
-    const tongue = part(sphere, mat(TONGUE, 0.65), 0, -0.028, 0.005, 0.09, 0.04, 0.07);
+    const tongue = part(sphere, mat(TONGUE, 0.60), 0, -0.018, 0.008, 0.10, 0.032, 0.06);
     mouth.add(tongue);
 
-    // Sculpted Cupid's bow upper lip
-    const upperLip = part(new T.TorusGeometry(0.125, 0.022, 6, 20, Math.PI * 0.85), mat(LIP_TOP, 0.65), 0, 0.030, 0.024);
+    // Soft curved Cupid's bow upper lip
+    const upperLip = part(new T.TorusGeometry(0.130, 0.020, 8, 24, Math.PI * 0.85), mat(LIP_TOP, 0.65), 0, 0.022, 0.024);
     upperLip.rotation.z = Math.PI * 0.08;
+    upperLip.scale.set(1.42, 0.58, 0.65);
     mouth.add(upperLip);
 
     // Plump warm lower lip
-    const lowerLip = part(new T.TorusGeometry(0.130, 0.024, 6, 20, Math.PI * 0.92), mat(LIP_BOT, 0.60), 0, 0.012, 0.028);
-    lowerLip.rotation.z = Math.PI * 1.04;
+    const lowerLip = part(new T.TorusGeometry(0.132, 0.022, 8, 24, Math.PI * 0.90), mat(LIP_BOT, 0.60), 0, 0.006, 0.026);
+    lowerLip.rotation.z = Math.PI * 1.05;
+    lowerLip.scale.set(1.38, 0.62, 0.70);
     mouth.add(lowerLip);
 
     // Smile corner dimples
     [-1, 1].forEach(s => {
-      const dimple = part(sphere, skinShadowMat, s * 0.17, 0.012, 0.018, 0.028, 0.040, 0.018);
+      const dimple = part(sphere, skinShadowMat, s * 0.18, 0.008, 0.018, 0.022, 0.032, 0.016);
       mouth.add(dimple);
     });
 
@@ -445,42 +450,42 @@ window.AhaanModel = {
     const hairGroup = new T.Group();
     head.add(hairGroup);
 
-    // Crown and upper skull volume
-    const crown = part(sphere, hairMat, 0, 0.24, -0.04, 0.94, 0.88, 0.98);
+    // Smooth volumetric crown and skull volume (neatly fitted to child head contour)
+    const crown = part(sphere, hairMat, 0, 0.22, -0.06, 0.94, 0.94, 0.98);
     hairGroup.add(crown);
 
     // Back of head and nape volume
-    const nape = part(sphere, hairMat, 0, 0.04, -0.22, 0.92, 0.98, 0.86);
+    const nape = part(sphere, hairMat, 0, 0.02, -0.22, 0.91, 0.96, 0.86);
     hairGroup.add(nape);
 
-    // Side temple volumes above ears
+    // Soft temple taper (blends skull contour into sideburns)
     [-1, 1].forEach(s => {
-      const temple = part(sphere, hairMat, s * 0.48, 0.18, 0.08, 0.52, 0.72, 0.78);
+      const temple = part(sphere, hairMat, s * 0.44, 0.16, 0.02, 0.44, 0.68, 0.72);
       hairGroup.add(temple);
     });
 
-    // Forehead bangs / fringe locks (following forehead curvature above brows)
-    const bangsCount = 7;
+    // Forehead bangs / fringe locks (neat child fringe following brow ridge)
+    const bangsCount = 9;
     for (let i = 0; i < bangsCount; i++) {
       const u = (i / (bangsCount - 1)) * 2 - 1; // -1 to +1
-      const bx = u * 0.44;
-      const by = 0.30 - Math.pow(u, 2) * 0.04; // Curved arch above eyebrows
-      const bz = 0.86 - Math.abs(u) * 0.10;
+      const bx = u * 0.42;
+      const by = 0.28 - Math.pow(u, 2) * 0.035; // Gentle natural curve
+      const bz = 0.88 - Math.abs(u) * 0.09;
       const bLock = part(
-        new T.CapsuleGeometry(0.065, 0.12, 8, 12),
+        new T.CapsuleGeometry(0.045, 0.11, 8, 12),
         i % 2 === 0 ? hairMat : hairStrandMat,
         bx, by, bz
       );
-      bLock.rotation.set(0.24, -u * 0.14, -u * 0.20);
-      bLock.scale.set(0.95, 1, 0.75);
+      bLock.rotation.set(0.20, -u * 0.12, -u * 0.15);
+      bLock.scale.set(0.75, 0.85, 0.55);
       hairGroup.add(bLock);
     }
 
     // Sideburn locks in front of ears
     [-1, 1].forEach(s => {
-      const sideburn = part(new T.CapsuleGeometry(0.050, 0.22, 8, 12), hairMat, s * 0.84, -0.02, 0.16);
+      const sideburn = part(new T.CapsuleGeometry(0.045, 0.19, 8, 12), hairMat, s * 0.82, -0.02, 0.16);
       sideburn.rotation.set(0.18, 0, s * 0.12);
-      sideburn.scale.set(0.70, 1, 0.85);
+      sideburn.scale.set(0.60, 1, 0.75);
       hairGroup.add(sideburn);
     });
 

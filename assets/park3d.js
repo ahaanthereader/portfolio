@@ -425,6 +425,7 @@
     // 3D Nature: Lush Trees, Rocks & Wildflowers
     // ==========================================
     buildNature(mapGroup, T);
+    buildHeroEnrichments(mapGroup, T);
 
     // ==========================================
     // 3D Storytelling Reading Props (Arkansas)
@@ -1224,6 +1225,8 @@
       registerInteractive(trampGroup, {
         name: "Spring Trampoline",
         activity: "trampoline",
+        x: -2.95,
+        z: 0.2,
         onInteract: () => startPlayActivity("trampoline")
       });
 
@@ -1519,6 +1522,115 @@
       createSignpost(1.8, 6.6, "Louisiana", "↓");
       createSignpost(-5.6, 3.2, "Texas", "↙");
       createSignpost(-5.6, -3.2, "Oklahoma", "↖");
+    }
+
+    function buildHeroEnrichments(parent, T) {
+      // 1. Floating celebration balloons near picnic lawn (x: -1.8, z: 2.3)
+      const balloonColors = [0xf43f5e, 0xfacc15, 0x38bdf8, 0xa855f7];
+      const balloonsGroup = new T.Group();
+      balloonsGroup.position.set(-1.8, 0.45, 2.3);
+
+      const cordMat = new T.MeshBasicMaterial({ color: 0x94a3b8 });
+      balloonColors.forEach((col, i) => {
+        const bMesh = new T.Mesh(new T.SphereGeometry(0.24, 16, 12), new T.MeshStandardMaterial({
+          color: col,
+          roughness: 0.35,
+          metalness: 0.05
+        }));
+        bMesh.scale.set(0.85, 1.15, 0.85);
+        const bx = (i % 2 === 0 ? -1 : 1) * 0.16 + (Math.sin(i * 1.5) * 0.08);
+        const bz = (i < 2 ? -1 : 1) * 0.14;
+        const by = 2.1 + (i * 0.22);
+        bMesh.position.set(bx, by, bz);
+        bMesh.castShadow = true;
+        balloonsGroup.add(bMesh);
+
+        // String down to anchor stone
+        const stringGeo = new T.CylinderGeometry(0.006, 0.006, by, 4);
+        const stringMesh = new T.Mesh(stringGeo, cordMat);
+        stringMesh.position.set(bx * 0.5, by * 0.5, bz * 0.5);
+        stringMesh.rotation.z = -bx * 0.12;
+        balloonsGroup.add(stringMesh);
+      });
+      parent.add(balloonsGroup);
+
+      // Animate balloons swaying in breeze
+      landmarkAnimators.push((dt) => {
+        if (!calm()) {
+          const t = performance.now() * 0.0016;
+          balloonsGroup.rotation.z = Math.sin(t) * 0.06;
+          balloonsGroup.rotation.x = Math.cos(t * 0.8) * 0.05;
+        } else {
+          balloonsGroup.rotation.set(0, 0, 0);
+        }
+      });
+
+      // 2. Animated Garden Butterflies
+      const butterflyMats = [
+        new T.MeshBasicMaterial({ color: 0xf59e0b, side: T.DoubleSide }),
+        new T.MeshBasicMaterial({ color: 0xec4899, side: T.DoubleSide }),
+        new T.MeshBasicMaterial({ color: 0x06b6d4, side: T.DoubleSide })
+      ];
+
+      const butterflies = [
+        { cx: 2.2, cz: 1.8, r: 1.1, speed: 1.2, h: 0.95 },
+        { cx: -2.4, cz: -1.6, r: 0.9, speed: 1.4, h: 0.85 }
+      ];
+
+      butterflies.forEach((bcfg, idx) => {
+        const bGroup = new T.Group();
+        const mat = butterflyMats[idx % butterflyMats.length];
+
+        const wingGeo = new T.PlaneGeometry(0.12, 0.09);
+        const leftWing = new T.Mesh(wingGeo, mat);
+        leftWing.position.x = -0.06;
+        const rightWing = new T.Mesh(wingGeo, mat);
+        rightWing.position.x = 0.06;
+
+        bGroup.add(leftWing);
+        bGroup.add(rightWing);
+        parent.add(bGroup);
+
+        landmarkAnimators.push((dt) => {
+          if (!calm()) {
+            const time = performance.now() * 0.001 * bcfg.speed;
+            const flap = Math.sin(time * 24) * 0.85;
+            leftWing.rotation.y = flap;
+            rightWing.rotation.y = -flap;
+
+            const bx = bcfg.cx + Math.cos(time) * bcfg.r;
+            const bz = bcfg.cz + Math.sin(time) * bcfg.r;
+            const by = 0.45 + bcfg.h + Math.sin(time * 3.0) * 0.22;
+            bGroup.position.set(bx, by, bz);
+            bGroup.rotation.y = -time + Math.PI / 2;
+          } else {
+            bGroup.position.set(bcfg.cx, 0.45 + bcfg.h, bcfg.cz);
+          }
+        });
+      });
+
+      // 3. Floating River Water Lilies
+      const lilyMat = new T.MeshStandardMaterial({ color: 0x2d6a4f, roughness: 0.75 });
+      const flowerMat = new T.MeshBasicMaterial({ color: 0xfde047 });
+      const petalMat = new T.MeshBasicMaterial({ color: 0xf472b6 });
+
+      const lilies = [
+        { x: 5.4, z: -1.2 },
+        { x: 4.9, z: 2.8 },
+        { x: 10.5, z: 8.5 }
+      ];
+
+      lilies.forEach(pos => {
+        const pad = new T.Mesh(new T.CylinderGeometry(0.26, 0.26, 0.02, 12), lilyMat);
+        pad.position.set(pos.x, 0.26, pos.z);
+        const bloom = new T.Mesh(new T.SphereGeometry(0.08, 8, 8), petalMat);
+        bloom.position.set(0, 0.05, 0);
+        pad.add(bloom);
+        const center = new T.Mesh(new T.SphereGeometry(0.04, 6, 6), flowerMat);
+        center.position.set(0, 0.08, 0);
+        pad.add(center);
+        parent.add(pad);
+      });
     }
 
     function buildLandmark(st, parent, T) {
@@ -2301,7 +2413,7 @@
         name: "Spring Trampoline",
         x: -4.3,
         z: 0.2,
-        approachRadius: 2.8,
+        approachRadius: 3.4,
         actionLabel: "Jump! 🤸",
         promptText: "Press Enter to Jump! 🤸",
         onActivate: () => startPlayActivity("trampoline")
@@ -2321,7 +2433,7 @@
         name: "Playground Slide",
         x: -2.6,
         z: -3.2,
-        approachRadius: 2.8,
+        approachRadius: 3.4,
         actionLabel: "Slide! 🛝",
         promptText: "Press Enter to Slide! 🛝",
         onActivate: () => startPlayActivity("slide")
@@ -2428,16 +2540,16 @@
         targetPos = new T.Vector3(-2.95, rigBaseY, 0.2);
         marker.position.set(-2.95, 0.52, 0.2);
         markerMat.opacity = 0.95;
-        trampY = 0.54;
-        trampVy = 5.6;
-        trampBounceApex = 1.6;
+        trampY = 0.56;
+        trampVy = 7.2;
+        trampBounceApex = 2.4;
         trampDeflection = 0;
         trampIsFlipping = false;
         trampFlip = 0;
         cameraMode = "action";
-        actionCamTarget.set(-4.3, 1.8, 0.2);
-        actionCamPos.set(-4.3 + 6.2, 6.2, 0.2 + 8.5);
-        sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high!", "🤸", "Spring Trampoline");
+        actionCamTarget.set(-4.3, 2.2, 0.2);
+        actionCamPos.set(-4.3 + 6.8, 6.2, 0.2 + 8.8);
+        sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high! Press Space to jump higher!", "🤸", "Spring Trampoline");
       }
 
       if (type === "trampoline" || type === "swing") {
@@ -2497,15 +2609,16 @@
     function boostCurrentActivity() {
       if (!currentActivity) return;
       if (currentActivity === "trampoline") {
-        trampBounceApex = Math.min(3.8, trampBounceApex + 0.85);
+        trampBounceApex = Math.min(4.8, trampBounceApex + 0.95);
         if (trampVy < 0) {
-          trampVy += 3.5;
+          trampVy = Math.max(3.8, trampVy + 5.2);
         } else {
-          trampVy = Math.max(trampVy, Math.sqrt(2 * 16.0 * trampBounceApex));
+          trampVy = Math.max(trampVy + 3.6, Math.sqrt(2 * 17.5 * trampBounceApex));
         }
+        trampY = Math.max(trampY, 0.56);
         playSound("bounce");
         spawnTrampParticles();
-        sayAhaan("Boing! Higher! 🤸", "Look at the clouds!", "🤸", "Spring Trampoline");
+        sayAhaan("Boing! Higher! 🤸", "Jumping to the stars! Wheeeee!", "🤸", "Spring Trampoline");
         wake();
       } else if (currentActivity === "swing") {
         const dir = Math.sign(swingVelocity) || 1;
@@ -2700,7 +2813,7 @@
         // Phase 0: Approach access ladder
         if (activityPhase === 0) {
           const dist = Math.hypot(A.rig.position.x - (-2.95), A.rig.position.z - 0.2);
-          if (dist < 0.65 || !targetPos) {
+          if (dist < 0.95 || !targetPos) {
             activityPhase = 1;
             activityTimer = 0;
             targetPos = null;
@@ -2713,7 +2826,7 @@
         // Phase 1: Hop onto trampoline mat
         else if (activityPhase === 1) {
           activityTimer += dt;
-          const hopTime = 0.55;
+          const hopTime = 0.50;
           const t = Math.min(1, activityTimer / hopTime);
           const curX = -2.95 + t * (-4.3 - (-2.95));
           const arcY = Math.sin(t * Math.PI) * 0.45;
@@ -2723,42 +2836,48 @@
           if (t >= 1) {
             activityPhase = 2;
             activityTimer = 0;
-            trampY = 0.54;
-            trampVy = 5.2;
+            trampY = 0.56;
+            trampVy = 7.0;
             A.rig.position.set(-4.3, rigBaseY + 0.54, 0.2);
+            playSound("bounce");
+            spawnTrampParticles();
             sayAhaan("Boing! Boing! 🤸", "I can touch the clouds!", "🤸", "Spring Trampoline");
           }
         }
         // Phase 2: Real spring bouncing physics
         else if (activityPhase === 2) {
           activityTimer += dt;
-          const gravity = 16.0;
+          const gravity = 17.5;
+          const MAT_BASE_Y = 0.54;
 
-          if (trampBounceApex > 1.4) {
-            trampBounceApex = Math.max(1.4, trampBounceApex - dt * 0.15);
+          if (trampBounceApex > 1.8) {
+            trampBounceApex = Math.max(1.8, trampBounceApex - dt * 0.12);
           }
 
-          if (trampY > 0.54) {
+          if (trampY > MAT_BASE_Y) {
             // Airborne flight
             trampVy -= gravity * dt;
             trampY += trampVy * dt;
 
-            const stretch = Math.min(0.2, Math.max(0, trampVy / 12) * 0.2);
-            A.rig.scale.set(
-              ahaanScale * (1 - stretch * 0.4),
-              ahaanScale * (1 + stretch * 0.6),
-              ahaanScale * (1 - stretch * 0.4)
-            );
-
-            A.leftArm.arm.rotation.z = 2.0;
-            A.wavingArm.arm.rotation.z = -2.0;
+            // Free-flight limbs: arms up/out for balance
+            A.leftArm.arm.rotation.z = 2.1;
+            A.wavingArm.arm.rotation.z = -2.1;
             A.leftArm.arm.rotation.x = -0.3;
             A.wavingArm.arm.rotation.x = -0.3;
-            A.leftLeg.knee.rotation.x = 0;
-            A.rightLeg.knee.rotation.x = 0;
+            A.leftLeg.knee.rotation.x = 0.15;
+            A.rightLeg.knee.rotation.x = 0.15;
 
+            // Stretch during fast ascent / descent
+            const stretch = Math.min(0.22, Math.abs(trampVy) / 20 * 0.22);
+            A.rig.scale.set(
+              ahaanScale * (1 - stretch * 0.35),
+              ahaanScale * (1 + stretch * 0.65),
+              ahaanScale * (1 - stretch * 0.35)
+            );
+
+            // 360 flip rotation during high bounces
             if (trampIsFlipping) {
-              trampFlip += dt * 8.0;
+              trampFlip += dt * 8.5;
               if (trampFlip >= Math.PI * 2) {
                 trampFlip = 0;
                 trampIsFlipping = false;
@@ -2768,21 +2887,28 @@
               A.rig.rotation.x = 0;
             }
 
-            if (trampVy < 0 && (trampVy + gravity * dt) >= 0 && trampBounceApex >= 2.0) {
-              playSound("bell");
+            // Descending touchdown trigger
+            if (trampY <= MAT_BASE_Y && trampVy < 0) {
+              trampY = MAT_BASE_Y;
+              playSound("bounce");
+              spawnTrampParticles();
             }
           } else {
-            // Mat compression and rebound
-            trampDeflection = 0.54 - trampY;
-            const springK = 220.0, springDamping = 4.0;
+            // Mat compression and elastic rebound
+            const trampDeflection = Math.min(0.28, Math.max(0, MAT_BASE_Y - trampY));
+            const springK = 260.0;
+            const springDamping = 3.2;
             const springForce = springK * trampDeflection - springDamping * trampVy;
+
             trampVy += springForce * dt;
             trampY += trampVy * dt;
 
-            trampDeflection = Math.min(0.24, Math.max(0, 0.54 - trampY));
-            if (trampMat) trampMat.position.y = 0.54 - trampDeflection;
+            // Visual mat deformation (mat stretches downward)
+            const currentDeflection = Math.min(0.28, Math.max(0, MAT_BASE_Y - trampY));
+            if (trampMat) trampMat.position.y = MAT_BASE_Y - currentDeflection;
 
-            const squash = Math.min(0.35, trampDeflection * 1.6);
+            // Squash on impact (knees bend, torso compresses)
+            const squash = Math.min(0.35, currentDeflection * 1.5);
             A.rig.scale.set(
               ahaanScale * (1 + squash * 0.7),
               ahaanScale * (1 - squash * 0.85),
@@ -2790,20 +2916,23 @@
             );
             A.rig.rotation.x = 0;
 
-            A.leftLeg.knee.rotation.x = squash * 4.5;
-            A.rightLeg.knee.rotation.x = squash * 4.5;
-            A.leftLeg.hip.rotation.x = -squash * 2.2;
-            A.rightLeg.hip.rotation.x = -squash * 2.2;
-            A.leftArm.arm.rotation.x = 0.35;
-            A.wavingArm.arm.rotation.x = 0.35;
-            A.leftArm.arm.rotation.z = 0.2;
-            A.wavingArm.arm.rotation.z = -0.2;
+            A.leftLeg.knee.rotation.x = squash * 4.2;
+            A.rightLeg.knee.rotation.x = squash * 4.2;
+            A.leftLeg.hip.rotation.x = -squash * 2.0;
+            A.rightLeg.hip.rotation.x = -squash * 2.0;
+            A.leftArm.arm.rotation.x = 0.4;
+            A.wavingArm.arm.rotation.x = 0.4;
+            A.leftArm.arm.rotation.z = 0.3;
+            A.wavingArm.arm.rotation.z = -0.3;
 
-            if (trampVy > 0 && trampY >= 0.52) {
-              trampY = 0.54;
-              if (trampMat) trampMat.position.y = 0.54;
+            // When rebounding upward and crossing baseline, launch into air!
+            if (trampVy > 0 && trampY >= MAT_BASE_Y) {
+              trampY = MAT_BASE_Y + 0.015; // Set strictly above mat baseline so airborne flight activates!
+              if (trampMat) trampMat.position.y = MAT_BASE_Y;
               playSound("bounce");
               spawnTrampParticles();
+
+              // High bounce initiates front flip
               if (trampBounceApex >= 2.2) {
                 trampIsFlipping = true;
                 trampFlip = 0;
@@ -2811,7 +2940,7 @@
             }
           }
 
-          A.rig.position.set(-4.3, rigBaseY + (trampY - 0.54) + 0.54, 0.2);
+          A.rig.position.set(-4.3, rigBaseY + (trampY - MAT_BASE_Y) + 0.54, 0.2);
           A.rig.rotation.y = 0;
         }
       }
@@ -3394,6 +3523,9 @@
       },
       getCurrentActivity: () => currentActivity,
       getCurrentNearbyItem: () => currentNearbyItem,
+      startPlayActivity,
+      stopPlayActivity,
+      boostCurrentActivity,
       getA: () => A,
       getSwingPivot: () => swingPivot,
       setCustomCamera: (pos, target) => {
