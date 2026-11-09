@@ -77,23 +77,23 @@ window.AhaanModel = {
 
     const skinMat = new T.MeshStandardMaterial({
       color: SKIN,
-      roughness: 0.62,
-      metalness: 0.02,
+      roughness: 0.90,
+      metalness: 0.01,
       emissive: SKIN_EMISSIVE,
-      emissiveIntensity: 0.15
+      emissiveIntensity: 0.06
     });
 
     const skinShadowMat = new T.MeshStandardMaterial({
       color: SKIN_SHADOW,
-      roughness: 0.68,
-      metalness: 0.02,
+      roughness: 0.92,
+      metalness: 0.01,
       emissive: 0x2c1208,
-      emissiveIntensity: 0.12
+      emissiveIntensity: 0.05
     });
 
-    const hairMat = mat(HAIR_BASE, 0.52, 0.06);
-    const hairStrandMat = mat(HAIR_STRAND, 0.56, 0.05);
-    const nailMat = mat(NAIL_TONE, 0.44, 0.02);
+    const hairMat = mat(HAIR_BASE, 0.92, 0.02);
+    const hairStrandMat = mat(HAIR_STRAND, 0.92, 0.02);
+    const nailMat = mat(NAIL_TONE, 0.60, 0.01);
 
     // Polo horizontal stripes texture
     function createPoloTexture(bands) {
@@ -122,7 +122,7 @@ window.AhaanModel = {
     // ==========================================
     const poloTex = createPoloTexture(8);
     poloTex.repeat.set(1, 1);
-    const poloMat = new T.MeshStandardMaterial({ map: poloTex, roughness: 0.86 });
+    const poloMat = new T.MeshStandardMaterial({ map: poloTex, roughness: 0.94 });
 
     const prof = [
       [0.001, -1.40], [0.52, -1.42], [1.02, -1.56], [1.18, -1.84],
@@ -177,7 +177,7 @@ window.AhaanModel = {
     // 2. Articulated Arms & Realistic Child Hands
     // ==========================================
     const sleeveTex = createPoloTexture(6);
-    const sleeveMat = new T.MeshStandardMaterial({ map: sleeveTex, roughness: 0.86 });
+    const sleeveMat = new T.MeshStandardMaterial({ map: sleeveTex, roughness: 0.94 });
     const cuffMat = mat(MAROON, 0.85);
 
     function makeArm(side) {
