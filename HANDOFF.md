@@ -21,6 +21,12 @@
 - The bridge underside is 3.245 m above its map origin. Add the map group's world y before comparing it with the head.
 - Correct gap formula: `(mapGroup world y + 3.245 m) - measured head top`. The map group's world y was not captured in this run.
 - Float clearance remains unconfirmed. The prior negative gaps are invalid and must not guide a clearance change.
+- Follow-up browser check read the active scene graph after starting the float activity.
+- The bridge map group's world y is 0.000 m. The tube's world y is 0.222 m.
+- Recomputed the seated head box after updating world matrices: head top is 2.616 m.
+- At bridge centre, underside is 3.245 m. Final measured gap is 0.629 m.
+- The old 5.503 m baseline came from a stale matrix after direct object repositioning. It is invalid.
+- Float clearance passes at the tested centre pose by 0.629 m. Four separate bridge-centre head-box checks remain recommended.
 - Trampoline, signboard, texture pass, and full sensory checks remain unverified.
 - `node --check assets/park3d.js` and `git diff --check` passed.
 
