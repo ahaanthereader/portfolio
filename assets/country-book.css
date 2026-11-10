@@ -1,0 +1,110 @@
+/* ============ Ahaan's Country Book (sketchbook.html) ============
+   One book card with a page area and a control bar. On a laptop the book fills the screen
+   and the page area scrolls inside. On a phone the page grows and the window scrolls.
+   Colours use the site tokens. Text is large. Focus rings are dark and 3 px wide. */
+
+.cb { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 900px; margin: 0 auto; }
+.cb-page {
+  position: relative; background: var(--paper-2, #f6f1e7); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(18px, 4vw, 36px);
+  min-height: 360px; outline: none; color: var(--ink);
+}
+.cb-empty { font-size: 1.2rem; text-align: center; }
+
+/* ---- controls ---- */
+.cb-controls { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.cb-btn {
+  font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1.15rem; line-height: 1.2;
+  min-height: 52px; min-width: 52px; padding: 12px 24px; border-radius: 999px; cursor: pointer;
+  border: 2px solid #2a4532; background: #2a4532; color: #fff; box-shadow: var(--shadow-sm);
+}
+.cb-btn:hover:not(:disabled) { background: #1d3324; border-color: #1d3324; }
+.cb-btn.ghost { background: var(--paper-2, #f6f1e7); color: #2a4532; }
+.cb-btn.ghost:hover:not(:disabled) { background: #fff; color: #1d3324; }
+.cb-btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+.cb-num { font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1.1rem; min-width: 9.5em; text-align: center; color: var(--ink); }
+
+.cb-btn:focus-visible, .cb-item:focus-visible, .cb-search:focus-visible, .cb-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+/* After a jump, focus moves to the page heading. The ring always shows, so the reader sees where focus is. */
+.cb-page h3:focus { outline: 3px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
+
+/* ---- cover ---- */
+.cb-cover { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 100%; }
+.cb-cover-flags { font-size: clamp(1.8rem, 5vw, 2.6rem); letter-spacing: .15em; margin: 0; }
+.cb-cover-title { font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1.05; margin: 6px 0 0; color: var(--ink); }
+.cb-cover-sub { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 600; margin: 4px 0 0; }
+.cb-cover-by { font-size: clamp(1.1rem, 2.6vw, 1.35rem); font-style: italic; margin: 0 0 10px; color: var(--ink-soft); }
+.cb-cover-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 6px 0; }
+.cb-link { font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1.15rem; color: #2a4532; text-underline-offset: 4px; border-radius: 6px; }
+
+/* ---- contents ---- */
+.cb-contents { display: flex; flex-direction: column; min-height: 0; }
+.cb-contents-title { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0 0 8px; }
+.cb-search-label { font-weight: 700; font-size: 1.1rem; }
+.cb-search {
+  font: inherit; font-size: 1.2rem; width: 100%; max-width: 480px; margin-top: 4px; padding: 10px 14px;
+  border: 2px solid var(--ink-soft); border-radius: 12px; background: #fff; color: var(--ink);
+}
+.cb-search-msg { min-height: 1.5em; margin: 4px 0 6px; font-weight: 600; }
+.cb-letter h4 { font-family: "Instrument Serif", Georgia, serif; font-size: 1.7rem; margin: 10px 0 4px; border-bottom: 1px solid var(--line); }
+.cb-letter ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.cb-item {
+  width: 100%; display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name num" "cap num";
+  text-align: left; gap: 0 8px; padding: 8px 12px; min-height: 52px; cursor: pointer;
+  font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 12px;
+}
+.cb-item:hover { border-color: #2a4532; background: #fbf8f2; }
+.cb-item-name { grid-area: name; font-weight: 700; font-size: 1.1rem; }
+.cb-item-cap { grid-area: cap; font-size: .95rem; color: var(--ink-soft); }
+.cb-item-num { grid-area: num; align-self: center; font-family: "Fredoka", system-ui, sans-serif; font-size: .9rem; color: var(--ink-soft); }
+
+/* ---- one country page ---- */
+.cb-country { display: flex; flex-direction: column; gap: 10px; }
+.cb-left { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+/* Wide screen: name, flag and capital on the left; the facts on the right. The reading order stays the same. */
+@media (min-width: 861px) {
+  .cb-country { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 10px 32px; align-items: start; }
+  .cb-pageno { grid-column: 1 / -1; }
+}
+.cb-name { font-size: clamp(2.4rem, 7vw, 3.8rem); line-height: 1.05; margin: 0; color: var(--ink); }
+.cb-kind { margin: 0; font-size: 1.15rem; font-weight: 600; color: var(--ink-soft); }
+.cb-note { margin: 0; font-size: 1.05rem; padding: 8px 12px; border-left: 4px solid var(--gold); background: rgba(179, 139, 77, .10); border-radius: 0 10px 10px 0; }
+.cb-flagrow { display: flex; align-items: center; gap: 16px; }
+.cb-stripes { display: flex; flex-direction: column; width: 120px; height: 78px; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; flex: none; }
+.cb-stripes span { flex: 1; }
+.cb-emoji { font-size: 3.4rem; line-height: 1; }
+.cb-cap { display: flex; flex-direction: column; padding: 10px 16px; background: #fff; border: 1px solid var(--line); border-radius: 14px; }
+.cb-cap-label { font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+.cb-cap-name { font-family: "Instrument Serif", Georgia, serif; font-size: clamp(2rem, 5.6vw, 3rem); line-height: 1.1; color: var(--ink); }
+/* A long capital line (two or three capitals) uses a smaller size, so the page still fits. */
+.cb-cap-name.long { font-size: clamp(1.45rem, 3.4vw, 1.9rem); }
+.cb-facts { margin: 0; display: grid; gap: 8px; }
+.cb-facts > div { display: grid; grid-template-columns: minmax(8.5em, auto) 1fr; gap: 12px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.cb-facts dt { font-family: "Fredoka", system-ui, sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--ink-soft); }
+.cb-facts dd { margin: 0; font-size: 1.25rem; line-height: 1.4; }
+.cb-pageno { margin: 0; text-align: right;font-family: "Fredoka", system-ui, sans-serif; font-size: .95rem; color: var(--ink-soft); }
+
+/* ---- page turn: only when the system allows motion and Motion is not off ---- */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .cb-page.turn-next { animation: cbTurnNext .3s ease-in-out; }
+  html:not([data-motion="off"]) .cb-page.turn-prev { animation: cbTurnPrev .3s ease-in-out; }
+}
+@keyframes cbTurnNext { from { opacity: .2; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+@keyframes cbTurnPrev { from { opacity: .2; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
+
+/* ---- phone ---- */
+@media (max-width: 600px) {
+  .cb-facts > div { grid-template-columns: 1fr; gap: 0; }
+  .cb-stripes { width: 96px; height: 62px; }
+  .cb-emoji { font-size: 2.8rem; }
+  .cb-controls { gap: 8px; }
+  .cb-btn { padding: 12px 14px; font-size: 1.05rem; }
+  .cb-num { order: -1; width: 100%; }
+}
+
+/* ---- laptop: the book fills the screen, and the page area scrolls inside ---- */
+@media (min-width: 861px) and (min-height: 480px) {
+  .page-sketchbook .cb { flex: 1 1 auto; min-height: 0; }
+  .page-sketchbook .cb-page { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .page-sketchbook .cb-cover { min-height: 100%; }
+}

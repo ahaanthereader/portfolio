@@ -222,6 +222,9 @@
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; font-size: .82rem; font-weight: 700; color: var(--ink-soft); }
   .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .map-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  /* Link from the map to Ahaan's Country Book (sketchbook.html). */
+  .geo-book-link { margin-left: auto; color: #2a4532; font-size: .95rem; text-underline-offset: 3px; border-radius: 4px; }
+  .geo-book-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
   /* fact box floats over the empty ocean at the bottom of the map */
   .fact-box { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26px; z-index: 4;
     width: min(560px, calc(100% - 48px));
@@ -537,6 +540,9 @@
   .medal-text p { margin: 0; color: #5a4a25; font-weight: 600; }
   .medal-shine { position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.7), transparent); transform: skewX(-18deg); animation: medalShine 4.5s ease-in-out infinite; pointer-events: none; }
   @keyframes medalShine { 0%, 60% { left: -60%; } 85%, 100% { left: 130%; } }
+  /* Stop the looping medal and music-button motion when the user asks for less motion. */
+  @media (prefers-reduced-motion: reduce) { .medal-emoji, .medal-shine, .music-fab.on { animation: none; } }
+  html[data-motion="off"] .medal-emoji, html[data-motion="off"] .medal-shine, html[data-motion="off"] .music-fab.on { animation: none; }
   .reward-bar { max-width: 760px; margin: 0 auto 18px; text-align: center; }
   .reward-count { font-family: "Fraunces", serif; font-weight: 900; font-size: 1.3rem; color: var(--forest-d); }
   .reward-track { height: 12px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 8px 0; }
@@ -940,7 +946,7 @@
   @keyframes scnGrassB { from { transform: skewX(4deg); } to { transform: skewX(-4deg); } }
   .breeze-off .scn-anim, .scn-paused .scn-anim { animation-play-state: paused; }
   .breeze-btn { font: inherit; cursor: pointer; justify-content: center; }
-  .breeze-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .breeze-pill:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
   html[data-motion="off"] .scn-anim { animation: none; }
   html[data-motion="off"] .breeze-btn { display: none; }
   @media (prefers-reduced-motion: reduce) { .scn-anim { animation: none; } .breeze-btn { display: none; } }

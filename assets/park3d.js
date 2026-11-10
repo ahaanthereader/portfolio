@@ -17,11 +17,14 @@
 
   // Sensory-friendly audio settings: silent until enabled
   const SKEY = "ahaanDoorsSound";
-  let soundOn = false;
+  let soundOn = false, soundVol = null;
   try {
     const s = JSON.parse(localStorage.getItem(SKEY));
     if (s) soundOn = !!s.on;
+    // Keep the volume that Ahaan set on the Bells or Doors page. The home toggle must not make sound louder.
+    if (s && typeof s.vol === "number") soundVol = s.vol;
   } catch (e) {}
+  if (soundVol !== null && window.AhaanAudio) window.AhaanAudio.setVolume(soundVol / 100);
 
   const soundBtn = document.getElementById("soundBtn");
   function syncSoundUI() {
@@ -33,7 +36,7 @@
   if (soundBtn) {
     soundBtn.addEventListener("click", () => {
       soundOn = !soundOn;
-      try { localStorage.setItem(SKEY, JSON.stringify({ on: soundOn, vol: 60 })); } catch (e) {}
+      try { localStorage.setItem(SKEY, JSON.stringify({ on: soundOn, vol: soundVol === null ? 60 : soundVol })); } catch (e) {}
       syncSoundUI();
       if (soundOn && window.AhaanAudio) {
         window.AhaanAudio.bell(523.25, 0, 0.08);
@@ -1474,9 +1477,9 @@
       // Ambient companion swing motion in breeze
       landmarkAnimators.push((dt) => {
         if (companionSwingPivot) {
-          if (!calm()) {
+          if (!calm() && breezeOn()) {
             companionSwingPivot.rotation.x = Math.sin(performance.now() * 0.0018) * 0.08;
-          } else {
+          } else if (calm()) {
             companionSwingPivot.rotation.x = 0;
           }
         }
@@ -1800,7 +1803,7 @@
 
       // Living organic breeze animator: continuous swaying for trees, grass tufts, and flowers
       landmarkAnimators.push((dt) => {
-        if (calm()) return false;
+        if (calm() || !breezeOn()) return false;
         const t = performance.now() * 0.001;
         for (let i = 0; i < windTrees.length; i++) {
           const wt = windTrees[i];
@@ -1859,6 +1862,7 @@
 
       // Animate balloons swaying in breeze
       landmarkAnimators.push((dt) => {
+        if (!breezeOn()) return false;
         if (!calm()) {
           const t = performance.now() * 0.0016;
           balloonsGroup.rotation.z = Math.sin(t) * 0.06;
@@ -1882,6 +1886,7 @@
 
       butterflies.forEach((bcfg, idx) => {
         const bGroup = new T.Group();
+        bGroup.position.set(bcfg.cx, 0.45 + bcfg.h, bcfg.cz);
         const mat = butterflyMats[idx % butterflyMats.length];
 
         const wingGeo = new T.PlaneGeometry(0.12, 0.09);
@@ -1895,6 +1900,7 @@
         parent.add(bGroup);
 
         landmarkAnimators.push((dt) => {
+          if (!breezeOn()) return false;
           if (!calm()) {
             const time = performance.now() * 0.001 * bcfg.speed;
             const flap = Math.sin(time * 24) * 0.85;
@@ -2151,7 +2157,7 @@
         parent.add(boat);
 
         landmarkAnimators.push((dt) => {
-          wheelGroup.rotation.z += dt * (1.5 + paddleBoost * 7.0);
+          wheelGroup.rotation.z += dt * ((breezeOn() ? 1.5 : 0) + paddleBoost * 7.0);
           if (paddleBoost > 0.001) {
             steamMat.opacity = Math.sin(paddleBoost * Math.PI) * 0.75;
             steam1.position.y = 2.1 + (1 - paddleBoost) * 0.6;
@@ -2204,7 +2210,7 @@
         parent.add(turbine);
 
         landmarkAnimators.push((dt) => {
-          const baseSpd = calm() ? 0 : 0.8;
+          const baseSpd = calm() || !breezeOn() ? 0 : 0.8;
           bladesGroup.rotation.z += (baseSpd + spinBoost) * dt;
           if (spinBoost > 0.01) {
             spinBoost = Math.max(0, spinBoost - dt * 2.5);
@@ -2265,7 +2271,7 @@
         parent.add(lightGroup);
 
         landmarkAnimators.push((dt) => {
-          const baseSpd = calm() ? 0 : 0.6;
+          const baseSpd = calm() || !breezeOn() ? 0 : 0.6;
           beamGroup.rotation.y += (baseSpd + sweepBoost) * dt;
           if (sweepBoost > 0.01) {
             sweepBoost = Math.max(0, sweepBoost - dt * 1.5);
@@ -2599,7 +2605,7 @@
       sayAhaan(item.greeting, item.sub, item.flag, `${item.lang} · ${item.country}`);
 
       // Start arm wave animation on character model
-      if (A.startWave) {
+      if (!isInitial && !calm() && A.startWave) {
         A.startWave();
         waveTimer = 3.8;
       }
@@ -3570,6 +3576,8 @@
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
       if (calm()) return;
+      if (isDown && hero.classList.contains("scn-paused")) return;
+      if (isDown && e.key !== "Escape" && e.target.closest && e.target.closest("button, a, input, select, textarea, [contenteditable]")) return;
       const code = e.code || "";
       const key = e.key || "";
       let handled = false;
@@ -3789,11 +3797,28 @@
     // ==========================================
     let raf = 0, last = performance.now();
     function render() { renderer.render(scene, camera); }
-    function wake() { if (!raf && !calm()) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+    function motionPaused() { return calm() || document.hidden || hero.classList.contains("scn-paused"); }
+    function breezeOn() { return !hero.classList.contains("breeze-off"); }
+    function wake() { if (!raf && !motionPaused()) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+
+    // Apply motion changes to an active loop as well as new interactions.
+    function syncMotion() {
+      if (motionPaused()) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        Object.keys(keys).forEach(key => { keys[key] = false; });
+      } else {
+        wake();
+      }
+    }
+    new MutationObserver(syncMotion).observe(hero, { attributes: true, attributeFilter: ["class"] });
+    new MutationObserver(syncMotion).observe(document.documentElement, { attributes: true, attributeFilter: ["data-motion"] });
+    matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", syncMotion);
+    document.addEventListener("visibilitychange", syncMotion);
 
     function frame(now) {
       raf = 0;
-      if (document.hidden) return;
+      if (motionPaused()) return;
 
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
@@ -3888,7 +3913,7 @@
       const anyParticlesActive = updateParticles(dt);
 
       // Drift storybook clouds if motion is allowed
-      if (!calm() && clouds) {
+      if (breezeOn() && clouds) {
         clouds.forEach(cl => {
           cl.position.x += cl.userData.speed * dt;
           if (cl.position.x > 75) cl.position.x = -75;
