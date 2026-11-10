@@ -432,3 +432,13 @@ Nishant decided to publish the site. The worker merged and pushed. The worker di
 - The local `main` branch in the main checkout is still at `dd564b2`. `origin/main` is ahead.
 - Before a `git pull` in the main checkout, move the untracked `HANDOFF.md` aside. The pull brings in a tracked `HANDOFF.md` with the same name, so Git will refuse to overwrite the untracked file.
 - Worktree `.worktrees/publish-main` can be removed with `git worktree remove .worktrees/publish-main`.
+
+## Signboard and texture audit — Nov 10, 2026
+
+- Six state-direction signs and one lazy-river sign exist.
+- State sign labels now shrink to fit the 144 px canvas width.
+- Close-view checks for sign direction, readability, flicker, and planted posts remain incomplete.
+- Before and after screenshots of three signs were not captured.
+- Existing detail includes lilies, lotus flowers, rocks, pebble and sand banks, docks, bridge planks, rails, and posts.
+- No water ripples or edge foam were found. No added reeds or beach balls were found.
+- No texture pass was made. Motion preference checks for water remain incomplete.

@@ -1718,7 +1718,11 @@
         g.fillStyle = "#ffffff";
         g.font = "bold 20px sans-serif";
         g.textAlign = "center";
-        g.fillText(`${arrow} ${label}`, 80, 35);
+        const labelText = `${arrow} ${label}`;
+        while (g.measureText(labelText).width > 144 && parseInt(g.font, 10) > 12) {
+          g.font = `bold ${parseInt(g.font, 10) - 1}px sans-serif`;
+        }
+        g.fillText(labelText, 80, 35, 144);
         const tex = new T.CanvasTexture(c);
         tex.encoding = T.sRGBEncoding;
 
