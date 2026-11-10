@@ -1,5 +1,18 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Lazy river bridge verification — Nov 10, 2026
+
+- The source measurements report a 2.1 m underside and 0.22–0.36 m head overlap.
+- The new shared profile sets a 2.84 m baseline underside and a 0.46 m arch.
+- The two Mississippi spans use the segmented bridge mesh.
+- The four lazy river spans now use `bridgeDeckHeight()` for deck segment heights.
+- `groundHeightAt()` raises Ahaan during walking on each radial bridge span.
+- Browser load passed with no JavaScript errors.
+- Four over-crossing screenshots were saved under `/tmp/ahaan-lazy-river/over-*.png`.
+- Floating-under screenshots were not captured. The browser run did not exercise the float path.
+- Trampoline, signboard, texture pass, and full sensory checks remain unverified.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+
 Written by Goku (Muse) on Nov 9, 2026, after the Antigravity session on this
 project stopped mid-work (budget expired). Purpose: any coding agent (Codex,
 Claude Code) can pick the work up cold from this file.
