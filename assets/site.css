@@ -940,7 +940,7 @@
   @keyframes scnGrassB { from { transform: skewX(4deg); } to { transform: skewX(-4deg); } }
   .breeze-off .scn-anim, .scn-paused .scn-anim { animation-play-state: paused; }
   .breeze-btn { font: inherit; cursor: pointer; justify-content: center; }
-  .breeze-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .breeze-pill:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
   html[data-motion="off"] .scn-anim { animation: none; }
   html[data-motion="off"] .breeze-btn { display: none; }
   @media (prefers-reduced-motion: reduce) { .scn-anim { animation: none; } .breeze-btn { display: none; } }
