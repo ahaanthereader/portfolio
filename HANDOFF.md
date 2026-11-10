@@ -435,6 +435,14 @@ Nishant decided to publish the site. The worker merged and pushed. The worker di
 
 ## Signboard and texture audit — Nov 10, 2026
 
+### Sign evidence follow-up
+
+- Chrome saved `/tmp/ahaan-lazy-river/sign-entrance.png`, `sign-missouri.png`, and `sign-mississippi.png`.
+- The camera framing placed Ahaan in front of the boards. The views do not establish path readability or board direction.
+- Visible portions show no clear text overflow, but all three text-fit checks remain inconclusive.
+- The screenshots show board edges and posts. They do not prove the posts meet the ground.
+- Keep the sign audit open. Do not treat these images as passing evidence.
+
 - Six state-direction signs and one lazy-river sign exist.
 - State sign labels now shrink to fit the 144 px canvas width.
 - Close-view checks for sign direction, readability, flicker, and planted posts remain incomplete.
