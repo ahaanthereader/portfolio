@@ -2,6 +2,14 @@
 
 ## Lazy river bridge verification — Nov 10, 2026
 
+### Trampoline browser retry
+
+- Fresh Chrome completed a 20-second sample with no JavaScript errors.
+- Apex: rig y=6.648 m at x=−4.3, z=0.2. Screenshot: `/tmp/ahaan-lazy-river/trampoline-apex.png`.
+- Landing: rig y=5.387 m at x=−4.3, z=0.2. Screenshot: `/tmp/ahaan-lazy-river/trampoline-landing.png`.
+- The mat base is at rig base + 0.54 m. The observed landing is within the bounce cycle near the mat.
+- Side-step exit and sustained repeated-bounce behavior were not verified.
+
 - The source measurements report a 2.1 m underside and 0.22–0.36 m head overlap.
 - The new shared profile sets a 2.84 m baseline underside and a 0.46 m arch.
 - The two Mississippi spans use the segmented bridge mesh.
