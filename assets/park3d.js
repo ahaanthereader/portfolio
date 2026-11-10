@@ -17,11 +17,14 @@
 
   // Sensory-friendly audio settings: silent until enabled
   const SKEY = "ahaanDoorsSound";
-  let soundOn = false;
+  let soundOn = false, soundVol = null;
   try {
     const s = JSON.parse(localStorage.getItem(SKEY));
     if (s) soundOn = !!s.on;
+    // Keep the volume that Ahaan set on the Bells or Doors page. The home toggle must not make sound louder.
+    if (s && typeof s.vol === "number") soundVol = s.vol;
   } catch (e) {}
+  if (soundVol !== null && window.AhaanAudio) window.AhaanAudio.setVolume(soundVol / 100);
 
   const soundBtn = document.getElementById("soundBtn");
   function syncSoundUI() {
@@ -33,7 +36,7 @@
   if (soundBtn) {
     soundBtn.addEventListener("click", () => {
       soundOn = !soundOn;
-      try { localStorage.setItem(SKEY, JSON.stringify({ on: soundOn, vol: 60 })); } catch (e) {}
+      try { localStorage.setItem(SKEY, JSON.stringify({ on: soundOn, vol: soundVol === null ? 60 : soundVol })); } catch (e) {}
       syncSoundUI();
       if (soundOn && window.AhaanAudio) {
         window.AhaanAudio.bell(523.25, 0, 0.08);
