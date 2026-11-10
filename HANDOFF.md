@@ -437,6 +437,15 @@ Nishant decided to publish the site. The worker merged and pushed. The worker di
 
 ### Sign evidence follow-up
 
+#### Clear-frame retry
+
+- Ahaan moved to the map centre before each screenshot.
+- New views: `/tmp/ahaan-lazy-river/sign-entrance-clear.png`, `sign-missouri-clear.png`, and `sign-mississippi-clear.png`.
+- Entrance: text fits — No; faces path — No; readable — No. The board is edge-on and partly outside frame.
+- Missouri: text fits — Yes; faces path — No; readable — No. A post blocks the text, and bridge parts cover the view.
+- Mississippi: text fits — Yes; faces path — No; readable — No. Bridge parts obstruct the board.
+- Camera framing still cannot show three clean path views. Stop this audit here.
+
 - Chrome saved `/tmp/ahaan-lazy-river/sign-entrance.png`, `sign-missouri.png`, and `sign-mississippi.png`.
 - The camera framing placed Ahaan in front of the boards. The views do not establish path readability or board direction.
 - Visible portions show no clear text overflow, but all three text-fit checks remain inconclusive.
