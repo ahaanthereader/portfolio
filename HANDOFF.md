@@ -357,3 +357,40 @@ Numbers and "biggest" facts to check in a book:
 - Northern Cyprus and Somaliland have no flag emoji. Their pages show 🗺️. The flag stripes still show their colours.
 - The flag stripes show three main colours. The stripes are not a drawing of the flag. Some stripes look like another flag (for example, the United States stripes look like the Netherlands flag). The emoji next to the stripes shows the real flag.
 - The brief asked for 177 pages. The real number is 176 (see "Count").
+
+## Worker update: publish — Nov 10, 2026
+
+Nishant decided to publish the site. The worker merged and pushed. The worker did not force-push.
+
+### Merge
+
+- The main checkout had untracked files (`HANDOFF.md` and three `FEATURE-BRIEF-*.md` files). The merge brings in a tracked `HANDOFF.md`, so the merge could not run in the main checkout.
+- The worker used a clean worktree: `.worktrees/publish-main`, detached at `origin/main` (`dd564b2`).
+- Merge commit: `77ed2ed` ("Merge feature/country-book: publish Ahaan's Country Book"). The merge had no conflicts.
+- The merge publishes three commits: `c8d5446` (home motion controls), `5f51f15` (saved sound volume and medal motion) and `0fd3edd` (Ahaan's Country Book).
+- Push: `dd564b2..77ed2ed` to `origin main`.
+
+### Deploy
+
+- Workflow: "Deploy to GitHub Pages".
+- Run: `42773091642` (https://github.com/ahaanthereader/portfolio/actions/runs/42773091642).
+- Commit: `77ed2edf729a68021145e8efd8e43c2f0fbf38af`.
+- Result: success. The run started at 07:07:25 UTC and ended at 07:07:48 UTC on Nov 10, 2026.
+
+### Live check (Chrome, 1280 × 800)
+
+- `https://ahaanthereader.github.io/portfolio/sketchbook.html`: HTTP 200. The title is "Ahaan's Country Book · Ahaan's World". The cover says "176 countries and places". The page has no iframe and no link to the Meng To page. `COUNTRY_BOOK` has 176 entries. `#india` shows India, New Delhi, "Page 70 of 176".
+- `https://ahaanthereader.github.io/portfolio/`: HTTP 200. The 3D park canvas renders. The Sound button shows "Sound: off". No AudioContext exists at load.
+- `https://ahaanthereader.github.io/portfolio/geography.html`: HTTP 200. The "📖 Open the Country Book" link exists. A click opens the Country Book cover.
+- No JavaScript errors and no console errors on the three pages.
+- Screenshots: `/tmp/ahaan-live/live-sketchbook.png`, `/tmp/ahaan-live/live-index.png`, `/tmp/ahaan-live/live-geography.png`.
+
+### Not done (stays for Nishant)
+
+- The custom domain `ahaanadhikari.com` is NOT wired. The domain needs Porkbun DNS changes and a Pages admin. See "custom domain check" above for the steps.
+
+### Local state after the publish
+
+- The local `main` branch in the main checkout is still at `dd564b2`. `origin/main` is ahead.
+- Before a `git pull` in the main checkout, move the untracked `HANDOFF.md` aside. The pull brings in a tracked `HANDOFF.md` with the same name, so Git will refuse to overwrite the untracked file.
+- Worktree `.worktrees/publish-main` can be removed with `git worktree remove .worktrees/publish-main`.
