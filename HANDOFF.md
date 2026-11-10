@@ -14,12 +14,13 @@
 - The four captures show different points on the loop, not one view at each bridge.
 - Therefore the images do not prove head clearance under all four bridges.
 - Observed head clearance remains unconfirmed. The float rig reported local head position y=1.48 m and tube center y≈0.22–0.26 m.
-- Numeric browser check placed the tube at each bridge centre and measured the head with `THREE.Box3.setFromObject(A.head)`.
-- North: head top 5.591 m; deck underside 3.245 m; gap −2.346 m.
-- East: head top 5.591 m; deck underside 3.245 m; gap −2.346 m.
-- South: head top 5.591 m; deck underside 3.245 m; gap −2.346 m.
-- West: head top 5.591 m; deck underside 3.245 m; gap −2.346 m.
-- The measurement reveals a coordinate-space or placement error. Do not claim float clearance until corrected and remeasured.
+- Correction: the prior check compared world-space head height with bridge-local underside height. Those values used different coordinate spaces.
+- At a plain float spot, rig world y was 4.971 m and seated head top was 5.503 m.
+- At the four bridge centres, rig world y was 4.971 m and seated head top was 5.723 m.
+- The additional 0.22 m came from placing the tube centre at local y=0.22 m during the check.
+- The bridge underside is 3.245 m above its map origin. Add the map group's world y before comparing it with the head.
+- Correct gap formula: `(mapGroup world y + 3.245 m) - measured head top`. The map group's world y was not captured in this run.
+- Float clearance remains unconfirmed. The prior negative gaps are invalid and must not guide a clearance change.
 - Trampoline, signboard, texture pass, and full sensory checks remain unverified.
 - `node --check assets/park3d.js` and `git diff --check` passed.
 
