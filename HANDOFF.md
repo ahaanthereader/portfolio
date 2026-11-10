@@ -257,3 +257,103 @@ Result: the worker did not wire the domain. Two steps need access that the worke
 - All site paths are relative. The move from `/portfolio/` to the domain root will not break links.
 - After step 7, `ahaanthereader.github.io/portfolio/` will redirect to `ahaanadhikari.com`.
 - A worker with admin access and Porkbun access can do steps 1 to 10. Nishant can also add a Porkbun API key or give the worker admin access.
+
+## Worker update: Ahaan's Country Book — Nov 10, 2026
+
+The worker made a local commit only. The worker did not merge, push or publish.
+
+### Where the work is
+
+- Branch: `feature/country-book`. The worker created the branch from `other-pages-check` at `5f51f15`.
+- Worktree: `.worktrees/country-book`.
+- Commit: see `git log -1 feature/country-book`. The commit message starts with "feat: add Ahaan's Country Book".
+
+### What changed
+
+- `sketchbook.html`: the Meng To iframe is gone. The page is now "Ahaan's Country Book". The title, the meta description, the icon and the section text are new.
+- `assets/country-data.js` (new): one line for each country or place. The header tells Ahaan how to fix a fact.
+- `assets/country-book.js` (new): one template draws every page from the data.
+- `assets/country-book.css` (new): the book styles.
+- `geography.html`: one new link, "Open the Country Book", in the map legend.
+- `assets/site.css`: three new lines for that link.
+- The nav label on every page is still "Sketchbook". The brief did not allow other page changes.
+
+### Count
+
+- The Geography map has 175 named shapes. The brief said 176, but that count included the page `<title>` tag.
+- The book has 176 pages: the 175 map names plus Singapore.
+- Data entries: 176. Book pages: 176. Contents entries: 176.
+- Each map name is used exactly once. A build check confirmed this.
+- 166 entries are countries. 10 entries are places: Falkland Islands, Greenland, Kosovo, New Caledonia, Northern Cyprus, Palestine, Puerto Rico, Somaliland, Taiwan and Western Sahara.
+- Each place page says "A place in …" and has one sentence that explains the place.
+
+### The book
+
+- Cover: "Ahaan's Country Book", "176 countries and places", "By Ahaan", and a "See the map" link to geography.html.
+- Contents: an A to Z list with the capital and the page number. A search box finds a name or a capital. The search ignores accents, so "cote" finds Côte d'Ivoire. Enter opens the first match.
+- Country page order: name, flag stripes and flag emoji, capital, continent, language, currency, famous place, fun fact.
+- Controls: Previous, Contents, Next, and "Page X of 176". The left and right arrow keys turn pages. The arrow keys do not turn pages in the search box or the menu.
+- Each page has its own address, for example `sketchbook.html#india`.
+- No sound. Nothing moves by itself. A short page slide (0.3 s) plays only when the system allows motion and Motion is not off.
+
+### Verified (Chrome, local server on port 8767)
+
+- No JavaScript error and no console error on desktop (1280 × 800) or mobile (390 × 844).
+- No empty field in any of the 176 entries. Each entry has three flag colours.
+- Keyboard only: Tab reaches Next after 11 stops. Enter opens Contents. Tab reaches the search box. Typing "singa" and Enter opens Singapore, page 137.
+- Focus rings: 3 px solid on the buttons, the search box, the contents names and the page heading after a jump.
+- ArrowRight walked all 176 pages in A to Z order from Afghanistan to Zimbabwe. All 176 names were different. Each page had a capital and 5 filled facts in the correct order.
+- Reduced motion: 0 animations after a page turn. Motion off: 0 animations. Normal motion: one `cbTurnNext` slide. 0 animations at load.
+- The "See the map" link and the "Open the Country Book" link both work.
+- Tap on Next works on the mobile size. No horizontal scroll on the mobile size.
+- At 1280 × 800 and at 1440 × 900, every country page fits with no inside scroll.
+
+### Screenshots
+
+- Folder: `/tmp/ahaan-country-book/`.
+- Desktop: `desktop-cover.png`, `desktop-contents.png`, `desktop-singapore.png`, `desktop-india.png`, `desktop-united-states.png`, `desktop-geography-link.png`.
+- Mobile: `mobile-cover.png`, `mobile-contents.png`, `mobile-singapore.png`, `mobile-india.png`, `mobile-united-states.png`.
+- Test scripts are in the worker scratchpad. They are temporary.
+
+### Meng To files
+
+- `sketchbook.html` no longer links to `public/landing-pages/meng-to-sketchbook.html`. That page and `landing-pages/meng-to-sketchbook.html` are now unlinked. The worker did not delete them.
+- Warning: do NOT delete the folder `public/landing-pages/meng-to-sketchbook/`. The site still uses images from that folder:
+  - `assets/site.css` uses `bg-wash.jpg` as the background of every inner page (3 places).
+  - `index.html` uses `botany-left.png` and `botany-right.png`.
+- If Nishant wants to remove all Meng To material, first move those three images to `assets/` and update the paths.
+
+### Facts for Ahaan to check
+
+Capitals that have a special case:
+- Indonesia: Jakarta. Indonesia is building a new capital, Nusantara. The move is not complete.
+- Israel: Jerusalem. Many countries keep their embassies in Tel Aviv.
+- Palestine: the page says "Seat of government: Ramallah". Palestine names East Jerusalem as its capital.
+- Western Sahara: the page says "Largest city: Laayoune". Countries do not agree about a capital.
+- Yemen: Sanaa. The recognised government works from Aden.
+- Equatorial Guinea: Malabo. A new capital, Ciudad de la Paz, is under construction.
+- Entries with two or three capitals: Benin, Bolivia, Burundi, Côte d'Ivoire, Eswatini, Netherlands, South Africa and Sri Lanka.
+
+Languages and money that changed in recent years:
+- Bulgaria: Euro (from January 1, 2026).
+- Burkina Faso, Mali and Niger: these countries changed the status of French between 2023 and 2025.
+- Zimbabwe: Zimbabwe Gold (ZiG) and US dollar.
+- Ethiopia: five working languages.
+- United States: English. English became the official language by an executive order in 2025.
+
+Continents that books show in different ways:
+- Cyprus and Northern Cyprus: the book says Europe. On a map, the island is in Asia.
+- Armenia, Azerbaijan and Georgia: the book says Asia. Some books say Europe.
+- Russia: Europe and Asia. Turkey: Asia and Europe.
+
+Numbers and "biggest" facts to check in a book:
+- Bahamas (about 700 islands), Croatia (more than 1,000), Estonia (more than 2,000), Fiji (more than 300), Japan (more than 14,000), Philippines (more than 7,600), Finland (about 188,000 lakes).
+- Ganvié (about 20,000 people), Latvia (forest on about half), Libya (desert on more than 90 percent), Tajikistan (mountains on more than 90 percent), Lesotho (all land above 1,000 m), Uganda (about half of the mountain gorillas).
+- Superlatives: Belize reef (second-largest), Colombia (most bird kinds), Lake Malawi (most fish kinds), Marovo Lagoon, New Caledonia Lagoon, Slovakia (most cars for each person), Kuwaiti dinar, Kaieteur Falls, Sudan pyramids, Lake Ohrid, Azerbaijan mud volcanoes.
+
+### Decisions for Nishant
+
+- Kosovo, Palestine and Taiwan are "places" in the book. Each page says that countries do not agree. Nishant can change `kind` to "country" in `assets/country-data.js`.
+- Northern Cyprus and Somaliland have no flag emoji. Their pages show 🗺️. The flag stripes still show their colours.
+- The flag stripes show three main colours. The stripes are not a drawing of the flag. Some stripes look like another flag (for example, the United States stripes look like the Netherlands flag). The emoji next to the stripes shows the real flag.
+- The brief asked for 177 pages. The real number is 176 (see "Count").

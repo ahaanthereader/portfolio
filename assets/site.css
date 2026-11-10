@@ -222,6 +222,9 @@
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; font-size: .82rem; font-weight: 700; color: var(--ink-soft); }
   .map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .map-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  /* Link from the map to Ahaan's Country Book (sketchbook.html). */
+  .geo-book-link { margin-left: auto; color: #2a4532; font-size: .95rem; text-underline-offset: 3px; border-radius: 4px; }
+  .geo-book-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
   /* fact box floats over the empty ocean at the bottom of the map */
   .fact-box { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26px; z-index: 4;
     width: min(560px, calc(100% - 48px));
