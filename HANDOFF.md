@@ -10,6 +10,10 @@
 - Browser load passed with no JavaScript errors.
 - Four over-crossing screenshots were saved under `/tmp/ahaan-lazy-river/over-*.png`.
 - Floating-under screenshots were not captured. The browser run did not exercise the float path.
+- Follow-up float check entered the lazy river and saved `under-1.png` through `under-4.png`.
+- The four captures show different points on the loop, not one view at each bridge.
+- Therefore the images do not prove head clearance under all four bridges.
+- Observed head clearance remains unconfirmed. The float rig reported local head position y=1.48 m and tube center y≈0.22–0.26 m.
 - Trampoline, signboard, texture pass, and full sensory checks remain unverified.
 - `node --check assets/park3d.js` and `git diff --check` passed.
 
