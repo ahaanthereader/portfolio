@@ -1,5 +1,43 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Lazy river bridge verification — Nov 10, 2026
+
+### Trampoline browser retry
+
+- Fresh Chrome completed a 20-second sample with no JavaScript errors.
+- Apex: rig y=6.648 m at x=−4.3, z=0.2. Screenshot: `/tmp/ahaan-lazy-river/trampoline-apex.png`.
+- Landing: rig y=5.387 m at x=−4.3, z=0.2. Screenshot: `/tmp/ahaan-lazy-river/trampoline-landing.png`.
+- The mat base is at rig base + 0.54 m. The observed landing is within the bounce cycle near the mat.
+- Side-step exit and sustained repeated-bounce behavior were not verified.
+
+- The source measurements report a 2.1 m underside and 0.22–0.36 m head overlap.
+- The new shared profile sets a 2.84 m baseline underside and a 0.46 m arch.
+- The two Mississippi spans use the segmented bridge mesh.
+- The four lazy river spans now use `bridgeDeckHeight()` for deck segment heights.
+- `groundHeightAt()` raises Ahaan during walking on each radial bridge span.
+- Browser load passed with no JavaScript errors.
+- Four over-crossing screenshots were saved under `/tmp/ahaan-lazy-river/over-*.png`.
+- Floating-under screenshots were not captured. The browser run did not exercise the float path.
+- Follow-up float check entered the lazy river and saved `under-1.png` through `under-4.png`.
+- The four captures show different points on the loop, not one view at each bridge.
+- Therefore the images do not prove head clearance under all four bridges.
+- Observed head clearance remains unconfirmed. The float rig reported local head position y=1.48 m and tube center y≈0.22–0.26 m.
+- Correction: the prior check compared world-space head height with bridge-local underside height. Those values used different coordinate spaces.
+- At a plain float spot, rig world y was 4.971 m and seated head top was 5.503 m.
+- At the four bridge centres, rig world y was 4.971 m and seated head top was 5.723 m.
+- The additional 0.22 m came from placing the tube centre at local y=0.22 m during the check.
+- The bridge underside is 3.245 m above its map origin. Add the map group's world y before comparing it with the head.
+- Correct gap formula: `(mapGroup world y + 3.245 m) - measured head top`. The map group's world y was not captured in this run.
+- Float clearance remains unconfirmed. The prior negative gaps are invalid and must not guide a clearance change.
+- Follow-up browser check read the active scene graph after starting the float activity.
+- The bridge map group's world y is 0.000 m. The tube's world y is 0.222 m.
+- Recomputed the seated head box after updating world matrices: head top is 2.616 m.
+- At bridge centre, underside is 3.245 m. Final measured gap is 0.629 m.
+- The old 5.503 m baseline came from a stale matrix after direct object repositioning. It is invalid.
+- Float clearance passes at the tested centre pose by 0.629 m. Four separate bridge-centre head-box checks remain recommended.
+- Trampoline, signboard, texture pass, and full sensory checks remain unverified.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+
 Written by Goku (Muse) on Nov 9, 2026, after the Antigravity session on this
 project stopped mid-work (budget expired). Purpose: any coding agent (Codex,
 Claude Code) can pick the work up cold from this file.
@@ -394,3 +432,30 @@ Nishant decided to publish the site. The worker merged and pushed. The worker di
 - The local `main` branch in the main checkout is still at `dd564b2`. `origin/main` is ahead.
 - Before a `git pull` in the main checkout, move the untracked `HANDOFF.md` aside. The pull brings in a tracked `HANDOFF.md` with the same name, so Git will refuse to overwrite the untracked file.
 - Worktree `.worktrees/publish-main` can be removed with `git worktree remove .worktrees/publish-main`.
+
+## Signboard and texture audit — Nov 10, 2026
+
+### Sign evidence follow-up
+
+#### Clear-frame retry
+
+- Ahaan moved to the map centre before each screenshot.
+- New views: `/tmp/ahaan-lazy-river/sign-entrance-clear.png`, `sign-missouri-clear.png`, and `sign-mississippi-clear.png`.
+- Entrance: text fits — No; faces path — No; readable — No. The board is edge-on and partly outside frame.
+- Missouri: text fits — Yes; faces path — No; readable — No. A post blocks the text, and bridge parts cover the view.
+- Mississippi: text fits — Yes; faces path — No; readable — No. Bridge parts obstruct the board.
+- Camera framing still cannot show three clean path views. Stop this audit here.
+
+- Chrome saved `/tmp/ahaan-lazy-river/sign-entrance.png`, `sign-missouri.png`, and `sign-mississippi.png`.
+- The camera framing placed Ahaan in front of the boards. The views do not establish path readability or board direction.
+- Visible portions show no clear text overflow, but all three text-fit checks remain inconclusive.
+- The screenshots show board edges and posts. They do not prove the posts meet the ground.
+- Keep the sign audit open. Do not treat these images as passing evidence.
+
+- Six state-direction signs and one lazy-river sign exist.
+- State sign labels now shrink to fit the 144 px canvas width.
+- Close-view checks for sign direction, readability, flicker, and planted posts remain incomplete.
+- Before and after screenshots of three signs were not captured.
+- Existing detail includes lilies, lotus flowers, rocks, pebble and sand banks, docks, bridge planks, rails, and posts.
+- No water ripples or edge foam were found. No added reeds or beach balls were found.
+- No texture pass was made. Motion preference checks for water remain incomplete.

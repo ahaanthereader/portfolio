@@ -590,6 +590,25 @@
       });
     }
 
+    // One profile drives bridge geometry and the walking route height.
+    function bridgeDeckHeight(u, bankY = 0.32) {
+      const t = Math.max(0, Math.min(1, u));
+      return bankY + 2.84 + 0.46 * Math.sin(Math.PI * t);
+    }
+
+    function groundHeightAt(x, z, baseY) {
+      const r = 8.8, halfSpan = 2.3;
+      const bridges = [[0,-1],[1,0],[0,1],[-1,0]];
+      for (const [dx,dz] of bridges) {
+        const cx=dx*r, cz=dz*r, along=(x-cx)*dx+(z-cz)*dz;
+        const across=Math.abs((x-cx)*dz-(z-cz)*dx);
+        if (Math.abs(along)<=halfSpan && across<=1.15) {
+          return Math.max(baseY, bridgeDeckHeight((along+halfSpan)/(2*halfSpan),0)+0.08);
+        }
+      }
+      return baseY;
+    }
+
     function buildRiver(parent, T, walkables) {
       const riverGeo = new T.PlaneGeometry(4.6, 78, 1, 48);
       riverGeo.rotateX(-Math.PI / 2);
@@ -612,35 +631,28 @@
       river.position.y = 0.14;
       parent.add(river);
 
-      function makeBridge(bx, bz, rot) {
+      function makeBridge(bx, bz, rot, length = 6.4, width = 2.6, bankY = 0.32) {
         const b = new T.Group();
-        b.position.set(bx, 0.32, bz);
+        b.position.set(bx, 0, bz);
         b.rotation.y = rot;
         const woodMat = new T.MeshStandardMaterial({ color: 0x7a4928, roughness: 0.82 });
         const darkWoodMat = new T.MeshStandardMaterial({ color: 0x543218, roughness: 0.90 });
-
-        // Solid wood plank deck spanning riverbanks
-        const deck = new T.Mesh(new T.BoxGeometry(2.6, 0.16, 6.4), woodMat);
-        deck.castShadow = true;
-        deck.receiveShadow = true;
-        b.add(deck);
-        if (walkables) walkables.push(deck);
-
-        // Under-deck support beams and handrails
-        [-1.25, 1.25].forEach(x => {
-          const underBeam = new T.Mesh(new T.BoxGeometry(0.14, 0.28, 6.4), darkWoodMat);
-          underBeam.position.set(x, -0.14, 0);
-          b.add(underBeam);
-
-          const rail = new T.Mesh(new T.BoxGeometry(0.12, 0.44, 6.4), woodMat);
-          rail.position.set(x, 0.32, 0);
-          b.add(rail);
-
-          [-2.6, -1.3, 0, 1.3, 2.6].forEach(pz => {
-            const post = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 0.55, 8), darkWoodMat);
-            post.position.set(x, 0.26, pz);
-            b.add(post);
-          });
+        const segments = 16, half = length / 2;
+        const surface = new T.BufferGeometry(), verts = [], indices = [];
+        for (let i=0;i<=segments;i++) {
+          const u=i/segments, z=-half+length*u, y=bridgeDeckHeight(u,bankY);
+          verts.push(-width/2,y,z,width/2,y,z);
+          if(i<segments){const n=i*2;indices.push(n,n+1,n+2,n+1,n+3,n+2);}
+        }
+        surface.setAttribute('position',new T.Float32BufferAttribute(verts,3)); surface.setIndex(indices); surface.computeVertexNormals();
+        const deck=new T.Mesh(surface,woodMat);deck.castShadow=true;deck.receiveShadow=true;b.add(deck);if(walkables)walkables.push(deck);
+        for(let i=0;i<segments;i++){
+          const u=(i+.5)/segments,z=-half+length*u,y=bridgeDeckHeight(u,bankY)+.025;
+          const line=new T.Mesh(new T.BoxGeometry(width,.025,.035),darkWoodMat);line.position.set(0,y,z);b.add(line);
+        }
+        [-width/2-.28,width/2+.28].forEach(x=>{
+          for(let i=0;i<=segments;i+=4){const u=i/segments,z=-half+length*u,y=bridgeDeckHeight(u,bankY);const post=new T.Mesh(new T.CylinderGeometry(.07,.09,y+0.45,8),darkWoodMat);post.position.set(x,(y+.45)/2,z);b.add(post);}
+          const rail=new T.Mesh(new T.BoxGeometry(.12,.14,length),woodMat);rail.position.set(x,3.42+bankY,0);b.add(rail);
         });
         parent.add(b);
       }
@@ -848,8 +860,8 @@
           const z0 = -totalSpan * 0.5 + t0 * totalSpan;
           const z1 = -totalSpan * 0.5 + t1 * totalSpan;
           const zmid = (z0 + z1) * 0.5;
-          const arch0 = 0.48 + 1.85 * (1 - Math.pow(z0 / (totalSpan * 0.5), 2));
-          const arch1 = 0.48 + 1.85 * (1 - Math.pow(z1 / (totalSpan * 0.5), 2));
+          const arch0 = bridgeDeckHeight(t0, 0);
+          const arch1 = bridgeDeckHeight(t1, 0);
           const ymid = (arch0 + arch1) * 0.5;
           const dz = z1 - z0;
           const dy = arch1 - arch0;
@@ -1706,7 +1718,11 @@
         g.fillStyle = "#ffffff";
         g.font = "bold 20px sans-serif";
         g.textAlign = "center";
-        g.fillText(`${arrow} ${label}`, 80, 35);
+        const labelText = `${arrow} ${label}`;
+        while (g.measureText(labelText).width > 144 && parseInt(g.font, 10) > 12) {
+          g.font = `bold ${parseInt(g.font, 10) - 1}px sans-serif`;
+        }
+        g.fillText(labelText, 80, 35, 144);
         const tex = new T.CanvasTexture(c);
         tex.encoding = T.sRGBEncoding;
 
@@ -3886,7 +3902,7 @@
       }
 
       if (!currentActivity || activityPhase === 0) {
-        A.rig.position.y = rigBaseY; // Lock vertical baseline
+      A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
       }
 
       // Track speech bubble above Ahaan and update walk state
