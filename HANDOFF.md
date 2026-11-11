@@ -433,6 +433,17 @@ Nishant decided to publish the site. The worker merged and pushed. The worker di
 - Before a `git pull` in the main checkout, move the untracked `HANDOFF.md` aside. The pull brings in a tracked `HANDOFF.md` with the same name, so Git will refuse to overwrite the untracked file.
 - Worktree `.worktrees/publish-main` can be removed with `git worktree remove .worktrees/publish-main`.
 
+## Worker update: publish lazy-river bridges — Nov 10, 2026
+
+Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only that branch into the fetched `origin/main` in detached worktree `.worktrees/publish-bridges`.
+
+### Merge
+
+- The merge had no conflicts. Existing handoff records remain in this file.
+- Merge commit: `60d0ad7` ("Merge branch 'feature/lazy-river-bridges' into HEAD").
+- The merge adds the lazy-river bridge changes in `assets/park3d.js` and the branch handoff record.
+- Push and deploy details will be added after the publish check.
+
 ## Signboard and texture audit — Nov 10, 2026
 
 ### Sign evidence follow-up
