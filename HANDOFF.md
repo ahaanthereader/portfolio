@@ -442,7 +442,22 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - The merge had no conflicts. Existing handoff records remain in this file.
 - Merge commit: `60d0ad7` ("Merge branch 'feature/lazy-river-bridges' into HEAD").
 - The merge adds the lazy-river bridge changes in `assets/park3d.js` and the branch handoff record.
-- Push and deploy details will be added after the publish check.
+- Handoff commit: `9193ee7` ("docs: record lazy-river bridges publish").
+- Push: `399e409..9193ee7` to `origin main`.
+
+### Deploy
+
+- Workflow: "Deploy to GitHub Pages".
+- Run: `43137412650` (https://github.com/ahaanthereader/portfolio/actions/runs/43137412650).
+- Commit: `9193ee7d96cb75e815ee000adcb0dfb6cae7aefc`.
+- Result: success.
+
+### Live check
+
+- `https://ahaanthereader.github.io/portfolio/`: HTTP 200.
+- `assets/park3d.js`: HTTP 200. The deployed script contains the four lazy-river bridges and bridge deck geometry.
+- `node --check` on the fetched script passed.
+- Browser console check was not available because Computer Use setup was incomplete. Runtime errors were not verified.
 
 ## Signboard and texture audit — Nov 10, 2026
 
