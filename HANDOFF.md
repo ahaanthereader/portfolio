@@ -642,3 +642,23 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - No JavaScript errors, console errors, or failed requests appeared.
 - Screenshots: `/tmp/ahaan-aesops-fables/contents.png`, `fable-desktop.png`, and `fable-phone.png`.
 - `node --check assets/aesop-book.js`, `node --check assets/aesop-data.js`, and `git diff --check` passed.
+
+## Publish: bike + ice cream and Aesop's Fables — Nov 14, 2026
+
+- Merged `feature/bike-ice-cream` into main: commit `63e994b` (bike feature `ee0688d`, record `e8a50b4`).
+- Merged `feature/aesops-fables` into main: commit `7f0ddfa` (book `6ab184a`). HANDOFF.md had one conflict (both branches appended records); resolved by keeping both records, bike first.
+- Fast-forwarded main from `dd564b2` to `origin/main 8310cea` first. The main worktree had an untracked coordinator HANDOFF.md (135 lines, Nov 9 Goku copy with the overnight queue). Backed up to `/tmp/HANDOFF-coordinator-2026-11-14.md` before the fast-forward. The tracked HANDOFF.md (487 lines) is the workers' record.
+- Pushed `8310cea..7f0ddfa` to origin main.
+- GitHub Pages deploy run `43596574039` ("Merge branch 'feature/aesops-fables'") completed success in 20 s, 2026-11-14T12:47:59Z.
+- Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 176,534 bytes, bike code live: "ride the bike", "Mississippi" x10), https://ahaanthereader.github.io/portfolio/aesop.html (200, 2,068 bytes, shell links all three Aesop assets), `assets/aesop-data.js` (200, 8,655 bytes, all ten fable titles and morals present).
+- The local `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted in the main worktree. It was not part of this publish.
+- The two-player and Country Book v2 branches were not merged. They are still in progress.
+
+## Next briefs - overnight queue (Goku, updated Nov 14, 2026)
+
+1. FEATURE-BRIEF-bike-icecream.md — PUBLISHED live Nov 14 (63e994b)
+2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
+3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
+4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); blocked on the PageFlip download question (npm pack page-flip@2.0.7) — Nishant has not answered it
+5. FEATURE-BRIEF-capitals-quiz.md — next pickup once two-player lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
