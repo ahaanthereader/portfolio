@@ -485,3 +485,104 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - Existing detail includes lilies, lotus flowers, rocks, pebble and sand banks, docks, bridge planks, rails, and posts.
 - No water ripples or edge foam were found. No added reeds or beach balls were found.
 - No texture pass was made. Motion preference checks for water remain incomplete.
+
+## Bike and ice cream feature — Nov 10, 2026
+
+- Branch `feature/bike-ice-cream` starts at `24f68aba1d6a8e6a37c08499c22a4effe1fc1e62`, the tip of `feature/lazy-river-bridges`.
+- The bike and ice cream brief is `FEATURE-BRIEF-bike-icecream.md` in the main checkout. The branch worktree does not track that brief.
+- The approved spec is `_bmad-output/implementation-artifacts/spec-bike-ice-cream.md`. Feature code is in progress.
+- The existing park has no touch walking controls. The feature will record this choice instead of adding bike touch buttons.
+- Code inspection found bridge-aware `groundHeightAt()`, interaction prompts, raycast taps, and smooth camera follow in `assets/park3d.js`.
+- Code inspection found no walking collision system. Bike movement needs its own checks for water and solid obstacles.
+
+### Browser check — Nov 11, 2026
+
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- Desktop Chrome loaded the park with the canvas ready. Sound stayed off. The browser reported no console errors.
+- Ahaan walked near the parked bike. The prompt said “Press E to ride the bike.” E mounted the bike and showed “Press E to park the bike.” The E dismount key is not yet verified.
+- W turned both bike wheels. Wheel rotation changed by 5.25 radians during the ride.
+- At x=−0.65, z=8.55, Ahaan's rig y was 7.55 m on the south lazy-river bridge. This confirms bridge height tracking at that point.
+- The shop callback opened the picker while riding and dismounted Ahaan first. Escape closed the picker. E opened the picker near the counter. Strawberry produced a cone and status text.
+- Mobile Chrome at 390 × 844 displayed the flavour picker. No console errors appeared.
+- Screenshots: `/tmp/ahaan-bike-icecream/bike-parked.png`, `bike-riding.png`, `over-bridge.png`, `shop-front.png`, `flavour-picker.png`, `eating-cone.png`, `mobile-park.png`, and `mobile-picker.png`.
+- Visual review found that Ahaan's legs still looked too straight while riding. The shop sign was also blocked in the close view. Both points were addressed in the Nov 12 follow-up below.
+- Water stops and tree collision stops are not yet verified. Mississippi bridge crossings are not yet verified.
+
+## Riding pose and shop view — Nov 12, 2026
+
+- Raised the handlebars to meet Ahaan's hands. Bent his knees and elbows into a riding pose.
+- Added a small leg cycle while the bike moves. The pedals and wheels turn together.
+- Raised the shop sign above the awning. Added two sign supports.
+- Moved Ahaan to the right side for the close shop screenshot. The “Ice Cream” sign now reads clearly.
+- Captured and inspected `/tmp/ahaan-bike-icecream/rider-pose-close.png` and `/tmp/ahaan-bike-icecream/shop-front.png`.
+- The bridge screenshot still shows Ahaan on the south lazy-river bridge. The rig position was x=−0.65, z=10.95, y=7.15 m.
+- The updated Chrome run had no console errors. The wheel rotation changed by 9.22 radians during the ride.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- Tree collision stops and Mississippi bridge crossings still need checks.
+
+## E dismount check — Nov 12, 2026
+
+- Chrome mounted the bike with E and rode across the south lazy-river bridge.
+- E dismounted Ahaan after the bike reached the path.
+- Ahaan stood 1.55 m from the bike. His feet reached y=0.45 m, the path height.
+- The prompt returned to “Press E to ride the bike.”
+- Screenshot: `/tmp/ahaan-bike-icecream/e-dismount.png`. Visual review showed Ahaan standing beside the parked bike.
+- The browser run reported no console errors. Tree stops and Mississippi bridge crossings remained unverified at this check.
+
+## Water-edge stop check — Nov 12, 2026
+
+- Chrome mounted the bike with E. W and D steered the bike off the south bridge toward the lazy river.
+- The water boundary blocked the bike at x=0.918, z=8.336 m. The position was beside the bridge, at river radius 8.386 m.
+- After key release, the bike moved 0.002 m over 1.8 seconds. The bike remained stopped beside the water.
+- Screenshot: `/tmp/ahaan-bike-icecream/water-stop.png`. Visual review showed the bike at the water edge beside the bridge.
+- The ride and dismount checks also passed. E returned the prompt “Press E to ride the bike.” No browser console errors appeared.
+- Tree collision stops and Mississippi bridge crossings still need checks.
+
+## Tree collision stop check — Nov 13, 2026
+
+- Chrome mounted the bike with E. W rode it south along the path toward the oak at x=0, z=32 m.
+- The bike stopped at x=−0.65, z=30.739 m. Its distance from the tree center was 1.418 m, matching the oak collision radius plus clearance.
+- After key release, the bike moved 0.043 m over 1.8 seconds, then stayed at the tree boundary.
+- Screenshot: `/tmp/ahaan-bike-icecream/tree-stop.png`. The bike wheel appears beside the tree. The tree crown hides much of Ahaan in this camera view.
+- The browser run reported no console errors. E dismount still returned the prompt “Press E to ride the bike.”
+- Mississippi bridge crossings still need checks.
+
+## Mississippi bridge ride attempt — Nov 13, 2026
+
+- Chrome mounted the bike with E and rode across the south lazy-river bridge onto the park path.
+- The ride reached the west bank near the second Mississippi bridge. The bike stopped at x=11.546, z=8.781 m, before it entered the bridge deck.
+- Ahaan's rig y stayed at 4.631 m at the stopped position. The bike did not cross the Mississippi bridge in this run.
+- This attempt does not confirm Mississippi bridge height tracking or deck clearance. No bridge crossing screenshot was captured.
+- The first Mississippi bridge remains unverified. The second bridge needed an aligned retry.
+
+## Aligned Mississippi bridge ride — Nov 13, 2026
+
+- The first ride stopped just before the second Mississippi bridge. The water check rejected the bike before the bridge collision span began.
+- Extended the bike's river-bridge collision span from 6.4 m to 6.8 m. This lets the bike move from the bank onto the raised deck.
+- Started the browser ride at x=9.69, z=5.57 m, heading 1.05 radians. The ride faced the southwest deck entrance.
+- The bike entered the deck at x=11.253, z=6.467 m. Its across-deck offset was 0.006 m.
+- At the midpoint, x=13.976, z=8.028 m, the bike stayed 0.006 m from the deck centerline. The bike height was 3.576 m. The deck height was 3.616 m.
+- Ahaan's rig height at the midpoint was 7.877 m. The path height before the bridge was 4.631 m. The rig followed the raised deck profile.
+- The bike reached the far bank at x=17.363, z=9.971 m. The bike height returned to 0.06 m, and the rig returned to 4.631 m.
+- Screenshot: `/tmp/ahaan-bike-icecream/mississippi-bridge-aligned.png`. Visual review showed Ahaan and the bike near the bridge's far end.
+- Chrome reported no browser errors. The bike's original parked position was restored after the check.
+- The second Mississippi bridge crossing passed. The first bridge remained for the aligned check below.
+
+## First Mississippi bridge ride — Nov 13, 2026
+
+- The earlier aligned start at x=8.013, z=−3.391 m was blocked by the lazy-river ring check. The bike could not move from that point.
+- Let Mississippi bridge positions pass the lazy-river ring check. The bike can now ride onto the bridge from the southwest approach.
+- Started at x=8.382, z=−3.550 m, heading 1.98 radians. E mounted the bike. The prompt changed from “Press E to ride the bike.” to “Press E to park the bike.”
+- The bike entered the deck at x=8.566, z=−3.630 m. Its along-deck position was −3.198 m, and its centerline offset was 0.002 m.
+- At the midpoint, x=11.297, z=−4.814 m, the bike stayed 0.002 m from the centerline. Bike height was 3.577 m. Deck height was 3.617 m.
+- Ahaan's rig height was 7.878 m at the midpoint. The path height was 4.631 m. The rig followed the raised deck profile.
+- The bike stayed on the deck through x=14.422, z=−6.169 m. The bike then reached the far bank at x=15.374, z=−6.582 m, and returned to path height.
+- The wheels rotated 8.18 radians during the deck crossing. Chrome reported no browser errors.
+- Screenshot: `/tmp/ahaan-bike-icecream/mississippi-bridge-first-midpoint.png`. Visual review showed Ahaan and the bike on the bridge deck.
+- The bike's original parked position was restored after the check. Both Mississippi bridge crossings passed.
+
+## Local commit — Nov 13, 2026
+
+- Feature commit: `ee0688d` (`Add bike and ice cream feature`).
+- The commit contains the bike and ice cream work, collision adjustments, and verification notes.
+- The commit is local. No push was made.

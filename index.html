@@ -134,6 +134,22 @@
       <span class="act-label">Hop Off 🚪</span>
     </button>
   </div>
+
+  <div class="icecream-picker" id="iceCreamPicker" role="dialog" aria-modal="true" aria-labelledby="iceCreamTitle" hidden>
+    <section class="icecream-card">
+      <button class="icecream-close" type="button" data-close-picker aria-label="Close flavour picker">×</button>
+      <h2 id="iceCreamTitle">Which flavour?</h2>
+      <p>Choose a scoop for your cone.</p>
+      <div class="icecream-flavours">
+        <button type="button" data-flavor="Vanilla"><span class="flavour-dot vanilla"></span>Vanilla</button>
+        <button type="button" data-flavor="Chocolate"><span class="flavour-dot chocolate"></span>Chocolate</button>
+        <button type="button" data-flavor="Strawberry"><span class="flavour-dot strawberry"></span>Strawberry</button>
+        <button type="button" data-flavor="Mango"><span class="flavour-dot mango"></span>Mango</button>
+      </div>
+      <p class="icecream-live" aria-live="polite">You can come back for another cone.</p>
+    </section>
+  </div>
+  <p class="icecream-status" id="iceCreamStatus" role="status" aria-live="polite"></p>
 </section>
 </main>
 
