@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aesop's Fables · Ahaan's World</title>
+<meta name="description" content="Read ten Aesop's Fables in the 1912 Vernon Jones translation." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+<link rel="stylesheet" href="assets/site.css" />
+<link rel="stylesheet" href="assets/aesop-book.css" />
+</head>
+<body class="page-aesop">
+<a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="dot"></span>Ahaan's&nbsp;World</a>
+    <div class="aesop-nav-links">
+      <a href="sketchbook.html">Sketchbook</a>
+      <a href="aesop.html" aria-current="page">Aesop's Fables</a>
+    </div>
+  </div>
+</nav>
+<main id="main">
+  <section class="aesop-wrap" aria-labelledby="bookTitle">
+    <header class="aesop-heading">
+      <p class="aesop-eyebrow">A book to read</p>
+      <h1 id="bookTitle">Aesop's Fables</h1>
+      <p>Stories by Aesop, translated by V. S. Vernon Jones.</p>
+    </header>
+    <div class="aesop-book" id="aesopBook">
+      <div class="aesop-page" id="aesopPage" aria-live="polite" aria-atomic="true"></div>
+      <div class="aesop-controls" aria-label="Book controls">
+        <button type="button" class="aesop-btn" id="aesopPrev">‹ Previous</button>
+        <button type="button" class="aesop-btn secondary" id="aesopContents">Contents</button>
+        <span class="aesop-page-number" id="aesopPageNumber" aria-live="polite">10 fables</span>
+        <button type="button" class="aesop-btn" id="aesopNext">Next ›</button>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="aesop-footer"><a href="index.html">← Home</a> · <a href="sketchbook.html">Sketchbook</a></footer>
+<script src="assets/aesop-data.js"></script>
+<script src="assets/aesop-book.js"></script>
+</body>
+</html>

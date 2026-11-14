@@ -586,3 +586,59 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - Feature commit: `ee0688d` (`Add bike and ice cream feature`).
 - The commit contains the bike and ice cream work, collision adjustments, and verification notes.
 - The commit is local. No push was made.
+
+## Aesop’s Fables — IN PROGRESS (Nov 12, 2026)
+
+- Started branch `feature/aesops-fables` from `origin/main` at `8310cea`.
+- Worktree: `.worktrees/aesops-fables`.
+- Project Gutenberg confirms the edition title, translator, and 1912 publication.
+- Source: https://www.gutenberg.org/files/11339/11339-h/11339-h.htm
+- Catalog: https://www.gutenberg.org/ebooks/11339
+- Catalog title: “Aesop’s Fables; a new translation.” Translator: V. S. Vernon Jones.
+- The source text title page says “1912 Edition.” Gutenberg lists the original publication as New York: Avenel Books, 1912.
+- All ten requested fables appear in this edition. The source uses these titles:
+  1. “The Hare and the Tortoise” (brief: “The Tortoise and the Hare”).
+  2. “The Fox and the Grapes.”
+  3. “The Shepherd’s Boy and the Wolf” (brief: “The Boy Who Cried Wolf”).
+  4. “The Lion and the Mouse.”
+  5. “The Grasshopper and the Ants” (brief: “The Ant and the Grasshopper”).
+  6. “The Fox and the Crow.”
+  7. “The Wolf in Sheep’s Clothing.”
+  8. “The Goose That Laid the Golden Eggs” (brief: “The Goose with the Golden Eggs”).
+  9. “The Milkmaid and Her Pail.”
+  10. “The Oak and the Reeds.”
+- Title matches were checked against the Gutenberg contents and story headings.
+- No story text had been copied at the time of source verification.
+- Added only the first fable to `assets/aesop-data.js`, with the source title and moral label.
+- The story text and moral match the Gutenberg text at the source URL above.
+- Added the second fable, “The Fox and the Grapes,” with its exact source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the story’s final sentence word for word.
+- Added the third fable, “The Shepherd’s Boy and the Wolf,” with its source text and moral.
+- The source moral is “You cannot believe a liar even when he tells the truth.”
+- Added the fourth fable, “The Lion and the Mouse,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the story’s final phrase word for word.
+- Added the fifth fable, “The Grasshopper and the Ants,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Ants’ final statement word for word.
+- Added the sixth fable, “The Fox and the Crow,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Fox’s final phrase word for word.
+- Added the seventh fable, “The Wolf in Sheep’s Clothing,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the source phrase “He completely deceived the shepherd”.
+- Added the eighth fable, “The Goose That Laid the Golden Eggs,” with its source title and story text.
+- The printed source moral is “Much wants more and loses all.”
+- Added the ninth fable, “The Milkmaid and Her Pail,” with its source title and story text.
+- The printed source moral is “Do not count your chickens before they are hatched.”
+- Added the tenth fable, “The Oak and the Reeds,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Reeds’ exact phrase “we bow and yield to every breeze”.
+
+### Page build and browser verification — Nov 13, 2026
+
+- Added `aesop.html`, `assets/aesop-book.js`, and `assets/aesop-book.css`.
+- Added one Aesop link to the home page footer and one to `sketchbook.html`.
+- The contents page shows all ten fables. Search finds each title.
+- All ten fable addresses opened the matching title and moral label.
+- The first contents link opened the first fable. Next and Previous changed pages.
+- Chrome checks passed at 1280 × 800 and 390 × 844.
+- The mobile document width was 390 px. The page had no horizontal overflow.
+- No JavaScript errors, console errors, or failed requests appeared.
+- Screenshots: `/tmp/ahaan-aesops-fables/contents.png`, `fable-desktop.png`, and `fable-phone.png`.
+- `node --check assets/aesop-book.js`, `node --check assets/aesop-data.js`, and `git diff --check` passed.
