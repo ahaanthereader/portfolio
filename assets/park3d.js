@@ -2745,7 +2745,7 @@
     const actionPromptText = document.getElementById("actionPromptText");
     const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
 
-    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, wheels: [], lean: 0 };
+    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0 };
     const bikeKeys = { up: false, down: false, left: false, right: false };
     const bikeRoot = new T.Group();
     const bikeFrameMat = new T.MeshStandardMaterial({ color: 0x7b3440, roughness: 0.72, metalness: 0.12 });
@@ -2942,6 +2942,7 @@
     function mountBike() {
       if (bikeState.riding || currentActivity || eatingTimer > 0) return;
       bikeState.riding = true; bikeState.speed = 0;
+      bikeState.boostHeld = false;
       targetPos = null;
       Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
       currentNearbyItem = null;
@@ -2959,6 +2960,7 @@
     function dismountBike() {
       if (!bikeState.riding) return;
       bikeState.riding = false; bikeState.speed = 0;
+      bikeState.boostHeld = false;
       Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
       const sideX = Math.cos(bikeState.heading) * 1.55;
       const sideZ = -Math.sin(bikeState.heading) * 1.55;
@@ -2976,6 +2978,7 @@
     const actBoostBtn = document.getElementById("actBoostBtn");
     const actBoostLabel = document.getElementById("actBoostLabel");
     const actDismountBtn = document.getElementById("actDismountBtn");
+    const actionBoostHint = document.getElementById("actionBoostHint");
 
     if (actionPromptBtn) {
       actionPromptBtn.addEventListener("click", () => {
@@ -2987,8 +2990,19 @@
 
     if (actBoostBtn) {
       actBoostBtn.addEventListener("click", () => {
-        boostCurrentActivity();
+        if (!bikeState.riding) boostCurrentActivity();
       });
+      const releaseBikeBoost = () => { bikeState.boostHeld = false; };
+      actBoostBtn.addEventListener("pointerdown", e => {
+        if (!bikeState.riding) return;
+        e.preventDefault();
+        bikeState.boostHeld = true;
+        if (actBoostBtn.setPointerCapture) actBoostBtn.setPointerCapture(e.pointerId);
+      });
+      actBoostBtn.addEventListener("pointerup", releaseBikeBoost);
+      actBoostBtn.addEventListener("pointercancel", releaseBikeBoost);
+      actBoostBtn.addEventListener("lostpointercapture", releaseBikeBoost);
+      window.addEventListener("blur", releaseBikeBoost);
     }
 
     if (actDismountBtn) {
@@ -3108,11 +3122,13 @@
         if (actionPrompt && actionPromptText) {
           actionPromptText.textContent = rideItem.promptText;
           if (actionKeyBadge) actionKeyBadge.textContent = "E";
+          if (actionBoostHint) actionBoostHint.hidden = false;
           actionPrompt.hidden = false;
           actionPrompt.classList.add("show");
         }
         return;
       }
+      if (actionBoostHint) actionBoostHint.hidden = true;
       if (currentActivity) {
         if (actionPrompt && !actionPrompt.hidden) {
           actionPrompt.classList.remove("show");
@@ -3945,6 +3961,11 @@
           if (isDown) e.preventDefault();
           wake();
         }
+        if (code === "Space" || key === " " || key === "Spacebar") {
+          bikeState.boostHeld = isDown;
+          e.preventDefault();
+          wake();
+        }
         return;
       }
 
@@ -4174,6 +4195,7 @@
         raf = 0;
         Object.keys(keys).forEach(key => { keys[key] = false; });
         Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+        bikeState.boostHeld = false;
         if (calm()) {
           bikeState.speed = 0;
           eatingTimer = 0;
@@ -4197,12 +4219,15 @@
 
       // Ride the bike or walk through the park.
       if (bikeState.riding) {
-        const topSpeed = 4.15;
-        if (bikeKeys.up && !bikeKeys.down) bikeState.speed = Math.min(topSpeed, bikeState.speed + dt * 1.55);
-        else if (bikeKeys.down) bikeState.speed = Math.max(0, bikeState.speed - dt * 2.4);
+        const normalTopSpeed = 5.5;
+        const boostTopSpeed = 8;
+        const topSpeed = bikeState.boostHeld ? boostTopSpeed : normalTopSpeed;
+        if (bikeKeys.down) bikeState.speed = Math.max(0, bikeState.speed - dt * 2.4);
+        else if (!bikeState.boostHeld && bikeState.speed > normalTopSpeed) bikeState.speed = Math.max(normalTopSpeed, bikeState.speed - dt * 0.65);
+        else if (bikeKeys.up) bikeState.speed = Math.min(topSpeed, bikeState.speed + dt * (bikeState.boostHeld ? 3.2 : 2.6));
         else bikeState.speed = Math.max(0, bikeState.speed - dt * 0.48);
         const steer = (bikeKeys.right ? 1 : 0) - (bikeKeys.left ? 1 : 0);
-        const turnRate = 0.22 + Math.min(1, bikeState.speed / topSpeed) * 1.05;
+        const turnRate = 0.55 + Math.min(1, bikeState.speed / topSpeed) * 1.05;
         bikeState.heading += steer * turnRate * dt;
         const nextX = bikeState.x + Math.sin(bikeState.heading) * bikeState.speed * dt;
         const nextZ = bikeState.z + Math.cos(bikeState.heading) * bikeState.speed * dt;
