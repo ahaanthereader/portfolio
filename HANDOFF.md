@@ -660,9 +660,10 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
 3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
 4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
-5. FEATURE-BRIEF-bike-speed-boost.md — QUEUED Nov 15, 2026 (Nishant: "use spacebar for speed — it's too slow"). Space = boost (about 2x top speed), faster base speed, better low-speed steering; runs after two-player lands.
-6. FEATURE-BRIEF-vihaan-quad.md — QUEUED Nov 15, 2026 (Nishant: "Vihaan bike convert into quad faster"). Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands.
-7. FEATURE-BRIEF-capitals-quiz.md — next pickup once the quad lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+5. FEATURE-BRIEF-bike-speed-boost.md — PUBLISHED live Nov 16, 2026 (feature 669318a, merge 1b39ba5; Pages run 43995668330 success). Space = boost (8 m/s top), base top 4.15 → 5.5 m/s, accel 1.55 → 2.6, steering base 0.22 → 0.55; hint "Hold Space to go fast! 🚲💨" live on index.html.
+6. FEATURE-BRIEF-vihaan-quad.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-vihaan-quad`, branch `feature/vihaan-quad` (from origin/main 1b39ba5), surface 1000090048 [terminal]. (First attempt: Claude agentSession surface 1000090044 came up with no agent process and never picked up the starter; rerouted to a Codex terminal surface per the Nov 10 fallback rule.) Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands. BLOCKED Nov 16, 2026 (21:06): worker ended task_complete — the quad cannot start until the two-player feature lands (worktree still at ee0688d; two-player merge/publish is the critical path). No code changed; do NOT nudge as a stall.
+7. FEATURE-BRIEF-capitals-quiz.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-capitals-quiz`, branch `feature/capitals-quiz` (from origin/main 1b39ba5), surface 1000090049 [terminal]. (Brief is the amended Nov 14 version: four 10-question quizzes — country capitals, US state capitals, country food, famous buildings; Stop button on every question, wrong answers never red.)
+8. FEATURE-BRIEF-reading-aesop-link.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-reading-aesop-link`, branch `feature/reading-aesop-link` (from origin/main 1b39ba5), surface 1000090050 [terminal]. One Aesop's Fables link/card on reading.html pointing to aesop.html; runs after Capitals Quiz.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
 ## Bike speed boost — Nov 15, 2026
@@ -674,3 +675,12 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Released boost above normal speed: ease down by 0.65 m/s².
 - Chrome checks passed at 1280 × 800 and 390 × 844. Space boost, release, E dismount, touch hold, and riding hint passed. No console errors appeared.
 - Screenshots: `/tmp/ahaan-bike-speed/parked.png`, `riding.png`, and `boosting.png`.
+
+## Publish: bike speed boost — Nov 16, 2026
+
+- Merged `feature/bike-speed-boost` into main: commit `1b39ba5` (feature `669318a`).
+- Pushed `85852ef..1b39ba5` to origin main.
+- GitHub Pages deploy run `43995668330` ("Merge branch 'feature/bike-speed-boost'") completed success.
+- Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 177,917 bytes, boost code live: `boostHeld`, Space handler, `actionBoostHint` toggle), live `index.html` contains the `actionBoostHint` hint element ("Hold Space to go fast! 🚲💨").
+- The main worktree's uncommitted `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted. It was not part of this publish.
+- The two-player and Country Book v2 branches were not merged. They are still in progress.
