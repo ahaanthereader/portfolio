@@ -240,7 +240,7 @@
   .quiz button.opt { font-family: inherit; font-weight: 700; cursor: pointer; padding: 11px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--paper); transition: .15s; }
   .quiz button.opt:hover { border-color: var(--forest); }
   .quiz button.opt.right { background: var(--forest); color: #fff; border-color: var(--forest); }
-  .quiz button.opt.wrong { background: #e7806a; color: #fff; border-color: #e7806a; }
+  .quiz button.opt.wrong { background: #eee9df; color: var(--ink); border-color: #b7ad9e; }
   .quiz button.opt:disabled { cursor: default; }
   .quiz .score { font-weight: 800; color: var(--forest-d); }
   .quiz-top { display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--ink-soft); font-size: .92rem; margin-bottom: 8px; }
@@ -253,6 +253,17 @@
   .quiz-final .msg { font-weight: 700; margin: 10px 0 16px; }
   .quiz-final .again { font-family: inherit; font-weight: 800; cursor: pointer; padding: 12px 24px; border: 0; border-radius: 999px; background: var(--forest); color: #fff; box-shadow: var(--shadow-sm); transition: transform .15s, background .2s; }
   .quiz-final .again:hover { transform: translateY(-2px); background: var(--forest-d); }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .quiz-start { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .quiz-start[hidden] { display: none; }
+  .quiz-card { border: 1px solid var(--line); border-radius: 14px; padding: 18px; background: var(--paper); }
+  .quiz-card h3 { margin: 0 0 6px; color: var(--forest-d); }
+  .quiz-card p { margin: 0 0 14px; color: var(--ink-soft); }
+  .quiz-card button, .quiz-stop, .quiz-feedback button, .quiz-final button { min-height: 48px; padding: 10px 18px; border: 0; border-radius: 999px; background: var(--forest); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+  .quiz-stop { margin-top: 16px; background: #eee9df; color: var(--ink); border: 1px solid var(--line); }
+  .quiz-feedback { margin-top: 16px; font-weight: 700; }
+  .quiz-feedback button { display: block; margin: 12px auto 0; }
+  .quiz-final button + button { margin-left: 8px; }
 
   /* ============ Swing ============ */
   .swing-sec { background: linear-gradient(180deg, transparent, rgba(106,174,221,.10) 40%, rgba(47,122,91,.12)); }
@@ -653,6 +664,8 @@
     .nav-links a { padding: 12px; }
     .menu-btn { display: block; }
     .quiz .opts { grid-template-columns: 1fr; }
+    .quiz-start { grid-template-columns: 1fr; }
+    .quiz-final button + button { margin: 8px 0 0; }
     section { padding: 64px 0; }
   }
   /* ---- Doors of the World ---- */

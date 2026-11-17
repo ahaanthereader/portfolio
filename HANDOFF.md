@@ -1,5 +1,41 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Capitals quiz brief — Nov 16, 2026
+
+### State before changes
+
+- The quiz page is `quiz.html` and loads `assets/quiz.js`.
+- The page shows a 50-question quiz immediately. It has no start screen or stop button.
+- A wrong answer uses the red `#e7806a` style.
+- `geography.html` and `sketchbook.html` already link to `quiz.html`.
+- The worktree is on `feature/capitals-quiz` from `origin/main`. Only the brief file was untracked.
+
+### Work in progress
+
+- Started the four-quiz implementation from `FEATURE-BRIEF-capitals-quiz.md`.
+
+### Implemented and checked
+
+- `quiz.html` now opens with four quiz cards. The page does not start a round on load.
+- Each quiz selects 10 questions without repeats. Each question has four distinct answer buttons.
+- The reader can stop at any time. Each answer shows kind feedback and a Next button.
+- Wrong answers use a soft neutral style. The right answer uses green.
+- The end screen shows the answered count, the score, Play again, and Choose another quiz.
+- Best scores save separately by quiz type. Storage errors do not stop the quiz.
+- The quiz uses 176 Country Book entries, 50 state-capital entries, 12 food entries, and 12 building entries.
+- All building country names match a Country Book entry. The starter list has no name mismatch.
+- Country food entries added: Australia—meat pie; Brazil—feijoada; Canada—poutine; China—dumplings; Egypt—koshari; France—baguette; India—biryani; Italy—pizza; Japan—sushi; Mexico—tacos; Peru—ceviche; Spain—paella.
+- Food sources: Australia—[Australian cuisine](https://en.wikipedia.org/wiki/Australian_cuisine#Meat_pies); Brazil—[feijoada](https://en.wikipedia.org/wiki/Feijoada); Canada—[poutine](https://en.wikipedia.org/wiki/Poutine); China—[Chinese dumplings](https://en.wikipedia.org/wiki/Chinese_dumpling).
+- Egypt—[UNESCO koshary entry](https://ich.unesco.org/en/RL/koshary-daily-life-dish-and-practices-associated-with-it-02278); France—[UNESCO baguette entry](https://ich.unesco.org/en/RL/baguette-bread-craft-knowledge-and-culture-01883); India—[biryani](https://en.wikipedia.org/wiki/Biryani); Italy—[pizza](https://en.wikipedia.org/wiki/Pizza).
+- Japan—[GO TOKYO food guide](https://www.gotokyo.org/en/see-and-do/drinking-and-dining/japanese-cuisine/index.html); Mexico—[UNESCO Mexican cuisine entry](https://ich.unesco.org/en/RL/traditional-mexican-cuisine-00400); Peru—[UN Tourism cuisine note](https://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2025-06/20250613_Information%20Note_70CAM_Peru_EN.pdf); Spain—[paella](https://en.wikipedia.org/wiki/Paella).
+- State-capital source: [Wikipedia list of U.S. capitals](https://en.wikipedia.org/wiki/List_of_capitals_in_the_United_States). The file contains 50 states with no duplicate state names.
+- Building pairs checked against the Country Book landmark entries and these building references: [Eiffel Tower](https://en.wikipedia.org/wiki/Eiffel_Tower), [Taj Mahal](https://en.wikipedia.org/wiki/Taj_Mahal), [Great Wall](https://en.wikipedia.org/wiki/Great_Wall_of_China), [Pyramids of Giza](https://en.wikipedia.org/wiki/Giza_pyramid_complex), [Colosseum](https://en.wikipedia.org/wiki/Colosseum), [Statue of Liberty](https://en.wikipedia.org/wiki/Statue_of_Liberty), [Sydney Opera House](https://en.wikipedia.org/wiki/Sydney_Opera_House), [Big Ben](https://en.wikipedia.org/wiki/Big_Ben), [Machu Picchu](https://en.wikipedia.org/wiki/Machu_Picchu), [Christ the Redeemer](https://en.wikipedia.org/wiki/Christ_the_Redeemer_(statue)), [Leaning Tower of Pisa](https://en.wikipedia.org/wiki/Leaning_Tower_of_Pisa), and [Sagrada Familia](https://en.wikipedia.org/wiki/Sagrada_Fam%C3%ADlia).
+- Chrome checks passed at 1280×800 and 390×844. The checks played every quiz to 10 questions, tested one wrong answer per quiz, checked score counts, stopped an empty round, checked answer focus, and found no horizontal scroll or JavaScript errors.
+- Screenshots are in `/tmp/ahaan-capitals-quiz/`: `start.png`, `question-1.png` through `question-4.png`, `wrong-neutral.png`, `stopped.png`, and `full-round.png`.
+- `node --check` passed for the quiz and both new data files. `git diff --check` passed.
+- Facts for Ahaan to check: none recorded.
+- The worker committed the changes locally on `feature/capitals-quiz` with message `Build four kind quiz rounds`. No files were published.
+
 ## Lazy river bridge verification — Nov 10, 2026
 
 ### Trampoline browser retry
@@ -662,7 +698,7 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
 5. FEATURE-BRIEF-bike-speed-boost.md — QUEUED Nov 15, 2026 (Nishant: "use spacebar for speed — it's too slow"). Space = boost (about 2x top speed), faster base speed, better low-speed steering; runs after two-player lands.
 6. FEATURE-BRIEF-vihaan-quad.md — QUEUED Nov 15, 2026 (Nishant: "Vihaan bike convert into quad faster"). Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands.
-7. FEATURE-BRIEF-capitals-quiz.md — next pickup once the quad lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+7. FEATURE-BRIEF-capitals-quiz.md — COMPLETE Nov 16, 2026 — worktree `.worktrees/feature-capitals-quiz`, branch `feature/capitals-quiz` (from origin/main 1b39ba5). Local commit `Build four kind quiz rounds`. (Four 10-question quizzes — country capitals, US state capitals, country food, famous buildings; Stop button on every question, wrong answers never red.)
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
 ## Bike speed boost — Nov 15, 2026

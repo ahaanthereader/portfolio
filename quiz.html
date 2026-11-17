@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Capitals Quiz · Ahaan's World</title>
-<meta name="description" content="Capitals Quiz — The 50 toughest capitals on Earth." />
+<meta name="description" content="Choose a quiz about country capitals, state capitals, foods, or famous buildings." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -37,18 +37,23 @@
   <div class="wrap">
     <div class="sec-head">
       <div class="eyebrow">Test Yourself</div>
-      <h2>The 50 toughest capitals 🧠</h2>
-      <p>The trickiest capital cities on Earth — the ones almost everyone gets wrong. How many can you get?</p>
+      <h2>Choose a quiz 🧠</h2>
+      <p>Pick a topic. Each round has 10 questions.</p>
     </div>
     <div class="quiz" id="quiz">
+      <div class="quiz-start" id="quizStart" aria-label="Choose a quiz"></div>
+      <div id="quizRound" hidden>
       <div class="quiz-top">
-        <span id="quizProg">Question 1 of 50</span>
+        <span id="quizProg">Question 1 of 10</span>
         <span class="score" id="quizScore">Score: 0</span>
       </div>
       <div class="quiz-bar"><div class="quiz-bar-fill" id="quizBar"></div></div>
       <div class="q" id="quizQ">Loading quiz…</div>
       <div class="opts" id="quizOpts"></div>
+      <div class="quiz-feedback" id="quizFeedback" role="status" aria-live="polite" hidden></div>
+      <button class="quiz-stop" id="quizStop" type="button">Stop and see my score</button>
       <div class="quiz-final" id="quizFinal" hidden></div>
+      </div>
     </div>
   </div>
 </section>
@@ -68,6 +73,9 @@
 <div class="reward-toast" id="rewardToast" hidden></div>
 
 <script src="assets/shared.js"></script>
+<script src="assets/country-data.js"></script>
+<script src="assets/us-state-capitals.js"></script>
+<script src="assets/famous-buildings.js"></script>
 <script src="assets/quiz.js"></script>
 </body>
 </html>
