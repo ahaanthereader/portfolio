@@ -209,6 +209,9 @@
   .reading-now .big { font-size: 2.4rem; }
   .reading-now .reading-cover { width: 66px; height: 90px; border-radius: 8px; object-fit: cover; box-shadow: var(--shadow-sm); flex: none; }
   .reading-now strong { color: var(--plum); }
+  .reading-aesop-link { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 18px; padding: 10px 14px; border: 1px solid rgba(43, 39, 33, 0.15); border-radius: 12px; background: #f6f1e7; color: #2a4532; font-weight: 800; text-decoration: none; box-shadow: 0 6px 18px rgba(43, 39, 33, 0.08); }
+  .reading-aesop-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .reading-aesop-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
   /* ============ Geography ============ */
   .geo-wrap { max-width: 1100px; }

@@ -1,5 +1,17 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Reading Nook Aesop link — Nov 16, 2026
+
+- The active brief is `FEATURE-BRIEF-reading-aesop-link.md`.
+- Added one Aesop's Fables link below the book shelf in `reading.html`.
+- Added a warm paper style and a visible keyboard focus outline.
+- Desktop screenshot at 1280 × 800 shows the link below the shelf.
+- Mobile screenshot at 390 × 844 shows the link below the shelf.
+- The mobile screenshot also shows the existing shelf content past the right edge.
+- Clicked the link in Chrome. The Aesop page opened and showed all ten fables.
+- Screenshots: `/tmp/ahaan-reading-aesop/reading-desktop.png` and `reading-mobile.png`.
+- `git diff --check` passed. Browser console errors were not checked.
+
 ## Lazy river bridge verification — Nov 10, 2026
 
 ### Trampoline browser retry
@@ -663,6 +675,7 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 5. FEATURE-BRIEF-bike-speed-boost.md — QUEUED Nov 15, 2026 (Nishant: "use spacebar for speed — it's too slow"). Space = boost (about 2x top speed), faster base speed, better low-speed steering; runs after two-player lands.
 6. FEATURE-BRIEF-vihaan-quad.md — QUEUED Nov 15, 2026 (Nishant: "Vihaan bike convert into quad faster"). Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands.
 7. FEATURE-BRIEF-capitals-quiz.md — next pickup once the quad lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+8. FEATURE-BRIEF-reading-aesop-link.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-reading-aesop-link`, branch `feature/reading-aesop-link` (from origin/main 1b39ba5), surface 1000090050 [terminal]. One Aesop's Fables link/card on reading.html pointing to aesop.html; runs after Capitals Quiz.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
 ## Bike speed boost — Nov 15, 2026
