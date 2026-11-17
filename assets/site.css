@@ -1801,11 +1801,23 @@
     transform: translateX(-50%) translateY(8px) scale(0.96);
     z-index: 60;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     pointer-events: auto;
     opacity: 0;
     transition: opacity 0.22s ease-out, transform 0.22s ease-out;
   }
+  .action-boost-hint {
+    margin-top: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #fcf9f2;
+    color: var(--ink);
+    font-size: 0.92rem;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(60, 48, 30, 0.1);
+  }
+  .action-boost-hint[hidden] { display: none; }
   .action-prompt.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);

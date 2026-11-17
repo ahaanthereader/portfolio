@@ -659,6 +659,18 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 1. FEATURE-BRIEF-bike-icecream.md — PUBLISHED live Nov 14 (63e994b)
 2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
 3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
-4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); blocked on the PageFlip download question (npm pack page-flip@2.0.7) — Nishant has not answered it
-5. FEATURE-BRIEF-capitals-quiz.md — next pickup once two-player lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
+5. FEATURE-BRIEF-bike-speed-boost.md — QUEUED Nov 15, 2026 (Nishant: "use spacebar for speed — it's too slow"). Space = boost (about 2x top speed), faster base speed, better low-speed steering; runs after two-player lands.
+6. FEATURE-BRIEF-vihaan-quad.md — QUEUED Nov 15, 2026 (Nishant: "Vihaan bike convert into quad faster"). Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands.
+7. FEATURE-BRIEF-capitals-quiz.md — next pickup once the quad lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
+
+## Bike speed boost — Nov 15, 2026
+
+- Normal top speed: 4.15 → 5.5 m/s.
+- Normal acceleration: 1.55 → 2.6 m/s².
+- Steering base rate: 0.22 → 0.55 rad/s; the speed-based part and lean remain.
+- Held Space boost top speed: 8 m/s, with 3.2 m/s² acceleration.
+- Released boost above normal speed: ease down by 0.65 m/s².
+- Chrome checks passed at 1280 × 800 and 390 × 844. Space boost, release, E dismount, touch hold, and riding hint passed. No console errors appeared.
+- Screenshots: `/tmp/ahaan-bike-speed/parked.png`, `riding.png`, and `boosting.png`.
