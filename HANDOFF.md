@@ -1,5 +1,56 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Capitals quiz brief — Nov 16, 2026
+
+### State before changes
+
+- The quiz page is `quiz.html` and loads `assets/quiz.js`.
+- The page shows a 50-question quiz immediately. It has no start screen or stop button.
+- A wrong answer uses the red `#e7806a` style.
+- `geography.html` and `sketchbook.html` already link to `quiz.html`.
+- The worktree is on `feature/capitals-quiz` from `origin/main`. Only the brief file was untracked.
+
+### Work in progress
+
+- Started the four-quiz implementation from `FEATURE-BRIEF-capitals-quiz.md`.
+
+### Implemented and checked
+
+- `quiz.html` now opens with four quiz cards. The page does not start a round on load.
+- Each quiz selects 10 questions without repeats. Each question has four distinct answer buttons.
+- The reader can stop at any time. Each answer shows kind feedback and a Next button.
+- Wrong answers use a soft neutral style. The right answer uses green.
+- The end screen shows the answered count, the score, Play again, and Choose another quiz.
+- Best scores save separately by quiz type. Storage errors do not stop the quiz.
+- The quiz uses 176 Country Book entries, 50 state-capital entries, 12 food entries, and 12 building entries.
+- All building country names match a Country Book entry. The starter list has no name mismatch.
+- Country food entries added: Australia—meat pie; Brazil—feijoada; Canada—poutine; China—dumplings; Egypt—koshari; France—baguette; India—biryani; Italy—pizza; Japan—sushi; Mexico—tacos; Peru—ceviche; Spain—paella.
+- Food sources: Australia—[Australian cuisine](https://en.wikipedia.org/wiki/Australian_cuisine#Meat_pies); Brazil—[feijoada](https://en.wikipedia.org/wiki/Feijoada); Canada—[poutine](https://en.wikipedia.org/wiki/Poutine); China—[Chinese dumplings](https://en.wikipedia.org/wiki/Chinese_dumpling).
+- Egypt—[UNESCO koshary entry](https://ich.unesco.org/en/RL/koshary-daily-life-dish-and-practices-associated-with-it-02278); France—[UNESCO baguette entry](https://ich.unesco.org/en/RL/baguette-bread-craft-knowledge-and-culture-01883); India—[biryani](https://en.wikipedia.org/wiki/Biryani); Italy—[pizza](https://en.wikipedia.org/wiki/Pizza).
+- Japan—[GO TOKYO food guide](https://www.gotokyo.org/en/see-and-do/drinking-and-dining/japanese-cuisine/index.html); Mexico—[UNESCO Mexican cuisine entry](https://ich.unesco.org/en/RL/traditional-mexican-cuisine-00400); Peru—[UN Tourism cuisine note](https://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2025-06/20250613_Information%20Note_70CAM_Peru_EN.pdf); Spain—[paella](https://en.wikipedia.org/wiki/Paella).
+- State-capital source: [Wikipedia list of U.S. capitals](https://en.wikipedia.org/wiki/List_of_capitals_in_the_United_States). The file contains 50 states with no duplicate state names.
+- Building pairs checked against the Country Book landmark entries and these building references: [Eiffel Tower](https://en.wikipedia.org/wiki/Eiffel_Tower), [Taj Mahal](https://en.wikipedia.org/wiki/Taj_Mahal), [Great Wall](https://en.wikipedia.org/wiki/Great_Wall_of_China), [Pyramids of Giza](https://en.wikipedia.org/wiki/Giza_pyramid_complex), [Colosseum](https://en.wikipedia.org/wiki/Colosseum), [Statue of Liberty](https://en.wikipedia.org/wiki/Statue_of_Liberty), [Sydney Opera House](https://en.wikipedia.org/wiki/Sydney_Opera_House), [Big Ben](https://en.wikipedia.org/wiki/Big_Ben), [Machu Picchu](https://en.wikipedia.org/wiki/Machu_Picchu), [Christ the Redeemer](https://en.wikipedia.org/wiki/Christ_the_Redeemer_(statue)), [Leaning Tower of Pisa](https://en.wikipedia.org/wiki/Leaning_Tower_of_Pisa), and [Sagrada Familia](https://en.wikipedia.org/wiki/Sagrada_Fam%C3%ADlia).
+- Chrome checks passed at 1280×800 and 390×844. The checks played every quiz to 10 questions, tested one wrong answer per quiz, checked score counts, stopped an empty round, checked answer focus, and found no horizontal scroll or JavaScript errors.
+- Screenshots are in `/tmp/ahaan-capitals-quiz/`: `start.png`, `question-1.png` through `question-4.png`, `wrong-neutral.png`, `stopped.png`, and `full-round.png`.
+- `node --check` passed for the quiz and both new data files. `git diff --check` passed.
+- Facts for Ahaan to check: none recorded.
+- The worker committed the changes locally on `feature/capitals-quiz` with message `Build four kind quiz rounds`. No files were published.
+## Two-player mode — Nov 13, 2026
+
+- Branch `feature/two-player` starts at bike branch commit `ee0688d`.
+- The approved spec is `_bmad-output/implementation-artifacts/spec-two-player.md`.
+- Vihaan uses Ahaan's model and scale with a red shirt. Ahaan keeps his maroon shirt.
+- Added the accessible Play together toggle and projected name labels.
+- Added separate arrow-key walking for Vihaan. Shift increases his walking speed.
+- In two-player mode, arrows do not enter Ahaan's bike controls.
+- The camera follows both players. A frustum-based limit preserves a screen margin.
+- Added separate ice-cream cones, timers, arms, prompts, and a trampoline bounce for Vihaan.
+- Vihaan enters and exits with a wave when motion is allowed.
+- Syntax, whitespace, desktop, mobile, and reduced-motion checks pass.
+- Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- Implementation commit: `b46a012` (rebased from `5a689a1` onto main `218ead7`; record commit `21cbcb3`).
+- Published Nov 17, 2026: merged to main as `8495fdc`, pushed `218ead7..8495fdc`; GitHub Pages run `44211964764` success; live verified desktop + mobile, browser suite errors: [].
+
 ## Lazy river bridge verification — Nov 10, 2026
 
 ### Trampoline browser retry
@@ -573,3 +624,230 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - Africa sources: Algeria (https://whc.unesco.org/en/list/179); Angola (https://whc.unesco.org/en/list/1511); Botswana (https://whc.unesco.org/en/list/1021); Central African Republic (https://whc.unesco.org/en/list/1380); Chad (https://whc.unesco.org/en/list/1400); Egypt (https://whc.unesco.org/en/list/88/); Ethiopia (https://whc.unesco.org/en/list/18); Gambia (https://whc.unesco.org/en/list/761); Madagascar (https://whc.unesco.org/en/documents/104118); Mali (https://whc.unesco.org/en/list/119); Morocco (https://whc.unesco.org/en/list/836); Rwanda (https://whc.unesco.org/en/list/1697/); Senegal (https://whc.unesco.org/en/list/1359/); South Africa (https://whc.unesco.org/en/list/915/); Sudan (https://whc.unesco.org/en/list/1336/); Tanzania (https://whc.unesco.org/en/list/173); Tunisia (https://whc.unesco.org/en/list/38/); Uganda (https://whc.unesco.org/en/list/1022).
 - Asia sources: Cambodia (https://www.unesco.org/en/mab/tonle-sap?hub=66369); China (https://za.china-embassy.gov.cn/eng/zngx_1/ChinaSARelations2004/202401/t20240104_11216991.htm); Georgia (https://ich.unesco.org/en/RL/ancient-georgian-traditional-qvevri-wine-making-method-00870); India (https://culture.gov.in/kaziranga-national-park); Indonesia (https://whc.unesco.org/en/list/609); Iran (https://whc.unesco.org/en/list/1506); Japan (https://www.japan.go.jp/tomodachi/2014/autumn2014/the_shinkansen_japans_high-speed_rail.html); Jordan (https://businessevents.visitjordan.com/en/page/17/DeadSea); Kazakhstan (https://www.gov.kz/uploads/2020/12/27/4d25dfd8ea1e19b5488d44e2528a8e12_original.17964681.pdf); Laos (https://whc.unesco.org/en/list/1587/); Malaysia (https://www.malaysia.travel/index.php/explore/appreciate-the-nation-s-unique-biodiversity-this-malaysia-day-flora-edition); Mongolia (https://ich.unesco.org/en/RL/traditional-music-of-the-morin-khuur-00068); Myanmar (https://ich.unesco.org/en/decisions/16.COM/8.B.27); Nepal (https://whc.unesco.org/en/list/120).
 - Other sources: Australia (https://whc.unesco.org/document/162440); Brazil (https://publicacoes-snif.florestal.gov.br/florestasdobrasil/en/forest-resources/extent-of-forests-in-brazil/); Canada (https://www.unesco.org/en/iggp/cliffs-fundy-unesco-global-geopark); Estonia (https://visitestonia.com/en/where-to-go/tallinn); France (https://whc.unesco.org/en/list/80/); Greece (https://www.unesco.org/en/mab/mount-olympus); Italy (https://whc.unesco.org/pg.cfm?CID=31&ID_SITE=394&l=en); New Zealand (https://www.doc.govt.nz/globalassets/documents/our-work/milford-opportunities-project/stage-2/mop-land-analysis-report-2021.pdf); United States (https://www.nps.gov/grca/faqs.htm); Vanuatu (https://tourism.gov.vu/en/program/products/product-development/iconic-tourism-products).
+
+## Bike and ice cream feature — Nov 10, 2026
+
+- Branch `feature/bike-ice-cream` starts at `24f68aba1d6a8e6a37c08499c22a4effe1fc1e62`, the tip of `feature/lazy-river-bridges`.
+- The bike and ice cream brief is `FEATURE-BRIEF-bike-icecream.md` in the main checkout. The branch worktree does not track that brief.
+- The approved spec is `_bmad-output/implementation-artifacts/spec-bike-ice-cream.md`. Feature code is in progress.
+- The existing park has no touch walking controls. The feature will record this choice instead of adding bike touch buttons.
+- Code inspection found bridge-aware `groundHeightAt()`, interaction prompts, raycast taps, and smooth camera follow in `assets/park3d.js`.
+- Code inspection found no walking collision system. Bike movement needs its own checks for water and solid obstacles.
+
+### Browser check — Nov 11, 2026
+
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- Desktop Chrome loaded the park with the canvas ready. Sound stayed off. The browser reported no console errors.
+- Ahaan walked near the parked bike. The prompt said “Press E to ride the bike.” E mounted the bike and showed “Press E to park the bike.” The E dismount key is not yet verified.
+- W turned both bike wheels. Wheel rotation changed by 5.25 radians during the ride.
+- At x=−0.65, z=8.55, Ahaan's rig y was 7.55 m on the south lazy-river bridge. This confirms bridge height tracking at that point.
+- The shop callback opened the picker while riding and dismounted Ahaan first. Escape closed the picker. E opened the picker near the counter. Strawberry produced a cone and status text.
+- Mobile Chrome at 390 × 844 displayed the flavour picker. No console errors appeared.
+- Screenshots: `/tmp/ahaan-bike-icecream/bike-parked.png`, `bike-riding.png`, `over-bridge.png`, `shop-front.png`, `flavour-picker.png`, `eating-cone.png`, `mobile-park.png`, and `mobile-picker.png`.
+- Visual review found that Ahaan's legs still looked too straight while riding. The shop sign was also blocked in the close view. Both points were addressed in the Nov 12 follow-up below.
+- Water stops and tree collision stops are not yet verified. Mississippi bridge crossings are not yet verified.
+
+## Riding pose and shop view — Nov 12, 2026
+
+- Raised the handlebars to meet Ahaan's hands. Bent his knees and elbows into a riding pose.
+- Added a small leg cycle while the bike moves. The pedals and wheels turn together.
+- Raised the shop sign above the awning. Added two sign supports.
+- Moved Ahaan to the right side for the close shop screenshot. The “Ice Cream” sign now reads clearly.
+- Captured and inspected `/tmp/ahaan-bike-icecream/rider-pose-close.png` and `/tmp/ahaan-bike-icecream/shop-front.png`.
+- The bridge screenshot still shows Ahaan on the south lazy-river bridge. The rig position was x=−0.65, z=10.95, y=7.15 m.
+- The updated Chrome run had no console errors. The wheel rotation changed by 9.22 radians during the ride.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- Tree collision stops and Mississippi bridge crossings still need checks.
+
+## E dismount check — Nov 12, 2026
+
+- Chrome mounted the bike with E and rode across the south lazy-river bridge.
+- E dismounted Ahaan after the bike reached the path.
+- Ahaan stood 1.55 m from the bike. His feet reached y=0.45 m, the path height.
+- The prompt returned to “Press E to ride the bike.”
+- Screenshot: `/tmp/ahaan-bike-icecream/e-dismount.png`. Visual review showed Ahaan standing beside the parked bike.
+- The browser run reported no console errors. Tree stops and Mississippi bridge crossings remained unverified at this check.
+
+## Water-edge stop check — Nov 12, 2026
+
+- Chrome mounted the bike with E. W and D steered the bike off the south bridge toward the lazy river.
+- The water boundary blocked the bike at x=0.918, z=8.336 m. The position was beside the bridge, at river radius 8.386 m.
+- After key release, the bike moved 0.002 m over 1.8 seconds. The bike remained stopped beside the water.
+- Screenshot: `/tmp/ahaan-bike-icecream/water-stop.png`. Visual review showed the bike at the water edge beside the bridge.
+- The ride and dismount checks also passed. E returned the prompt “Press E to ride the bike.” No browser console errors appeared.
+- Tree collision stops and Mississippi bridge crossings still need checks.
+
+## Tree collision stop check — Nov 13, 2026
+
+- Chrome mounted the bike with E. W rode it south along the path toward the oak at x=0, z=32 m.
+- The bike stopped at x=−0.65, z=30.739 m. Its distance from the tree center was 1.418 m, matching the oak collision radius plus clearance.
+- After key release, the bike moved 0.043 m over 1.8 seconds, then stayed at the tree boundary.
+- Screenshot: `/tmp/ahaan-bike-icecream/tree-stop.png`. The bike wheel appears beside the tree. The tree crown hides much of Ahaan in this camera view.
+- The browser run reported no console errors. E dismount still returned the prompt “Press E to ride the bike.”
+- Mississippi bridge crossings still need checks.
+
+## Mississippi bridge ride attempt — Nov 13, 2026
+
+- Chrome mounted the bike with E and rode across the south lazy-river bridge onto the park path.
+- The ride reached the west bank near the second Mississippi bridge. The bike stopped at x=11.546, z=8.781 m, before it entered the bridge deck.
+- Ahaan's rig y stayed at 4.631 m at the stopped position. The bike did not cross the Mississippi bridge in this run.
+- This attempt does not confirm Mississippi bridge height tracking or deck clearance. No bridge crossing screenshot was captured.
+- The first Mississippi bridge remains unverified. The second bridge needed an aligned retry.
+
+## Aligned Mississippi bridge ride — Nov 13, 2026
+
+- The first ride stopped just before the second Mississippi bridge. The water check rejected the bike before the bridge collision span began.
+- Extended the bike's river-bridge collision span from 6.4 m to 6.8 m. This lets the bike move from the bank onto the raised deck.
+- Started the browser ride at x=9.69, z=5.57 m, heading 1.05 radians. The ride faced the southwest deck entrance.
+- The bike entered the deck at x=11.253, z=6.467 m. Its across-deck offset was 0.006 m.
+- At the midpoint, x=13.976, z=8.028 m, the bike stayed 0.006 m from the deck centerline. The bike height was 3.576 m. The deck height was 3.616 m.
+- Ahaan's rig height at the midpoint was 7.877 m. The path height before the bridge was 4.631 m. The rig followed the raised deck profile.
+- The bike reached the far bank at x=17.363, z=9.971 m. The bike height returned to 0.06 m, and the rig returned to 4.631 m.
+- Screenshot: `/tmp/ahaan-bike-icecream/mississippi-bridge-aligned.png`. Visual review showed Ahaan and the bike near the bridge's far end.
+- Chrome reported no browser errors. The bike's original parked position was restored after the check.
+- The second Mississippi bridge crossing passed. The first bridge remained for the aligned check below.
+
+## First Mississippi bridge ride — Nov 13, 2026
+
+- The earlier aligned start at x=8.013, z=−3.391 m was blocked by the lazy-river ring check. The bike could not move from that point.
+- Let Mississippi bridge positions pass the lazy-river ring check. The bike can now ride onto the bridge from the southwest approach.
+- Started at x=8.382, z=−3.550 m, heading 1.98 radians. E mounted the bike. The prompt changed from “Press E to ride the bike.” to “Press E to park the bike.”
+- The bike entered the deck at x=8.566, z=−3.630 m. Its along-deck position was −3.198 m, and its centerline offset was 0.002 m.
+- At the midpoint, x=11.297, z=−4.814 m, the bike stayed 0.002 m from the centerline. Bike height was 3.577 m. Deck height was 3.617 m.
+- Ahaan's rig height was 7.878 m at the midpoint. The path height was 4.631 m. The rig followed the raised deck profile.
+- The bike stayed on the deck through x=14.422, z=−6.169 m. The bike then reached the far bank at x=15.374, z=−6.582 m, and returned to path height.
+- The wheels rotated 8.18 radians during the deck crossing. Chrome reported no browser errors.
+- Screenshot: `/tmp/ahaan-bike-icecream/mississippi-bridge-first-midpoint.png`. Visual review showed Ahaan and the bike on the bridge deck.
+- The bike's original parked position was restored after the check. Both Mississippi bridge crossings passed.
+
+## Local commit — Nov 13, 2026
+
+- Feature commit: `ee0688d` (`Add bike and ice cream feature`).
+- The commit contains the bike and ice cream work, collision adjustments, and verification notes.
+- The commit is local. No push was made.
+
+## Aesop’s Fables — IN PROGRESS (Nov 12, 2026)
+
+- Started branch `feature/aesops-fables` from `origin/main` at `8310cea`.
+- Worktree: `.worktrees/aesops-fables`.
+- Project Gutenberg confirms the edition title, translator, and 1912 publication.
+- Source: https://www.gutenberg.org/files/11339/11339-h/11339-h.htm
+- Catalog: https://www.gutenberg.org/ebooks/11339
+- Catalog title: “Aesop’s Fables; a new translation.” Translator: V. S. Vernon Jones.
+- The source text title page says “1912 Edition.” Gutenberg lists the original publication as New York: Avenel Books, 1912.
+- All ten requested fables appear in this edition. The source uses these titles:
+  1. “The Hare and the Tortoise” (brief: “The Tortoise and the Hare”).
+  2. “The Fox and the Grapes.”
+  3. “The Shepherd’s Boy and the Wolf” (brief: “The Boy Who Cried Wolf”).
+  4. “The Lion and the Mouse.”
+  5. “The Grasshopper and the Ants” (brief: “The Ant and the Grasshopper”).
+  6. “The Fox and the Crow.”
+  7. “The Wolf in Sheep’s Clothing.”
+  8. “The Goose That Laid the Golden Eggs” (brief: “The Goose with the Golden Eggs”).
+  9. “The Milkmaid and Her Pail.”
+  10. “The Oak and the Reeds.”
+- Title matches were checked against the Gutenberg contents and story headings.
+- No story text had been copied at the time of source verification.
+- Added only the first fable to `assets/aesop-data.js`, with the source title and moral label.
+- The story text and moral match the Gutenberg text at the source URL above.
+- Added the second fable, “The Fox and the Grapes,” with its exact source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the story’s final sentence word for word.
+- Added the third fable, “The Shepherd’s Boy and the Wolf,” with its source text and moral.
+- The source moral is “You cannot believe a liar even when he tells the truth.”
+- Added the fourth fable, “The Lion and the Mouse,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the story’s final phrase word for word.
+- Added the fifth fable, “The Grasshopper and the Ants,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Ants’ final statement word for word.
+- Added the sixth fable, “The Fox and the Crow,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Fox’s final phrase word for word.
+- Added the seventh fable, “The Wolf in Sheep’s Clothing,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the source phrase “He completely deceived the shepherd”.
+- Added the eighth fable, “The Goose That Laid the Golden Eggs,” with its source title and story text.
+- The printed source moral is “Much wants more and loses all.”
+- Added the ninth fable, “The Milkmaid and Her Pail,” with its source title and story text.
+- The printed source moral is “Do not count your chickens before they are hatched.”
+- Added the tenth fable, “The Oak and the Reeds,” with its source title and story text.
+- The Gutenberg entry has no separate moral line. The displayed moral uses the Reeds’ exact phrase “we bow and yield to every breeze”.
+
+### Page build and browser verification — Nov 13, 2026
+
+- Added `aesop.html`, `assets/aesop-book.js`, and `assets/aesop-book.css`.
+- Added one Aesop link to the home page footer and one to `sketchbook.html`.
+- The contents page shows all ten fables. Search finds each title.
+- All ten fable addresses opened the matching title and moral label.
+- The first contents link opened the first fable. Next and Previous changed pages.
+- Chrome checks passed at 1280 × 800 and 390 × 844.
+- The mobile document width was 390 px. The page had no horizontal overflow.
+- No JavaScript errors, console errors, or failed requests appeared.
+- Screenshots: `/tmp/ahaan-aesops-fables/contents.png`, `fable-desktop.png`, and `fable-phone.png`.
+- `node --check assets/aesop-book.js`, `node --check assets/aesop-data.js`, and `git diff --check` passed.
+
+## Publish: bike + ice cream and Aesop's Fables — Nov 14, 2026
+
+- Merged `feature/bike-ice-cream` into main: commit `63e994b` (bike feature `ee0688d`, record `e8a50b4`).
+- Merged `feature/aesops-fables` into main: commit `7f0ddfa` (book `6ab184a`). HANDOFF.md had one conflict (both branches appended records); resolved by keeping both records, bike first.
+- Fast-forwarded main from `dd564b2` to `origin/main 8310cea` first. The main worktree had an untracked coordinator HANDOFF.md (135 lines, Nov 9 Goku copy with the overnight queue). Backed up to `/tmp/HANDOFF-coordinator-2026-11-14.md` before the fast-forward. The tracked HANDOFF.md (487 lines) is the workers' record.
+- Pushed `8310cea..7f0ddfa` to origin main.
+- GitHub Pages deploy run `43596574039` ("Merge branch 'feature/aesops-fables'") completed success in 20 s, 2026-11-14T12:47:59Z.
+- Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 176,534 bytes, bike code live: "ride the bike", "Mississippi" x10), https://ahaanthereader.github.io/portfolio/aesop.html (200, 2,068 bytes, shell links all three Aesop assets), `assets/aesop-data.js` (200, 8,655 bytes, all ten fable titles and morals present).
+- The local `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted in the main worktree. It was not part of this publish.
+- The two-player and Country Book v2 branches were not merged. They are still in progress.
+
+## Next briefs - overnight queue (Goku, updated Nov 14, 2026)
+
+1. FEATURE-BRIEF-bike-icecream.md — PUBLISHED live Nov 14 (63e994b)
+2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
+3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
+4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
+5. FEATURE-BRIEF-bike-speed-boost.md — PUBLISHED live Nov 16, 2026 (feature 669318a, merge 1b39ba5; Pages run 43995668330 success). Space = boost (8 m/s top), base top 4.15 → 5.5 m/s, accel 1.55 → 2.6, steering base 0.22 → 0.55; hint "Hold Space to go fast! 🚲💨" live on index.html.
+6. FEATURE-BRIEF-vihaan-quad.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-vihaan-quad`, branch `feature/vihaan-quad` (from origin/main 1b39ba5), surface 1000090048 [terminal]. (First attempt: Claude agentSession surface 1000090044 came up with no agent process and never picked up the starter; rerouted to a Codex terminal surface per the Nov 10 fallback rule.) Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands. BLOCKED Nov 16, 2026 (21:06): worker ended task_complete — the quad cannot start until the two-player feature lands (worktree still at ee0688d; two-player merge/publish is the critical path). No code changed; do NOT nudge as a stall.
+7. FEATURE-BRIEF-capitals-quiz.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-capitals-quiz`, branch `feature/capitals-quiz` (from origin/main 1b39ba5), surface 1000090049 [terminal]. (Brief is the amended Nov 14 version: four 10-question quizzes — country capitals, US state capitals, country food, famous buildings; Stop button on every question, wrong answers never red.) COMPLETE Nov 16, 2026 — local commit e441a3c "Build four kind quiz rounds".
+8. FEATURE-BRIEF-reading-aesop-link.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-reading-aesop-link`, branch `feature/reading-aesop-link` (from origin/main 1b39ba5), surface 1000090050 [terminal]. One Aesop's Fables link/card on reading.html pointing to aesop.html; runs after Capitals Quiz.
+When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
+
+## Bike speed boost — Nov 15, 2026
+
+- Normal top speed: 4.15 → 5.5 m/s.
+- Normal acceleration: 1.55 → 2.6 m/s².
+- Steering base rate: 0.22 → 0.55 rad/s; the speed-based part and lean remain.
+- Held Space boost top speed: 8 m/s, with 3.2 m/s² acceleration.
+- Released boost above normal speed: ease down by 0.65 m/s².
+- Chrome checks passed at 1280 × 800 and 390 × 844. Space boost, release, E dismount, touch hold, and riding hint passed. No console errors appeared.
+- Screenshots: `/tmp/ahaan-bike-speed/parked.png`, `riding.png`, and `boosting.png`.
+
+## Publish: bike speed boost — Nov 16, 2026
+
+- Merged `feature/bike-speed-boost` into main: commit `1b39ba5` (feature `669318a`).
+- Pushed `85852ef..1b39ba5` to origin main.
+- GitHub Pages deploy run `43995668330` ("Merge branch 'feature/bike-speed-boost'") completed success.
+- Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 177,917 bytes, boost code live: `boostHeld`, Space handler, `actionBoostHint` toggle), live `index.html` contains the `actionBoostHint` hint element ("Hold Space to go fast! 🚲💨").
+- The main worktree's uncommitted `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted. It was not part of this publish.
+- The two-player and Country Book v2 branches were not merged. They are still in progress.
+## Two-player feature — Nov 13, 2026
+
+- Created branch `feature/two-player` from commit `ee0688d` in `.worktrees/feature/two-player`.
+- Source brief: `FEATURE-BRIEF-two-player.md` in the main checkout.
+- Read the brief, queue entry, project instructions, and sensory-friendly spec.
+- Mapped the model, input, activity, interaction, and camera code.
+- Drafted `_bmad-output/implementation-artifacts/spec-two-player.md`. The spec records the control map, camera limit, actor-specific actions, and verification checks.
+- Nishant approved the spec and implementation on Nov 13, 2026.
+- Implementation now uses baseline commit `ee0688d1d4d6fee53e74f8ea1e48a1923263579a`.
+
+## Two-player implementation results — Nov 17, 2026
+
+- Nishant changed Vihaan's shirt from teal to red. Ahaan keeps his maroon shirt.
+- Ahaan uses WASD and E. Vihaan uses arrow keys and Enter when the toggle is on.
+- Shift with movement keys makes either boy run.
+- Arrow keys do not steer Ahaan's bike. WASD still controls the bike.
+- Both boys have separate prompts, ice-cream cones, timers, and trampoline actions.
+- Vihaan followed the Mississippi deck height at x=11.5, z=−4.9 m. His rig and ground height both measured 8.00094 m.
+- The camera follows the players' midpoint and zooms up to the existing 1.45 limit.
+- A frustum limit preserves a 3.5 m horizontal margin. The limit adjusts when the viewport changes.
+- Desktop and mobile frame checks kept both players within 0.90 NDC. The mobile screenshot shows both names and characters.
+- Reduced motion kept the toggle active and skipped entry and exit waves.
+- Browser checks passed for solo controls, both control sets, independent trampoline actions, both ice-cream cones, bridge height, bike isolation, camera bounds, and toggle cleanup.
+- No browser page errors appeared. Sound stayed off.
+- `node --check` passed for both source files and the browser test. `git diff --check` passed.
+- Browser test: `tests/two-player-browser.cjs`. Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
+- The branch contains local commits only. No changes were published.

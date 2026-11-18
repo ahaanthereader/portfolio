@@ -281,6 +281,7 @@
 
     const interactiveMeshes = [];
     const landmarkAnimators = [];
+    const parkObstacles = [];
 
     // Living breeze animation arrays
     const windTrees = [];
@@ -596,17 +597,35 @@
       return bankY + 2.84 + 0.46 * Math.sin(Math.PI * t);
     }
 
-    function groundHeightAt(x, z, baseY) {
+    function bridgeDeckAt(x, z) {
       const r = 8.8, halfSpan = 2.3;
       const bridges = [[0,-1],[1,0],[0,1],[-1,0]];
       for (const [dx,dz] of bridges) {
         const cx=dx*r, cz=dz*r, along=(x-cx)*dx+(z-cz)*dz;
         const across=Math.abs((x-cx)*dz-(z-cz)*dx);
         if (Math.abs(along)<=halfSpan && across<=1.15) {
-          return Math.max(baseY, bridgeDeckHeight((along+halfSpan)/(2*halfSpan),0)+0.08);
+          return bridgeDeckHeight((along+halfSpan)/(2*halfSpan),0);
         }
       }
-      return baseY;
+      const riverBridges = [[11.5,-4.9,1.98],[14.2,8.15,1.05]];
+      for (const [cx,cz,rotation] of riverBridges) {
+        const along=(x-cx)*Math.sin(rotation)+(z-cz)*Math.cos(rotation);
+        const across=Math.abs((x-cx)*Math.cos(rotation)-(z-cz)*Math.sin(rotation));
+        if (Math.abs(along)<=3.2 && across<=1.05) {
+          return bridgeDeckHeight((along+3.2)/6.4,0.32);
+        }
+      }
+      return null;
+    }
+
+    function groundHeightAt(x, z, baseY) {
+      const deck = bridgeDeckAt(x, z);
+      return deck === null ? baseY : baseY + Math.max(0, deck + 0.08 - 0.45);
+    }
+
+    function bikeSurfaceHeightAt(x, z) {
+      const deck = bridgeDeckAt(x, z);
+      return deck === null ? 0.06 : deck - 0.04;
     }
 
     function buildRiver(parent, T, walkables) {
@@ -1239,6 +1258,11 @@
     // 3D Playground Equipment (Arkansas)
     // ==========================================
     function buildPlayground(parent, T, walkables) {
+      parkObstacles.push(
+        { x: -2.6, z: -3.2, r: 1.55 },
+        { x: 3.2, z: -2.8, r: 2.05 },
+        { x: -4.3, z: 0.2, r: 2.35 }
+      );
       const playGroup = new T.Group();
       parent.add(playGroup);
 
@@ -1605,6 +1629,7 @@
       ];
 
       function createOak(x, z, scale, matIdx) {
+        parkObstacles.push({ x, z, r: 0.62 * scale });
         const tree = new T.Group();
         tree.position.set(x, 0, z);
         const trunk = new T.Mesh(new T.CylinderGeometry(0.24 * scale, 0.38 * scale, 2.6 * scale, 8), barkMat);
@@ -1631,6 +1656,7 @@
       }
 
       function createPine(x, z, scale) {
+        parkObstacles.push({ x, z, r: 0.52 * scale });
         const tree = new T.Group();
         tree.position.set(x, 0, z);
         const trunk = new T.Mesh(new T.CylinderGeometry(0.18 * scale, 0.28 * scale, 1.8 * scale, 8), barkMat);
@@ -1656,6 +1682,7 @@
       }
 
       function createRock(x, z, sx, sy, sz) {
+        parkObstacles.push({ x, z, r: Math.max(sx, sz) * 0.65 });
         const rock = new T.Mesh(new T.DodecahedronGeometry(0.7, 0), rockMat);
         rock.position.set(x, 0.3 * sy, z);
         rock.scale.set(sx, sy, sz);
@@ -2384,8 +2411,106 @@
     // 3D Ahaan Character Setup
     // ==========================================
     const A = window.AhaanModel.build(T);
+    const V = window.AhaanModel.build(T, { shirt: 0xc9363e, collar: 0x92232d });
     const ahaanScale = 0.62; // Bold, prominent hero scale
     A.rig.scale.setScalar(ahaanScale);
+    V.rig.scale.setScalar(ahaanScale);
+    V.rig.visible = false;
+    scene.add(V.rig);
+    const playerLabelAhaan = document.getElementById("playerLabelAhaan");
+    const playerLabelVihaan = document.getElementById("playerLabelVihaan");
+    const togetherBtn = document.getElementById("togetherBtn");
+    const vihaanKeys = { up: false, down: false, left: false, right: false };
+    let togetherEnabled = false;
+    let vihaanAngle = 0;
+    let vihaanWalking = false;
+    let vihaanWaveTimer = 0;
+    let vihaanExiting = false;
+    let vihaanExitTimeout = 0;
+    let shiftHeld = false;
+    function maxPlayerSeparation() {
+      const maximumZoom = 1.45;
+      const cameraDistance = Math.hypot(28, 22) * maximumZoom;
+      const horizontalSpan = 2 * Math.tan(20 * Math.PI / 180) * cameraDistance * Math.min(camera.aspect, 1.25);
+      return Math.max(4, horizontalSpan - 7);
+    }
+    function moveActor(actor, dx, dz) {
+      const nextX = actor.rig.position.x + dx;
+      const nextZ = actor.rig.position.z + dz;
+      if (togetherEnabled && Math.hypot(nextX - (actor === A ? V.rig.position.x : A.rig.position.x), nextZ - (actor === A ? V.rig.position.z : A.rig.position.z)) > maxPlayerSeparation()) return false;
+      actor.rig.position.x = nextX;
+      actor.rig.position.z = nextZ;
+      return true;
+    }
+    function clampPlayerSeparation() {
+      if (!togetherEnabled) return;
+      const dx = V.rig.position.x - A.rig.position.x;
+      const dz = V.rig.position.z - A.rig.position.z;
+      const distance = Math.hypot(dx, dz);
+      const limit = maxPlayerSeparation();
+      if (distance <= limit || distance === 0) return;
+      const scale = limit / distance;
+      V.rig.position.x = A.rig.position.x + dx * scale;
+      V.rig.position.z = A.rig.position.z + dz * scale;
+      V.rig.position.y = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
+    }
+    const vihaanStart = new T.Vector3(1.55, 0, 0.25);
+    V.rig.position.set(vihaanStart.x, 0, vihaanStart.z);
+    V.rig.rotation.y = vihaanAngle;
+    const playerLabelVector = new T.Vector3();
+    function updatePlayerLabels() {
+      [[A, playerLabelAhaan], [V, playerLabelVihaan]].forEach(([actor, label]) => {
+        if (!label || !togetherEnabled) return;
+        playerLabelVector.set(actor.rig.position.x, actor.rig.position.y + 3.4, actor.rig.position.z).project(camera);
+        const rect = hero.getBoundingClientRect();
+        const labelMargin = (label.offsetWidth || 48) * 0.5 + 10;
+        const labelX = Math.max(labelMargin, Math.min(rect.width - labelMargin, (playerLabelVector.x * 0.5 + 0.5) * rect.width));
+        const labelY = Math.max(42, Math.min(rect.height - 12, (-playerLabelVector.y * 0.5 + 0.5) * rect.height));
+        label.style.left = `${labelX}px`;
+        label.style.top = `${labelY}px`;
+      });
+    }
+    if (togetherBtn) togetherBtn.addEventListener("click", event => {
+      togetherEnabled = !togetherEnabled;
+      togetherBtn.setAttribute("aria-pressed", String(togetherEnabled));
+      togetherBtn.textContent = `Play together: ${togetherEnabled ? "On" : "Off"}`;
+      if (event.detail > 0) togetherBtn.blur();
+      if (playerLabelAhaan) playerLabelAhaan.hidden = !togetherEnabled;
+      if (playerLabelVihaan) playerLabelVihaan.hidden = !togetherEnabled;
+      vihaanKeys.up = vihaanKeys.down = vihaanKeys.left = vihaanKeys.right = false;
+      if (togetherEnabled) {
+        clearTimeout(vihaanExitTimeout);
+        vihaanExitTimeout = 0;
+        V.rig.visible = true;
+        vihaanExiting = false;
+        V.rig.position.set(A.rig.position.x + vihaanStart.x, groundLevelY - V.footY * ahaanScale, A.rig.position.z + vihaanStart.z);
+        if (!calm() && V.startWave) { V.startWave(); vihaanWaveTimer = 2.8; }
+      } else {
+        vihaanBounceTime = 0;
+        vihaanEatingTimer = 0;
+        vihaanConeGroup.visible = false;
+        V.leftArm.arm.rotation.set(0, 0, V.leftArm.rest);
+        V.leftArm.elbow.rotation.set(0, 0, 0);
+        if (pickerActor === V) closeIceCreamPicker(false);
+        if (!calm() && V.rig.visible && V.startWave) {
+          V.startWave(); vihaanWaveTimer = 2; vihaanExiting = true;
+          vihaanExitTimeout = setTimeout(() => {
+            if (togetherEnabled) return;
+            vihaanWaveTimer = 0;
+            vihaanExiting = false;
+            V.rig.visible = false;
+            if (V.stopWave) V.stopWave();
+          }, 2100);
+        } else {
+          if (V.stopWave) V.stopWave();
+          vihaanWaveTimer = 0; V.rig.visible = false; vihaanExiting = false;
+        }
+      }
+      updateCameraPosition(1);
+      updatePlayerLabels();
+      render();
+      wake();
+    });
 
     // Baseline height so Ahaan stands upright on the state tile
     const groundLevelY = 0.45;
@@ -2716,25 +2841,279 @@
     const actionPrompt = document.getElementById("actionPrompt");
     const actionPromptBtn = document.getElementById("actionPromptBtn");
     const actionPromptText = document.getElementById("actionPromptText");
+    const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
+
+    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0 };
+    const bikeKeys = { up: false, down: false, left: false, right: false };
+    const bikeRoot = new T.Group();
+    const bikeFrameMat = new T.MeshStandardMaterial({ color: 0x7b3440, roughness: 0.72, metalness: 0.12 });
+    const bikeMetalMat = new T.MeshStandardMaterial({ color: 0x514b43, roughness: 0.52, metalness: 0.62 });
+    const rubberMat = new T.MeshStandardMaterial({ color: 0x282721, roughness: 0.9 });
+    const seatMat = new T.MeshStandardMaterial({ color: 0x3d3029, roughness: 0.88 });
+    const bikeWheelRadius = 0.78;
+    const bikeWheelZ = [-1.12, 1.12];
+    function bikeRod(parent, a, b, radius, material) {
+      const start = new T.Vector3(a[0], a[1], a[2]);
+      const end = new T.Vector3(b[0], b[1], b[2]);
+      const direction = end.clone().sub(start);
+      const mesh = new T.Mesh(new T.CylinderGeometry(radius, radius, direction.length(), 8), material);
+      mesh.position.copy(start).add(end).multiplyScalar(0.5);
+      mesh.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), direction.normalize());
+      mesh.castShadow = true;
+      parent.add(mesh);
+      return mesh;
+    }
+    bikeWheelZ.forEach(z => {
+      const wheel = new T.Group();
+      wheel.position.set(0, bikeWheelRadius + 0.04, z);
+      wheel.rotation.y = Math.PI / 2;
+      wheel.rotation.order = "YXZ";
+      wheel.add(new T.Mesh(new T.TorusGeometry(bikeWheelRadius, 0.075, 10, 28), rubberMat));
+      wheel.add(new T.Mesh(new T.TorusGeometry(bikeWheelRadius - 0.10, 0.026, 6, 24), bikeMetalMat));
+      const hub = new T.Mesh(new T.CylinderGeometry(0.075, 0.075, 0.22, 10), bikeMetalMat);
+      hub.rotation.z = Math.PI / 2;
+      wheel.add(hub);
+      for (let i = 0; i < 8; i++) {
+        const angle = i * Math.PI / 4;
+        bikeRod(wheel, [0, 0, 0], [Math.sin(angle) * (bikeWheelRadius - 0.13), Math.cos(angle) * (bikeWheelRadius - 0.13), 0], 0.012, bikeMetalMat);
+      }
+      bikeRoot.add(wheel);
+      bikeState.wheels.push(wheel);
+    });
+    bikeRod(bikeRoot, [0, 0.82, -1.12], [0, 0.92, 0], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 0.92, 0], [0, 1.72, -0.58], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 1.72, -0.58], [0, 0.82, -1.12], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 0.92, 0], [0, 1.62, 0.63], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 2.48, 0.63], [0, 0.82, 1.12], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 0.82, 1.12], [0, 0.92, 0], 0.075, bikeFrameMat);
+    bikeRod(bikeRoot, [0, 0.82, -1.12], [0, 0.82, 1.12], 0.035, bikeMetalMat);
+    bikeRod(bikeRoot, [0, 1.72, -0.58], [0, 1.92, -0.68], 0.055, bikeMetalMat);
+    bikeRoot.add(new T.Mesh(new T.BoxGeometry(0.55, 0.13, 0.24), seatMat));
+    bikeRoot.children[bikeRoot.children.length - 1].position.set(0, 1.95, -0.68);
+    bikeRod(bikeRoot, [0, 2.48, 0.63], [0, 2.84, 0.78], 0.06, bikeMetalMat);
+    const handlebar = new T.Mesh(new T.BoxGeometry(0.86, 0.09, 0.12), bikeMetalMat);
+    handlebar.position.set(0, 2.84, 0.78);
+    bikeRoot.add(handlebar);
+    [-1, 1].forEach(side => {
+      const grip = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 0.22, 10), seatMat);
+      grip.rotation.z = Math.PI / 2;
+      grip.position.set(side * 0.48, 2.84, 0.78);
+      bikeRoot.add(grip);
+    });
+    const pedalCrank = bikeRod(bikeRoot, [-0.25, 0.93, 0], [0.25, 0.93, 0], 0.055, bikeMetalMat);
+    [-1, 1].forEach(side => {
+      const pedal = new T.Mesh(new T.BoxGeometry(0.3, 0.07, 0.12), seatMat);
+      pedal.position.set(side * 0.34, 0.93, side * 0.1);
+      bikeRoot.add(pedal);
+    });
+    bikeRoot.position.set(bikeState.x, 0.06, bikeState.z);
+    mapGroup.add(bikeRoot);
+    registerInteractive(bikeRoot, {
+      name: "Ahaan's bike",
+      onInteract: () => bikeState.riding ? dismountBike() : mountBike()
+    });
+
+    const shopState = { x: 4.2, z: -13.5 };
+    const shopRoot = new T.Group();
+    shopRoot.position.set(shopState.x, 0, shopState.z);
+    const woodMat = new T.MeshStandardMaterial({ color: 0x79533a, roughness: 0.9 });
+    const creamMat = new T.MeshStandardMaterial({ color: 0xf6eddc, roughness: 0.92 });
+    const berryMat = new T.MeshStandardMaterial({ color: 0xb54e58, roughness: 0.85 });
+    const shopSignCanvas = document.createElement("canvas");
+    shopSignCanvas.width = 512; shopSignCanvas.height = 128;
+    const shopSignCtx = shopSignCanvas.getContext("2d");
+    shopSignCtx.fillStyle = "#f6eddc"; shopSignCtx.fillRect(0, 0, 512, 128);
+    shopSignCtx.fillStyle = "#553726"; shopSignCtx.font = "bold 58px Georgia"; shopSignCtx.textAlign = "center";
+    shopSignCtx.fillText("Ice Cream", 256, 84);
+    const shopSignTex = new T.CanvasTexture(shopSignCanvas);
+    shopSignTex.encoding = T.sRGBEncoding;
+    const shopPanel = (w, h, d, x, y, z, material) => {
+      const mesh = new T.Mesh(new T.BoxGeometry(w, h, d), material);
+      mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true;
+      shopRoot.add(mesh); return mesh;
+    };
+    shopPanel(3.5, 1.35, 0.22, 0, 1.05, -0.15, creamMat);
+    shopPanel(3.9, 0.22, 2.05, 0, 2.05, -0.05, woodMat);
+    [-1.72, 1.72].forEach(x => shopPanel(0.16, 2.15, 0.16, x, 1.1, 0.42, woodMat));
+    shopPanel(4.35, 0.12, 1.05, 0, 2.35, 0.35, creamMat);
+    for (let i = 0; i < 8; i++) {
+      const stripe = new T.Mesh(new T.BoxGeometry(0.55, 0.10, 1.08), i % 2 ? berryMat : creamMat);
+      stripe.position.set(-1.92 + i * 0.55, 2.36, 0.37); shopRoot.add(stripe);
+    }
+    [-1.55, 1.55].forEach(x => shopPanel(0.13, 2.25, 0.13, x, 3.55, 0.48, woodMat));
+    shopPanel(4.0, 0.58, 0.72, 0, 1.18, 1.02, woodMat);
+    const signPlane = new T.Mesh(new T.PlaneGeometry(3.0, 0.82), new T.MeshBasicMaterial({ map: shopSignTex }));
+    signPlane.position.set(0, 4.72, 0.54); shopRoot.add(signPlane);
+    const menuCanvas = document.createElement("canvas");
+    menuCanvas.width = 384; menuCanvas.height = 256;
+    const menuCtx = menuCanvas.getContext("2d");
+    menuCtx.fillStyle = "#fcf8ef"; menuCtx.fillRect(0, 0, 384, 256);
+    menuCtx.fillStyle = "#372b23"; menuCtx.font = "bold 30px Georgia"; menuCtx.fillText("Flavours", 22, 42);
+    [["Vanilla", "#f2e5bd"], ["Chocolate", "#70452e"], ["Strawberry", "#dc7690"], ["Mango", "#f0ad38"]].forEach(([name, color], i) => {
+      const y = 88 + i * 40;
+      menuCtx.fillStyle = color; menuCtx.beginPath(); menuCtx.arc(32, y - 8, 11, 0, Math.PI * 2); menuCtx.fill();
+      menuCtx.fillStyle = "#372b23"; menuCtx.font = "24px Georgia"; menuCtx.fillText(name, 56, y);
+    });
+    const menuTex = new T.CanvasTexture(menuCanvas); menuTex.encoding = T.sRGBEncoding;
+    const menuBoard = new T.Mesh(new T.PlaneGeometry(1.8, 1.2), new T.MeshBasicMaterial({ map: menuTex }));
+    menuBoard.position.set(1.1, 2.05, 0.49); shopRoot.add(menuBoard);
+    mapGroup.add(shopRoot);
+    parkObstacles.push({ x: shopState.x, z: shopState.z, r: 2.35 }, { x: 8.2, z: 0.8, r: 1.75 }, { x: 7, z: 0.8, r: 1.55 });
+    registerInteractive(shopRoot, { name: "Ice Cream", onInteract: () => openIceCreamPicker() });
+
+    const coneGroup = new T.Group();
+    const coneMat = new T.MeshStandardMaterial({ color: 0xc78a4b, roughness: 0.93 });
+    const cone = new T.Mesh(new T.ConeGeometry(0.28, 0.66, 12), coneMat);
+    cone.rotation.x = Math.PI; cone.position.y = -0.33; coneGroup.add(cone);
+    const scoopMeshes = [];
+    for (let i = 0; i < 3; i++) {
+      const scoop = new T.Mesh(new T.SphereGeometry(0.24, 12, 10), new T.MeshStandardMaterial({ color: 0xf2e5bd, roughness: 0.95 }));
+      scoop.position.set((i - 1) * 0.13, 0.02 + (i === 1 ? 0.08 : 0), 0.02);
+      coneGroup.add(scoop); scoopMeshes.push(scoop);
+    }
+    coneGroup.position.set(0.82, -2.35, 1.0);
+    coneGroup.visible = false;
+    A.rig.add(coneGroup);
+    const vihaanConeGroup = coneGroup.clone(true);
+    vihaanConeGroup.position.copy(coneGroup.position);
+    vihaanConeGroup.children.forEach(child => { if (child.material) child.material = child.material.clone(); });
+    V.rig.add(vihaanConeGroup);
+    vihaanConeGroup.visible = false;
+    const vihaanScoopMeshes = vihaanConeGroup.children.filter(child => child.geometry && child.geometry.type === "SphereGeometry");
+    let eatingTimer = 0;
+    let vihaanEatingTimer = 0;
+    let eatingRunId = 0;
+    let lastPickerFocus = null;
+    let pickerActor = A;
+    const iceCreamPicker = document.getElementById("iceCreamPicker");
+    const iceCreamStatus = document.getElementById("iceCreamStatus");
+    const flavorButtons = iceCreamPicker ? [...iceCreamPicker.querySelectorAll("[data-flavor]")] : [];
+    const flavorColors = { Vanilla: 0xf2e5bd, Chocolate: 0x70452e, Strawberry: 0xdc7690, Mango: 0xf0ad38 };
+    function openIceCreamPicker(actor = A) {
+      if (actor === A && bikeState.riding) dismountBike();
+      if (!iceCreamPicker) return;
+      pickerActor = actor;
+      const live = iceCreamPicker.querySelector(".icecream-live");
+      if (live) live.textContent = "Choose Vanilla, Chocolate, Strawberry, or Mango.";
+      lastPickerFocus = document.activeElement;
+      iceCreamPicker.hidden = false;
+      requestAnimationFrame(() => flavorButtons[0] && flavorButtons[0].focus());
+      wake();
+    }
+    function closeIceCreamPicker(restoreFocus = true) {
+      if (!iceCreamPicker) return;
+      iceCreamPicker.hidden = true;
+      if (restoreFocus && lastPickerFocus && lastPickerFocus.focus) lastPickerFocus.focus();
+      lastPickerFocus = null;
+    }
+    function eatIceCream(flavor) {
+      if (!flavorColors[flavor]) return;
+      const actor = pickerActor;
+      const actorScoops = actor === A ? scoopMeshes : vihaanScoopMeshes;
+      actorScoops.forEach(scoop => {
+        scoop.material.color.setHex(flavorColors[flavor]); scoop.scale.setScalar(1);
+      });
+      (actor === A ? coneGroup : vihaanConeGroup).visible = true;
+      if (actor === A) eatingTimer = 4.5; else vihaanEatingTimer = 4.5;
+      closeIceCreamPicker(true);
+      eatingRunId += 1;
+      const runId = eatingRunId;
+      actor.leftArm.arm.rotation.set(-1.05, 0, 0.25);
+      actor.leftArm.elbow.rotation.set(0.85, 0, 0);
+      if (actor === A) sayAhaan("Yum! " + flavor + " ice cream!", "The scoops taste delicious.", "🍦", "Ice Cream");
+      if (iceCreamStatus) iceCreamStatus.textContent = `${actor === A ? "Ahaan" : "Vihaan"} eats ${flavor} ice cream.`;
+      if (calm()) {
+        setTimeout(() => {
+          if (runId !== eatingRunId) return;
+          if (actor === A) eatingTimer = 0; else vihaanEatingTimer = 0;
+          (actor === A ? coneGroup : vihaanConeGroup).visible = false;
+          actor.leftArm.arm.rotation.set(0, 0, actor.leftArm.rest);
+          actor.leftArm.elbow.rotation.set(0, 0, 0);
+        }, 4500);
+      }
+      wake();
+    }
+    flavorButtons.forEach(button => button.addEventListener("click", () => eatIceCream(button.dataset.flavor)));
+    const pickerClose = iceCreamPicker && iceCreamPicker.querySelector("[data-close-picker]");
+    if (pickerClose) pickerClose.addEventListener("click", () => closeIceCreamPicker());
+    if (iceCreamPicker) iceCreamPicker.addEventListener("click", e => { if (e.target === iceCreamPicker) closeIceCreamPicker(); });
+    if (iceCreamPicker) iceCreamPicker.addEventListener("keydown", e => {
+      if (e.key !== "Tab") return;
+      const focusable = [...iceCreamPicker.querySelectorAll("button:not([disabled])")];
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    window.addEventListener("keydown", e => {
+      if (iceCreamPicker && !iceCreamPicker.hidden && e.key === "Escape") closeIceCreamPicker();
+    });
+
+    function mountBike() {
+      if (bikeState.riding || currentActivity || eatingTimer > 0) return;
+      bikeState.riding = true; bikeState.speed = 0;
+      bikeState.boostHeld = false;
+      targetPos = null;
+      Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+      currentNearbyItem = null;
+      if (actionPrompt) actionPrompt.hidden = true;
+      A.leftArm.arm.rotation.set(-1.45, 0, 0.18);
+      A.leftArm.elbow.rotation.set(1.2, 0, 0);
+      A.wavingArm.arm.rotation.set(-1.45, 0, -0.18);
+      A.wavingArm.elbow.rotation.set(1.2, 0, 0);
+      A.leftLeg.hip.rotation.set(-1.25, 0, 0);
+      A.rightLeg.hip.rotation.set(-1.25, 0, 0);
+      A.leftLeg.knee.rotation.set(1.55, 0, 0);
+      A.rightLeg.knee.rotation.set(1.55, 0, 0);
+      wake();
+    }
+    function dismountBike() {
+      if (!bikeState.riding) return;
+      bikeState.riding = false; bikeState.speed = 0;
+      bikeState.boostHeld = false;
+      Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+      const sideX = Math.cos(bikeState.heading) * 1.55;
+      const sideZ = -Math.sin(bikeState.heading) * 1.55;
+      A.rig.position.set(bikeState.x + sideX, groundHeightAt(bikeState.x + sideX, bikeState.z + sideZ, rigBaseY), bikeState.z + sideZ);
+      A.rig.rotation.y = bikeState.heading;
+      A.leftArm.arm.rotation.set(0, 0, A.leftArm.rest); A.leftArm.elbow.rotation.set(0, 0, 0);
+      A.wavingArm.arm.rotation.set(0, 0, A.wavingArm.rest); A.wavingArm.elbow.rotation.set(0, 0, 0);
+      A.leftLeg.hip.rotation.set(0, 0, 0); A.rightLeg.hip.rotation.set(0, 0, 0);
+      A.leftLeg.knee.rotation.set(0, 0, 0); A.rightLeg.knee.rotation.set(0, 0, 0);
+      wake();
+    }
 
     // Activity control buttons state
     const activityHud = document.getElementById("activityHud");
     const actBoostBtn = document.getElementById("actBoostBtn");
     const actBoostLabel = document.getElementById("actBoostLabel");
     const actDismountBtn = document.getElementById("actDismountBtn");
+    const actionBoostHint = document.getElementById("actionBoostHint");
 
     if (actionPromptBtn) {
       actionPromptBtn.addEventListener("click", () => {
         if (currentNearbyItem && currentNearbyItem.onActivate) {
           currentNearbyItem.onActivate();
         }
+        actionPromptBtn.blur();
       });
     }
 
     if (actBoostBtn) {
       actBoostBtn.addEventListener("click", () => {
-        boostCurrentActivity();
+        if (!bikeState.riding) boostCurrentActivity();
       });
+      const releaseBikeBoost = () => { bikeState.boostHeld = false; };
+      actBoostBtn.addEventListener("pointerdown", e => {
+        if (!bikeState.riding) return;
+        e.preventDefault();
+        bikeState.boostHeld = true;
+        if (actBoostBtn.setPointerCapture) actBoostBtn.setPointerCapture(e.pointerId);
+      });
+      actBoostBtn.addEventListener("pointerup", releaseBikeBoost);
+      actBoostBtn.addEventListener("pointercancel", releaseBikeBoost);
+      actBoostBtn.addEventListener("lostpointercapture", releaseBikeBoost);
+      window.addEventListener("blur", releaseBikeBoost);
     }
 
     if (actDismountBtn) {
@@ -2745,6 +3124,26 @@
 
     // List of interactive locations and prompts
     const INTERACTABLES = [
+      {
+        id: "bike",
+        name: "Ahaan's bike",
+        x: bikeState.x,
+        z: bikeState.z,
+        approachRadius: 3.8,
+        actionLabel: "Ride the bike 🚲",
+        promptText: "Press E to ride the bike.",
+        onActivate: () => bikeState.riding ? dismountBike() : mountBike()
+      },
+      {
+        id: "icecream",
+        name: "Ice Cream",
+        x: shopState.x,
+        z: shopState.z + 1.0,
+        approachRadius: 3.2,
+        actionLabel: "Choose ice cream 🍦",
+        promptText: "Press E to choose ice cream.",
+        onActivate: openIceCreamPicker
+      },
       {
         id: "trampoline",
         name: "Spring Trampoline",
@@ -2799,8 +3198,87 @@
       }))
     ];
 
+    let vihaanNearbyItem = null;
+    let vihaanBounceTime = 0;
+    const vihaanActionPrompt = document.getElementById("vihaanActionPrompt");
+    const vihaanActionPromptBtn = document.getElementById("vihaanActionPromptBtn");
+    const vihaanActionPromptText = document.getElementById("vihaanActionPromptText");
+    function activateVihaanItem() {
+      if (!vihaanNearbyItem) return;
+      if (vihaanNearbyItem.id === "icecream") openIceCreamPicker(V);
+      if (vihaanNearbyItem.id === "trampoline") {
+        vihaanBounceTime = 5;
+        moveActor(V, -4.85 - V.rig.position.x, 0.2 - V.rig.position.z);
+        wake();
+      }
+    }
+    if (vihaanActionPromptBtn) vihaanActionPromptBtn.addEventListener("click", () => {
+      activateVihaanItem();
+      vihaanActionPromptBtn.blur();
+    });
+
+    function withinBridge(x, z, bridges, span, width) {
+      return bridges.some(([cx, cz, rotation]) => {
+        const dx = x - cx, dz = z - cz;
+        const along = dx * Math.sin(rotation) + dz * Math.cos(rotation);
+        const across = Math.abs(dx * Math.cos(rotation) - dz * Math.sin(rotation));
+        return Math.abs(along) <= span / 2 + 0.25 && across <= width;
+      });
+    }
+    function blockedBikePosition(x, z) {
+      if (Math.abs(x) > 44 || Math.abs(z) > 44) return true;
+      if (parkObstacles.some(obstacle => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.55)) return true;
+      const lazyBridge = withinBridge(x, z, [[0,-8.8,0],[8.8,0,Math.PI/2],[0,8.8,0],[-8.8,0,Math.PI/2]], 4.6, 0.92);
+      const riverBridges = [[11.5,-4.9,1.98],[14.2,8.15,1.05]];
+      const onRiverBridge = withinBridge(x, z, riverBridges, 6.8, 0.94);
+      const lazyRadius = Math.hypot(x, z);
+      if (!lazyBridge && !onRiverBridge && lazyRadius >= 7.15 && lazyRadius <= 10.4) return true;
+      if (!onRiverBridge && Math.abs(z) <= 39) {
+        const riverX = Math.sin(z * 0.08) * 3.0 + Math.cos(z * 0.05) * 1.5 + 11.2;
+        if (Math.abs(x - riverX) <= 2.95) return true;
+      }
+      return false;
+    }
+
+    function checkVihaanProximity() {
+      let closest = null;
+      let minDistance = Infinity;
+      if (togetherEnabled) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id)).forEach(item => {
+        const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
+        if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
+      });
+      if (closest !== vihaanNearbyItem) {
+        vihaanNearbyItem = closest;
+        if (closest && vihaanActionPrompt && vihaanActionPromptText) {
+          vihaanActionPromptText.textContent = closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
+          vihaanActionPrompt.hidden = false;
+          requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
+        } else if (vihaanActionPrompt) {
+          vihaanActionPrompt.classList.remove("show");
+          vihaanActionPrompt.hidden = true;
+        }
+      }
+    }
+
     // Detect nearby playground items and landmarks
     function checkProximity() {
+      if (bikeState.riding) {
+        const rideItem = {
+          id: "bikeRide",
+          promptText: "Press E to park the bike.",
+          onActivate: dismountBike
+        };
+        currentNearbyItem = rideItem;
+        if (actionPrompt && actionPromptText) {
+          actionPromptText.textContent = rideItem.promptText;
+          if (actionKeyBadge) actionKeyBadge.textContent = "E";
+          if (actionBoostHint) actionBoostHint.hidden = false;
+          actionPrompt.hidden = false;
+          actionPrompt.classList.add("show");
+        }
+        return;
+      }
+      if (actionBoostHint) actionBoostHint.hidden = true;
       if (currentActivity) {
         if (actionPrompt && !actionPrompt.hidden) {
           actionPrompt.classList.remove("show");
@@ -2827,7 +3305,8 @@
       if (closest !== currentNearbyItem) {
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
-          actionPromptText.textContent = currentNearbyItem.promptText;
+          actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "icecream"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -2837,6 +3316,7 @@
           }, 220);
         }
       }
+
     }
 
     // Zoom into landmark and animate 3D landmark directly without blocking modal
@@ -3421,7 +3901,17 @@
 
     function updateCameraPosition(dt) {
       let desiredTarget, desiredPos;
-      if (cameraMode === "action" || cameraMode === "landmark" || cameraMode === "custom") {
+      if (togetherEnabled) {
+        const targetX = (A.rig.position.x + V.rig.position.x) * 0.5;
+        const targetZ = (A.rig.position.z + V.rig.position.z) * 0.5;
+        const targetY = (A.rig.position.y + V.rig.position.y) * 0.5;
+        const separation = Math.hypot(A.rig.position.x - V.rig.position.x, A.rig.position.z - V.rig.position.z);
+        const duoZoom = Math.min(1.45, Math.max(1, 1 + separation * 0.035));
+        normalCamTarget.set(targetX, targetY, targetZ);
+        normalCamPos.set(targetX, targetY + baseCamY * duoZoom, targetZ + baseCamZ * duoZoom);
+        desiredTarget = normalCamTarget;
+        desiredPos = normalCamPos;
+      } else if (cameraMode === "action" || cameraMode === "landmark" || cameraMode === "custom") {
         desiredTarget = actionCamTarget;
         desiredPos = actionCamPos;
       } else {
@@ -3552,6 +4042,10 @@
         if (intHits.length > 0) {
           const hit = intHits[0];
           const data = hit.object.userData;
+          if (bikeState.riding && data && !["Ahaan's bike", "Ice Cream"].includes(data.name)) {
+            isDragging = false;
+            return;
+          }
           if (data && data.onInteract) {
             if (currentActivity && (!data.activity || data.activity !== currentActivity)) {
               stopPlayActivity();
@@ -3591,12 +4085,71 @@
 
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
-      if (calm()) return;
+      if (e.code === "ShiftLeft" || e.code === "ShiftRight") shiftHeld = isDown;
+      if (calm()) {
+        if (isDown && bikeState.riding && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
+          e.preventDefault();
+          dismountBike();
+        }
+        return;
+      }
       if (isDown && hero.classList.contains("scn-paused")) return;
-      if (isDown && e.key !== "Escape" && e.target.closest && e.target.closest("button, a, input, select, textarea, [contenteditable]")) return;
+      const focusedControl = isDown && e.key !== "Escape" && e.target.closest && e.target.closest("button, a, input, select, textarea, [contenteditable]");
+      if (focusedControl && focusedControl !== togetherBtn) return;
       const code = e.code || "";
       const key = e.key || "";
       let handled = false;
+
+      if (e.target === togetherBtn && (code === "Space" || key === " " || (!togetherEnabled && (code === "Enter" || key === "Enter")))) return;
+
+      if (togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(key)) {
+        const direction = key.slice(5).toLowerCase();
+        vihaanKeys[direction] = isDown;
+        if (isDown) e.preventDefault();
+        wake();
+        return;
+      }
+      if (togetherEnabled && (code === "Enter" || key === "Enter")) {
+        if (isDown) {
+          e.preventDefault();
+          if (vihaanBounceTime > 0) vihaanBounceTime = Math.min(vihaanBounceTime, 0.5);
+          else activateVihaanItem();
+        }
+        return;
+      }
+
+      if (isDown && (code === "KeyE" || key.toLowerCase() === "e")) {
+        if (bikeState.riding) {
+          e.preventDefault();
+          dismountBike();
+          return;
+        }
+        if (currentNearbyItem && (togetherEnabled || ["bike", "icecream"].includes(currentNearbyItem.id))) {
+          e.preventDefault();
+          currentNearbyItem.onActivate();
+          return;
+        }
+      }
+
+      if (bikeState.riding) {
+        const rideKey =
+          code === "KeyW" || key.toLowerCase() === "w" ? "up" :
+          code === "KeyS" || key.toLowerCase() === "s" ? "down" :
+          code === "KeyA" || key.toLowerCase() === "a" ? "left" :
+          code === "KeyD" || key.toLowerCase() === "d" ? "right" :
+          !togetherEnabled && (key === "ArrowUp" || key === "ArrowDown" || key === "ArrowLeft" || key === "ArrowRight") ? key.slice(5).toLowerCase() : null;
+        if (rideKey) {
+          bikeKeys[rideKey] = isDown;
+          if (isDown) e.preventDefault();
+          wake();
+        }
+        if (code === "Space" || key === " " || key === "Spacebar") {
+          bikeState.boostHeld = isDown;
+          e.preventDefault();
+          wake();
+        }
+        return;
+      }
 
       // Enter key to interact with nearby item or boost active equipment
       if (isDown && (code === "Enter" || key === "Enter")) {
@@ -3823,6 +4376,13 @@
         cancelAnimationFrame(raf);
         raf = 0;
         Object.keys(keys).forEach(key => { keys[key] = false; });
+        Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+        bikeState.boostHeld = false;
+        if (calm()) {
+          bikeState.speed = 0;
+          eatingTimer = 0;
+          coneGroup.visible = false;
+        }
       } else {
         wake();
       }
@@ -3839,41 +4399,121 @@
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
-      // Handle Walking via Keys or Click Target
-      let moveX = 0, moveZ = 0;
-      if (keys.up) moveZ -= 1;
-      if (keys.down) moveZ += 1;
-      if (keys.left) moveX -= 1;
-      if (keys.right) moveX += 1;
+      // Ride the bike or walk through the park.
+      if (bikeState.riding) {
+        const normalTopSpeed = 5.5;
+        const boostTopSpeed = 8;
+        const topSpeed = bikeState.boostHeld ? boostTopSpeed : normalTopSpeed;
+        if (bikeKeys.down) bikeState.speed = Math.max(0, bikeState.speed - dt * 2.4);
+        else if (!bikeState.boostHeld && bikeState.speed > normalTopSpeed) bikeState.speed = Math.max(normalTopSpeed, bikeState.speed - dt * 0.65);
+        else if (bikeKeys.up) bikeState.speed = Math.min(topSpeed, bikeState.speed + dt * (bikeState.boostHeld ? 3.2 : 2.6));
+        else bikeState.speed = Math.max(0, bikeState.speed - dt * 0.48);
+        const steer = (bikeKeys.right ? 1 : 0) - (bikeKeys.left ? 1 : 0);
+        const turnRate = 0.55 + Math.min(1, bikeState.speed / topSpeed) * 1.05;
+        bikeState.heading += steer * turnRate * dt;
+        const nextX = bikeState.x + Math.sin(bikeState.heading) * bikeState.speed * dt;
+        const nextZ = bikeState.z + Math.cos(bikeState.heading) * bikeState.speed * dt;
+        const tooFarFromVihaan = togetherEnabled && Math.hypot(nextX - V.rig.position.x, nextZ - V.rig.position.z) > maxPlayerSeparation();
+        if (!blockedBikePosition(nextX, nextZ) && !tooFarFromVihaan) {
+          bikeState.x = nextX;
+          bikeState.z = nextZ;
+        } else {
+          bikeState.speed = Math.max(0, bikeState.speed - dt * 2.9);
+        }
+        const bikeGround = bikeSurfaceHeightAt(bikeState.x, bikeState.z);
+        const riderGround = groundHeightAt(bikeState.x, bikeState.z, rigBaseY);
+        bikeRoot.position.set(bikeState.x, bikeGround, bikeState.z);
+        bikeRoot.rotation.y = bikeState.heading;
+        bikeState.wheels.forEach(wheel => { wheel.rotation.x += bikeState.speed * dt / bikeWheelRadius; });
+        const movingBike = INTERACTABLES.find(item => item.id === "bike");
+        if (movingBike) { movingBike.x = bikeState.x; movingBike.z = bikeState.z; }
+        pedalCrank.rotation.x += bikeState.speed * dt * 2.4;
+        const pedalPhase = Math.sin(pedalCrank.rotation.x) * 0.12;
+        A.leftLeg.hip.rotation.x = -1.25 + pedalPhase;
+        A.rightLeg.hip.rotation.x = -1.25 - pedalPhase;
+        A.leftLeg.knee.rotation.x = 1.55 - pedalPhase * 1.4;
+        A.rightLeg.knee.rotation.x = 1.55 + pedalPhase * 1.4;
+        bikeState.lean += (steer * Math.min(0.16, bikeState.speed * 0.035) - bikeState.lean) * Math.min(1, dt * 4);
+        A.rig.position.set(bikeState.x, riderGround - 0.12, bikeState.z);
+        A.rig.rotation.set(0, bikeState.heading, bikeState.lean);
+        isWalking = bikeState.speed > 0.06;
+        targetPos = null;
+        markerMat.opacity = 0;
+      } else {
+        let moveX = 0, moveZ = 0;
+        if (keys.up) moveZ -= 1;
+        if (keys.down) moveZ += 1;
+        if (keys.left) moveX -= 1;
+        if (keys.right) moveX += 1;
 
-      if (moveX !== 0 || moveZ !== 0) {
-        isWalking = true;
-        const len = Math.hypot(moveX, moveZ);
-        moveX /= len; moveZ /= len;
-        ahaanAngle = Math.atan2(moveX, moveZ);
-        A.rig.position.x += moveX * walkSpeed * dt;
-        A.rig.position.z += moveZ * walkSpeed * dt;
-      } else if (targetPos) {
-        const dx = targetPos.x - A.rig.position.x;
-        const dz = targetPos.z - A.rig.position.z;
-        const dist = Math.hypot(dx, dz);
-        if (dist > 0.4) {
-          isWalking = true;
-          ahaanAngle = Math.atan2(dx / dist, dz / dist);
-          A.rig.position.x += (dx / dist) * walkSpeed * dt;
-          A.rig.position.z += (dz / dist) * walkSpeed * dt;
-          markerMat.opacity = Math.max(0.2, markerMat.opacity - dt * 0.4);
+        if (moveX !== 0 || moveZ !== 0) {
+          const len = Math.hypot(moveX, moveZ);
+          moveX /= len; moveZ /= len;
+          ahaanAngle = Math.atan2(moveX, moveZ);
+          isWalking = moveActor(A, moveX * walkSpeed * dt, moveZ * walkSpeed * dt);
+        } else if (targetPos) {
+          const dx = targetPos.x - A.rig.position.x;
+          const dz = targetPos.z - A.rig.position.z;
+          const dist = Math.hypot(dx, dz);
+          if (dist > 0.4) {
+            ahaanAngle = Math.atan2(dx / dist, dz / dist);
+            isWalking = moveActor(A, (dx / dist) * walkSpeed * dt, (dz / dist) * walkSpeed * dt);
+            markerMat.opacity = Math.max(0.2, markerMat.opacity - dt * 0.4);
+          } else {
+            isWalking = false;
+            targetPos = null;
+            markerMat.opacity = 0;
+          }
         } else {
           isWalking = false;
-          targetPos = null;
-          markerMat.opacity = 0;
         }
-      } else {
-        isWalking = false;
       }
 
+      if (togetherEnabled) {
+        let moveX = (vihaanKeys.right ? 1 : 0) - (vihaanKeys.left ? 1 : 0);
+        let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
+        vihaanWalking = moveX !== 0 || moveZ !== 0;
+        if (vihaanWalking) {
+          const length = Math.hypot(moveX, moveZ);
+          moveX /= length; moveZ /= length;
+          vihaanAngle = Math.atan2(moveX, moveZ);
+          vihaanWalking = moveActor(V, moveX * walkSpeed * (shiftHeld ? 1.55 : 1) * dt, moveZ * walkSpeed * (shiftHeld ? 1.55 : 1) * dt);
+          let diff = vihaanAngle - V.rig.rotation.y;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          V.rig.rotation.y += diff * Math.min(1, dt * 14);
+        }
+        if (V.updateWalk) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, dt);
+      }
+      if (vihaanWaveTimer > 0) {
+        vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
+        if (!vihaanWaveTimer) {
+          if (V.stopWave) V.stopWave();
+          if (vihaanExiting) { V.rig.visible = false; vihaanExiting = false; }
+        }
+      }
+      if (V.rig.visible) {
+        if (vihaanWaveTimer > 0 && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
+        const vihaanGround = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
+        if (vihaanBounceTime > 0) {
+          vihaanBounceTime = Math.max(0, vihaanBounceTime - dt);
+          const bounceProgress = 5 - vihaanBounceTime;
+          V.rig.position.y = vihaanGround + Math.max(0, Math.sin(bounceProgress * Math.PI * 1.6)) * 1.8;
+        } else if (!vihaanExiting) V.rig.position.y = vihaanGround;
+        if (vihaanEatingTimer > 0) {
+          vihaanEatingTimer = Math.max(0, vihaanEatingTimer - dt);
+          vihaanScoopMeshes.forEach(scoop => scoop.scale.setScalar(Math.max(0.02, vihaanEatingTimer / 4.5)));
+          if (!vihaanEatingTimer) {
+            vihaanConeGroup.visible = false;
+            V.leftArm.arm.rotation.set(0, 0, V.leftArm.rest);
+            V.leftArm.elbow.rotation.set(0, 0, 0);
+          }
+        }
+      }
+      clampPlayerSeparation();
+
       // Smoothly rotate Ahaan towards heading
-      if (isWalking && (!currentActivity || activityPhase === 0)) {
+      if (isWalking && !bikeState.riding && (!currentActivity || activityPhase === 0)) {
         const curRot = A.rig.rotation.y;
         let diff = ahaanAngle - curRot;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -3887,13 +4527,24 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (A.updateWave && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && A.updateWave && (!currentActivity || activityPhase === 0)) {
         wavingActive = A.updateWave(dt, isWalking, calm());
       }
 
       // Update leg and arm walk cycle
-      if (A.updateWalk && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && A.updateWalk && (!currentActivity || activityPhase === 0)) {
         A.updateWalk(isWalking, 8.5, dt);
+      }
+
+      if (eatingTimer > 0) {
+        eatingTimer = Math.max(0, eatingTimer - dt);
+        const size = Math.max(0.02, eatingTimer / 4.5);
+        scoopMeshes.forEach(scoop => scoop.scale.setScalar(size));
+        if (!eatingTimer) {
+          coneGroup.visible = false;
+          A.leftArm.arm.rotation.set(0, 0, A.leftArm.rest);
+          A.leftArm.elbow.rotation.set(0, 0, 0);
+        }
       }
 
       // Update playground activity
@@ -3901,8 +4552,8 @@
         updatePlayActivity(dt);
       }
 
-      if (!currentActivity || activityPhase === 0) {
-      A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
+      if (!bikeState.riding && (!currentActivity || activityPhase === 0)) {
+        A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
       }
 
       // Track speech bubble above Ahaan and update walk state
@@ -3918,12 +4569,14 @@
 
       // Check nearby interactive items for action prompt
       checkProximity();
+      checkVihaanProximity();
 
       // Check current state boundary
       checkCurrentState(A.rig.position.x, A.rig.position.z);
 
       // Update camera in top view or close-up action view
       updateCameraPosition(dt);
+      updatePlayerLabels();
 
       // Update trampoline sparkle particles
       const anyParticlesActive = updateParticles(dt);
@@ -3954,7 +4607,7 @@
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || isWalking || targetPos || Object.values(keys).some(v => v) || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || (bikeState.riding && bikeState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -3966,11 +4619,15 @@
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      updateCameraPosition();
+      clampPlayerSeparation();
+      updateCameraPosition(1);
       updateBubblePosition();
       render();
     }
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", () => {
+      resize();
+      if (typeof raf !== "undefined") wake();
+    });
     resize();
     render();
 
@@ -4031,6 +4688,27 @@
       stopPlayActivity,
       boostCurrentActivity,
       getA: () => A,
+      getV: () => V,
+      isTogetherEnabled: () => togetherEnabled,
+      teleportVihaan: (x, z) => {
+        vihaanBounceTime = 0;
+        V.rig.position.set(x, groundHeightAt(x, z, rigBaseY), z);
+        checkVihaanProximity();
+        wake();
+      },
+      getVihaanBounceTime: () => vihaanBounceTime,
+      getVihaanExitState: () => ({ timer: vihaanWaveTimer, exiting: vihaanExiting, visible: V.rig.visible }),
+      getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed }),
+      getSeparationLimit: maxPlayerSeparation,
+      getGroundHeight: (x, z) => groundHeightAt(x, z, rigBaseY),
+      attemptVihaanMove: (dx, dz) => moveActor(V, dx, dz),
+      projectPlayers: () => {
+        const project = actor => {
+          const point = actor.rig.position.clone().project(camera);
+          return { x: point.x, y: point.y };
+        };
+        return { ahaan: project(A), vihaan: project(V) };
+      },
       getSwingPivot: () => swingPivot,
       setCustomCamera: (pos, target) => {
         if (pos && target) {

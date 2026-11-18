@@ -1,0 +1,45 @@
+.page-aesop { min-height: 100vh; }
+.page-aesop .nav-inner { gap: 16px; flex-wrap: wrap; }
+.aesop-nav-links { display: flex; gap: 10px 20px; flex-wrap: wrap; }
+.aesop-nav-links a { color: var(--ink); font-weight: 700; text-underline-offset: 4px; }
+.aesop-nav-links a:focus-visible, .aesop-footer a:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.aesop-wrap { width: min(900px, 100%); margin: 0 auto; padding: 34px 22px 26px; }
+.aesop-heading { margin: 0 0 18px; }
+.aesop-eyebrow { margin: 0 0 4px; color: #3c5d46; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.aesop-heading h1 { margin: 0; color: var(--ink); font-size: clamp(2.4rem, 7vw, 4rem); line-height: 1.04; }
+.aesop-heading > p:last-child { margin: 8px 0 0; font-size: 1.15rem; }
+.aesop-book { display: grid; gap: 12px; }
+.aesop-page { min-height: 450px; padding: clamp(18px, 4vw, 38px); color: #2b2721; background: #f6f1e7; border: 1px solid rgba(43,39,33,.2); border-radius: 16px; box-shadow: 0 10px 30px rgba(43,39,33,.12); }
+.aesop-page:focus { outline: none; }
+.aesop-page h2:focus { outline: 3px solid #2b2721; outline-offset: 4px; border-radius: 4px; }
+.aesop-contents-title { margin: 0 0 12px; font-size: clamp(2rem, 5vw, 2.7rem); }
+.aesop-search-label { display: block; margin-bottom: 5px; font-size: 1.1rem; font-weight: 700; }
+.aesop-search { width: min(100%, 500px); min-height: 48px; padding: 10px 13px; border: 2px solid #62594d; border-radius: 10px; color: #2b2721; background: #fff; font: inherit; font-size: 1.15rem; }
+.aesop-search:focus-visible, .aesop-list a:focus-visible, .aesop-btn:focus-visible { outline: 3px solid #2b2721; outline-offset: 3px; }
+.aesop-search-message { min-height: 1.5em; margin: 4px 0; font-weight: 600; }
+.aesop-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 22px; margin: 12px 0 0; padding-left: 1.6em; }
+.aesop-list li { padding: 4px 0; font-size: 1.22rem; }
+.aesop-list a { color: #244630; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.aesop-story h2 { margin: 0 0 18px; font-size: clamp(2.15rem, 6vw, 3.6rem); line-height: 1.05; overflow-wrap: anywhere; }
+.aesop-story p { margin: 0 0 1em; font-size: clamp(1.22rem, 2.5vw, 1.55rem); line-height: 1.58; overflow-wrap: anywhere; }
+.aesop-story .aesop-moral { margin: 1.3em 0 0; padding-top: .8em; border-top: 2px solid rgba(43,39,33,.25); font-size: clamp(1.25rem, 2.5vw, 1.6rem); }
+.aesop-moral strong { color: #244630; }
+.aesop-controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 9px; }
+.aesop-btn { min-width: 48px; min-height: 48px; padding: 10px 18px; border: 2px solid #2a4532; border-radius: 999px; color: #fff; background: #2a4532; font: inherit; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+.aesop-btn.secondary { color: #2a4532; background: #f6f1e7; }
+.aesop-btn:hover:not(:disabled) { background: #1d3324; color: #fff; }
+.aesop-btn:disabled { opacity: .45; cursor: default; }
+.aesop-page-number { min-width: 110px; text-align: center; font-weight: 700; }
+.aesop-footer { padding: 0 22px 28px; text-align: center; }
+@media (max-width: 600px) {
+  .aesop-wrap { padding: 24px 14px 20px; }
+  .aesop-page { min-height: 0; padding: 18px 16px; }
+  .aesop-list { grid-template-columns: 1fr; gap: 4px; }
+  .aesop-controls { gap: 7px; }
+  .aesop-btn { padding: 10px 12px; font-size: 1rem; }
+  .aesop-page-number { order: -1; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-aesop *, .page-aesop *::before, .page-aesop *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+html[data-motion="off"] .page-aesop *, html[data-motion="off"] .page-aesop *::before, html[data-motion="off"] .page-aesop *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }

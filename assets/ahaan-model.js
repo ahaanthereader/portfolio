@@ -32,7 +32,7 @@
    - Fully articulated walking, waving, and procedural blinking animations. ---- */
 
 window.AhaanModel = {
-  build(T) {
+  build(T, palette = {}) {
     // ---- Color Palette ----
     const SKIN = 0xc98d64;          // Warm golden-caramel skin tone
     const SKIN_SHADOW = 0xb47952;   // Contoured shadow skin
@@ -49,9 +49,9 @@ window.AhaanModel = {
     const MOUTH_IN = 0x361016;      // Deep ruby oral cavity
     const TEETH_WHITE = 0xffffff;   // Pearly white teeth
     const TONGUE = 0xbf525c;        // Soft pink tongue
-    const MAROON = 0x5a1d2d;        // Rich maroon polo stripe
+    const MAROON = palette.shirt || 0x5a1d2d; // Rich maroon polo stripe
     const CREAM = 0xf5f0e1;         // Warm cream polo stripe
-    const COLLAR = 0x43121f;        // Solid maroon polo collar
+    const COLLAR = palette.collar || 0x43121f; // Solid maroon polo collar
     const JEANS = 0x6e91b8;         // Storybook light denim
     const JEANS_D = 0x5a7c9f;       // Denim shadow tone
     const NAVY = 0x1c2b48;          // Sneaker navy canvas

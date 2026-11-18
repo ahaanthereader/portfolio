@@ -1,0 +1,12 @@
+# Park browser checks
+
+The browser check starts a local HTTP server for this worktree.
+
+Install Playwright outside the site when no local Playwright module exists.
+Set `PLAYWRIGHT_MODULE` to the Playwright package path when needed.
+Set `CHROMIUM_EXECUTABLE` when the browser path differs from the Playwright default.
+Set `BASE_URL` to use a running local site instead of the test's local server.
+
+Run `node tests/two-player-browser.cjs`.
+The check saves desktop and mobile screenshots under `/tmp/ahaan-two-player`.
+The check covers solo controls, twin controls, ice cream, trampoline, bridge height, camera bounds, toggle cleanup, and browser errors.

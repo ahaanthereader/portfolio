@@ -19,6 +19,7 @@
     <div class="nav-controls">
       <button type="button" class="breeze-pill breeze-btn" id="breezeBtn" aria-pressed="true">🍃 Breeze: on</button>
       <button type="button" class="breeze-pill sound-btn" id="soundBtn" aria-pressed="false">🔔 Sound: off</button>
+      <button type="button" class="breeze-pill together-btn" id="togetherBtn" aria-pressed="false" aria-label="Play together. Ahaan uses WASD and E. Vihaan uses arrow keys and Enter." title="Ahaan: WASD and E. Vihaan: arrows and Enter.">Play together: Off</button>
     </div>
   </div>
 </nav>
@@ -27,6 +28,8 @@
 
 <main id="main">
 <section class="home-hero" id="top" aria-labelledby="heroTitle">
+  <div class="player-world-label player-label-ahaan" id="playerLabelAhaan" hidden>Ahaan</div>
+  <div class="player-world-label player-label-vihaan" id="playerLabelVihaan" hidden>Vihaan</div>
   <div class="hero-paper-wash" aria-hidden="true"></div>
   <div class="hero-botany hero-botany-left" aria-hidden="true">
     <img src="public/landing-pages/meng-to-sketchbook/botany-left.png" alt="" />
@@ -121,6 +124,13 @@
       <span class="action-key-badge">Enter ⏎</span>
       <span class="action-text" id="actionPromptText">Jump! 🤸</span>
     </button>
+    <span class="action-boost-hint" id="actionBoostHint" hidden>Hold Space to go fast! 🚲💨</span>
+  </div>
+  <div class="action-prompt vihaan-action-prompt" id="vihaanActionPrompt" role="region" aria-live="polite" hidden>
+    <button type="button" class="action-prompt-btn" id="vihaanActionPromptBtn">
+      <span class="action-key-badge">Enter</span>
+      <span class="action-text" id="vihaanActionPromptText"></span>
+    </button>
   </div>
 
   <!-- Playground Activity HUD (Controls during Trampoline / Swing) -->
@@ -134,6 +144,22 @@
       <span class="act-label">Hop Off 🚪</span>
     </button>
   </div>
+
+  <div class="icecream-picker" id="iceCreamPicker" role="dialog" aria-modal="true" aria-labelledby="iceCreamTitle" hidden>
+    <section class="icecream-card">
+      <button class="icecream-close" type="button" data-close-picker aria-label="Close flavour picker">×</button>
+      <h2 id="iceCreamTitle">Which flavour?</h2>
+      <p>Choose a scoop for your cone.</p>
+      <div class="icecream-flavours">
+        <button type="button" data-flavor="Vanilla"><span class="flavour-dot vanilla"></span>Vanilla</button>
+        <button type="button" data-flavor="Chocolate"><span class="flavour-dot chocolate"></span>Chocolate</button>
+        <button type="button" data-flavor="Strawberry"><span class="flavour-dot strawberry"></span>Strawberry</button>
+        <button type="button" data-flavor="Mango"><span class="flavour-dot mango"></span>Mango</button>
+      </div>
+      <p class="icecream-live" aria-live="polite">You can come back for another cone.</p>
+    </section>
+  </div>
+  <p class="icecream-status" id="iceCreamStatus" role="status" aria-live="polite"></p>
 </section>
 </main>
 
@@ -142,7 +168,7 @@
     <h2>Thanks for visiting my world! 🌍</h2>
     <p>Built with curiosity, books, and a really good swing.</p>
     <div class="links">
-      <a href="index.html">← Home</a> · <a href="#">Back to top ↑</a>
+      <a href="index.html">← Home</a> · <a href="aesop.html">Read Aesop's Fables</a> · <a href="#">Back to top ↑</a>
       <!-- Add real links here, e.g. a reading log -->
     </div>
     <div class="tiny">Made with ❤️ · placeholder content, ready for the real stuff.</div>

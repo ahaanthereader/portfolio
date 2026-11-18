@@ -12,6 +12,7 @@
      language  - the main language or languages
      currency  - the money
      famous    - one famous place
+     food      - optional verified food for the quiz
      fact      - one fun fact
      hello     - one greeting in a main language
      population- an approximate 2024 population
