@@ -12,7 +12,9 @@
 - Chrome DevTools reported no console errors on `reading.html`.
 - Screenshots: `/tmp/ahaan-reading-aesop/reading-desktop.png` and `reading-mobile.png`.
 - `git diff --check` passed.
-- Feature commit: `1d21b5f` (`Add Reading Nook link to Aesop fables`). The commit is local and not pushed.
+- Feature commit: `1d21b5f` (`Add Reading Nook link to Aesop fables`).
+- Published Nov 18, 2026: merged to main as `a8fe125`, pushed `990e2a1..a8fe125`; GitHub Pages run `44256079700` success in 19 s; live verified reading.html (200) desktop 1280×800 + mobile 390×844, link visible, click opens aesop.html (200, title "Aesop's Fables · Ahaan's World"), zero console errors, zero failed requests; live aesop-data.js 200, 8,655 bytes; live aesop.html 200, 2,068 bytes.
+
 ## Capitals quiz brief — Nov 16, 2026
 
 ### State before changes
@@ -816,7 +818,7 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 5. FEATURE-BRIEF-bike-speed-boost.md — PUBLISHED live Nov 16, 2026 (feature 669318a, merge 1b39ba5; Pages run 43995668330 success). Space = boost (8 m/s top), base top 4.15 → 5.5 m/s, accel 1.55 → 2.6, steering base 0.22 → 0.55; hint "Hold Space to go fast! 🚲💨" live on index.html.
 6. FEATURE-BRIEF-vihaan-quad.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-vihaan-quad`, branch `feature/vihaan-quad` (from origin/main 1b39ba5), surface 1000090048 [terminal]. (First attempt: Claude agentSession surface 1000090044 came up with no agent process and never picked up the starter; rerouted to a Codex terminal surface per the Nov 10 fallback rule.) Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands. BLOCKED Nov 16, 2026 (21:06): worker ended task_complete — the quad cannot start until the two-player feature lands (worktree still at ee0688d; two-player merge/publish is the critical path). No code changed; do NOT nudge as a stall.
 7. FEATURE-BRIEF-capitals-quiz.md — PUBLISHED live Nov 17, 2026 (merge 218ead7, Pages run 44200931157 success, live-verified: all four rounds, Stop button on every question, wrong answers never red; local commit e441a3c).
-8. FEATURE-BRIEF-reading-aesop-link.md — COMPLETE locally Nov 17, 2026 (feature commit 1d21b5f, HANDOFF record 9313356, Chrome DevTools zero console errors; link, screenshots, click verified). Publish pending — runs once screen capture is back.
+8. FEATURE-BRIEF-reading-aesop-link.md — PUBLISHED live Nov 18, 2026 (merge a8fe125, Pages run 44256079700 success, live-verified: reading.html 200 desktop + mobile, link visible, click opens aesop.html, zero console errors).
 9. FEATURE-BRIEF-two-player-vehicles.md — QUEUED Nov 17, 2026 (Nishant's ask: Ahaan blue tee in two-player mode; quad, e-bike, 2-seater car, chopper parked outside the middle park with proper mechanics and physics; bike stuck fix first). Next for the idle two-player worker (1000090004) once screen capture is back.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
