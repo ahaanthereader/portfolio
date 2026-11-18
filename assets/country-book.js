@@ -11,6 +11,7 @@
   const BOOK = window.COUNTRY_BOOK.slice().sort(byName);
   const TOTAL = BOOK.length;
   const COVER = 0, CONTENTS = 1, FIRST = 2, LAST = FIRST + TOTAL - 1;
+  const spreadMedia = matchMedia("(min-width: 861px)");
 
   const pageEl = document.getElementById("cbPage");
   const numEl = document.getElementById("cbNum");
@@ -69,11 +70,12 @@
   }
 
   function countryHTML(c, n) {
+    const nameId = "cbName-" + n;
     const stripes = c.colors.map(col => '<span style="background:' + esc(col) + '"></span>').join("");
     const kind = c.kind === "place" ? "A place in " : "A country in ";
-    const row = (label, value) => "<div><dt>" + label + "</dt><dd>" + esc(value) + "</dd></div>";
-    return '<article class="cb-country" aria-labelledby="cbName"><div class="cb-left">' +
-      '<h3 class="cb-name" id="cbName" tabindex="-1">' + esc(c.name) + "</h3>" +
+    const row = (label, value) => value ? "<div><dt>" + label + "</dt><dd>" + esc(value) + "</dd></div>" : "";
+    return '<article class="cb-country" data-country-index="' + n + '" aria-labelledby="' + nameId + '"><div class="cb-left">' +
+      '<h3 class="cb-name" id="' + nameId + '" tabindex="-1">' + esc(c.name) + "</h3>" +
       '<p class="cb-kind">' + kind + esc(c.continent) + ".</p>" +
       (c.note ? '<p class="cb-note">' + esc(c.note) + "</p>" : "") +
       '<div class="cb-flagrow">' +
@@ -85,9 +87,13 @@
       '<dl class="cb-facts">' +
         row("Continent", c.continent) +
         row("Language", c.language) +
+        row("Hello", c.hello) +
+        row("Population (2024)", c.population) +
         row("Currency", c.currency) +
         row("Famous place", c.famous) +
+        row(c.food ? "Famous food" : "Another famous place", c.food || c.famous2) +
         row("Fun fact", c.fact) +
+        row("Another fun fact", c.fact2) +
       "</dl>" +
       '<p class="cb-pageno" aria-hidden="true">' + n + "</p>" +
     "</article>";
@@ -114,17 +120,28 @@
     const dir = p > current ? "next" : p < current ? "prev" : "";
     current = p;
 
+    pageEl.classList.toggle("cb-spread", p >= FIRST && spreadMedia.matches);
     if (p === COVER) pageEl.innerHTML = coverHTML();
     else if (p === CONTENTS) { pageEl.innerHTML = contentsHTML(); wireContents(); }
-    else pageEl.innerHTML = countryHTML(BOOK[p - FIRST], p - FIRST + 1);
+    else if (spreadMedia.matches) {
+      const start = Math.floor((p - FIRST) / 2) * 2;
+      const left = BOOK[start], right = BOOK[start + 1];
+      pageEl.innerHTML = '<div class="cb-leaf">' + countryHTML(left, start + 1) + "</div>" +
+        (right ? '<div class="cb-leaf">' + countryHTML(right, start + 2) + "</div>" : '<div class="cb-leaf cb-leaf-empty" aria-hidden="true"></div>');
+    } else pageEl.innerHTML = countryHTML(BOOK[p - FIRST], p - FIRST + 1);
     pageEl.scrollTop = 0;
 
     if (p === COVER) numEl.textContent = "Cover";
     else if (p === CONTENTS) numEl.textContent = "Contents";
-    else numEl.textContent = "Page " + (p - FIRST + 1) + " of " + TOTAL;
+    else if (spreadMedia.matches) {
+      const start = Math.floor((p - FIRST) / 2) * 2 + 1;
+      const end = Math.min(start + 1, TOTAL);
+      numEl.textContent = "Pages " + start + (end > start ? "–" + end : "") + " of " + TOTAL;
+    } else numEl.textContent = "Page " + (p - FIRST + 1) + " of " + TOTAL;
 
-    prevBtn.disabled = p === COVER;
-    nextBtn.disabled = p === LAST;
+    const spreadStart = Math.floor((p - FIRST) / 2) * 2;
+    prevBtn.disabled = p === COVER || (p >= FIRST && spreadMedia.matches && spreadStart === 0);
+    nextBtn.disabled = p === LAST || (p >= FIRST && spreadMedia.matches && spreadStart + 2 >= TOTAL);
     contentsBtn.disabled = p === CONTENTS;
 
     try { history.replaceState(null, "", "#" + hashFor(p)); } catch (e) {}
@@ -135,11 +152,36 @@
 
     // Move focus to the page heading only after a jump. Previous and Next keep focus on the button.
     // A page change also removes old page content. If focus was in that content, move focus to the new heading.
-    if (opts.focusPage || hadInPage) { const h = pageEl.querySelector("h3"); if (h) h.focus({ preventScroll: true }); }
+    if (opts.focusPage || hadInPage) {
+      const n = p >= FIRST ? p - FIRST + 1 : 0;
+      const h = pageEl.querySelector('.cb-country[data-country-index="' + n + '"] h3') || pageEl.querySelector("h3");
+      if (h) h.focus({ preventScroll: true });
+    }
     // A disabled button loses focus. Move focus to the other turn button so focus stays visible.
     else if (had && had.disabled && (had === prevBtn || had === nextBtn)) (had === prevBtn ? nextBtn : prevBtn).focus();
   }
   pageEl.addEventListener("animationend", () => pageEl.classList.remove("turn-next", "turn-prev"));
+
+  // A horizontal touch swipe turns one page. Vertical gestures keep their normal scroll action.
+  let touchStart = null;
+  pageEl.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1 || e.target.closest("button, a, input, textarea, select")) return;
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  pageEl.addEventListener("touchend", e => {
+    if (!touchStart || e.changedTouches.length !== 1) return;
+    const dx = e.changedTouches[0].clientX - touchStart.x, dy = e.changedTouches[0].clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) >= 56 && Math.abs(dx) > Math.abs(dy) * 1.25) show(turnStep(dx < 0 ? 1 : -1));
+  }, { passive: true });
+  pageEl.addEventListener("touchcancel", () => { touchStart = null; }, { passive: true });
+
+  function turnStep(direction) {
+    if (current < FIRST || !spreadMedia.matches) return current + direction;
+    const start = Math.floor((current - FIRST) / 2) * 2;
+    return FIRST + start + (direction > 0 ? 2 : -2);
+  }
+  spreadMedia.addEventListener("change", () => show(current, { still: true }));
 
   /* ---------- contents search ---------- */
   function wireContents() {
@@ -161,8 +203,8 @@
   }
 
   /* ---------- controls ---------- */
-  prevBtn.addEventListener("click", () => show(current - 1));
-  nextBtn.addEventListener("click", () => show(current + 1));
+  prevBtn.addEventListener("click", () => show(turnStep(-1)));
+  nextBtn.addEventListener("click", () => show(turnStep(1)));
   contentsBtn.addEventListener("click", () => show(CONTENTS, { focusPage: true }));
   pageEl.addEventListener("click", e => {
     const item = e.target.closest(".cb-item");
@@ -179,7 +221,7 @@
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
     if (t && t.closest && t.closest(".nav")) return;
     e.preventDefault();
-    show(current + (e.key === "ArrowRight" ? 1 : -1));
+    show(turnStep(e.key === "ArrowRight" ? 1 : -1));
   });
 
   window.addEventListener("hashchange", () => { const p = pageFromHash(); if (p !== current) show(p, { focusPage: true }); });

@@ -13,6 +13,56 @@
 - Screenshots: `/tmp/ahaan-reading-aesop/reading-desktop.png` and `reading-mobile.png`.
 - `git diff --check` passed.
 - Feature commit: `1d21b5f` (`Add Reading Nook link to Aesop fables`). The commit is local and not pushed.
+## Capitals quiz brief — Nov 16, 2026
+
+### State before changes
+
+- The quiz page is `quiz.html` and loads `assets/quiz.js`.
+- The page shows a 50-question quiz immediately. It has no start screen or stop button.
+- A wrong answer uses the red `#e7806a` style.
+- `geography.html` and `sketchbook.html` already link to `quiz.html`.
+- The worktree is on `feature/capitals-quiz` from `origin/main`. Only the brief file was untracked.
+
+### Work in progress
+
+- Started the four-quiz implementation from `FEATURE-BRIEF-capitals-quiz.md`.
+
+### Implemented and checked
+
+- `quiz.html` now opens with four quiz cards. The page does not start a round on load.
+- Each quiz selects 10 questions without repeats. Each question has four distinct answer buttons.
+- The reader can stop at any time. Each answer shows kind feedback and a Next button.
+- Wrong answers use a soft neutral style. The right answer uses green.
+- The end screen shows the answered count, the score, Play again, and Choose another quiz.
+- Best scores save separately by quiz type. Storage errors do not stop the quiz.
+- The quiz uses 176 Country Book entries, 50 state-capital entries, 12 food entries, and 12 building entries.
+- All building country names match a Country Book entry. The starter list has no name mismatch.
+- Country food entries added: Australia—meat pie; Brazil—feijoada; Canada—poutine; China—dumplings; Egypt—koshari; France—baguette; India—biryani; Italy—pizza; Japan—sushi; Mexico—tacos; Peru—ceviche; Spain—paella.
+- Food sources: Australia—[Australian cuisine](https://en.wikipedia.org/wiki/Australian_cuisine#Meat_pies); Brazil—[feijoada](https://en.wikipedia.org/wiki/Feijoada); Canada—[poutine](https://en.wikipedia.org/wiki/Poutine); China—[Chinese dumplings](https://en.wikipedia.org/wiki/Chinese_dumpling).
+- Egypt—[UNESCO koshary entry](https://ich.unesco.org/en/RL/koshary-daily-life-dish-and-practices-associated-with-it-02278); France—[UNESCO baguette entry](https://ich.unesco.org/en/RL/baguette-bread-craft-knowledge-and-culture-01883); India—[biryani](https://en.wikipedia.org/wiki/Biryani); Italy—[pizza](https://en.wikipedia.org/wiki/Pizza).
+- Japan—[GO TOKYO food guide](https://www.gotokyo.org/en/see-and-do/drinking-and-dining/japanese-cuisine/index.html); Mexico—[UNESCO Mexican cuisine entry](https://ich.unesco.org/en/RL/traditional-mexican-cuisine-00400); Peru—[UN Tourism cuisine note](https://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2025-06/20250613_Information%20Note_70CAM_Peru_EN.pdf); Spain—[paella](https://en.wikipedia.org/wiki/Paella).
+- State-capital source: [Wikipedia list of U.S. capitals](https://en.wikipedia.org/wiki/List_of_capitals_in_the_United_States). The file contains 50 states with no duplicate state names.
+- Building pairs checked against the Country Book landmark entries and these building references: [Eiffel Tower](https://en.wikipedia.org/wiki/Eiffel_Tower), [Taj Mahal](https://en.wikipedia.org/wiki/Taj_Mahal), [Great Wall](https://en.wikipedia.org/wiki/Great_Wall_of_China), [Pyramids of Giza](https://en.wikipedia.org/wiki/Giza_pyramid_complex), [Colosseum](https://en.wikipedia.org/wiki/Colosseum), [Statue of Liberty](https://en.wikipedia.org/wiki/Statue_of_Liberty), [Sydney Opera House](https://en.wikipedia.org/wiki/Sydney_Opera_House), [Big Ben](https://en.wikipedia.org/wiki/Big_Ben), [Machu Picchu](https://en.wikipedia.org/wiki/Machu_Picchu), [Christ the Redeemer](https://en.wikipedia.org/wiki/Christ_the_Redeemer_(statue)), [Leaning Tower of Pisa](https://en.wikipedia.org/wiki/Leaning_Tower_of_Pisa), and [Sagrada Familia](https://en.wikipedia.org/wiki/Sagrada_Fam%C3%ADlia).
+- Chrome checks passed at 1280×800 and 390×844. The checks played every quiz to 10 questions, tested one wrong answer per quiz, checked score counts, stopped an empty round, checked answer focus, and found no horizontal scroll or JavaScript errors.
+- Screenshots are in `/tmp/ahaan-capitals-quiz/`: `start.png`, `question-1.png` through `question-4.png`, `wrong-neutral.png`, `stopped.png`, and `full-round.png`.
+- `node --check` passed for the quiz and both new data files. `git diff --check` passed.
+- Facts for Ahaan to check: none recorded.
+- The worker committed the changes locally on `feature/capitals-quiz` with message `Build four kind quiz rounds`. No files were published.
+## Two-player mode — Nov 13, 2026
+
+- Branch `feature/two-player` starts at bike branch commit `ee0688d`.
+- The approved spec is `_bmad-output/implementation-artifacts/spec-two-player.md`.
+- Vihaan uses Ahaan's model and scale with a red shirt. Ahaan keeps his maroon shirt.
+- Added the accessible Play together toggle and projected name labels.
+- Added separate arrow-key walking for Vihaan. Shift increases his walking speed.
+- In two-player mode, arrows do not enter Ahaan's bike controls.
+- The camera follows both players. A frustum-based limit preserves a screen margin.
+- Added separate ice-cream cones, timers, arms, prompts, and a trampoline bounce for Vihaan.
+- Vihaan enters and exits with a wave when motion is allowed.
+- Syntax, whitespace, desktop, mobile, and reduced-motion checks pass.
+- Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- Implementation commit: `b46a012` (rebased from `5a689a1` onto main `218ead7`; record commit `21cbcb3`).
+- Published Nov 17, 2026: merged to main as `8495fdc`, pushed `218ead7..8495fdc`; GitHub Pages run `44211964764` success; live verified desktop + mobile, browser suite errors: [].
 
 ## Lazy river bridge verification — Nov 10, 2026
 
@@ -500,6 +550,95 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - No water ripples or edge foam were found. No added reeds or beach balls were found.
 - No texture pass was made. Motion preference checks for water remain incomplete.
 
+## Country Book v2 — COMPLETE (Nov 17, 2026)
+
+- Started branch `feature/country-book-v2` from `origin/main` at `8310cea`.
+- Worktree: `.worktrees/country-book-v2`.
+- First check: inspect the current 176-entry data and the book renderer.
+- The current data has 176 entries. Each entry uses one object line.
+- Added optional template rows for Hello, Population (2024), Famous food or another place, and another fun fact.
+- Missing optional fields hide their rows.
+- The data now has 176 greetings, 171 populations, 163 foods, 12 extra places, and 42 extra facts. Every entry has at least one new field.
+- Added rounded 2024 population values to 171 entries.
+- Source: World Bank indicator `SP.POP.TOTL`, 2024 values: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?date=2024&format=json&per_page=1000
+- Indicator notes: https://data.worldbank.org/indicator/SP.POP.TOTL
+- Values use two significant figures. Each value starts with “About”.
+- All brief work is complete. No implementation step remains.
+- The optional facts listed below remain hidden until checked. The brief allows uncertain fields to stay off the pages.
+
+### Facts for Ahaan to check
+
+- The World Bank query has no separate 2024 match for Falkland Islands, Northern Cyprus, Somaliland, Taiwan, or Western Sahara.
+- Their population rows stay hidden until a reliable source and matching territory are checked.
+- Western Sahara has no checked population or food/second-place value. Its greeting now uses a checked Hassaniya phrase.
+
+### Book component research
+
+- The React route uses `react-pageflip`. Its README requires React components, JSX, and a build step. This static site has no React or build step.
+- The plain JavaScript route uses StPageFlip. Its repository offers a browser bundle and an HTML element API.
+- The React route would add React, a build pipeline, JSX, and a rewrite of the current renderer and navigation.
+- The StPageFlip prototype loaded the real 176 entries plus cover and contents. It created 178 page nodes at once, so it failed the 176-page requirement.
+- Selected the current plain JavaScript pager. It renders one country page on phones and two country pages per wide-screen spread.
+- A two-page spread keeps each country address. Search and contents still select a country page. The spread keeps only two country templates in the DOM.
+- Sources: https://github.com/Nodlik/react-pageflip · https://github.com/Nodlik/StPageFlip · https://nodlik.github.io/StPageFlip/docs/classes/pageflip.html
+
+### First content pass — greetings
+
+- Added checked greeting fields to all 176 entries.
+- Each greeting that uses one language from a multilingual entry names the language.
+- The renderer hides the greeting row when no checked phrase exists.
+- Moved the greeting and population rows before the food and fact rows.
+- Omniglot greeting list: https://www.omniglot.com/language/phrases/hello.htm
+- Checked phrase pages: https://www.omniglot.com/language/phrases/albanian.php · https://www.omniglot.com/language/phrases/macedonian.php · https://www.omniglot.com/language/phrases/malay.php · https://www.omniglot.com/language/phrases/kinyarwanda.php · https://www.omniglot.com/language/phrases/vietnamese.php
+- Added greetings for Bangladesh, Burundi, Montenegro, Vietnam, and Western Sahara after checking language-specific sources.
+- Bangladesh displays both common greetings because greeting choice differs across religious communities: https://www.ciee.org/sites/default/files/documents/hsib-orientation/bangladesh.pdf · https://www.omniglot.com/language/phrases/bengali.php
+- Burundi: Amahoro is a Kirundi greeting: https://repository.ub.edu.bi/server/api/core/bitstreams/ffcd52b4-69dc-467d-96d8-045942f1e7ba/content
+- Montenegro: Ćao is listed as an informal greeting by the national tourism site: https://www.montenegro.travel/en/plan-your-stay-in-montenegro/useful-tips-and-facts/montenegrin-dictionary
+- Vietnam: Xin chào is a common versatile greeting: https://www.vietnamairlines.com/us/en/plan-book/travel/travel-guide/hello-in-vietnamese
+- Western Sahara: a Hassaniya phrase list gives “Salam Aleïkum”: https://www.amatlichtours.mr/en/hassaniya-2/ · LangMedia confirms Hassaniya use in the Western Saharan region: https://www.langmedia.fivecolleges.edu/resources/western-sahara/basic-communications/greetings-and-hospitality
+- A data load check confirms 176 entries and 176 greetings. No greeting row stays hidden.
+
+### Book look and interaction checks — Nov 17, 2026
+
+- Added a cream page, a subtle texture, a centre fold, page edges, and a soft shadow.
+- The existing sketchbook background gives the book a calm desk setting.
+- Added a two-page spread at widths above 860 px. Phones show one country page.
+- Added touch swipes. A horizontal swipe turns pages. Vertical touch still scrolls.
+- The StPageFlip prototype loaded 178 page nodes. It did not meet the requirement to avoid 176 page subtrees.
+- Browser checks at 1280x800 found two country pages and no console errors. Search opened India at `#india`. Direct `#mongolia` opened Mongolia.
+- Browser checks at 390x844 found one country page, no horizontal overflow, no console errors, and a working touch swipe.
+- Button, arrow, and touch checks turned pages at both viewports. Motion off and reduced motion removed the page-turn animation.
+- Screenshots: `/tmp/ahaan-country-book-v2/desktop-cover.png`, `/tmp/ahaan-country-book-v2/desktop-india.png`, `/tmp/ahaan-country-book-v2/desktop-contents.png`, `/tmp/ahaan-country-book-v2/mobile-india.png`.
+
+### Next content pass — famous food or another place
+
+- Started source checks for the third data field in the brief.
+- Added 163 source-checked foods and 12 second famous places to the data.
+- Sources: Afghanistan — Kabuli palaw (https://lets-visit-afghanistan.com/en/food-and-drinks); Albania — tavë kosi (https://albaniatourism.org/albanian-food-and-drink/); Algeria — couscous (https://visitalgeria.dz/en/culture-history/algerian-cuisine); Argentina — asado (https://www.argentina.travel/en/news/el-asado-guia-para-vivir-el-ritual-mas-sabroso); Armenia — khorovats (https://armenia.travel/things-to-do/armenian-cuisine/); Australia — meat pie (https://www.australia.com/en-ca/things-to-do/food-and-drinks/typical-aussie-foods-to-try.html); Austria — Wiener schnitzel (https://www.austria.info/en-us/recipes/wiener-schnitzel/); Azerbaijan — plov (https://azerbaijan.travel/azerbaijani-plov); Bahamas — cracked conch (https://www.bahamas.com/blog/5-ways-to-eat-conch-in-the-bahamas); Benin — amiwo (https://www.untourism.int/africa/african-gastronomy/benin); Bhutan — ema datshi (https://bhutan.travel/journal/editorial/the-diverse-and-delicious-food-of-bhutan); Bosnia and Herzegovina — ćevapi (https://fsa.gov.ba/wp-content/uploads/2026/04/Katalog_zasticenih_proizvoda_final_compressed.pdf); Cambodia — fish amok (https://lib.ncdd.gov.kh/storage/app/public/library_backend/CAT_19903_1/2016-Invest-in-Cambodia.pdf).
+- More sources: Denmark — smørrebrød (https://www.visitdenmark.com/denmark/things-to-do/eat-drink/traditional-danish-food); Iceland — skyr (https://www.visiticeland.com/article/enjoy-icelandic-food/); Peru — ceviche (https://www.peru.travel/news/peru-conquers-canada-and-awakens-the-world-a-destination-that-has-it-all); Romania — sarmale (https://www.euraxess.gov.ro/romania/information-assistance/daily-life/romanian-cuisine); Serbia — ćevapi (https://www.serbia.travel/en/authentic-from-serbia/); Slovakia — bryndzové halušky (https://slovakia.travel/en/things-to-see-and-do/gastronomia/tradition-on-a-plate); South Africa — bobotie (https://www.southafrica.net/gl/en/travel/article/iconic-south-african-foods-taste-all-the-flavours-of-the-rainbow-nation); Spain — paella (https://www.spain.info/en/discover-spain/dishes-traditional-cuisine-spain/); Uganda — matooke (https://utb.go.ug/utb-hosts-spectacular-cultural-gala-for-international-visitors-at-ndere-cultural-center/); Vietnam — phở (https://vietnam.travel/things-to-do/21-must-try-vietnamese-dishes/).
+- I left foods out when the source did not support a clear choice.
+- Food sources for the next 47 records: Fiji — Kokoda (https://www.fiji.travel/things-to-do/local-eats/how-to-make-fijian-kokoda); Finland — Karelian pie (https://www.visitfinland.com/en/articles/finlands-traditional-and-iconic-foods/); France — baguette (https://www.france.fr/en/article/art-french-breakfast/); Gabon — nyembwe (https://presidence.ga/la-culture-du-gabon/); Gambia — benachin (https://visitgambia.com/gambia/themes/food-drink); Georgia — khachapuri (https://georgia.travel/get-a-taste-of-khachapuri); Germany — Thuringian Rostbratwurst (https://www.germany.travel/en/experience-enjoy/german-cuisine.html); Ghana — banku (https://visitghana.com/wp-content/uploads/2024/04/Glitz-See-Ghana-Brochure.pdf); Greece — tzatziki (https://www.visitgreece.gr/en/experiences/culture/archaeological-sites-monuments/cherished-greek-dishes); Greenland — suaasat (https://visitgreenland.com/activities/greenlandic-gastronomy-a-taste-of-greenland/); Guatemala — pepián (https://nominaciones.mcd.gob.gt/en/glossary/); Guinea — sauce feuille (https://mpci.gov.gn/TOURISM/GUIDETOURISTIQUE.html); Guinea-Bissau — cafriela (https://www.consulmarbissau.com/sites/default/files/files/tourist_guide_guinea-bissau_eu_acl2018_en_web.pdf); Guyana — pepperpot (https://travelguyana.gy/story/cuisine/); Haiti — soup joumou (https://ich.unesco.org/en/d%C3%A9cisions/16.COM/19); Honduras — baleadas (https://bvss.incap.int/honduras/); Hungary — gulyás soup (https://visithungary.com/articles/all-you-need-to-know-about-hungarian-cuisine); India — Hyderabadi biryani (https://www.incredibleindia.gov.in/en/telangana/hyderabad/embark-on-an-extravagant-culinary-journey-in-hyderabad); Indonesia — nasi goreng (https://www.indonesia.travel/gb/en/travel-ideas/gastronomy/5-popular-fried-rice-varieties-at-jakarta-s-food-stalls); Iran — chelow kabab (https://www.iranicaonline.org/articles/spazi-cookery/?generate_pdf=1); Iraq — masgouf (https://iraqiembassy.us/art-and-culture/); Ireland — Irish stew (https://www.ireland.com/en-gb/magazine/food-and-drink/traditional-irish-food/); Israel — shakshuka (https://www.gov.il/BlobFolder/generalpage/facts-about-israel-2018/en/English_ABOUT_ISRAEL_PDF_Israel%20Lifestyle%202018.pdf); Italy — Neapolitan pizza (https://www.italia.it/en/campania/naples/things-to-do/pizza); Jamaica — ackee and saltfish (https://www.visitjamaica.com/best-of-jamaica/food/); Japan — sushi (https://www.japan.travel/en/things-to-do/eat-and-drink/); Jordan — mansaf (https://international.visitjordan.com/page/13/RomanTheatre.aspx); Kazakhstan — beshbarmak (https://www.gov.kz/article/64578?lang=en); Kenya — ugali (https://www.kenyarep-jp.com/en/kenya/basic/); Kosovo — flija (https://kosovo.travel/About); Kuwait — machboos (https://www.journeykuwait.com/taste-kuwait); Kyrgyzstan — beshbarmak (https://cbtkyrgyzstan.kg/useful/o-kyrgyzstane/); Laos — laap (https://www.tourismlaos.org/welcome/food-flavours/); Latvia — grey peas with bacon (https://www.latvia.travel/en/flavours-latvia); Lebanon — falafel (https://apnews.com/article/bc03a28df47d174f89708ac7a27f4cb4); Lesotho — papa (https://centralbank.org.ls/about-the-kingdom-of-lesotho/); Liberia — palm butter soup (https://enjoyliberia.travel/pages/cultural-heritage/); Libya — bazin (https://libyanheritagehouse.org/arts-culture/libyan-cuisine); Lithuania — cepelinai (https://lithuania.travel/en/what-to-do/food-and-drink/lithuanian-products/cepelinai); Luxembourg — Judd mat Gaardebounen (https://luxembourg.public.lu/dam-assets/publications/just-arrived/just-arrived-en.pdf); Madagascar — romazava (https://madagascar-tourisme.com/fr/activities/gastronomie/?ontm_categorie=0&ontm_recherche=&ontm_region=); Malawi — nsima (https://ich.unesco.org/en/RL/nsima-culinary-tradition-of-malawi-01292); Malaysia — nasi lemak (https://rai.malaysia.gov.my/visit); Mali — mafé (https://www.ibamako.com/en/que-faire/malian-food-dishes-bamako/); Mauritania — leksour (https://visitmauritania.com/saveurs/); Mexico — mole (https://visitmexico.com/en/destino/18021/mercado-zonal-candiani); Moldova — mămăligă (https://turism.gov.md/wp-content/uploads/2025/06/brosura_generala_plic_cap3_en_2025_tipar.pdf).
+
+- More food sources: Morocco — couscous (https://www.visitmorocco.com/en/travel-info/food-drinks); Namibia — kapana (https://visitnamibia.com.na/top-10-things-to-do/); Nepal — dal bhat tarkari (https://trade.ntb.gov.np/know-nepal/culture/); Norway — lefse (https://www.visitnorway.com/things-to-do/food-and-drink/lefse/); Palestine — musakhan (https://visitpalestine.ps/travel-information/food-and-dining/); Poland — pierogi (https://www.poland.travel/en/flavours-of-polish-cuisine/); Portugal — bacalhau à Brás (https://www.visitportugal.com/en/content/the-portuguese-menu-fish-coriander-and-fantasy); Qatar — machboos (https://visitqatar.com/intl-en/about-qatar/cuisine); Rwanda — brochettes (https://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2024-11/a-tour-of-african-gastronomy-rwanda.pdf?VersionId=aL6dwgxuvJuOedB0VSx7t2Qw8Sb3nJa0); South Korea — kimchi (https://english.visitkorea.or.kr/svc/contents/contentsView.do?vcontsId=140728); South Sudan — kisra (https://lib-repo.pnu.edu.ua/bitstream/123456789/20830/1/TastesofTraditions.pdf); Sri Lanka — kottu (https://www.srilanka.travel/culinary-tourism/index.php); Switzerland — rösti (https://www.aboutswitzerland.eda.admin.ch/en/switzerlands-national-dishes); Thailand — pad Thai (https://www.doae.go.th/en/pad-thai/); Togo — fufu (https://togotourisme.tg/detailsite?slug=specialites-culinaires&type=activite); Trinidad and Tobago — doubles (https://visittrinbago.tt/things-to-do/cuisine/); Yemen — saltah (https://embassy-of-yemen.pl/en/home/visit-yemen/tourism-in-yemen/must-try/).
+
+- Recent food sources: Cameroon — Achu soup (https://tourismeouestcameroun.com/specialites-culinaires/); Chad — boule (https://tchadmaculture.com/en/cuisine/); Djibouti — skoudehkaris (https://visit-djibouti.com/en/culture/djiboutian-cuisine/); Egypt — koshari (https://www.experienceegypt.eg/en/home/culture); Eritrea — zigni (https://shabait.com/2013/02/22/traditional-maadi/); Mozambique — matapa (https://www.visitmozambique.gov.mz/wp-content/uploads/2025/04/BROCHURA-Cultura_Gastronomia_Print.pdf); Nigeria — jollof rice (https://www.fmacce.gov.ng/gastronomy); Somalia — cambulo (https://www.fao.org/4/aq045e/aq045e.pdf); Somaliland — laxoox (https://link.springer.com/article/10.1186/s42779-022-00138-3); Sudan — ful medames (https://visitsudan.org/en/cuisine); Tanzania — pilau (https://www.ke.tzembassy.go.tz/tanzania/category/people-and-culture); Tunisia — brik (https://www.discovertunisia.com/en/sophistication-and-tradition); Zimbabwe — sadza (https://tourismzim.gov.zw/).
+
+- More checked foods: Belgium — Brussels waffle (https://www.visit.brussels/en/visitors/where-to-eat/brussels-culinary-specialities); Cyprus — halloumi (https://www.visitcyprus.com/discover-cyprus/food-drink/local-produce/halloumi-cheese/); Czechia — svíčková (https://www.visitczechia.com/en-us/things-to-do/places/gastronomic-tourism/czech-cuisine-and-regional-products/g-svickova-na-smetane); North Korea — Pyongyang naengmyeon (https://chinese1.visitkorea.or.kr/enu/FOD/FO_ENG_1_4.jsp); Oman — shuwa (https://booknow.visitoman.om/en/idea/62015096/prepare-oman-s-no-1-underground-traditional-dish-oman); Philippines — pinakbet (https://app.philippines.travel/articles/intro-to-ilocos-norte); Saudi Arabia — kabsa (https://www.visitsaudi.com/en/stories/saudis-youngest-ambassadors-omar-and-aya); Ukraine — borscht (https://mincult.gov.ua/en/news/ukrainian-borscht-is-inscribed-on-the-unesco-list-of-intangible-cultural-heritage/); Uruguay — chivito (https://uruguaynatural.com/en/experiences/uruguay-patrimonio-vivo-del-futbol-mundial/); Panama — sancocho (https://embajadadepanamaenespana.gob.pa/conoce-panama/); Paraguay — sopa paraguaya (https://cultura.gov.py/2017/08/cultura-declara-patrimonio-cultural-inmaterial-del-paraguay-la-sopa-paraguaya-el-vori-vori-el-locro-y-el-jopara/); Sweden — köttbullar (https://visitsweden.com/what-to-do/food-drink/swedish-kitchen/local-legends/); Vanuatu — lap lap (https://www.vanuatu.travel/en/about-vanuatu/local-eats).
+- Added four more places: Falkland Islands — Christ Church Cathedral in Stanley (https://www.falklandislands.com/our-islands/stanley-capital-of-the-falklands); Montenegro — Ostrog Monastery (https://www.montenegro.travel/en/explore-montenegro/culture-and-tours/sacral-objects); Myanmar — Shwedagon Pagoda in Yangon (https://myanmar.gov.mm/-/yangon?redirect=%2Ftravel-myanmar); Pakistan — Faisal Mosque in Islamabad (https://www.ptpctourism.com/).
+
+- Latest food sources: Equatorial Guinea — pepesup (https://www.guineaecuatorialpress.com/index.php/noticias/gastronomia); Eswatini — sidvudvu selijoti (https://agrinfosystems.gov.sz/assets/uploadsEswatini%20food%20composition%20table.pdf); Republic of the Congo — saka-saka (https://www.untourism.int/africa/african-gastronomy/republic-of-congo); Suriname — pom (https://www.southamerica.travel/guianas/travel-info/food-drink/); Zambia — nshima (https://www.mots.gov.zm/wp-content/uploads/2026/03/ZAMBIA-COUNTRY-HIGHLIGHTS_english.pdf).
+- Latest place sources: Central African Republic — Boali Falls (https://www.usrcaembassy.org/tourism); Niger — Aïr and Ténéré Natural Reserves (https://whc.unesco.org/en/list/573); Solomon Islands — Lake Tegano on Rennell Island (https://whc.unesco.org/en/list/854/); Syria — Palmyra (https://whc.unesco.org/en/list/23/); United States — Statue of Liberty (https://www.nps.gov/stli/learn/statue-of-liberty-facts.htm).
+
+### Second fun fact pass
+
+- Added checked `fact2` fields to 42 entries.
+- The page labels these rows “Another fun fact”.
+- I skipped repeat candidates for Azerbaijan, South Korea, and Fiji.
+- Africa sources: Algeria (https://whc.unesco.org/en/list/179); Angola (https://whc.unesco.org/en/list/1511); Botswana (https://whc.unesco.org/en/list/1021); Central African Republic (https://whc.unesco.org/en/list/1380); Chad (https://whc.unesco.org/en/list/1400); Egypt (https://whc.unesco.org/en/list/88/); Ethiopia (https://whc.unesco.org/en/list/18); Gambia (https://whc.unesco.org/en/list/761); Madagascar (https://whc.unesco.org/en/documents/104118); Mali (https://whc.unesco.org/en/list/119); Morocco (https://whc.unesco.org/en/list/836); Rwanda (https://whc.unesco.org/en/list/1697/); Senegal (https://whc.unesco.org/en/list/1359/); South Africa (https://whc.unesco.org/en/list/915/); Sudan (https://whc.unesco.org/en/list/1336/); Tanzania (https://whc.unesco.org/en/list/173); Tunisia (https://whc.unesco.org/en/list/38/); Uganda (https://whc.unesco.org/en/list/1022).
+- Asia sources: Cambodia (https://www.unesco.org/en/mab/tonle-sap?hub=66369); China (https://za.china-embassy.gov.cn/eng/zngx_1/ChinaSARelations2004/202401/t20240104_11216991.htm); Georgia (https://ich.unesco.org/en/RL/ancient-georgian-traditional-qvevri-wine-making-method-00870); India (https://culture.gov.in/kaziranga-national-park); Indonesia (https://whc.unesco.org/en/list/609); Iran (https://whc.unesco.org/en/list/1506); Japan (https://www.japan.go.jp/tomodachi/2014/autumn2014/the_shinkansen_japans_high-speed_rail.html); Jordan (https://businessevents.visitjordan.com/en/page/17/DeadSea); Kazakhstan (https://www.gov.kz/uploads/2020/12/27/4d25dfd8ea1e19b5488d44e2528a8e12_original.17964681.pdf); Laos (https://whc.unesco.org/en/list/1587/); Malaysia (https://www.malaysia.travel/index.php/explore/appreciate-the-nation-s-unique-biodiversity-this-malaysia-day-flora-edition); Mongolia (https://ich.unesco.org/en/RL/traditional-music-of-the-morin-khuur-00068); Myanmar (https://ich.unesco.org/en/decisions/16.COM/8.B.27); Nepal (https://whc.unesco.org/en/list/120).
+- Other sources: Australia (https://whc.unesco.org/document/162440); Brazil (https://publicacoes-snif.florestal.gov.br/florestasdobrasil/en/forest-resources/extent-of-forests-in-brazil/); Canada (https://www.unesco.org/en/iggp/cliffs-fundy-unesco-global-geopark); Estonia (https://visitestonia.com/en/where-to-go/tallinn); France (https://whc.unesco.org/en/list/80/); Greece (https://www.unesco.org/en/mab/mount-olympus); Italy (https://whc.unesco.org/pg.cfm?CID=31&ID_SITE=394&l=en); New Zealand (https://www.doc.govt.nz/globalassets/documents/our-work/milford-opportunities-project/stage-2/mop-land-analysis-report-2021.pdf); United States (https://www.nps.gov/grca/faqs.htm); Vanuatu (https://tourism.gov.vu/en/program/products/product-development/iconic-tourism-products).
+- Published Nov 17, 2026: merged to main as `e05fc2f` (branch `1a2296e`; main merged into the branch first, HANDOFF.md kept both sides, country-data.js kept the branch version plus main's header line), pushed `3c2b456..e05fc2f`; GitHub Pages run `44221176304` success; live verified https://ahaanthereader.github.io/portfolio/sketchbook.html desktop + mobile (176 entries A-to-Z, direct #mongolia, search India to #india, button/arrow/touch turns, motion off + reduced motion), browser suite errors: []. Evidence: `/tmp/ahaan-country-book-v2-live/` (live-check.json, live-desktop-mongolia.png, live-desktop-india.png, live-mobile-india.png).
+
 ## Bike and ice cream feature — Nov 10, 2026
 
 - Branch `feature/bike-ice-cream` starts at `24f68aba1d6a8e6a37c08499c22a4effe1fc1e62`, the tip of `feature/lazy-river-bridges`.
@@ -674,9 +813,9 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
 3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
 4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
-5. FEATURE-BRIEF-bike-speed-boost.md — QUEUED Nov 15, 2026 (Nishant: "use spacebar for speed — it's too slow"). Space = boost (about 2x top speed), faster base speed, better low-speed steering; runs after two-player lands.
-6. FEATURE-BRIEF-vihaan-quad.md — QUEUED Nov 15, 2026 (Nishant: "Vihaan bike convert into quad faster"). Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands.
-7. FEATURE-BRIEF-capitals-quiz.md — next pickup once the quad lands (brief needs the Nov 11 amend: US state capitals + country food + buildings quizzes)
+5. FEATURE-BRIEF-bike-speed-boost.md — PUBLISHED live Nov 16, 2026 (feature 669318a, merge 1b39ba5; Pages run 43995668330 success). Space = boost (8 m/s top), base top 4.15 → 5.5 m/s, accel 1.55 → 2.6, steering base 0.22 → 0.55; hint "Hold Space to go fast! 🚲💨" live on index.html.
+6. FEATURE-BRIEF-vihaan-quad.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-vihaan-quad`, branch `feature/vihaan-quad` (from origin/main 1b39ba5), surface 1000090048 [terminal]. (First attempt: Claude agentSession surface 1000090044 came up with no agent process and never picked up the starter; rerouted to a Codex terminal surface per the Nov 10 fallback rule.) Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands. BLOCKED Nov 16, 2026 (21:06): worker ended task_complete — the quad cannot start until the two-player feature lands (worktree still at ee0688d; two-player merge/publish is the critical path). No code changed; do NOT nudge as a stall.
+7. FEATURE-BRIEF-capitals-quiz.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-capitals-quiz`, branch `feature/capitals-quiz` (from origin/main 1b39ba5), surface 1000090049 [terminal]. (Brief is the amended Nov 14 version: four 10-question quizzes — country capitals, US state capitals, country food, famous buildings; Stop button on every question, wrong answers never red.) COMPLETE Nov 16, 2026 — local commit e441a3c "Build four kind quiz rounds".
 8. FEATURE-BRIEF-reading-aesop-link.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-reading-aesop-link`, branch `feature/reading-aesop-link` (from origin/main 1b39ba5), surface 1000090050 [terminal]. One Aesop's Fables link/card on reading.html pointing to aesop.html; runs after Capitals Quiz.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
@@ -689,3 +828,40 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Released boost above normal speed: ease down by 0.65 m/s².
 - Chrome checks passed at 1280 × 800 and 390 × 844. Space boost, release, E dismount, touch hold, and riding hint passed. No console errors appeared.
 - Screenshots: `/tmp/ahaan-bike-speed/parked.png`, `riding.png`, and `boosting.png`.
+
+## Publish: bike speed boost — Nov 16, 2026
+
+- Merged `feature/bike-speed-boost` into main: commit `1b39ba5` (feature `669318a`).
+- Pushed `85852ef..1b39ba5` to origin main.
+- GitHub Pages deploy run `43995668330` ("Merge branch 'feature/bike-speed-boost'") completed success.
+- Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 177,917 bytes, boost code live: `boostHeld`, Space handler, `actionBoostHint` toggle), live `index.html` contains the `actionBoostHint` hint element ("Hold Space to go fast! 🚲💨").
+- The main worktree's uncommitted `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted. It was not part of this publish.
+- The two-player and Country Book v2 branches were not merged. They are still in progress.
+## Two-player feature — Nov 13, 2026
+
+- Created branch `feature/two-player` from commit `ee0688d` in `.worktrees/feature/two-player`.
+- Source brief: `FEATURE-BRIEF-two-player.md` in the main checkout.
+- Read the brief, queue entry, project instructions, and sensory-friendly spec.
+- Mapped the model, input, activity, interaction, and camera code.
+- Drafted `_bmad-output/implementation-artifacts/spec-two-player.md`. The spec records the control map, camera limit, actor-specific actions, and verification checks.
+- Nishant approved the spec and implementation on Nov 13, 2026.
+- Implementation now uses baseline commit `ee0688d1d4d6fee53e74f8ea1e48a1923263579a`.
+
+## Two-player implementation results — Nov 17, 2026
+
+- Nishant changed Vihaan's shirt from teal to red. Ahaan keeps his maroon shirt.
+- Ahaan uses WASD and E. Vihaan uses arrow keys and Enter when the toggle is on.
+- Shift with movement keys makes either boy run.
+- Arrow keys do not steer Ahaan's bike. WASD still controls the bike.
+- Both boys have separate prompts, ice-cream cones, timers, and trampoline actions.
+- Vihaan followed the Mississippi deck height at x=11.5, z=−4.9 m. His rig and ground height both measured 8.00094 m.
+- The camera follows the players' midpoint and zooms up to the existing 1.45 limit.
+- A frustum limit preserves a 3.5 m horizontal margin. The limit adjusts when the viewport changes.
+- Desktop and mobile frame checks kept both players within 0.90 NDC. The mobile screenshot shows both names and characters.
+- Reduced motion kept the toggle active and skipped entry and exit waves.
+- Browser checks passed for solo controls, both control sets, independent trampoline actions, both ice-cream cones, bridge height, bike isolation, camera bounds, and toggle cleanup.
+- No browser page errors appeared. Sound stayed off.
+- `node --check` passed for both source files and the browser test. `git diff --check` passed.
+- Browser test: `tests/two-player-browser.cjs`. Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
+- The branch contains local commits only. No changes were published.
