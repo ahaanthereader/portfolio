@@ -48,7 +48,8 @@
 - Vihaan enters and exits with a wave when motion is allowed.
 - Syntax, whitespace, desktop, mobile, and reduced-motion checks pass.
 - Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
-- Next: review the final diff and commit locally. Do not push.
+- Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
+- No changes were pushed.
 
 ## Lazy river bridge verification — Nov 10, 2026
 
@@ -760,4 +761,5 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - No browser page errors appeared. Sound stayed off.
 - `node --check` passed for both source files and the browser test. `git diff --check` passed.
 - Browser test: `tests/two-player-browser.cjs`. Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
-- The branch has no commit yet. No changes were published.
+- Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
+- The branch contains local commits only. No changes were published.
