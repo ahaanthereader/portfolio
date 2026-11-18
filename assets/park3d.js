@@ -2472,6 +2472,10 @@
     }
     if (togetherBtn) togetherBtn.addEventListener("click", event => {
       togetherEnabled = !togetherEnabled;
+      A.setShirtPalette(
+        togetherEnabled ? 0x2b6ea6 : 0x5a1d2d,
+        togetherEnabled ? 0x1d4f78 : 0x43121f
+      );
       togetherBtn.setAttribute("aria-pressed", String(togetherEnabled));
       togetherBtn.textContent = `Play together: ${togetherEnabled ? "On" : "Off"}`;
       if (event.detail > 0) togetherBtn.blur();
@@ -2486,6 +2490,9 @@
         V.rig.position.set(A.rig.position.x + vihaanStart.x, groundLevelY - V.footY * ahaanScale, A.rig.position.z + vihaanStart.z);
         if (!calm() && V.startWave) { V.startWave(); vihaanWaveTimer = 2.8; }
       } else {
+        parkEbike();
+        parkCar();
+        parkChopper();
         vihaanBounceTime = 0;
         vihaanEatingTimer = 0;
         vihaanConeGroup.visible = false;
@@ -2949,6 +2956,185 @@
     mapGroup.add(quadRoot);
     registerInteractive(quadRoot, { name: "Vihaan's quad", onInteract: () => { if (togetherEnabled) toggleQuadRide(); } });
 
+    const eBikeParking = { x: -13, z: 7, heading: Math.PI / 2 };
+    const eBikeState = { ...eBikeParking, speed: 0, rider: null, wheels: [] };
+    const eBikeKeys = { up: false, down: false, left: false, right: false };
+    const eBikeRoot = new T.Group();
+    const eBikeFrameMat = new T.MeshStandardMaterial({ color: 0x315d63, roughness: 0.62, metalness: 0.22 });
+    const eBikeDarkMat = new T.MeshStandardMaterial({ color: 0x272a29, roughness: 0.9 });
+    const eBikeBatteryMat = new T.MeshStandardMaterial({ color: 0x456c70, roughness: 0.55, metalness: 0.16 });
+    const eBikeWheelRadius = 0.66;
+    [-0.94, 0.94].forEach(z => {
+      const wheel = new T.Group();
+      wheel.position.set(0, eBikeWheelRadius + 0.04, z);
+      wheel.rotation.y = Math.PI / 2;
+      wheel.rotation.order = "YXZ";
+      wheel.add(new T.Mesh(new T.TorusGeometry(eBikeWheelRadius, 0.065, 9, 24), eBikeDarkMat));
+      wheel.add(new T.Mesh(new T.TorusGeometry(eBikeWheelRadius - 0.09, 0.025, 6, 20), eBikeFrameMat));
+      const hub = new T.Mesh(new T.CylinderGeometry(0.12, 0.12, 0.25, 12), eBikeBatteryMat);
+      hub.rotation.z = Math.PI / 2;
+      wheel.add(hub);
+      eBikeRoot.add(wheel);
+      eBikeState.wheels.push(wheel);
+    });
+    bikeRod(eBikeRoot, [0, 0.78, -0.94], [0, 0.9, -0.08], 0.065, eBikeFrameMat);
+    bikeRod(eBikeRoot, [0, 0.9, -0.08], [0, 1.58, -0.48], 0.065, eBikeFrameMat);
+    bikeRod(eBikeRoot, [0, 1.58, -0.48], [0, 0.78, -0.94], 0.065, eBikeFrameMat);
+    bikeRod(eBikeRoot, [0, 0.9, -0.08], [0, 1.45, 0.50], 0.065, eBikeFrameMat);
+    bikeRod(eBikeRoot, [0, 1.45, 0.50], [0, 0.78, 0.94], 0.065, eBikeFrameMat);
+    bikeRod(eBikeRoot, [0, 0.78, 0.94], [0, 0.9, -0.08], 0.065, eBikeFrameMat);
+    const eBikeBattery = new T.Mesh(new T.BoxGeometry(0.34, 0.62, 0.50), eBikeBatteryMat);
+    eBikeBattery.position.set(0, 1.22, 0.12);
+    eBikeBattery.castShadow = true;
+    eBikeRoot.add(eBikeBattery);
+    const eBikeSeat = new T.Mesh(new T.BoxGeometry(0.42, 0.12, 0.48), seatMat);
+    eBikeSeat.position.set(0, 1.65, -0.52);
+    eBikeRoot.add(eBikeSeat);
+    bikeRod(eBikeRoot, [0, 1.48, 0.50], [0, 2.25, 0.63], 0.055, eBikeFrameMat);
+    const eBikeHandlebar = new T.Mesh(new T.BoxGeometry(0.78, 0.08, 0.11), bikeMetalMat);
+    eBikeHandlebar.position.set(0, 2.25, 0.63);
+    eBikeRoot.add(eBikeHandlebar);
+    const eBikeLight = new T.Mesh(new T.SphereGeometry(0.13, 10, 8), new T.MeshStandardMaterial({ color: 0xf5e8bb, emissive: 0x6d5c30, emissiveIntensity: 0.2 }));
+    eBikeLight.position.set(0, 2.03, 0.68);
+    eBikeRoot.add(eBikeLight);
+    eBikeRoot.position.set(eBikeState.x, 0.06, eBikeState.z);
+    eBikeRoot.rotation.y = eBikeState.heading;
+    mapGroup.add(eBikeRoot);
+    registerInteractive(eBikeRoot, {
+      name: "E-bike",
+      onInteract: () => {
+        const rider = togetherEnabled && Math.hypot(V.rig.position.x - eBikeState.x, V.rig.position.z - eBikeState.z) < Math.hypot(A.rig.position.x - eBikeState.x, A.rig.position.z - eBikeState.z) ? V : A;
+        mountEbike(rider);
+      }
+    });
+
+    const carParking = { x: -14, z: -8, heading: 0 };
+    const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [] };
+    const carKeys = { up: false, down: false, left: false, right: false };
+    const carRoot = new T.Group();
+    const carBodyMat = new T.MeshStandardMaterial({ color: 0xc57a45, roughness: 0.58, metalness: 0.18 });
+    const carTrimMat = new T.MeshStandardMaterial({ color: 0x343637, roughness: 0.82 });
+    const carGlassMat = new T.MeshStandardMaterial({ color: 0x8fb5bd, roughness: 0.28, metalness: 0.08, transparent: true, opacity: 0.62 });
+    const carSeatMat = new T.MeshStandardMaterial({ color: 0x51463c, roughness: 0.9 });
+    const carBody = new T.Mesh(new T.BoxGeometry(1.76, 0.62, 3.25), carBodyMat);
+    carBody.position.set(0, 0.72, 0);
+    carBody.castShadow = true;
+    carRoot.add(carBody);
+    const carHood = new T.Mesh(new T.BoxGeometry(1.58, 0.34, 0.9), carBodyMat);
+    carHood.position.set(0, 1.12, 1.02);
+    carHood.castShadow = true;
+    carRoot.add(carHood);
+    const carRearDeck = new T.Mesh(new T.BoxGeometry(1.56, 0.28, 0.62), carBodyMat);
+    carRearDeck.position.set(0, 1.05, -1.15);
+    carRoot.add(carRearDeck);
+    const carRoof = new T.Mesh(new T.BoxGeometry(1.48, 0.13, 1.45), carBodyMat);
+    carRoof.position.set(0, 2.0, -0.1);
+    carRoot.add(carRoof);
+    [-0.68, 0.68].forEach(side => {
+      bikeRod(carRoot, [side, 1.0, 0.72], [side * 0.82, 1.95, 0.55], 0.055, carBodyMat);
+      bikeRod(carRoot, [side, 1.0, -0.83], [side * 0.82, 1.95, -0.72], 0.055, carBodyMat);
+      const window = new T.Mesh(new T.BoxGeometry(0.035, 0.72, 1.18), carGlassMat);
+      window.position.set(side * 0.72, 1.52, -0.08);
+      carRoot.add(window);
+    });
+    const carWindshield = new T.Mesh(new T.BoxGeometry(1.28, 0.65, 0.05), carGlassMat);
+    carWindshield.position.set(0, 1.55, 0.65);
+    carWindshield.rotation.x = -0.18;
+    carRoot.add(carWindshield);
+    [-0.43, 0.43].forEach(side => {
+      const seat = new T.Mesh(new T.BoxGeometry(0.58, 0.62, 0.58), carSeatMat);
+      seat.position.set(side, 1.18, -0.05);
+      carRoot.add(seat);
+      const headrest = new T.Mesh(new T.BoxGeometry(0.4, 0.26, 0.16), carSeatMat);
+      headrest.position.set(side, 1.58, -0.32);
+      carRoot.add(headrest);
+    });
+    const carSteeringWheel = new T.Mesh(new T.TorusGeometry(0.22, 0.035, 8, 18), carTrimMat);
+    carSteeringWheel.position.set(-0.43, 1.67, 0.58);
+    carSteeringWheel.rotation.x = Math.PI / 2;
+    carRoot.add(carSteeringWheel);
+    [-1, 1].forEach(side => [-1, 1].forEach(front => {
+      const wheel = new T.Group();
+      wheel.position.set(side * 0.91, 0.48, front * 1.08);
+      wheel.rotation.z = Math.PI / 2;
+      const tire = new T.Mesh(new T.CylinderGeometry(0.36, 0.36, 0.22, 12), carTrimMat);
+      tire.castShadow = true;
+      wheel.add(tire);
+      const hub = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.24, 10), bikeMetalMat);
+      wheel.add(hub);
+      carRoot.add(wheel);
+      carState.wheels.push(wheel);
+    }));
+    [-0.56, 0.56].forEach(side => {
+      const lamp = new T.Mesh(new T.BoxGeometry(0.32, 0.18, 0.08), new T.MeshStandardMaterial({ color: 0xf3e6bb, emissive: 0x554522, emissiveIntensity: 0.18 }));
+      lamp.position.set(side, 1.0, 1.64);
+      carRoot.add(lamp);
+    });
+    carRoot.position.set(carState.x, 0.06, carState.z);
+    mapGroup.add(carRoot);
+    registerInteractive(carRoot, {
+      name: "Two-seat car",
+      onInteract: () => {
+        const actor = togetherEnabled && Math.hypot(V.rig.position.x - carState.x, V.rig.position.z - carState.z) < Math.hypot(A.rig.position.x - carState.x, A.rig.position.z - carState.z) ? V : A;
+        mountCar(actor);
+      }
+    });
+
+    const chopperParking = { x: 23, z: -20, heading: 0 };
+    const chopperState = { ...chopperParking, altitude: 0, speed: 0, rider: null, rotorSpeed: 0 };
+    const chopperKeys = { up: false, down: false, left: false, right: false, lift: false, descend: false };
+    const chopperRoot = new T.Group();
+    const chopperBodyMat = new T.MeshStandardMaterial({ color: 0x4c806f, roughness: 0.62 });
+    const chopperTrimMat = new T.MeshStandardMaterial({ color: 0x333b3b, roughness: 0.68 });
+    const chopperGlassMat = new T.MeshStandardMaterial({ color: 0x9ec4c5, roughness: 0.24, transparent: true, opacity: 0.72 });
+    const chopperBody = new T.Mesh(new T.SphereGeometry(0.72, 14, 10), chopperBodyMat);
+    chopperBody.scale.set(0.9, 0.76, 1.55);
+    chopperBody.position.y = 1.05;
+    chopperBody.castShadow = true;
+    chopperRoot.add(chopperBody);
+    const chopperCabin = new T.Mesh(new T.SphereGeometry(0.52, 14, 10), chopperGlassMat);
+    chopperCabin.scale.set(0.9, 0.8, 0.85);
+    chopperCabin.position.set(0, 1.42, 0.35);
+    chopperRoot.add(chopperCabin);
+    const chopperTail = new T.Mesh(new T.CylinderGeometry(0.1, 0.2, 2.35, 8), chopperBodyMat);
+    chopperTail.rotation.x = Math.PI / 2;
+    chopperTail.position.set(0, 1.12, -1.8);
+    chopperRoot.add(chopperTail);
+    const chopperRotor = new T.Group();
+    chopperRotor.position.set(0, 1.82, 0);
+    chopperRoot.add(chopperRotor);
+    [-1, 1].forEach(side => {
+      const blade = new T.Mesh(new T.BoxGeometry(0.18, 0.045, 3.15), chopperTrimMat);
+      blade.position.z = side * 1.58;
+      blade.castShadow = true;
+      chopperRotor.add(blade);
+    });
+    const tailRotor = new T.Group();
+    tailRotor.position.set(0, 1.18, -2.93);
+    chopperRoot.add(tailRotor);
+    [-1, 1].forEach(side => {
+      const blade = new T.Mesh(new T.BoxGeometry(0.08, 0.92, 0.12), chopperTrimMat);
+      blade.position.y = side * 0.46;
+      tailRotor.add(blade);
+    });
+    [-1, 1].forEach(side => {
+      const skid = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 2.05, 8), chopperTrimMat);
+      skid.rotation.x = Math.PI / 2;
+      skid.position.set(side * 0.58, 0.34, 0.05);
+      chopperRoot.add(skid);
+      bikeRod(chopperRoot, [side * 0.48, 0.58, 0.65], [side * 0.58, 0.35, 0.75], 0.045, chopperTrimMat);
+      bikeRod(chopperRoot, [side * 0.48, 0.58, -0.65], [side * 0.58, 0.35, -0.72], 0.045, chopperTrimMat);
+    });
+    chopperRoot.position.set(chopperState.x, bikeSurfaceHeightAt(chopperState.x, chopperState.z), chopperState.z);
+    mapGroup.add(chopperRoot);
+    registerInteractive(chopperRoot, {
+      name: "Chopper",
+      onInteract: () => {
+        const actor = togetherEnabled && Math.hypot(V.rig.position.x - chopperState.x, V.rig.position.z - chopperState.z) < Math.hypot(A.rig.position.x - chopperState.x, A.rig.position.z - chopperState.z) ? V : A;
+        mountChopper(actor);
+      }
+    });
+
     const shopState = { x: 4.2, z: -13.5 };
     const shopRoot = new T.Group();
     shopRoot.position.set(shopState.x, 0, shopState.z);
@@ -3027,6 +3213,8 @@
     const flavorColors = { Vanilla: 0xf2e5bd, Chocolate: 0x70452e, Strawberry: 0xdc7690, Mango: 0xf0ad38 };
     function openIceCreamPicker(actor = A) {
       if (actor === A && bikeState.riding) dismountBike();
+      if (eBikeState.rider === actor) dismountEbike();
+      if (carState.driver === actor || carState.passenger === actor) dismountCar(actor);
       if (!iceCreamPicker) return;
       pickerActor = actor;
       const live = iceCreamPicker.querySelector(".icecream-live");
@@ -3118,6 +3306,186 @@
       A.leftLeg.knee.rotation.set(0, 0, 0); A.rightLeg.knee.rotation.set(0, 0, 0);
       wake();
     }
+    function mountEbike(actor) {
+      if (!actor || eBikeState.rider || currentActivity || (actor === A && (bikeState.riding || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || vihaanEatingTimer > 0))) return;
+      eBikeState.rider = actor;
+      eBikeState.speed = 0;
+      Object.keys(eBikeKeys).forEach(key => { eBikeKeys[key] = false; });
+      if (actor === A) Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+      else Object.keys(vihaanKeys).forEach(key => { vihaanKeys[key] = false; });
+      targetPos = null;
+      currentNearbyItem = null;
+      vihaanNearbyItem = null;
+      actor.leftArm.arm.rotation.set(-1.35, 0, 0.18);
+      actor.leftArm.elbow.rotation.set(1.05, 0, 0);
+      actor.wavingArm.arm.rotation.set(-1.35, 0, -0.18);
+      actor.wavingArm.elbow.rotation.set(1.05, 0, 0);
+      actor.leftLeg.hip.rotation.set(-1.05, 0, 0);
+      actor.rightLeg.hip.rotation.set(-1.05, 0, 0);
+      actor.leftLeg.knee.rotation.set(1.25, 0, 0);
+      actor.rightLeg.knee.rotation.set(1.25, 0, 0);
+      wake();
+    }
+    function dismountEbike() {
+      const actor = eBikeState.rider;
+      if (!actor) return;
+      eBikeState.rider = null;
+      eBikeState.speed = 0;
+      Object.keys(eBikeKeys).forEach(key => { eBikeKeys[key] = false; });
+      const sideX = Math.cos(eBikeState.heading) * 1.35;
+      const sideZ = -Math.sin(eBikeState.heading) * 1.35;
+      actor.rig.position.set(eBikeState.x + sideX, groundHeightAt(eBikeState.x + sideX, eBikeState.z + sideZ, rigBaseY), eBikeState.z + sideZ);
+      actor.rig.rotation.y = eBikeState.heading;
+      actor.leftArm.arm.rotation.set(0, 0, actor.leftArm.rest); actor.leftArm.elbow.rotation.set(0, 0, 0);
+      actor.wavingArm.arm.rotation.set(0, 0, actor.wavingArm.rest); actor.wavingArm.elbow.rotation.set(0, 0, 0);
+      actor.leftLeg.hip.rotation.set(0, 0, 0); actor.rightLeg.hip.rotation.set(0, 0, 0);
+      actor.leftLeg.knee.rotation.set(0, 0, 0); actor.rightLeg.knee.rotation.set(0, 0, 0);
+      wake();
+    }
+    function parkEbike() {
+      if (eBikeState.rider) dismountEbike();
+      eBikeState.x = eBikeParking.x;
+      eBikeState.z = eBikeParking.z;
+      eBikeState.heading = eBikeParking.heading;
+      eBikeState.speed = 0;
+      eBikeRoot.position.set(eBikeState.x, bikeSurfaceHeightAt(eBikeState.x, eBikeState.z), eBikeState.z);
+      eBikeRoot.rotation.y = eBikeState.heading;
+      const item = INTERACTABLES.find(entry => entry.id === "ebike");
+      if (item) { item.x = eBikeState.x; item.z = eBikeState.z; }
+    }
+    function carSeatPosition(actor) {
+      const side = carState.driver === actor ? -0.43 : 0.43;
+      const cos = Math.cos(carState.heading), sin = Math.sin(carState.heading);
+      return { x: carState.x + side * cos, z: carState.z - side * sin };
+    }
+    function positionCarRider(actor) {
+      const seat = carSeatPosition(actor);
+      actor.rig.position.set(seat.x, groundHeightAt(seat.x, seat.z, rigBaseY) - 0.12, seat.z);
+      actor.rig.rotation.set(0, carState.heading, 0);
+    }
+    function setCarRiderPose(actor) {
+      actor.leftArm.arm.rotation.set(-1.05, 0, 0.20);
+      actor.leftArm.elbow.rotation.set(0.82, 0, 0);
+      actor.wavingArm.arm.rotation.set(-1.05, 0, -0.20);
+      actor.wavingArm.elbow.rotation.set(0.82, 0, 0);
+      actor.leftLeg.hip.rotation.set(-0.55, 0, 0);
+      actor.rightLeg.hip.rotation.set(-0.55, 0, 0);
+      actor.leftLeg.knee.rotation.set(0.55, 0, 0);
+      actor.rightLeg.knee.rotation.set(0.55, 0, 0);
+      if (actor.stopWave) actor.stopWave();
+      if (actor === A) waveTimer = 0;
+      else vihaanWaveTimer = 0;
+    }
+    function resetCarRiderPose(actor) {
+      actor.leftArm.arm.rotation.set(0, 0, actor.leftArm.rest); actor.leftArm.elbow.rotation.set(0, 0, 0);
+      actor.wavingArm.arm.rotation.set(0, 0, actor.wavingArm.rest); actor.wavingArm.elbow.rotation.set(0, 0, 0);
+      actor.leftLeg.hip.rotation.set(0, 0, 0); actor.rightLeg.hip.rotation.set(0, 0, 0);
+      actor.leftLeg.knee.rotation.set(0, 0, 0); actor.rightLeg.knee.rotation.set(0, 0, 0);
+    }
+    function mountCar(actor) {
+      if (!actor) return;
+      if (carState.driver === actor || carState.passenger === actor) { dismountCar(actor); return; }
+      if (currentActivity || (actor === A && (bikeState.riding || eBikeState.rider === A || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || eBikeState.rider === V || vihaanEatingTimer > 0))) return;
+      if (carState.driver && carState.passenger) return;
+      const wasEmpty = !carState.driver;
+      if (wasEmpty) carState.driver = actor;
+      else carState.passenger = actor;
+      if (wasEmpty) Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
+      targetPos = null;
+      currentNearbyItem = null;
+      vihaanNearbyItem = null;
+      if (actor === A) Object.keys(keys).forEach(key => { keys[key] = false; });
+      else Object.keys(vihaanKeys).forEach(key => { vihaanKeys[key] = false; });
+      setCarRiderPose(actor);
+      positionCarRider(actor);
+      wake();
+    }
+    function dismountCar(actor) {
+      const isDriver = carState.driver === actor;
+      const isPassenger = carState.passenger === actor;
+      if (!isDriver && !isPassenger) return;
+      const side = isDriver ? -1.42 : 1.42;
+      const exitX = carState.x + side * Math.cos(carState.heading);
+      const exitZ = carState.z - side * Math.sin(carState.heading);
+      actor.rig.position.set(exitX, groundHeightAt(exitX, exitZ, rigBaseY), exitZ);
+      actor.rig.rotation.y = carState.heading;
+      resetCarRiderPose(actor);
+      if (isDriver) {
+        carState.speed = 0;
+        carState.driver = carState.passenger;
+        carState.passenger = null;
+        Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
+        if (carState.driver) { setCarRiderPose(carState.driver); positionCarRider(carState.driver); }
+        else carState.speed = 0;
+      } else carState.passenger = null;
+      wake();
+    }
+    function parkCar() {
+      if (carState.passenger) dismountCar(carState.passenger);
+      if (carState.driver) dismountCar(carState.driver);
+      carState.x = carParking.x;
+      carState.z = carParking.z;
+      carState.heading = carParking.heading;
+      carState.speed = 0;
+      Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
+      carRoot.position.set(carState.x, bikeSurfaceHeightAt(carState.x, carState.z), carState.z);
+      carRoot.rotation.y = carState.heading;
+      const item = INTERACTABLES.find(entry => entry.id === "car");
+      if (item) { item.x = carState.x; item.z = carState.z; }
+    }
+    function mountChopper(actor) {
+      if (!actor || chopperState.rider || chopperState.altitude > 0.05 || currentActivity || (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || eBikeState.rider === V || carState.driver === V || carState.passenger === V || vihaanEatingTimer > 0))) return;
+      chopperState.rider = actor;
+      chopperState.speed = 0;
+      Object.keys(chopperKeys).forEach(key => { chopperKeys[key] = false; });
+      targetPos = null;
+      currentNearbyItem = null;
+      vihaanNearbyItem = null;
+      actor.leftArm.arm.rotation.set(-1.25, 0, 0.2);
+      actor.leftArm.elbow.rotation.set(0.9, 0, 0);
+      actor.wavingArm.arm.rotation.set(-1.25, 0, -0.2);
+      actor.wavingArm.elbow.rotation.set(0.9, 0, 0);
+      actor.leftLeg.hip.rotation.set(-0.92, 0, 0);
+      actor.rightLeg.hip.rotation.set(-0.92, 0, 0);
+      actor.leftLeg.knee.rotation.set(1.25, 0, 0);
+      actor.rightLeg.knee.rotation.set(1.25, 0, 0);
+      wake();
+    }
+    function dismountChopper() {
+      const actor = chopperState.rider;
+      if (!actor || chopperState.altitude > 0.05 || chopperState.speed > 0.25) return;
+      chopperState.rider = null;
+      chopperState.speed = 0;
+      Object.keys(chopperKeys).forEach(key => { chopperKeys[key] = false; });
+      const sideX = Math.cos(chopperState.heading) * 1.5;
+      const sideZ = -Math.sin(chopperState.heading) * 1.5;
+      let exitX = chopperState.x + sideX, exitZ = chopperState.z + sideZ;
+      if (blockedBikePosition(exitX, exitZ)) { exitX = chopperState.x - sideX; exitZ = chopperState.z - sideZ; }
+      actor.rig.position.set(exitX, groundHeightAt(exitX, exitZ, rigBaseY), exitZ);
+      actor.rig.rotation.y = chopperState.heading;
+      actor.leftArm.arm.rotation.set(0, 0, actor.leftArm.rest); actor.leftArm.elbow.rotation.set(0, 0, 0);
+      actor.wavingArm.arm.rotation.set(0, 0, actor.wavingArm.rest); actor.wavingArm.elbow.rotation.set(0, 0, 0);
+      actor.leftLeg.hip.rotation.set(0, 0, 0); actor.rightLeg.hip.rotation.set(0, 0, 0);
+      actor.leftLeg.knee.rotation.set(0, 0, 0); actor.rightLeg.knee.rotation.set(0, 0, 0);
+      wake();
+    }
+    function parkChopper() {
+      if (chopperState.rider) {
+        chopperState.altitude = 0;
+        chopperState.speed = 0;
+        chopperRoot.position.y = bikeSurfaceHeightAt(chopperState.x, chopperState.z);
+        dismountChopper();
+      }
+      chopperState.x = chopperParking.x;
+      chopperState.z = chopperParking.z;
+      chopperState.heading = chopperParking.heading;
+      chopperState.altitude = 0;
+      chopperState.speed = 0;
+      chopperRoot.position.set(chopperState.x, bikeSurfaceHeightAt(chopperState.x, chopperState.z), chopperState.z);
+      chopperRoot.rotation.y = chopperState.heading;
+      const item = INTERACTABLES.find(entry => entry.id === "chopper");
+      if (item) { item.x = chopperState.x; item.z = chopperState.z; }
+    }
 
     // Activity control buttons state
     const activityHud = document.getElementById("activityHud");
@@ -3169,6 +3537,36 @@
         actionLabel: "Ride the bike 🚲",
         promptText: "Press E to ride the bike.",
         onActivate: () => bikeState.riding ? dismountBike() : mountBike()
+      },
+      {
+        id: "ebike",
+        name: "E-bike",
+        x: eBikeState.x,
+        z: eBikeState.z,
+        approachRadius: 3.8,
+        actionLabel: "Ride the e-bike ⚡",
+        promptText: "Press E to ride the e-bike.",
+        onActivate: () => mountEbike(A)
+      },
+      {
+        id: "car",
+        name: "Two-seat car",
+        x: carState.x,
+        z: carState.z,
+        approachRadius: 4.2,
+        actionLabel: "Ride in the car 🚙",
+        promptText: "Press E to ride in the car.",
+        onActivate: () => mountCar(A)
+      },
+      {
+        id: "chopper",
+        name: "Chopper",
+        x: chopperState.x,
+        z: chopperState.z,
+        approachRadius: 4.2,
+        actionLabel: "Ride the chopper 🚁",
+        promptText: "Press E to ride the chopper.",
+        onActivate: () => mountChopper(A)
       },
       {
         id: "icecream",
@@ -3262,6 +3660,12 @@
     }
     function activateVihaanItem() {
       if (!vihaanNearbyItem) return;
+      if (vihaanNearbyItem.id === "chopper") mountChopper(V);
+      if (vihaanNearbyItem.id === "chopperRide") dismountChopper();
+      if (vihaanNearbyItem.id === "ebike") mountEbike(V);
+      if (vihaanNearbyItem.id === "ebikeRide") dismountEbike();
+      if (vihaanNearbyItem.id === "car") mountCar(V);
+      if (vihaanNearbyItem.id === "carRide") dismountCar(V);
       if (vihaanNearbyItem.id === "icecream") openIceCreamPicker(V);
       if (vihaanNearbyItem.id === "trampoline") {
         vihaanBounceTime = 5;
@@ -3296,22 +3700,47 @@
       }
       return false;
     }
+    function bikePositionAllowed(x, z) {
+      return !blockedBikePosition(x, z) && (!togetherEnabled || Math.hypot(x - V.rig.position.x, z - V.rig.position.z) <= maxPlayerSeparation());
+    }
+    function eBikePositionAllowed(x, z) {
+      const otherRider = eBikeState.rider === A ? V : A;
+      return !blockedBikePosition(x, z) && (!togetherEnabled || Math.hypot(x - otherRider.rig.position.x, z - otherRider.rig.position.z) <= maxPlayerSeparation());
+    }
+    function blockedCarPosition(x, z) {
+      return blockedBikePosition(x, z) || parkObstacles.some(obstacle => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 1.15);
+    }
+    function carPositionAllowed(x, z) {
+      if (Math.abs(x) > 42 || Math.abs(z) > 42 || blockedCarPosition(x, z)) return false;
+      if (!togetherEnabled || (carState.driver && carState.passenger)) return true;
+      const otherActor = carState.driver === A || carState.passenger === A ? V : A;
+      return Math.hypot(x - otherActor.rig.position.x, z - otherActor.rig.position.z) <= maxPlayerSeparation();
+    }
 
     function checkVihaanProximity() {
       let closest = null;
       let minDistance = Infinity;
-      if (togetherEnabled && !quadState.riding) {
+      if (togetherEnabled && chopperState.rider === V) {
+        closest = { id: "chopperRide", x: chopperState.x, z: chopperState.z, approachRadius: Infinity };
+        minDistance = 0;
+      } else if (togetherEnabled && (carState.driver === V || carState.passenger === V)) {
+        closest = { id: "carRide", x: carState.x, z: carState.z, approachRadius: Infinity };
+        minDistance = 0;
+      } else if (togetherEnabled && eBikeState.rider === V) {
+        closest = { id: "ebikeRide", x: eBikeState.x, z: eBikeState.z, approachRadius: Infinity };
+        minDistance = 0;
+      } else if (togetherEnabled && !quadState.riding) {
         const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
         if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
       }
-      if (togetherEnabled && !quadState.riding) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id)).forEach(item => {
+      if (togetherEnabled && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
+          vihaanActionPromptText.textContent = closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -3323,17 +3752,20 @@
 
     // Detect nearby playground items and landmarks
     function checkProximity() {
-      if (bikeState.riding) {
+      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A) {
+        const ridingBike = bikeState.riding;
+        const ridingEbike = eBikeState.rider === A;
+        const ridingChopper = chopperState.rider === A;
         const rideItem = {
-          id: "bikeRide",
-          promptText: "Press E to park the bike.",
-          onActivate: dismountBike
+          id: ridingBike ? "bikeRide" : ridingEbike ? "ebikeRide" : ridingChopper ? "chopperRide" : "carRide",
+          promptText: ridingBike ? "Press E to park the bike." : ridingEbike ? "Press E to park the e-bike." : ridingChopper ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Press E to leave the chopper.") : "Press E to leave the car.",
+          onActivate: ridingBike ? dismountBike : ridingEbike ? dismountEbike : ridingChopper ? dismountChopper : () => dismountCar(A)
         };
         currentNearbyItem = rideItem;
         if (actionPrompt && actionPromptText) {
           actionPromptText.textContent = rideItem.promptText;
           if (actionKeyBadge) actionKeyBadge.textContent = "E";
-          if (actionBoostHint) actionBoostHint.hidden = false;
+          if (actionBoostHint) actionBoostHint.hidden = !bikeState.riding;
           actionPrompt.hidden = false;
           actionPrompt.classList.add("show");
         }
@@ -3356,6 +3788,9 @@
 
       for (let i = 0; i < INTERACTABLES.length; i++) {
         const item = INTERACTABLES[i];
+        if (item.id === "ebike" && eBikeState.rider) continue;
+        if (item.id === "car" && carState.driver && carState.passenger) continue;
+        if (item.id === "chopper" && chopperState.rider) continue;
         const d = Math.hypot(px - item.x, pz - item.z);
         if (d <= item.approachRadius && d < minD) {
           minD = d;
@@ -3367,7 +3802,7 @@
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "icecream"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -4147,10 +4582,30 @@
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") shiftHeld = isDown;
+      const flightActor = chopperState.rider;
+      if (flightActor) {
+        const flightKey = e.code === "KeyW" || e.key === "ArrowUp" ? "up" : e.code === "KeyS" || e.key === "ArrowDown" ? "down" : e.code === "KeyA" || e.key === "ArrowLeft" ? "left" : e.code === "KeyD" || e.key === "ArrowRight" ? "right" : e.code === "Space" ? "lift" : e.code === "ShiftLeft" || e.code === "ShiftRight" ? "descend" : null;
+        const ownExit = flightActor === A ? e.code === "KeyE" || (e.key || "").toLowerCase() === "e" : e.code === "Enter" || e.key === "Enter";
+        if (isDown && ownExit) { e.preventDefault(); dismountChopper(); return; }
+        if (flightKey) { chopperKeys[flightKey] = isDown; if (isDown) e.preventDefault(); wake(); return; }
+        if (flightActor === A || flightActor === V) return;
+      }
       if (calm()) {
         if (isDown && bikeState.riding && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
           e.preventDefault();
           dismountBike();
+        }
+        if (isDown && ((eBikeState.rider === A && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) || (eBikeState.rider === V && (e.code === "Enter" || e.key === "Enter")))) {
+          e.preventDefault();
+          dismountEbike();
+        }
+        if (isDown && (carState.driver === A || carState.passenger === A) && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
+          e.preventDefault();
+          dismountCar(A);
+        }
+        if (isDown && (carState.driver === V || carState.passenger === V) && (e.code === "Enter" || e.key === "Enter")) {
+          e.preventDefault();
+          dismountCar(V);
         }
         return;
       }
@@ -4165,7 +4620,11 @@
 
       if (togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(key)) {
         const direction = key.slice(5).toLowerCase();
-        if (quadState.riding) quadKeys[direction] = isDown;
+        if (chopperState.rider === V) chopperKeys[direction] = isDown;
+        else if (carState.driver === V) carKeys[direction] = isDown;
+        else if (carState.passenger === V) { if (isDown) e.preventDefault(); return; }
+        else if (eBikeState.rider === V) eBikeKeys[direction] = isDown;
+        else if (quadState.riding) quadKeys[direction] = isDown;
         else vihaanKeys[direction] = isDown;
         if (isDown) e.preventDefault();
         wake();
@@ -4174,7 +4633,13 @@
       if (togetherEnabled && (code === "Enter" || key === "Enter")) {
         if (isDown) {
           e.preventDefault();
-          if (quadState.riding) toggleQuadRide();
+          if (chopperState.rider === V) dismountChopper();
+          else if (vihaanNearbyItem && vihaanNearbyItem.id === "chopper") mountChopper(V);
+          else if (carState.driver === V || carState.passenger === V) dismountCar(V);
+          else if (vihaanNearbyItem && vihaanNearbyItem.id === "car") mountCar(V);
+          else if (eBikeState.rider === V) dismountEbike();
+          else if (vihaanNearbyItem && vihaanNearbyItem.id === "ebike") mountEbike(V);
+          else if (quadState.riding) toggleQuadRide();
           else if (vihaanNearbyItem && vihaanNearbyItem.id === "quad") toggleQuadRide();
           else if (!quadState.riding && Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z) <= 2.2) toggleQuadRide();
           else if (vihaanBounceTime > 0) vihaanBounceTime = Math.min(vihaanBounceTime, 0.5);
@@ -4184,9 +4649,21 @@
       }
 
       if (isDown && (code === "KeyE" || key.toLowerCase() === "e")) {
+        if (chopperState.rider === A) { e.preventDefault(); dismountChopper(); return; }
+        if (currentNearbyItem && currentNearbyItem.id === "chopper") { e.preventDefault(); mountChopper(A); return; }
+        if (carState.driver === A || carState.passenger === A) {
+          e.preventDefault();
+          dismountCar(A);
+          return;
+        }
         if (bikeState.riding) {
           e.preventDefault();
           dismountBike();
+          return;
+        }
+        if (eBikeState.rider === A) {
+          e.preventDefault();
+          dismountEbike();
           return;
         }
         if (currentNearbyItem && (togetherEnabled || ["bike", "icecream"].includes(currentNearbyItem.id))) {
@@ -4194,6 +4671,35 @@
           currentNearbyItem.onActivate();
           return;
         }
+      }
+
+      if (carState.driver === A) {
+        const rideKey =
+          code === "KeyW" || key.toLowerCase() === "w" ? "up" :
+          code === "KeyS" || key.toLowerCase() === "s" ? "down" :
+          code === "KeyA" || key.toLowerCase() === "a" ? "left" :
+          code === "KeyD" || key.toLowerCase() === "d" ? "right" : null;
+        if (rideKey) {
+          carKeys[rideKey] = isDown;
+          if (isDown) e.preventDefault();
+          wake();
+        }
+        return;
+      }
+      if (carState.passenger === A) return;
+
+      if (eBikeState.rider === A) {
+        const rideKey =
+          code === "KeyW" || key.toLowerCase() === "w" ? "up" :
+          code === "KeyS" || key.toLowerCase() === "s" ? "down" :
+          code === "KeyA" || key.toLowerCase() === "a" ? "left" :
+          code === "KeyD" || key.toLowerCase() === "d" ? "right" : null;
+        if (rideKey) {
+          eBikeKeys[rideKey] = isDown;
+          if (isDown) e.preventDefault();
+          wake();
+        }
+        return;
       }
 
       if (bikeState.riding) {
@@ -4442,9 +4948,13 @@
         raf = 0;
         Object.keys(keys).forEach(key => { keys[key] = false; });
         Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
+        Object.keys(eBikeKeys).forEach(key => { eBikeKeys[key] = false; });
+        Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
         bikeState.boostHeld = false;
         if (calm()) {
           bikeState.speed = 0;
+          eBikeState.speed = 0;
+          carState.speed = 0;
           eatingTimer = 0;
           coneGroup.visible = false;
         }
@@ -4478,12 +4988,22 @@
         bikeState.heading += steer * turnRate * dt;
         const nextX = bikeState.x + Math.sin(bikeState.heading) * bikeState.speed * dt;
         const nextZ = bikeState.z + Math.cos(bikeState.heading) * bikeState.speed * dt;
-        const tooFarFromVihaan = togetherEnabled && Math.hypot(nextX - V.rig.position.x, nextZ - V.rig.position.z) > maxPlayerSeparation();
-        if (!blockedBikePosition(nextX, nextZ) && !tooFarFromVihaan) {
+        if (bikePositionAllowed(nextX, nextZ)) {
           bikeState.x = nextX;
           bikeState.z = nextZ;
         } else {
-          bikeState.speed = Math.max(0, bikeState.speed - dt * 2.9);
+          const slideCandidates = [
+            { x: nextX, z: bikeState.z, distance: Math.abs(nextX - bikeState.x) },
+            { x: bikeState.x, z: nextZ, distance: Math.abs(nextZ - bikeState.z) }
+          ].sort((a, b) => b.distance - a.distance);
+          const slide = slideCandidates.find(candidate => candidate.distance > 0 && bikePositionAllowed(candidate.x, candidate.z));
+          if (slide) {
+            bikeState.x = slide.x;
+            bikeState.z = slide.z;
+            bikeState.speed = Math.max(0, bikeState.speed - dt * 1.8);
+          } else {
+            bikeState.speed = Math.max(0, bikeState.speed - dt * 5.5);
+          }
         }
         const bikeGround = bikeSurfaceHeightAt(bikeState.x, bikeState.z);
         const riderGround = groundHeightAt(bikeState.x, bikeState.z, rigBaseY);
@@ -4504,7 +5024,7 @@
         isWalking = bikeState.speed > 0.06;
         targetPos = null;
         markerMat.opacity = 0;
-      } else {
+      } else if (chopperState.rider !== A) {
         let moveX = 0, moveZ = 0;
         if (keys.up) moveZ -= 1;
         if (keys.down) moveZ += 1;
@@ -4532,6 +5052,118 @@
         } else {
           isWalking = false;
         }
+      } else {
+        isWalking = false;
+        targetPos = null;
+      }
+
+      if (chopperState.rider) {
+        const rider = chopperState.rider;
+        const rotorTarget = 18;
+        chopperState.rotorSpeed += (rotorTarget - chopperState.rotorSpeed) * Math.min(1, dt * 2);
+        const climb = (chopperKeys.lift ? 1 : 0) - (chopperKeys.descend ? 1 : 0);
+        chopperState.altitude = Math.max(0, Math.min(12.5, chopperState.altitude + climb * 4.2 * dt));
+        const topSpeed = 12;
+        if (chopperKeys.down) chopperState.speed = Math.max(0, chopperState.speed - dt * 4.5);
+        else if (chopperKeys.up) chopperState.speed = Math.min(topSpeed, chopperState.speed + dt * 3.8);
+        else chopperState.speed = Math.max(0, chopperState.speed - dt * 1.6);
+        const steer = (chopperKeys.right ? 1 : 0) - (chopperKeys.left ? 1 : 0);
+        chopperState.heading += steer * (0.55 + Math.min(1, chopperState.speed / topSpeed) * 0.7) * dt;
+        const nextX = chopperState.x + Math.sin(chopperState.heading) * chopperState.speed * dt;
+        const nextZ = chopperState.z + Math.cos(chopperState.heading) * chopperState.speed * dt;
+        if (!blockedBikePosition(nextX, nextZ)) { chopperState.x = nextX; chopperState.z = nextZ; }
+        else chopperState.speed = Math.max(0, chopperState.speed - dt * 5.5);
+        const baseY = bikeSurfaceHeightAt(chopperState.x, chopperState.z);
+        chopperRoot.position.set(chopperState.x, baseY + chopperState.altitude, chopperState.z);
+        chopperRoot.rotation.y = chopperState.heading;
+        chopperRotor.rotation.y += chopperState.rotorSpeed * dt;
+        tailRotor.rotation.z += chopperState.rotorSpeed * dt * 1.7;
+        rider.rig.position.set(chopperState.x, groundHeightAt(chopperState.x, chopperState.z, rigBaseY) + chopperState.altitude + 0.25, chopperState.z);
+        rider.rig.rotation.set(0, chopperState.heading, 0);
+        if (rider === A) { isWalking = false; targetPos = null; }
+        else vihaanWalking = false;
+        const item = INTERACTABLES.find(entry => entry.id === "chopper");
+        if (item) { item.x = chopperState.x; item.z = chopperState.z; }
+      } else {
+        chopperState.rotorSpeed = Math.max(0, chopperState.rotorSpeed - dt * 5);
+        chopperRotor.rotation.y += chopperState.rotorSpeed * dt;
+        tailRotor.rotation.z += chopperState.rotorSpeed * dt * 1.7;
+      }
+
+      if (eBikeState.rider) {
+        const topSpeed = 10.4;
+        if (eBikeKeys.down) eBikeState.speed = Math.max(0, eBikeState.speed - dt * 3);
+        else if (eBikeKeys.up) eBikeState.speed = Math.min(topSpeed, eBikeState.speed + dt * 3.2);
+        else eBikeState.speed = Math.max(0, eBikeState.speed - dt * 0.65);
+        const steer = (eBikeKeys.right ? 1 : 0) - (eBikeKeys.left ? 1 : 0);
+        eBikeState.heading += steer * (0.55 + Math.min(1, eBikeState.speed / topSpeed) * 0.9) * dt;
+        const nextX = eBikeState.x + Math.sin(eBikeState.heading) * eBikeState.speed * dt;
+        const nextZ = eBikeState.z + Math.cos(eBikeState.heading) * eBikeState.speed * dt;
+        if (eBikePositionAllowed(nextX, nextZ)) {
+          eBikeState.x = nextX;
+          eBikeState.z = nextZ;
+        } else {
+          const slideCandidates = [
+            { x: nextX, z: eBikeState.z, distance: Math.abs(nextX - eBikeState.x) },
+            { x: eBikeState.x, z: nextZ, distance: Math.abs(nextZ - eBikeState.z) }
+          ].sort((a, b) => b.distance - a.distance);
+          const slide = slideCandidates.find(candidate => candidate.distance > 0 && eBikePositionAllowed(candidate.x, candidate.z));
+          if (slide) {
+            eBikeState.x = slide.x;
+            eBikeState.z = slide.z;
+            eBikeState.speed = Math.max(0, eBikeState.speed - dt * 1.8);
+          } else {
+            eBikeState.speed = Math.max(0, eBikeState.speed - dt * 5.5);
+          }
+        }
+        eBikeRoot.position.set(eBikeState.x, bikeSurfaceHeightAt(eBikeState.x, eBikeState.z), eBikeState.z);
+        eBikeRoot.rotation.y = eBikeState.heading;
+        eBikeState.wheels.forEach(wheel => { wheel.rotation.x += eBikeState.speed * dt / eBikeWheelRadius; });
+        const rider = eBikeState.rider;
+        const riderGround = groundHeightAt(eBikeState.x, eBikeState.z, rigBaseY);
+        rider.rig.position.set(eBikeState.x, riderGround - 0.12, eBikeState.z);
+        rider.rig.rotation.set(0, eBikeState.heading, steer * Math.min(0.12, eBikeState.speed * 0.018));
+        if (rider === A) { isWalking = eBikeState.speed > 0.06; targetPos = null; }
+        else vihaanWalking = eBikeState.speed > 0.06;
+        const item = INTERACTABLES.find(entry => entry.id === "ebike");
+        if (item) { item.x = eBikeState.x; item.z = eBikeState.z; }
+      }
+
+      if (carState.driver) {
+        const topSpeed = 16;
+        if (carKeys.down) carState.speed = Math.max(0, carState.speed - dt * 5.5);
+        else if (carKeys.up) carState.speed = Math.min(topSpeed, carState.speed + dt * 4.5);
+        else carState.speed = Math.max(0, carState.speed - dt * 0.8);
+        const steer = (carKeys.right ? 1 : 0) - (carKeys.left ? 1 : 0);
+        carState.heading += steer * (0.32 + Math.min(1, carState.speed / topSpeed) * 0.42) * dt;
+        const nextX = carState.x + Math.sin(carState.heading) * carState.speed * dt;
+        const nextZ = carState.z + Math.cos(carState.heading) * carState.speed * dt;
+        if (carPositionAllowed(nextX, nextZ)) {
+          carState.x = nextX;
+          carState.z = nextZ;
+        } else {
+          const slideCandidates = [
+            { x: nextX, z: carState.z, distance: Math.abs(nextX - carState.x) },
+            { x: carState.x, z: nextZ, distance: Math.abs(nextZ - carState.z) }
+          ].sort((a, b) => b.distance - a.distance);
+          const slide = slideCandidates.find(candidate => candidate.distance > 0 && carPositionAllowed(candidate.x, candidate.z));
+          if (slide) {
+            carState.x = slide.x;
+            carState.z = slide.z;
+            carState.speed = Math.max(0, carState.speed - dt * 1.8);
+          } else {
+            carState.speed = Math.max(0, carState.speed - dt * 5.5);
+          }
+        }
+        carRoot.position.set(carState.x, bikeSurfaceHeightAt(carState.x, carState.z), carState.z);
+        carRoot.rotation.y = carState.heading;
+        carState.wheels.forEach(wheel => { wheel.rotation.x += carState.speed * dt / 0.36; });
+        if (carState.driver === A || carState.passenger === A) isWalking = carState.driver === A && carState.speed > 0.06;
+        if (carState.driver === V || carState.passenger === V) vihaanWalking = carState.driver === V && carState.speed > 0.06;
+        positionCarRider(carState.driver);
+        if (carState.passenger) positionCarRider(carState.passenger);
+        const item = INTERACTABLES.find(entry => entry.id === "car");
+        if (item) { item.x = carState.x; item.z = carState.z; }
       }
 
       if (togetherEnabled) {
@@ -4556,8 +5188,10 @@
         }
         let moveX = (vihaanKeys.right ? 1 : 0) - (vihaanKeys.left ? 1 : 0);
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
-        vihaanWalking = !quadState.riding && (moveX !== 0 || moveZ !== 0);
-        if (vihaanWalking) {
+        const vihaanInCar = carState.driver === V || carState.passenger === V;
+        const vihaanInChopper = chopperState.rider === V;
+        vihaanWalking = vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
+        if (!vihaanInCar && !vihaanInChopper && vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
           vihaanAngle = Math.atan2(moveX, moveZ);
@@ -4567,7 +5201,7 @@
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, dt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, dt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -4577,7 +5211,7 @@
         }
       }
       if (V.rig.visible) {
-        if (vihaanWaveTimer > 0 && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
+        if (vihaanWaveTimer > 0 && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
         const vihaanGround = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
         if (vihaanBounceTime > 0) {
           vihaanBounceTime = Math.max(0, vihaanBounceTime - dt);
@@ -4597,7 +5231,9 @@
       clampPlayerSeparation();
 
       // Smoothly rotate Ahaan towards heading
-      if (isWalking && !bikeState.riding && (!currentActivity || activityPhase === 0)) {
+      const ahaanInCar = carState.driver === A || carState.passenger === A;
+      const ahaanInChopper = chopperState.rider === A;
+      if (isWalking && !bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
         const curRot = A.rig.rotation.y;
         let diff = ahaanAngle - curRot;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -4611,12 +5247,12 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (!bikeState.riding && A.updateWave && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && A.updateWave && (!currentActivity || activityPhase === 0)) {
         wavingActive = A.updateWave(dt, isWalking, calm());
       }
 
       // Update leg and arm walk cycle
-      if (!bikeState.riding && A.updateWalk && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && A.updateWalk && (!currentActivity || activityPhase === 0)) {
         A.updateWalk(isWalking, 8.5, dt);
       }
 
@@ -4636,7 +5272,7 @@
         updatePlayActivity(dt);
       }
 
-      if (!bikeState.riding && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
         A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
       }
 
@@ -4691,7 +5327,7 @@
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || (bikeState.riding && bikeState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -4784,6 +5420,7 @@
       getVihaanExitState: () => ({ timer: vihaanWaveTimer, exiting: vihaanExiting, visible: V.rig.visible }),
       getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed }),
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed }),
+      getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
       getGroundHeight: (x, z) => groundHeightAt(x, z, rigBaseY),
