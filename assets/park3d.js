@@ -2920,8 +2920,8 @@
       onInteract: () => bikeState.riding ? dismountBike() : mountBike()
     });
 
-    // Vihaan's red quad stays parked beside Ahaan's bike until he rides it.
-    const quadState = { x: 2.45, z: 6.2, heading: 0, speed: 0, riding: false, wheels: [] };
+    // Reuse Vihaan's red quad at a clear outer parking spot.
+    const quadState = { x: 23, z: 20, heading: 0, speed: 0, riding: false, wheels: [] };
     const quadKeys = { up: false, down: false, left: false, right: false };
     const quadRoot = new T.Group();
     const quadRedMat = new T.MeshStandardMaterial({ color: 0xc92f38, roughness: 0.62, metalness: 0.08 });
