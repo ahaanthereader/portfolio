@@ -2913,6 +2913,42 @@
       onInteract: () => bikeState.riding ? dismountBike() : mountBike()
     });
 
+    // Vihaan's red quad stays parked beside Ahaan's bike until he rides it.
+    const quadState = { x: 2.45, z: 6.2, heading: 0, speed: 0, riding: false, wheels: [] };
+    const quadKeys = { up: false, down: false, left: false, right: false };
+    const quadRoot = new T.Group();
+    const quadRedMat = new T.MeshStandardMaterial({ color: 0xc92f38, roughness: 0.62, metalness: 0.08 });
+    const quadDarkMat = new T.MeshStandardMaterial({ color: 0x282721, roughness: 0.88 });
+    const quadMetalMat = new T.MeshStandardMaterial({ color: 0x514b43, roughness: 0.52, metalness: 0.62 });
+    const quadBody = new T.Mesh(new T.BoxGeometry(1.25, 0.28, 1.7), quadRedMat);
+    quadBody.position.set(0, 0.78, 0);
+    quadBody.castShadow = true;
+    quadRoot.add(quadBody);
+    const quadSeat = new T.Mesh(new T.BoxGeometry(0.62, 0.16, 0.62), seatMat);
+    quadSeat.position.set(0, 1.02, -0.12);
+    quadRoot.add(quadSeat);
+    [-1, 1].forEach(side => [-1, 1].forEach(front => {
+      const wheel = new T.Group();
+      wheel.position.set(side * 0.76, 0.48, front * 0.76);
+      wheel.rotation.z = Math.PI / 2;
+      const tire = new T.Mesh(new T.CylinderGeometry(0.48, 0.48, 0.3, 12), quadDarkMat);
+      tire.castShadow = true;
+      wheel.add(tire);
+      const hub = new T.Mesh(new T.CylinderGeometry(0.19, 0.19, 0.32, 10), quadMetalMat);
+      wheel.add(hub);
+      quadRoot.add(wheel);
+      quadState.wheels.push(wheel);
+    }));
+    [-1, 1].forEach(side => {
+      const fender = new T.Mesh(new T.BoxGeometry(0.34, 0.12, 0.94), quadRedMat);
+      fender.position.set(side * 0.76, 0.99, 0);
+      quadRoot.add(fender);
+    });
+    bikeRod(quadRoot, [-0.38, 1.28, 0.48], [0.38, 1.28, 0.48], 0.055, quadMetalMat);
+    quadRoot.position.set(quadState.x, 0.02, quadState.z);
+    mapGroup.add(quadRoot);
+    registerInteractive(quadRoot, { name: "Vihaan's quad", onInteract: () => { if (togetherEnabled) toggleQuadRide(); } });
+
     const shopState = { x: 4.2, z: -13.5 };
     const shopRoot = new T.Group();
     shopRoot.position.set(shopState.x, 0, shopState.z);
@@ -3203,6 +3239,27 @@
     const vihaanActionPrompt = document.getElementById("vihaanActionPrompt");
     const vihaanActionPromptBtn = document.getElementById("vihaanActionPromptBtn");
     const vihaanActionPromptText = document.getElementById("vihaanActionPromptText");
+    function toggleQuadRide() {
+      if (!togetherEnabled) return;
+      quadState.riding = !quadState.riding;
+      quadState.speed = 0;
+      Object.keys(quadKeys).forEach(key => { quadKeys[key] = false; });
+      if (quadState.riding) {
+        V.rig.position.set(quadState.x, groundHeightAt(quadState.x, quadState.z, rigBaseY) - 0.12, quadState.z);
+        V.rig.rotation.y = quadState.heading;
+        V.leftArm.arm.rotation.set(-1.25, 0, 0.18);
+        V.wavingArm.arm.rotation.set(-1.25, 0, -0.18);
+        vihaanNearbyItem = { id: "quad" };
+      } else {
+        V.rig.position.set(quadState.x + Math.cos(quadState.heading) * 1.25, groundHeightAt(quadState.x, quadState.z, rigBaseY), quadState.z - Math.sin(quadState.heading) * 1.25);
+        V.leftArm.arm.rotation.set(0, 0, V.leftArm.rest);
+        V.wavingArm.arm.rotation.set(0, 0, V.wavingArm.rest);
+        vihaanNearbyItem = null;
+      }
+      if (vihaanActionPromptText) vihaanActionPromptText.textContent = quadState.riding ? "Enter: park the quad" : "Press Enter to ride the quad.";
+      if (vihaanActionPrompt) vihaanActionPrompt.hidden = !quadState.riding;
+      wake();
+    }
     function activateVihaanItem() {
       if (!vihaanNearbyItem) return;
       if (vihaanNearbyItem.id === "icecream") openIceCreamPicker(V);
@@ -3243,14 +3300,18 @@
     function checkVihaanProximity() {
       let closest = null;
       let minDistance = Infinity;
-      if (togetherEnabled) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id)).forEach(item => {
+      if (togetherEnabled && !quadState.riding) {
+        const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
+        if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
+      }
+      if (togetherEnabled && !quadState.riding) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id)).forEach(item => {
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
+          vihaanActionPromptText.textContent = closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -4104,7 +4165,8 @@
 
       if (togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(key)) {
         const direction = key.slice(5).toLowerCase();
-        vihaanKeys[direction] = isDown;
+        if (quadState.riding) quadKeys[direction] = isDown;
+        else vihaanKeys[direction] = isDown;
         if (isDown) e.preventDefault();
         wake();
         return;
@@ -4112,7 +4174,10 @@
       if (togetherEnabled && (code === "Enter" || key === "Enter")) {
         if (isDown) {
           e.preventDefault();
-          if (vihaanBounceTime > 0) vihaanBounceTime = Math.min(vihaanBounceTime, 0.5);
+          if (quadState.riding) toggleQuadRide();
+          else if (vihaanNearbyItem && vihaanNearbyItem.id === "quad") toggleQuadRide();
+          else if (!quadState.riding && Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z) <= 2.2) toggleQuadRide();
+          else if (vihaanBounceTime > 0) vihaanBounceTime = Math.min(vihaanBounceTime, 0.5);
           else activateVihaanItem();
         }
         return;
@@ -4470,9 +4535,28 @@
       }
 
       if (togetherEnabled) {
+        if (quadState.riding) {
+          const topSpeed = 12;
+          if (quadKeys.down) quadState.speed = Math.max(0, quadState.speed - dt * 3.2);
+          else if (quadKeys.up) quadState.speed = Math.min(topSpeed, quadState.speed + dt * 2.2);
+          else quadState.speed = Math.max(0, quadState.speed - dt * 0.55);
+          const steer = (quadKeys.right ? 1 : 0) - (quadKeys.left ? 1 : 0);
+          quadState.heading += steer * (0.48 + Math.min(1, quadState.speed / topSpeed) * 0.8) * dt;
+          const nextX = quadState.x + Math.sin(quadState.heading) * quadState.speed * dt;
+          const nextZ = quadState.z + Math.cos(quadState.heading) * quadState.speed * dt;
+          if (!blockedBikePosition(nextX, nextZ)) { quadState.x = nextX; quadState.z = nextZ; }
+          else quadState.speed = Math.max(0, quadState.speed - dt * 3.4);
+          quadRoot.position.set(quadState.x, bikeSurfaceHeightAt(quadState.x, quadState.z), quadState.z);
+          quadRoot.rotation.y = quadState.heading;
+          quadState.wheels.forEach(wheel => { wheel.rotation.x += quadState.speed * dt / 0.48; });
+          V.rig.position.set(quadState.x, groundHeightAt(quadState.x, quadState.z, rigBaseY) - 0.12, quadState.z);
+          V.rig.rotation.set(0, quadState.heading, steer * Math.min(0.08, quadState.speed * 0.012));
+          vihaanWalking = quadState.speed > 0.06;
+          targetPos = null;
+        }
         let moveX = (vihaanKeys.right ? 1 : 0) - (vihaanKeys.left ? 1 : 0);
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
-        vihaanWalking = moveX !== 0 || moveZ !== 0;
+        vihaanWalking = !quadState.riding && (moveX !== 0 || moveZ !== 0);
         if (vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
@@ -4699,6 +4783,8 @@
       getVihaanBounceTime: () => vihaanBounceTime,
       getVihaanExitState: () => ({ timer: vihaanWaveTimer, exiting: vihaanExiting, visible: V.rig.visible }),
       getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed }),
+      getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed }),
+      getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
       getGroundHeight: (x, z) => groundHeightAt(x, z, rigBaseY),
       attemptVihaanMove: (dx, dz) => moveActor(V, dx, dz),

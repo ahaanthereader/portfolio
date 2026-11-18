@@ -1,0 +1,54 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const http = require('node:http');
+const path = require('node:path');
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const root = path.resolve(__dirname, '..');
+const server = http.createServer((req, res) => {
+  const file = path.resolve(root, `.${decodeURIComponent(new URL(req.url, 'http://localhost').pathname)}`);
+  if (!file.startsWith(root + path.sep)) return res.writeHead(403).end();
+  fs.readFile(file, (err, data) => res.writeHead(err ? 404 : 200, { 'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html' }).end(err ? '' : data));
+});
+let point = 'server-start';
+const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); process.exit(2); }, 30000);
+(async () => {
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const browser = await chromium.launch({ headless: true, args: ['--disable-gpu', '--use-gl=swiftshader', '--disable-gpu-sandbox'] });
+  const page = await browser.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    point = 'page-load';
+    await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    point = 'park-ready';
+    await page.waitForFunction(() => window.Park3D?.getQuadState);
+    point = 'enable-together';
+    await page.evaluate(() => Park3D.teleportAhaan(0, 6));
+    await page.evaluate(() => document.querySelector('#togetherBtn').click());
+    await page.waitForFunction(() => Park3D.isTogetherEnabled());
+    point = 'move-vihaan-near-quad';
+    await page.evaluate(() => Park3D.teleportVihaan(2.45, 6.2));
+    console.log('immediately after teleport', await page.evaluate(() => ({ nearby: Park3D.getVihaanNearbyItem(), position: [Park3D.getV().rig.position.x, Park3D.getV().rig.position.z], together: Park3D.isTogetherEnabled() })));
+    await page.waitForFunction(() => Park3D.getVihaanNearbyItem() === 'quad');
+    point = 'mount';
+    console.log('before Enter', await page.evaluate(() => ({ together: Park3D.isTogetherEnabled(), nearby: Park3D.getVihaanNearbyItem(), position: [Park3D.getV().rig.position.x, Park3D.getV().rig.position.z], riding: Park3D.getQuadState().riding })));
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true })));
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', bubbles: true })));
+    console.log('after Enter', await page.evaluate(() => ({ nearby: Park3D.getVihaanNearbyItem(), riding: Park3D.getQuadState().riding })));
+    assert.equal((await page.evaluate(() => Park3D.getQuadState())).riding, true, 'mount');
+    const before = await page.evaluate(() => Park3D.getQuadState());
+    await page.keyboard.down('ArrowUp');
+    await page.waitForTimeout(900);
+    await page.keyboard.up('ArrowUp');
+    const moving = await page.evaluate(() => Park3D.getQuadState());
+    assert.ok(moving.z > before.z && moving.speed > 0, 'ride');
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', bubbles: true })));
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', bubbles: true })));
+    assert.equal((await page.evaluate(() => Park3D.getQuadState())).riding, false, 'dismount');
+    assert.deepEqual(errors, [], 'browser errors');
+    point = 'complete';
+    process.stdout.write(JSON.stringify({ mount: 'pass', ride: 'pass', dismount: 'pass', errors }));
+  } finally { clearTimeout(timeout); await browser.close(); server.close(); }
+})().catch(error => { console.error(`FAIL at ${point}:`, error); clearTimeout(timeout); server.close(); process.exitCode = 1; });
+    point = 'ride';
+    point = 'dismount';
