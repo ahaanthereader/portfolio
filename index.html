@@ -19,6 +19,7 @@
     <div class="nav-controls">
       <button type="button" class="breeze-pill breeze-btn" id="breezeBtn" aria-pressed="true">🍃 Breeze: on</button>
       <button type="button" class="breeze-pill sound-btn" id="soundBtn" aria-pressed="false">🔔 Sound: off</button>
+      <button type="button" class="breeze-pill together-btn" id="togetherBtn" aria-pressed="false" aria-label="Play together. Ahaan uses WASD and E. Vihaan uses arrow keys and Enter." title="Ahaan: WASD and E. Vihaan: arrows and Enter.">Play together: Off</button>
     </div>
   </div>
 </nav>
@@ -27,6 +28,8 @@
 
 <main id="main">
 <section class="home-hero" id="top" aria-labelledby="heroTitle">
+  <div class="player-world-label player-label-ahaan" id="playerLabelAhaan" hidden>Ahaan</div>
+  <div class="player-world-label player-label-vihaan" id="playerLabelVihaan" hidden>Vihaan</div>
   <div class="hero-paper-wash" aria-hidden="true"></div>
   <div class="hero-botany hero-botany-left" aria-hidden="true">
     <img src="public/landing-pages/meng-to-sketchbook/botany-left.png" alt="" />
@@ -122,6 +125,12 @@
       <span class="action-text" id="actionPromptText">Jump! 🤸</span>
     </button>
     <span class="action-boost-hint" id="actionBoostHint" hidden>Hold Space to go fast! 🚲💨</span>
+  </div>
+  <div class="action-prompt vihaan-action-prompt" id="vihaanActionPrompt" role="region" aria-live="polite" hidden>
+    <button type="button" class="action-prompt-btn" id="vihaanActionPromptBtn">
+      <span class="action-key-badge">Enter</span>
+      <span class="action-text" id="vihaanActionPromptText"></span>
+    </button>
   </div>
 
   <!-- Playground Activity HUD (Controls during Trampoline / Swing) -->

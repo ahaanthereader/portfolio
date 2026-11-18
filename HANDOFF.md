@@ -35,6 +35,20 @@
 - `node --check` passed for the quiz and both new data files. `git diff --check` passed.
 - Facts for Ahaan to check: none recorded.
 - The worker committed the changes locally on `feature/capitals-quiz` with message `Build four kind quiz rounds`. No files were published.
+## Two-player mode — Nov 13, 2026
+
+- Branch `feature/two-player` starts at bike branch commit `ee0688d`.
+- The approved spec is `_bmad-output/implementation-artifacts/spec-two-player.md`.
+- Vihaan uses Ahaan's model and scale with a red shirt. Ahaan keeps his maroon shirt.
+- Added the accessible Play together toggle and projected name labels.
+- Added separate arrow-key walking for Vihaan. Shift increases his walking speed.
+- In two-player mode, arrows do not enter Ahaan's bike controls.
+- The camera follows both players. A frustum-based limit preserves a screen margin.
+- Added separate ice-cream cones, timers, arms, prompts, and a trampoline bounce for Vihaan.
+- Vihaan enters and exits with a wave when motion is allowed.
+- Syntax, whitespace, desktop, mobile, and reduced-motion checks pass.
+- Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- Next: review the final diff and commit locally. Do not push.
 
 ## Lazy river bridge verification — Nov 10, 2026
 
@@ -720,3 +734,30 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 177,917 bytes, boost code live: `boostHeld`, Space handler, `actionBoostHint` toggle), live `index.html` contains the `actionBoostHint` hint element ("Hold Space to go fast! 🚲💨").
 - The main worktree's uncommitted `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted. It was not part of this publish.
 - The two-player and Country Book v2 branches were not merged. They are still in progress.
+## Two-player feature — Nov 13, 2026
+
+- Created branch `feature/two-player` from commit `ee0688d` in `.worktrees/feature/two-player`.
+- Source brief: `FEATURE-BRIEF-two-player.md` in the main checkout.
+- Read the brief, queue entry, project instructions, and sensory-friendly spec.
+- Mapped the model, input, activity, interaction, and camera code.
+- Drafted `_bmad-output/implementation-artifacts/spec-two-player.md`. The spec records the control map, camera limit, actor-specific actions, and verification checks.
+- Nishant approved the spec and implementation on Nov 13, 2026.
+- Implementation now uses baseline commit `ee0688d1d4d6fee53e74f8ea1e48a1923263579a`.
+
+## Two-player implementation results — Nov 17, 2026
+
+- Nishant changed Vihaan's shirt from teal to red. Ahaan keeps his maroon shirt.
+- Ahaan uses WASD and E. Vihaan uses arrow keys and Enter when the toggle is on.
+- Shift with movement keys makes either boy run.
+- Arrow keys do not steer Ahaan's bike. WASD still controls the bike.
+- Both boys have separate prompts, ice-cream cones, timers, and trampoline actions.
+- Vihaan followed the Mississippi deck height at x=11.5, z=−4.9 m. His rig and ground height both measured 8.00094 m.
+- The camera follows the players' midpoint and zooms up to the existing 1.45 limit.
+- A frustum limit preserves a 3.5 m horizontal margin. The limit adjusts when the viewport changes.
+- Desktop and mobile frame checks kept both players within 0.90 NDC. The mobile screenshot shows both names and characters.
+- Reduced motion kept the toggle active and skipped entry and exit waves.
+- Browser checks passed for solo controls, both control sets, independent trampoline actions, both ice-cream cones, bridge height, bike isolation, camera bounds, and toggle cleanup.
+- No browser page errors appeared. Sound stayed off.
+- `node --check` passed for both source files and the browser test. `git diff --check` passed.
+- Browser test: `tests/two-player-browser.cjs`. Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
+- The branch has no commit yet. No changes were published.
