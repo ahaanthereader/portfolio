@@ -486,7 +486,7 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - No water ripples or edge foam were found. No added reeds or beach balls were found.
 - No texture pass was made. Motion preference checks for water remain incomplete.
 
-## Country Book v2 — IN PROGRESS (Nov 13, 2026)
+## Country Book v2 — COMPLETE (Nov 17, 2026)
 
 - Started branch `feature/country-book-v2` from `origin/main` at `8310cea`.
 - Worktree: `.worktrees/country-book-v2`.
@@ -499,6 +499,8 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - Source: World Bank indicator `SP.POP.TOTL`, 2024 values: https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?date=2024&format=json&per_page=1000
 - Indicator notes: https://data.worldbank.org/indicator/SP.POP.TOTL
 - Values use two significant figures. Each value starts with “About”.
+- All brief work is complete. No implementation step remains.
+- The optional facts listed below remain hidden until checked. The brief allows uncertain fields to stay off the pages.
 
 ### Facts for Ahaan to check
 
