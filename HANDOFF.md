@@ -822,6 +822,47 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 9. FEATURE-BRIEF-two-player-vehicles.md — QUEUED Nov 17, 2026 (Nishant's ask: Ahaan blue tee in two-player mode; quad, e-bike, 2-seater car, chopper parked outside the middle park with proper mechanics and physics; bike stuck fix first). Next for the idle two-player worker (1000090004) once screen capture is back. NOTE Nov 18, 2026: the Vihaan quad has LANDED on main (merge 8f35b6b). Reuse this quad in the vehicles build. Do NOT add a second quad to the park.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
+## FEATURE-BRIEF-two-player-vehicles.md — bike baseline before changes — Nov 18, 2026
+
+- Created `.worktrees/feature-two-player-vehicles` on `feature/two-player-vehicles` from main commit `4e6dcac`, which includes quad merge `8f35b6b`.
+- Reused the merged quad. Did not add another quad.
+- Reproduction used Chrome at 1280 × 800. Ahaan mounted the bike at `(-0.65, 6.2)` and held W south.
+- Repro result: **PASS** — reproduced the stuck behavior at the recorded South Grove oak.
+- Draft implementation spec: `_bmad-output/implementation-artifacts/spec-two-player-vehicles.md`.
+- Shirt switch: `assets/ahaan-model.js` now supports live shirt palette changes. `assets/park3d.js` sets Ahaan to blue (`#2b6ea6`) when Play together is on and restores maroon (`#5a1d2d`) when off. Vihaan remains red (`#c9363e`).
+- Reused the published quad. `assets/park3d.js` still has one `quadState`; no second quad was added.
+- Syntax checks passed: `node --check assets/park3d.js` and `node --check assets/ahaan-model.js`.
+- The bike crossed the central island's south bridge without stopping or wobbling. It continued south and stopped at the South Grove oak.
+- Exact last safe bike position: `x = -0.65`, `z = 30.4945`. The oak is at `(0, 32)`. The collision threshold is 1.418 m; the next step enters that threshold.
+- At the last sample, speed was 5.175 m/s and decreasing. The bike remained at the same coordinates while the collision check rejected forward movement.
+- No bike code changed before this baseline record. Page errors: none.
+- Reproduction harness: `/tmp/repro-middle-bike.cjs`.
+- Fix: keep full movement when clear. If an obstacle blocks the full step, allow the safe axis movement so the bike can slide along the edge. Reduce speed at 1.8 m/s² while sliding and 5.5 m/s² when blocked head-on.
+- Bike slide-fix step: confirmed the movement code keeps clear steps, tests safe-axis slide candidates after a blocked step, and uses the requested 1.8 m/s² and 5.5 m/s² deceleration rates. `node --check assets/park3d.js` passed.
+- E-bike step: added one electric bike model and state at outer parking spot `(-13, 7)`. The spot is outside the central island and clear of the nearby bridge and recorded obstacles.
+- E-bike top speed is 10.4 m/s. Ahaan mounts and dismounts with E and rides with WASD. Vihaan mounts and dismounts with Enter and rides with arrows when Play together is on.
+- E-bike movement reuses park ground and obstacle checks. Blocked movement uses the same safe-axis slide, 1.8 m/s² slide deceleration, and 5.5 m/s² head-on deceleration as the bike. The e-bike adds no sound.
+- `node --check assets/park3d.js` passed after the e-bike change.
+- Two-seat car step: added one car model and state at outer parking spot `(-14, -8)`, clear of the central island and nearby rock.
+- Car top speed is 16 m/s. The first boy to mount drives; the second boy takes the passenger seat. Each boy exits with E or Enter. The driver's usual keys control the car. If the driver exits first, the passenger takes the driver seat and the car stops.
+- The car uses shared bridge surface and rider ground heights, water and obstacle checks, and safe-axis sliding. It decelerates at 1.8 m/s² while sliding and 5.5 m/s² when blocked head-on. The car adds no sound.
+- `node --check assets/park3d.js` passed after the car change.
+- Car-only follow-up: confirmed the single car state/model remains at `(-14, -8)`, outside the middle park. Top speed is 16 m/s. Ahaan exits with E; Vihaan exits with Enter. Each boy can occupy the driver or passenger seat. `node --check assets/park3d.js` passed on Nov 18, 2026.
+- Chopper step: added one model and state at `(23, -20)`, on a clear outer spot outside the middle park and away from nearby trees. Space lifts to a 12.5 m altitude cap; Shift descends; W/A/S/D or arrows steer and move. The rotor spins up on mount. E or Enter cannot dismount above ground level. Movement reuses `blockedBikePosition` and the shared ground and bridge height helpers. The chopper adds no sound. `node --check assets/park3d.js` passed on Nov 18, 2026.
+- Chopper browser checks used Playwright from `/Users/Nishant/dev-tools/browser-check` with `/tmp/chopper-browser-check.cjs`.
+- Desktop (1280×800) and mobile (390×844) checks passed. Ahaan mounted, the rotor spun, Space lifted, W moved, E stayed blocked in flight, Shift descended, and E dismounted on the ground. Sound stayed off. Both viewports reported zero page errors.
+- Screenshots: `/tmp/ahaan-chopper-check/desktop-airborne.png` and `/tmp/ahaan-chopper-check/mobile-airborne.png`.
+- Initial visual inspection found Ahaan upright above the cabin. Added a seated leg pose and raised the rider slightly to align his hips with the cabin seat.
+- The browser run exposed a ground-height reset that prevented Ahaan from rising. Added a chopper rider guard to the normal height update. The first parking spot also blocked forward movement near a pine; moved the chopper to `(23, -20)`, then both movement checks passed.
+- `node --check assets/park3d.js` passed after the browser fixes.
+- Pose follow-up: the durable desktop and mobile chopper checks passed again after the seated pose change. Both screenshots show bent knees over the cabin seat. Rotor spin, lift, movement, blocked airborne dismount, descent, grounded dismount, silent audio, and zero page errors passed at both viewport sizes. Screenshots remain `/tmp/ahaan-chopper-check/desktop-airborne.png` and `/tmp/ahaan-chopper-check/mobile-airborne.png`. `node --check assets/park3d.js` passed.
+- Vehicles implementation commit: `812cb86` (`Add chopper and outer vehicles`), local on `feature/two-player-vehicles`; no push.
+- Quad parking follow-up: moved the single reused quad to the clear outer spot `(23, 20)`. Updated `tests/quad-browser.cjs` to place both players near the quad. Durable browser check: `/Users/Nishant/dev-tools/browser-check/node_modules/playwright`; desktop 1280×720 mount, ride, and dismount passed with zero page errors. `node --check assets/park3d.js` and `node --check tests/quad-browser.cjs` passed.
+- After the fix, the same southward ride crossed the island and bridge. It stopped at `(-0.65, 30.73975)` just outside the oak collision radius, with speed at 0 m/s.
+- With W and A held from the stop, the bike steered around the oak and moved to `(-5.6258, 27.0204)` at 5.5 m/s. The bike did not remain stuck.
+- `node --check assets/park3d.js` and `git diff --check` passed. The browser reproduction reported no page errors.
+- The straight route showed one blocked spot. It did not show a wobble or a stop at the central south bridge.
+
 ## Bike speed boost — Nov 15, 2026
 
 - Normal top speed: 4.15 → 5.5 m/s.

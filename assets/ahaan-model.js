@@ -49,9 +49,9 @@ window.AhaanModel = {
     const MOUTH_IN = 0x361016;      // Deep ruby oral cavity
     const TEETH_WHITE = 0xffffff;   // Pearly white teeth
     const TONGUE = 0xbf525c;        // Soft pink tongue
-    const MAROON = palette.shirt || 0x5a1d2d; // Rich maroon polo stripe
+    const SHIRT_COLOR = palette.shirt || 0x5a1d2d; // Primary polo stripe
     const CREAM = 0xf5f0e1;         // Warm cream polo stripe
-    const COLLAR = palette.collar || 0x43121f; // Solid maroon polo collar
+    const COLLAR_COLOR = palette.collar || 0x43121f; // Dark polo collar
     const JEANS = 0x6e91b8;         // Storybook light denim
     const JEANS_D = 0x5a7c9f;       // Denim shadow tone
     const NAVY = 0x1c2b48;          // Sneaker navy canvas
@@ -96,15 +96,19 @@ window.AhaanModel = {
     const nailMat = mat(NAIL_TONE, 0.60, 0.01);
 
     // Polo horizontal stripes texture
-    function createPoloTexture(bands) {
+    function createPoloTexture(bands, stripeColor = SHIRT_COLOR) {
       const c = document.createElement("canvas");
       c.width = 64;
       c.height = bands * 32;
       const g = c.getContext("2d");
+      const color = `#${stripeColor.toString(16).padStart(6, "0")}`;
+      const r = Math.round(((stripeColor >> 16) & 0xff) * 0.25);
+      const green = Math.round(((stripeColor >> 8) & 0xff) * 0.25);
+      const b = Math.round((stripeColor & 0xff) * 0.25);
       for (let i = 0; i < bands; i++) {
-        g.fillStyle = i % 2 ? "#f5f0e1" : "#5a1d2d";
+        g.fillStyle = i % 2 ? "#f5f0e1" : color;
         g.fillRect(0, i * 32, 64, 32);
-        g.fillStyle = i % 2 ? "rgba(220, 210, 190, 0.25)" : "rgba(60, 15, 25, 0.25)";
+        g.fillStyle = i % 2 ? "rgba(220, 210, 190, 0.25)" : `rgba(${r}, ${green}, ${b}, 0.25)`;
         for (let y = 0; y < 32; y += 4) {
           g.fillRect(0, i * 32 + y, 64, 1.5);
         }
@@ -151,13 +155,18 @@ window.AhaanModel = {
     rig.add(neckNape);
 
     // Ribbed Polo Collar
-    const collarRing = part(new T.TorusGeometry(0.44, 0.10, 14, 36), mat(COLLAR, 0.82), 0, -1.46, 0.02, 1.08, 1, 0.80);
+    const shirtTrimMats = [];
+    const collarRingMat = mat(COLLAR_COLOR, 0.82);
+    shirtTrimMats.push(collarRingMat);
+    const collarRing = part(new T.TorusGeometry(0.44, 0.10, 14, 36), collarRingMat, 0, -1.46, 0.02, 1.08, 1, 0.80);
     collarRing.rotation.x = Math.PI / 2;
     rig.add(collarRing);
 
     // Collar Lapels
     [-1, 1].forEach(s => {
-      const lapel = part(new T.BoxGeometry(0.36, 0.22, 0.04), mat(COLLAR, 0.82), s * 0.18, -1.62, 0.62);
+      const lapelMat = mat(COLLAR_COLOR, 0.82);
+      shirtTrimMats.push(lapelMat);
+      const lapel = part(new T.BoxGeometry(0.36, 0.22, 0.04), lapelMat, s * 0.18, -1.62, 0.62);
       lapel.rotation.set(-0.24, 0, s * 0.52);
       rig.add(lapel);
     });
@@ -178,7 +187,20 @@ window.AhaanModel = {
     // ==========================================
     const sleeveTex = createPoloTexture(6);
     const sleeveMat = new T.MeshStandardMaterial({ map: sleeveTex, roughness: 0.94 });
-    const cuffMat = mat(MAROON, 0.85);
+    const cuffMat = mat(SHIRT_COLOR, 0.85);
+
+    function setShirtPalette(shirtColor, collarColor) {
+      const oldTorsoTexture = poloMat.map;
+      const oldSleeveTexture = sleeveMat.map;
+      poloMat.map = createPoloTexture(8, shirtColor);
+      sleeveMat.map = createPoloTexture(6, shirtColor);
+      poloMat.needsUpdate = true;
+      sleeveMat.needsUpdate = true;
+      if (oldTorsoTexture) oldTorsoTexture.dispose();
+      if (oldSleeveTexture) oldSleeveTexture.dispose();
+      cuffMat.color.setHex(shirtColor);
+      shirtTrimMats.forEach(material => material.color.setHex(collarColor));
+    }
 
     function makeArm(side) {
       const arm = new T.Group();
@@ -878,7 +900,7 @@ window.AhaanModel = {
     return {
       rig, head, torso, neck, neckBall, neckNape, collarRing, mouth, wavingArm, leftArm, leftLeg, rightLeg,
       updateWalk, updateBlink, startWave, stopWave, updateWave, resetLimbs,
-      chomp, pose,
+      chomp, pose, setShirtPalette,
       footY: b3.min.y,
       height: b3.max.y - b3.min.y
     };
