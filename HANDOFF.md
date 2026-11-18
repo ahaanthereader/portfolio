@@ -792,18 +792,19 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 - GitHub Pages deploy run `43596574039` ("Merge branch 'feature/aesops-fables'") completed success in 20 s, 2026-11-14T12:47:59Z.
 - Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 176,534 bytes, bike code live: "ride the bike", "Mississippi" x10), https://ahaanthereader.github.io/portfolio/aesop.html (200, 2,068 bytes, shell links all three Aesop assets), `assets/aesop-data.js` (200, 8,655 bytes, all ten fable titles and morals present).
 - The local `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted in the main worktree. It was not part of this publish.
-- The two-player and Country Book v2 branches were not merged. They are still in progress.
+- Two-player PUBLISHED Nov 17 (merge 8495fdc, Pages run 44211964764, live-verified). Country Book v2 PUBLISHED Nov 17 (merge e05fc2f, Pages run 44221176304, live-verified).
 
-## Next briefs - overnight queue (Goku, updated Nov 14, 2026)
+## Next briefs - overnight queue (Goku, updated Nov 17, 2026)
 
 1. FEATURE-BRIEF-bike-icecream.md — PUBLISHED live Nov 14 (63e994b)
 2. FEATURE-BRIEF-aesops-fables.md — PUBLISHED live Nov 14 (7f0ddfa)
-3. FEATURE-BRIEF-two-player.md — IN PROGRESS on the bike worker (1000090004); Chromium installed Nov 14 ~06:40 AM, browser checks running; Vihaan's shirt is RED
-4. FEATURE-BRIEF-country-book-v2.md — IN PROGRESS on the Aesop's worker (1000090002); PageFlip download (npm pack page-flip@2.0.7) APPROVED by Nishant Nov 14, 2026 — relay pending
+3. FEATURE-BRIEF-two-player.md — PUBLISHED live Nov 17, 2026 (merge 8495fdc, Pages run 44211964764 success, live-verified; HANDOFF record fix 3c2b456). Vihaan's shirt is RED.
+4. FEATURE-BRIEF-country-book-v2.md — PUBLISHED live Nov 17, 2026 (merge e05fc2f, Pages run 44221176304 success, live-verified: 176 entries, desktop + mobile, zero console errors; record commit 990e2a1).
 5. FEATURE-BRIEF-bike-speed-boost.md — PUBLISHED live Nov 16, 2026 (feature 669318a, merge 1b39ba5; Pages run 43995668330 success). Space = boost (8 m/s top), base top 4.15 → 5.5 m/s, accel 1.55 → 2.6, steering base 0.22 → 0.55; hint "Hold Space to go fast! 🚲💨" live on index.html.
 6. FEATURE-BRIEF-vihaan-quad.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-vihaan-quad`, branch `feature/vihaan-quad` (from origin/main 1b39ba5), surface 1000090048 [terminal]. (First attempt: Claude agentSession surface 1000090044 came up with no agent process and never picked up the starter; rerouted to a Codex terminal surface per the Nov 10 fallback rule.) Vihaan's own ride, a red four-wheel quad, about 1.5x the bike's top speed; runs AFTER bike-speed lands. BLOCKED Nov 16, 2026 (21:06): worker ended task_complete — the quad cannot start until the two-player feature lands (worktree still at ee0688d; two-player merge/publish is the critical path). No code changed; do NOT nudge as a stall.
-7. FEATURE-BRIEF-capitals-quiz.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-capitals-quiz`, branch `feature/capitals-quiz` (from origin/main 1b39ba5), surface 1000090049 [terminal]. (Brief is the amended Nov 14 version: four 10-question quizzes — country capitals, US state capitals, country food, famous buildings; Stop button on every question, wrong answers never red.) COMPLETE Nov 16, 2026 — local commit e441a3c "Build four kind quiz rounds".
-8. FEATURE-BRIEF-reading-aesop-link.md — DISPATCHED Nov 16, 2026 to a Codex worker — worktree `.worktrees/feature-reading-aesop-link`, branch `feature/reading-aesop-link` (from origin/main 1b39ba5), surface 1000090050 [terminal]. One Aesop's Fables link/card on reading.html pointing to aesop.html; runs after Capitals Quiz.
+7. FEATURE-BRIEF-capitals-quiz.md — PUBLISHED live Nov 17, 2026 (merge 218ead7, Pages run 44200931157 success, live-verified: all four rounds, Stop button on every question, wrong answers never red; local commit e441a3c).
+8. FEATURE-BRIEF-reading-aesop-link.md — COMPLETE locally Nov 17, 2026 (feature commit 1d21b5f, HANDOFF record 9313356, Chrome DevTools zero console errors; link, screenshots, click verified). Publish pending — runs once screen capture is back.
+9. FEATURE-BRIEF-two-player-vehicles.md — QUEUED Nov 17, 2026 (Nishant's ask: Ahaan blue tee in two-player mode; quad, e-bike, 2-seater car, chopper parked outside the middle park with proper mechanics and physics; bike stuck fix first). Next for the idle two-player worker (1000090004) once screen capture is back.
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
 ## Bike speed boost — Nov 15, 2026
@@ -823,7 +824,7 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - GitHub Pages deploy run `43995668330` ("Merge branch 'feature/bike-speed-boost'") completed success.
 - Live verified: https://ahaanthereader.github.io/portfolio/ (200), `assets/park3d.js` (200, 177,917 bytes, boost code live: `boostHeld`, Space handler, `actionBoostHint` toggle), live `index.html` contains the `actionBoostHint` hint element ("Hold Space to go fast! 🚲💨").
 - The main worktree's uncommitted `AGENTS.md` modification (Karpathy worker rules, Nov 11) is still uncommitted. It was not part of this publish.
-- The two-player and Country Book v2 branches were not merged. They are still in progress.
+- Two-player PUBLISHED Nov 17 (merge 8495fdc, Pages run 44211964764, live-verified). Country Book v2 PUBLISHED Nov 17 (merge e05fc2f, Pages run 44221176304, live-verified).
 ## Two-player feature — Nov 13, 2026
 
 - Created branch `feature/two-player` from commit `ee0688d` in `.worktrees/feature/two-player`.
@@ -851,4 +852,4 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - `node --check` passed for both source files and the browser test. `git diff --check` passed.
 - Browser test: `tests/two-player-browser.cjs`. Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
 - Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
-- The branch contains local commits only. No changes were published.
+- Merged to main Nov 17, 2026 (merge 8495fdc); pushed 218ead7..8495fdc; Pages run 44211964764 success; live-verified (toggle On, both boys, Vihaan red, zero console errors). HANDOFF record fix 3c2b456.
