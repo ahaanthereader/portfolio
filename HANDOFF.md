@@ -48,8 +48,8 @@
 - Vihaan enters and exits with a wave when motion is allowed.
 - Syntax, whitespace, desktop, mobile, and reduced-motion checks pass.
 - Screenshots: `/tmp/ahaan-two-player/desktop.png` and `/tmp/ahaan-two-player/mobile.png`.
-- Implementation commit: `5a689a1f5d8417fc287a6b54305aa5019a754df2`.
-- No changes were pushed.
+- Implementation commit: `b46a012` (rebased from `5a689a1` onto main `218ead7`; record commit `21cbcb3`).
+- Published Nov 17, 2026: merged to main as `8495fdc`, pushed `218ead7..8495fdc`; GitHub Pages run `44211964764` success; live verified desktop + mobile, browser suite errors: [].
 
 ## Lazy river bridge verification — Nov 10, 2026
 
