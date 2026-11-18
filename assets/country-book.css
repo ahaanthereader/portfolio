@@ -3,11 +3,17 @@
    and the page area scrolls inside. On a phone the page grows and the window scrolls.
    Colours use the site tokens. Text is large. Focus rings are dark and 3 px wide. */
 
-.cb { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 900px; margin: 0 auto; }
+.cb { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 1020px; margin: 0 auto; }
 .cb-page {
-  position: relative; background: var(--paper-2, #f6f1e7); border: 1px solid var(--line);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(18px, 4vw, 36px);
-  min-height: 360px; outline: none; color: var(--ink);
+  position: relative; isolation: isolate; background-color: #f8f3e8;
+  background-image:
+    radial-gradient(rgba(113, 87, 54, .045) .55px, transparent .7px),
+    linear-gradient(90deg, rgba(255, 255, 255, .32), transparent 8%, transparent 94%, rgba(139, 111, 70, .08));
+  background-size: 5px 5px, 100% 100%;
+  border: 1px solid #d7cbb7; border-radius: 12px 16px 16px 12px;
+  box-shadow: inset 7px 0 12px -11px rgba(70, 49, 25, .45), 3px 0 #eee6d8,
+    6px 2px 0 #e6ddce, 9px 4px 0 #ddd3c2, 0 14px 32px rgba(43, 39, 33, .16);
+  padding: clamp(18px, 4vw, 36px); min-height: 360px; outline: none; color: var(--ink);
 }
 .cb-empty { font-size: 1.2rem; text-align: center; }
 
@@ -84,6 +90,28 @@
 .cb-facts dd { margin: 0; font-size: 1.25rem; line-height: 1.4; }
 .cb-pageno { margin: 0; text-align: right;font-family: "Fredoka", system-ui, sans-serif; font-size: .95rem; color: var(--ink-soft); }
 
+/* ---- wide screen: two light page views with a narrow centre fold ---- */
+.cb-page.cb-spread { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px 20px; }
+.cb-leaf { min-width: 0; padding: 6px 18px 0 6px; }
+.cb-leaf + .cb-leaf { padding: 6px 6px 0 24px; border-left: 1px solid rgba(94, 72, 45, .22); box-shadow: inset 9px 0 12px -14px rgba(70, 49, 25, .55); }
+.cb-spread .cb-country { display: flex; gap: 8px; }
+.cb-spread .cb-left { gap: 8px; }
+.cb-spread .cb-name { font-size: clamp(1.85rem, 3vw, 2.55rem); }
+.cb-spread .cb-kind { font-size: 1rem; }
+.cb-spread .cb-note { font-size: .95rem; padding: 6px 9px; }
+.cb-spread .cb-flagrow { gap: 9px; }
+.cb-spread .cb-stripes { width: 84px; height: 56px; }
+.cb-spread .cb-emoji { font-size: 2.55rem; }
+.cb-spread .cb-cap { padding: 7px 10px; }
+.cb-spread .cb-cap-label { font-size: .82rem; }
+.cb-spread .cb-cap-name { font-size: 2rem; }
+.cb-spread .cb-cap-name.long { font-size: 1.35rem; }
+.cb-spread .cb-facts { gap: 3px; }
+.cb-spread .cb-facts > div { grid-template-columns: minmax(5.7em, 38%) minmax(0, 1fr); gap: 7px; padding: 4px 0; align-items: start; }
+.cb-spread .cb-facts dt { font-size: .95rem; }
+.cb-spread .cb-facts dd { font-size: 1.05rem; line-height: 1.3; }
+.cb-spread .cb-pageno { margin-top: 8px; }
+
 /* ---- page turn: only when the system allows motion and Motion is not off ---- */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-motion="off"]) .cb-page.turn-next { animation: cbTurnNext .3s ease-in-out; }
@@ -94,12 +122,20 @@
 
 /* ---- phone ---- */
 @media (max-width: 600px) {
+  .cb-page { box-shadow: inset 5px 0 10px -10px rgba(70, 49, 25, .45), 2px 0 #eee6d8,
+    4px 2px 0 #e6ddce, 6px 3px 0 #ddd3c2, 0 10px 24px rgba(43, 39, 33, .14); }
   .cb-facts > div { grid-template-columns: 1fr; gap: 0; }
   .cb-stripes { width: 96px; height: 62px; }
   .cb-emoji { font-size: 2.8rem; }
   .cb-controls { gap: 8px; }
   .cb-btn { padding: 12px 14px; font-size: 1.05rem; }
   .cb-num { order: -1; width: 100%; }
+}
+
+@media (max-width: 860px) {
+  .cb-page.cb-spread { display: block; padding: clamp(18px, 4vw, 36px); }
+  .cb-leaf { padding: 0; }
+  .cb-leaf + .cb-leaf { display: none; }
 }
 
 /* ---- laptop: the book fills the screen, and the page area scrolls inside ---- */
