@@ -1,6 +1,6 @@
 # HANDOFF — Ahaan's Portfolio
 
-## Reading Nook Aesop link — Nov 16, 2026
+## Reading Nook Aesop link — Nov 16–17, 2026
 
 - The active brief is `FEATURE-BRIEF-reading-aesop-link.md`.
 - Added one Aesop's Fables link below the book shelf in `reading.html`.
@@ -9,8 +9,10 @@
 - Mobile screenshot at 390 × 844 shows the link below the shelf.
 - The mobile screenshot also shows the existing shelf content past the right edge.
 - Clicked the link in Chrome. The Aesop page opened and showed all ten fables.
+- Chrome DevTools reported no console errors on `reading.html`.
 - Screenshots: `/tmp/ahaan-reading-aesop/reading-desktop.png` and `reading-mobile.png`.
-- `git diff --check` passed. Browser console errors were not checked.
+- `git diff --check` passed.
+- Feature commit: `1d21b5f` (`Add Reading Nook link to Aesop fables`). The commit is local and not pushed.
 
 ## Lazy river bridge verification — Nov 10, 2026
 
