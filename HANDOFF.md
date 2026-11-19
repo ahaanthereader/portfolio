@@ -820,6 +820,7 @@ Nishant approved publishing `feature/lazy-river-bridges`. The worker merged only
 7. FEATURE-BRIEF-capitals-quiz.md — PUBLISHED live Nov 17, 2026 (merge 218ead7, Pages run 44200931157 success, live-verified: all four rounds, Stop button on every question, wrong answers never red; local commit e441a3c).
 8. FEATURE-BRIEF-reading-aesop-link.md — PUBLISHED live Nov 18, 2026 (merge a8fe125, Pages run 44256079700 success, live-verified: reading.html 200 desktop + mobile, link visible, click opens aesop.html, zero console errors).
 9. FEATURE-BRIEF-two-player-vehicles.md — QUEUED Nov 17, 2026 (Nishant's ask: Ahaan blue tee in two-player mode; quad, e-bike, 2-seater car, chopper parked outside the middle park with proper mechanics and physics; bike stuck fix first). Next for the idle two-player worker (1000090004) once screen capture is back. NOTE Nov 18, 2026: the Vihaan quad has LANDED on main (merge 8f35b6b). Reuse this quad in the vehicles build. Do NOT add a second quad to the park.
+10. FEATURE-BRIEF-sally-home-page-improvements.md — DISPATCHED Nov 19, 2026 (Nishant's ask: work with Sally to improve home page; home-page items R5, R12, R13, R15, R3-home from sally-ux-review-2026-11-12.md; worker 1000090004).
 When one job finishes, start the next brief without waiting. Update this HANDOFF as you go.
 
 ## FEATURE-BRIEF-two-player-vehicles.md — bike baseline before changes — Nov 18, 2026
