@@ -932,3 +932,17 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Quad teleport comparison: both scripts call Park3D.teleportVihaan(2.45, 6.2), which sets coordinates and recomputes proximity synchronously. In the full check, the immediate log showed together=true, position (1.4700, 3.7201), and nearby=null. A frame clamps Vihaan to maxPlayerSeparation from Ahaan at origin: the requested point is 6.67 m away, but the allowed distance is 4 m. The probe dispatches Enter before the next animation frame can clamp Vihaan. Full check then waits forever for quad proximity. Exact difference: probe's immediate Enter precedes the separation clamp; full check's proximity wait yields to the frame and the clamp moves Vihaan outside quad radius. No Enter changes made in this step. Mount, ride, and dismount remain unverified.
 - Quad-only browser check setup fix: moved Ahaan to (0, 6) before enabling Play together, so Vihaan can reach the quad without separation clamping. One full run passed: mount pass, ride pass, dismount pass, zero page errors. The quad moved forward under ArrowUp. Check: tests/quad-browser.cjs. Branch is ready for publish verification; no publish or push performed.
 - Published Nov 18, 2026: merged to main as 8f35b6b (HANDOFF conflict resolved by hand: kept the two-player publish record and the full quad section; dropped only the stale "branch contains local commits only" line), pushed b58ffbe..8f35b6b; GitHub Pages run 44282760464 success in 19 s; live verified on the deployed site with /tmp/ahaan-quad-live.cjs — desktop 1280x800: mount pass, ride pass, dismount pass, zero page errors, quad z 6.2 to 6.308625, speed 0.52; mobile 390x844: mount pass, ride pass, dismount pass, zero page errors, quad z 6.2 to 6.347125, speed 0.63; live index.html 200, park3d.js 200, tests/quad-browser.cjs 200; screenshots /tmp/ahaan-quad-live/quad-riding-desktop.png and quad-riding-mobile.png.
+
+## Sally home page improvements — Nov 19, 2026
+
+- Goku dispatched queue item 10 from `FEATURE-BRIEF-sally-home-page-improvements.md`.
+- Read Sally's review and the implementation brief. No planning or implementation artifacts exist in the new worktree.
+- Created `.worktrees/feature-sally-home-page-improvements` on `feature/sally-home-page-improvements` from main commit `a435570`.
+- The build workflow identified five independently shippable changes: add the grouped home navigation, rename the shared Country Book link, replace footer placeholder copy, wrap fit-screen intros, and add global focus rings.
+- Added the home navigation groups `Read`, `Explore`, `Play`, and `My stuff` in `index.html`.
+- Kept all 16 existing navigation destinations and left the candy drawer unchanged.
+- Checked the group labels, destination files, and candy drawer. No other brief items changed.
+- Completed R12: changed the shared navigation label from `Sketchbook` to `Country Book` on every page with the grouped nav. Kept the `sketchbook.html` destination.
+- Completed R13 on the home page: replaced the footer placeholder with `Made with love by Ahaan.` No other footer or Journey copy changed.
+- Completed R15 in `assets/site.css`: fit-screen intro paragraphs now wrap naturally instead of clipping to one line. This prevents horizontal overflow from long intro text.
+- Completed R3: verified the existing global `button:focus-visible, a:focus-visible` rule in `assets/site.css`. It uses a 3 px `var(--ink)` outline with a 2 px offset. No duplicate rule was needed.
