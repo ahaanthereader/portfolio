@@ -4971,7 +4971,9 @@
       raf = 0;
       if (motionPaused()) return;
 
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const elapsed = Math.min(0.2, (now - last) / 1000);
+      const dt = Math.min(0.05, elapsed);
+      const walkDt = elapsed;
       last = now;
 
       // Ride the bike or walk through the park.
@@ -5035,14 +5037,14 @@
           const len = Math.hypot(moveX, moveZ);
           moveX /= len; moveZ /= len;
           ahaanAngle = Math.atan2(moveX, moveZ);
-          isWalking = moveActor(A, moveX * walkSpeed * dt, moveZ * walkSpeed * dt);
+          isWalking = moveActor(A, moveX * walkSpeed * walkDt, moveZ * walkSpeed * walkDt);
         } else if (targetPos) {
           const dx = targetPos.x - A.rig.position.x;
           const dz = targetPos.z - A.rig.position.z;
           const dist = Math.hypot(dx, dz);
           if (dist > 0.4) {
             ahaanAngle = Math.atan2(dx / dist, dz / dist);
-            isWalking = moveActor(A, (dx / dist) * walkSpeed * dt, (dz / dist) * walkSpeed * dt);
+            isWalking = moveActor(A, (dx / dist) * walkSpeed * walkDt, (dz / dist) * walkSpeed * walkDt);
             markerMat.opacity = Math.max(0.2, markerMat.opacity - dt * 0.4);
           } else {
             isWalking = false;
@@ -5195,13 +5197,13 @@
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
           vihaanAngle = Math.atan2(moveX, moveZ);
-          vihaanWalking = moveActor(V, moveX * walkSpeed * (shiftHeld ? 1.55 : 1) * dt, moveZ * walkSpeed * (shiftHeld ? 1.55 : 1) * dt);
+          vihaanWalking = moveActor(V, moveX * walkSpeed * (shiftHeld ? 1.55 : 1) * walkDt, moveZ * walkSpeed * (shiftHeld ? 1.55 : 1) * walkDt);
           let diff = vihaanAngle - V.rig.rotation.y;
           while (diff < -Math.PI) diff += Math.PI * 2;
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, dt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -5253,7 +5255,7 @@
 
       // Update leg and arm walk cycle
       if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && A.updateWalk && (!currentActivity || activityPhase === 0)) {
-        A.updateWalk(isWalking, 8.5, dt);
+        A.updateWalk(isWalking, 8.5, walkDt);
       }
 
       if (eatingTimer > 0) {
