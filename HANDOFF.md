@@ -970,3 +970,4 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Durable local browser check passed: desktop 1280 × 800 and mobile 390 × 844; home card and nav link opened the page; candy drawer opened and closed; all 12 images loaded; no horizontal overflow; zero console or page errors. Screenshots: `/private/tmp/fresh-drops-local/`.
 - `node --check assets/fresh-drops.js` and `git diff --check` passed.
 - Date note: the vehicles branch merged as `a435570` on Nov 18. HANDOFF has no separate Pages run for that feature. The Nov 19 Sally Pages run `44500957374` is the next recorded full-site publish and includes the merge.
+- Feature commit: `470639e` (`Add Fresh Drops release page`). Publishing and live verification are next.
