@@ -1,5 +1,13 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Brief queue — dispatched by Goku (Nov 20, 2026)
+
+Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19 drive instruction). Update HANDOFF.md as you go. Fresh Drops standing rule: every publish adds a Fresh Drops entry with its screenshot (from publish verification) — no entry without its screenshot.
+
+1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). TOP OF QUEUE — execute first.
+2. **Park 2-player + walking improvement pass** — `FEATURE-BRIEF-two-player-walking.md` (Nishant's Nov 20 priority: walking is off — test yourself and fix issues you see).
+3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot).
+
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
 - The active brief is `FEATURE-BRIEF-reading-aesop-link.md`.
