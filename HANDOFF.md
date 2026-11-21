@@ -4,7 +4,7 @@
 
 Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19 drive instruction). Update HANDOFF.md as you go. Fresh Drops standing rule: every publish adds a Fresh Drops entry with its screenshot (from publish verification) — no entry without its screenshot.
 
-1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). TOP OF QUEUE — execute first.
+1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). Completed Nov 21, 2026; published and live-verified.
 2. **Park 2-player + walking improvement pass** — `FEATURE-BRIEF-two-player-walking.md` (Nishant's Nov 20 priority: walking is off — test yourself and fix issues you see).
 3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot).
 
@@ -961,7 +961,7 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Goku placed `FEATURE-BRIEF-release-notes.md` at the top of the brief queue.
 - Created `.worktrees/feature-fresh-drops` on `feature/fresh-drops` from main commit `1e8ac9a`.
 - Read the brief and confirmed the seed publish dates against this HANDOFF. The bridge feature published on Nov 10, 2026.
-- First publish and live verification passed. A visual spacing fix and its Fresh Drops entry are in progress.
+- First publish, spacing fix, follow-up publish, and live verification passed.
 - Standing rule: add a dated Fresh Drops entry with its live publish screenshot during every future site publish. Do not add an entry without its screenshot. Update the home card's latest date with each new entry.
 - Built `fresh-drops.html` with 13 dated entries in newest-first order. Each entry has a live-site screenshot, kid-readable copy, and a Try it instruction.
 - Added a Fresh Drops link to the home page's My stuff menu and a visible home card. The card shows `NEW` when its latest entry is within seven days.
@@ -975,7 +975,10 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - First live verification passed on Nov 21. Desktop and mobile showed 12 entries, eight NEW entry badges, all images loaded, no horizontal overflow, and zero page or console errors. Screenshots: `/private/tmp/fresh-drops-live/`.
 - Visual follow-up: removed inherited section padding that left a large gap above the cards. Added the Nov 21 Fresh Drops page entry with a screenshot from the first live publish. Updated the home card's latest date to Nov 21.
 - The follow-up local browser check passed at 1280 × 800 and 390 × 844. The page showed 13 entries and nine NEW badges. All images loaded. No horizontal overflow or page errors appeared.
-- Feature commit: `470639e` (`Add Fresh Drops release page`). Follow-up visual fix is ready for a second publish.
+- Feature commits: `470639e` (`Add Fresh Drops release page`) and `0def0a3` (`Polish Fresh Drops page`).
+- Second publish: merged as `6936351`, pushed `7b745ea..6936351`; GitHub Pages run `44891647142` completed successfully.
+- Final live verification passed on desktop 1280 × 800 and mobile 390 × 844. Both views showed 13 entries; desktop showed nine NEW badges. All images loaded, no horizontal overflow appeared, and zero page or console errors appeared.
+- Final live screenshots: `/private/tmp/fresh-drops-live-final/fresh-drops-desktop.png`, `fresh-drops-mobile.png`, `home-desktop.png`, and `home-mobile.png`.
 
 ## Park 2-player walking pass — Nov 21, 2026
 
@@ -989,3 +992,4 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - The post-fix probe passed for both boys in four directions and four diagonals. Both boys walked north together. The 350 ms cardinal sample increased from 0.68 m before the fix to 2.72 m after the fix.
 - Desktop and mobile screenshots show both boys in frame. The probe reported zero page errors. `node --check assets/park3d.js` passed.
 - Screenshots: `/tmp/ahaan-two-player-walking/walking-desktop.png` and `walking-mobile.png`.
+- Feature commit: `b8c349e` (`Fix Park walking speed on slow frames`). The publish and Fresh Drops entry are in progress.
