@@ -992,4 +992,9 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - The post-fix probe passed for both boys in four directions and four diagonals. Both boys walked north together. The 350 ms cardinal sample increased from 0.68 m before the fix to 2.72 m after the fix.
 - Desktop and mobile screenshots show both boys in frame. The probe reported zero page errors. `node --check assets/park3d.js` passed.
 - Screenshots: `/tmp/ahaan-two-player-walking/walking-desktop.png` and `walking-mobile.png`.
-- Feature commit: `b8c349e` (`Fix Park walking speed on slow frames`). The publish and Fresh Drops entry are in progress.
+- Feature commit: `b8c349e` (`Fix Park walking speed on slow frames`). Handoff correction commit: `18e15d3` (`Refresh release handoff status`).
+- First publish: merged to main as `0f095c0`, pushed `6936351..0f095c0`. GitHub Pages run `44914958144` completed successfully.
+- First live verification passed with the durable browser harness. Desktop 1280 × 800 and mobile 390 × 844 passed eight-direction movement for both boys and simultaneous walking. Page errors, console errors, and failed requests were empty. Both players remained in frame.
+- Live screenshots: `/tmp/ahaan-two-player-live-walking-44914958144/walking-desktop.jpg` and `walking-mobile.jpg`. The desktop screenshot is saved as `public/fresh-drops/2026-11-21-two-player-walking.jpg`.
+- Mobile visual review found the two player labels overlap when the boys stand close. The Fresh Drops home card also covers part of the Vihaan label. Record this for the next walking review; this publish does not change label placement.
+- Added the Nov 21 Fresh Drops entry `Walk together in the park` with the live desktop screenshot. The home card already has the Nov 21 latest date. The Fresh Drops entry publish is pending.
