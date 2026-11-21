@@ -982,7 +982,7 @@
   .fresh-drops-head h1 { margin: 0; color: var(--ink); font: 400 clamp(3.2rem, 8vw, 6rem)/.95 'Instrument Serif', Georgia, serif; }
   .fresh-drops-subtitle { margin: 8px 0 12px; color: var(--terra); font: 700 clamp(1.35rem, 3vw, 1.8rem)/1.2 'Newsreader', Georgia, serif; }
   .fresh-drops-intro { margin: 0 auto; color: var(--ink-soft); font-size: 1.1rem; }
-  .fresh-drops-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
+  .fresh-drops-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; padding: 0; }
   .fresh-drop { min-width: 0; overflow: hidden; border: 1px solid rgba(43,46,33,.14); border-radius: 18px; background: rgba(255,253,248,.92); box-shadow: 0 6px 20px rgba(43,46,33,.08); }
   .fresh-drop-image { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #e5dfd3; }
   .fresh-drop-image img { display: block; width: 100%; height: 100%; object-fit: cover; }

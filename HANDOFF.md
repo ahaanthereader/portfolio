@@ -961,13 +961,18 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Goku placed `FEATURE-BRIEF-release-notes.md` at the top of the brief queue.
 - Created `.worktrees/feature-fresh-drops` on `feature/fresh-drops` from main commit `1e8ac9a`.
 - Read the brief and confirmed the seed publish dates against this HANDOFF. The bridge feature published on Nov 10, 2026.
-- Implementation and local checks are complete. Next: commit, publish, and live-verify this branch.
+- First publish and live verification passed. A visual spacing fix and its Fresh Drops entry are in progress.
 - Standing rule: add a dated Fresh Drops entry with its live publish screenshot during every future site publish. Do not add an entry without its screenshot. Update the home card's latest date with each new entry.
-- Built `fresh-drops.html` with 12 dated entries in newest-first order. Each entry has a live-site screenshot, kid-readable copy, and a Try it instruction.
+- Built `fresh-drops.html` with 13 dated entries in newest-first order. Each entry has a live-site screenshot, kid-readable copy, and a Try it instruction.
 - Added a Fresh Drops link to the home page's My stuff menu and a visible home card. The card shows `NEW` when its latest entry is within seven days.
-- Added date-based `NEW` badges to fresh entries. The Nov 21 local check showed eight fresh entries.
-- Captured all 12 seed screenshots from the live site at 1280 × 800. Saved optimized JPEGs in `public/fresh-drops/` (2.3 MB total).
-- Durable local browser check passed: desktop 1280 × 800 and mobile 390 × 844; home card and nav link opened the page; candy drawer opened and closed; all 12 images loaded; no horizontal overflow; zero console or page errors. Screenshots: `/private/tmp/fresh-drops-local/`.
+- Added date-based `NEW` badges to fresh entries. The Nov 21 local check showed nine fresh entries.
+- Captured 12 seed screenshots from the live site at 1280 × 800. Saved optimized JPEGs in `public/fresh-drops/`.
+- The first publish added a Fresh Drops entry for this page. Its screenshot is `/private/tmp/fresh-drops-live/fresh-drops-desktop.png`, saved as `public/fresh-drops/2026-11-21-fresh-drops.jpg`.
+- Durable local browser check passed: desktop 1280 × 800 and mobile 390 × 844; home card and nav link opened the page; candy drawer opened and closed; all 13 images loaded; no horizontal overflow; zero console or page errors. Screenshots: `/private/tmp/fresh-drops-local/`.
 - `node --check assets/fresh-drops.js` and `git diff --check` passed.
 - Date note: the vehicles branch merged as `a435570` on Nov 18. HANDOFF has no separate Pages run for that feature. The Nov 19 Sally Pages run `44500957374` is the next recorded full-site publish and includes the merge.
-- Feature commit: `470639e` (`Add Fresh Drops release page`). Publishing and live verification are next.
+- First publish: merge `7b745ea` (`Publish Fresh Drops release page`), pushed `1e8ac9a..7b745ea`; GitHub Pages run `44885800007` completed successfully.
+- First live verification passed on Nov 21. Desktop and mobile showed 12 entries, eight NEW entry badges, all images loaded, no horizontal overflow, and zero page or console errors. Screenshots: `/private/tmp/fresh-drops-live/`.
+- Visual follow-up: removed inherited section padding that left a large gap above the cards. Added the Nov 21 Fresh Drops page entry with a screenshot from the first live publish. Updated the home card's latest date to Nov 21.
+- The follow-up local browser check passed at 1280 × 800 and 390 × 844. The page showed 13 entries and nine NEW badges. All images loaded. No horizontal overflow or page errors appeared.
+- Feature commit: `470639e` (`Add Fresh Drops release page`). Follow-up visual fix is ready for a second publish.
