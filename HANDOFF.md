@@ -955,3 +955,18 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Completed R15 in `assets/site.css`: fit-screen intro paragraphs now wrap naturally instead of clipping to one line. This prevents horizontal overflow from long intro text.
 - Completed R3: verified the existing global `button:focus-visible, a:focus-visible` rule in `assets/site.css`. It uses a 3 px `var(--ink)` outline with a 2 px offset. No duplicate rule was needed.
 - Published Nov 19, 2026: merged to main as dd4156a, pushed a435570..dd4156a; GitHub Pages run 44500957374 success in 23 s; live-verified on ahaanthereader.github.io/portfolio with the durable harness — desktop 1280x800 + mobile 390x844: grouped nav (Read/Explore/Play/My stuff), Country Book label, footer "Made with love by Ahaan.", focus outline solid 3px, no horizontal scroll, zero console errors. Acceptance checks run locally before publish (no passing record existed in HANDOFF); desktop footer hidden by the pre-existing .page-home footer rule, copy verified in live HTML and visible on mobile.
+
+## Fresh Drops — Nov 21, 2026
+
+- Goku placed `FEATURE-BRIEF-release-notes.md` at the top of the brief queue.
+- Created `.worktrees/feature-fresh-drops` on `feature/fresh-drops` from main commit `1e8ac9a`.
+- Read the brief and confirmed the seed publish dates against this HANDOFF. The bridge feature published on Nov 10, 2026.
+- Implementation and local checks are complete. Next: commit, publish, and live-verify this branch.
+- Standing rule: add a dated Fresh Drops entry with its live publish screenshot during every future site publish. Do not add an entry without its screenshot. Update the home card's latest date with each new entry.
+- Built `fresh-drops.html` with 12 dated entries in newest-first order. Each entry has a live-site screenshot, kid-readable copy, and a Try it instruction.
+- Added a Fresh Drops link to the home page's My stuff menu and a visible home card. The card shows `NEW` when its latest entry is within seven days.
+- Added date-based `NEW` badges to fresh entries. The Nov 21 local check showed eight fresh entries.
+- Captured all 12 seed screenshots from the live site at 1280 × 800. Saved optimized JPEGs in `public/fresh-drops/` (2.3 MB total).
+- Durable local browser check passed: desktop 1280 × 800 and mobile 390 × 844; home card and nav link opened the page; candy drawer opened and closed; all 12 images loaded; no horizontal overflow; zero console or page errors. Screenshots: `/private/tmp/fresh-drops-local/`.
+- `node --check assets/fresh-drops.js` and `git diff --check` passed.
+- Date note: the vehicles branch merged as `a435570` on Nov 18. HANDOFF has no separate Pages run for that feature. The Nov 19 Sally Pages run `44500957374` is the next recorded full-site publish and includes the merge.
