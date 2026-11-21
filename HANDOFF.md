@@ -976,3 +976,16 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Visual follow-up: removed inherited section padding that left a large gap above the cards. Added the Nov 21 Fresh Drops page entry with a screenshot from the first live publish. Updated the home card's latest date to Nov 21.
 - The follow-up local browser check passed at 1280 × 800 and 390 × 844. The page showed 13 entries and nine NEW badges. All images loaded. No horizontal overflow or page errors appeared.
 - Feature commit: `470639e` (`Add Fresh Drops release page`). Follow-up visual fix is ready for a second publish.
+
+## Park 2-player walking pass — Nov 21, 2026
+
+- Created `.worktrees/feature-two-player-walking` on `feature/two-player-walking` from `origin/main` at `6936351adac1fce1177b4edfa40aa82bfb2ff166`.
+- Ran `tests/two-player-browser.cjs` with the durable browser-check Playwright module. The suite passed on desktop and mobile. Bridge height matched at 8.00094 m. Both players stayed in frame, and page errors were empty. Evidence: `/tmp/ahaan-two-player/`.
+- The walking-direction probe covered all four directions and four diagonals for both boys. Both boys also walked north at the same time. The desktop run sampled only three animation frames in 350 ms.
+- The probe measured 0.68 m of north movement in 350 ms (1.94 m/s), below the 6.8 m/s walking speed. The animation loop capped every frame at 0.05 s, so slow frames dropped walking distance.
+- Earlier probe attempts failed their test thresholds: 0.34 m in 200 ms (<0.70 m), 1.02 m in 600 ms (<2.00 m), and diagonal direction dot 0.952 (<0.96). These limits were too strict for the low-frame sample and sequential key dispatch. The final probe uses browser key event times and a 0.90 diagonal direction threshold.
+- A post-fix speed assertion also failed at 3.71 m/s because it included Playwright dispatch overhead. The final probe measured from browser keydown through keyup instead.
+- Fixed walking displacement and both foot cycles to use elapsed time capped at 0.2 s. Other park animation still uses the existing 0.05 s cap.
+- The post-fix probe passed for both boys in four directions and four diagonals. Both boys walked north together. The 350 ms cardinal sample increased from 0.68 m before the fix to 2.72 m after the fix.
+- Desktop and mobile screenshots show both boys in frame. The probe reported zero page errors. `node --check assets/park3d.js` passed.
+- Screenshots: `/tmp/ahaan-two-player-walking/walking-desktop.png` and `walking-mobile.png`.
