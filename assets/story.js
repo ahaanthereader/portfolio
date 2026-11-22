@@ -13,6 +13,7 @@
 
   let story = load();
   let cur = 0;
+  let deletedPage = null, deletedAt = -1, undoTimer;
 
   function blank() { return { title: "", pages: [{ text: "", sticker: "🌟" }] }; }
   function load() {
@@ -31,6 +32,7 @@
 
   const titleInput = $("#storyTitle"), pageText = $("#pageText"), pageSticker = $("#pageSticker"),
         pageLabel = $("#pageLabel");
+  const deleteDialog = $("#deleteDialog"), undoToast = $("#storyUndoToast"), undoButton = $("#undoDelete");
 
   function renderEdit() {
     const p = story.pages[cur];
@@ -59,14 +61,30 @@
   });
 
   $("#addPg").addEventListener("click", () => { story.pages.splice(cur + 1, 0, { text: "", sticker: "🌟" }); cur++; renderEdit(); save(); });
-  $("#delPg").addEventListener("click", () => {
-    if (story.pages.length === 1) return;
+  $("#delPg").addEventListener("click", () => { if (story.pages.length > 1) deleteDialog.showModal(); });
+  $("#keepPage").addEventListener("click", () => deleteDialog.close());
+  $("#confirmDelete").addEventListener("click", () => {
+    if (story.pages.length === 1) return deleteDialog.close();
+    clearTimeout(undoTimer);
+    deletedAt = cur; deletedPage = story.pages[cur];
     story.pages.splice(cur, 1); cur = Math.max(0, cur - 1); renderEdit(); save();
+    deleteDialog.close();
+    undoToast.hidden = false; undoToast.classList.add("show"); undoButton.focus();
+    undoTimer = setTimeout(() => {
+      undoToast.classList.remove("show"); undoToast.hidden = true; deletedPage = null;
+      if (document.activeElement === undoButton) pageText.focus();
+    }, 5000);
+  });
+  undoButton.addEventListener("click", () => {
+    if (!deletedPage) return;
+    clearTimeout(undoTimer); story.pages.splice(deletedAt, 0, deletedPage); cur = deletedAt; deletedPage = null;
+    undoToast.classList.remove("show"); undoToast.hidden = true; renderEdit(); save(); pageText.focus();
   });
   $("#prevPg").addEventListener("click", () => { if (cur > 0) { cur--; renderEdit(); } });
   $("#nextPg").addEventListener("click", () => { if (cur < story.pages.length - 1) { cur++; renderEdit(); } });
   $("#newBook").addEventListener("click", () => {
     if (!confirm("Start a brand new story? Your current one will be cleared.")) return;
+    clearTimeout(undoTimer); deletedPage = null; undoToast.classList.remove("show"); undoToast.hidden = true;
     story = blank(); cur = 0; renderEdit(); save();
   });
 
