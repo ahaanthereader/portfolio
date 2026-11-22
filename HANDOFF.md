@@ -53,7 +53,11 @@
 - Pushed merge commit `517751c` to `main`. Pages run `45043472388` completed successfully.
 - Ran the train browser check against the live Pages URL. Desktop and mobile passed all train, smoke, sound, boarding, and exit checks with zero page errors.
 - Captured the live train at the Ice Cream Stop in `public/fresh-drops/2026-11-22-dinosaur-train.png`.
-- Added the dinosaur train entry to `fresh-drops.html` with the live screenshot. The Fresh Drops update still needs its own publish and live check.
+- Added the dinosaur train entry to `fresh-drops.html` with the live screenshot. Commit `60b7c67` published the entry, and Pages run `45047203903` succeeded.
+- Focused live Fresh Drops checks passed on desktop and mobile. The card text and live screenshot loaded with zero page errors.
+- Live screenshots: `/tmp/ahaan-park-train/fresh-drops-live-1280.png` and `/tmp/ahaan-park-train/fresh-drops-live-390.png`.
+- The full live chopper harness failed at its chopper click wait before reaching Fresh Drops. The focused Fresh Drops check passed.
+- Latest main commit `7c37f74` keeps the garage brief next in the queue.
 - `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed after the boarding changes.
 - The first browser attempt found a timing race when the test tried to reboard during the initial station dwell. Updated the check to verify each rider at separate station stops.
 - The next browser attempt reached Bridge Stop with Vihaan aboard. The test radius missed the rear carriage, so I widened the position check to cover the train length.
@@ -132,8 +136,8 @@ Execute in this order. Build, publish, live-verify on driver authority (Nishant'
 Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WITH a screenshot of the live feature — no entry without its screenshot; (b) every new feature/page goes under an existing menu tab at publish time — no orphan/random separate pages — and gets a visible "NEW" tag (nav entry + home card) for its first 7 days so the kids know what to try.
 
 1. **Click-to-go for ALL vehicles + chopper sound/design/default height** — `FEATURE-BRIEF-chopper-click-to-fly.md`. TOP OF QUEUE — execute first.
-2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. IN FLIGHT on worker 0004 (worktree `feature-park-train-and-cars`).
-3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage).
+2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. COMPLETED and published Nov 22, 2026. Train commit `b7e3c74`; Pages run `45043472388` succeeded; live desktop and mobile checks passed.
+3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage). COMPLETED and published in `60b7c67`; Fresh Drops Pages run `45047203903` succeeded; live desktop and mobile checks passed.
 4. **Garage + 1.5x speed + lifelike vehicles + rider seating** — `FEATURE-BRIEF-park-garage-speed-positions.md` (garage near the picnic area for chopper/bike/bicycle/car — train stays outside; everything 1.5x faster; fix odd rider seating positions).
 5. **Train guided tour upgrade** — `FEATURE-BRIEF-park-train-guided-tour.md` (Ahaan + Nishant, Nov 22 voice call: make the existing train bigger, both Ahaan and Vihaan ride at the same time, camera follows the train, choo-choo sound, one boarding station, kid-friendly narration of what is on the left and right). QUEUED Nov 22, 2026 — runs after the current train publish + garage brief.
 6. **Movie theater** — `FEATURE-BRIEF-park-movie-theater.md` (Ahaan, Nov 22 voice call: theater building with a big screen and seats). QUEUED Nov 22, 2026.
