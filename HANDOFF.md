@@ -997,4 +997,10 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - First live verification passed with the durable browser harness. Desktop 1280 × 800 and mobile 390 × 844 passed eight-direction movement for both boys and simultaneous walking. Page errors, console errors, and failed requests were empty. Both players remained in frame.
 - Live screenshots: `/tmp/ahaan-two-player-live-walking-44914958144/walking-desktop.jpg` and `walking-mobile.jpg`. The desktop screenshot is saved as `public/fresh-drops/2026-11-21-two-player-walking.jpg`.
 - Mobile visual review found the two player labels overlap when the boys stand close. The Fresh Drops home card also covers part of the Vihaan label. Record this for the next walking review; this publish does not change label placement.
-- Added the Nov 21 Fresh Drops entry `Walk together in the park` with the live desktop screenshot. The home card already has the Nov 21 latest date. The Fresh Drops entry publish is pending.
+- Added the Nov 21 Fresh Drops entry `Walk together in the park` with the live desktop screenshot. The home card already has the Nov 21 latest date.
+- Entry commit: `8860622` (`Add walking fix to Fresh Drops`).
+- Second publish: merged as `6d9490a`, pushed `0f095c0..6d9490a`. GitHub Pages run `44918968152` completed successfully.
+- Final live verification passed with the durable browser harness. Desktop and mobile walking probes passed for both boys in four directions and four diagonals. Simultaneous walking passed. Fresh Drops showed 14 entries, the new image loaded at 1280 pixels wide, and the home card date was `2026-11-21`. No horizontal overflow, page errors, console errors, or failed requests appeared.
+- The combined run first captured the Fresh Drops route at 390 pixels wide. A separate check then passed at 1280 × 800 and 390 × 844.
+- Final walking screenshots: `/tmp/ahaan-two-player-final-live-44918968152/walking-desktop.jpg` and `walking-mobile.jpg`.
+- Final Fresh Drops screenshots: `/tmp/fresh-drops-final-desktop-44918968152/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.
