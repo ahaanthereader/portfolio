@@ -457,6 +457,7 @@
     // ==========================================
     buildNature(mapGroup, T);
     buildHeroEnrichments(mapGroup, T);
+    const zooInteractables = buildZoo(mapGroup, T);
 
     // ==========================================
     // 3D Storytelling Reading Props (Arkansas)
@@ -1877,6 +1878,303 @@
       createSignpost(1.8, 6.6, "Louisiana", "↓");
       createSignpost(-5.6, 3.2, "Texas", "↙");
       createSignpost(-5.6, -3.2, "Oklahoma", "↖");
+    }
+
+    // ==========================================
+    // Ahaan's Zoo (southwest section, outside the train loop; the water park goes northeast)
+    // Ahaan picked the animals: tiger, elephant, kangaroo, monkey.
+    // ==========================================
+    function buildZoo(parent, T) {
+      const zoo = new T.Group();
+      parent.add(zoo);
+      const mat = color => new T.MeshStandardMaterial({ color, roughness: 0.85 });
+      const woodMat = mat(0x8a6240);
+      const gravelMat = mat(0xd9c7a2);
+      const darkMat = mat(0x2b2721);
+      const eyeMat = mat(0x1d1a17);
+      const plaza = { x: -45, z: 45 };
+
+      function addPart(group, geo, material, x, y, z) {
+        const m = new T.Mesh(geo, material);
+        m.position.set(x, y, z);
+        m.castShadow = true;
+        group.add(m);
+        return m;
+      }
+      function pathStrip(x1, z1, x2, z2, width) {
+        const len = Math.hypot(x2 - x1, z2 - z1);
+        const strip = new T.Mesh(new T.PlaneGeometry(width, len), gravelMat);
+        strip.rotation.x = -Math.PI / 2;
+        strip.rotation.z = Math.atan2(x2 - x1, z2 - z1);
+        strip.position.set((x1 + x2) / 2, 0.03, (z1 + z2) / 2);
+        strip.receiveShadow = true;
+        zoo.add(strip);
+      }
+      function makeSign(lines, w, h) {
+        const c = document.createElement("canvas");
+        c.width = 512; c.height = Math.round(512 * h / w);
+        const g = c.getContext("2d");
+        g.fillStyle = "#f6eddc"; g.fillRect(0, 0, c.width, c.height);
+        g.strokeStyle = "#553726"; g.lineWidth = 12; g.strokeRect(6, 6, c.width - 12, c.height - 12);
+        g.fillStyle = "#3b2a1c"; g.textAlign = "center"; g.textBaseline = "middle";
+        lines.forEach((line, i) => {
+          g.font = `bold ${line.size}px Georgia`;
+          g.fillText(line.text, c.width / 2, c.height * (i + 1) / (lines.length + 1));
+        });
+        const tex = new T.CanvasTexture(c);
+        tex.encoding = T.sRGBEncoding;
+        return new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ map: tex, side: T.DoubleSide }));
+      }
+
+      // Gravel path from Texas, through the rim-tree gap, to the gate and plaza.
+      pathStrip(-27, 19, -29.5, 33, 1.8);
+      pathStrip(-29.5, 33, -38, 38, 1.8);
+      pathStrip(-38, 38, plaza.x, plaza.z, 2.2);
+      const plazaDisc = new T.Mesh(new T.CircleGeometry(4.2, 28), gravelMat);
+      plazaDisc.rotation.x = -Math.PI / 2;
+      plazaDisc.position.set(plaza.x, 0.035, plaza.z);
+      plazaDisc.receiveShadow = true;
+      zoo.add(plazaDisc);
+
+      // Gate arch facing the park.
+      const gate = new T.Group();
+      gate.position.set(-38, 0, 38);
+      gate.rotation.y = Math.PI * 3 / 4;
+      [-1.6, 1.6].forEach(x => addPart(gate, new T.CylinderGeometry(0.16, 0.2, 3.4, 8), woodMat, x, 1.7, 0));
+      addPart(gate, new T.BoxGeometry(3.8, 0.28, 0.3), woodMat, 0, 3.45, 0);
+      const gateSign = makeSign([{ text: "Ahaan's Zoo", size: 74 }], 3.2, 0.8);
+      gateSign.position.set(0, 2.95, 0.17);
+      gate.add(gateSign);
+      const gateSignBack = gateSign.clone();
+      gateSignBack.position.z = -0.17;
+      gateSignBack.rotation.y = Math.PI;
+      gate.add(gateSignBack);
+      zoo.add(gate);
+      parkObstacles.push({ x: -39.13, z: 36.87, r: 0.3 }, { x: -36.87, z: 39.13, r: 0.3 });
+
+      // --- Animal models (simple, friendly shapes) ---
+      function eyes(group, y, z, spread, size) {
+        [-spread, spread].forEach(x => addPart(group, new T.SphereGeometry(size, 8, 6), eyeMat, x, y, z));
+      }
+      function buildTiger() {
+        const root = new T.Group();
+        const orange = mat(0xe08a3c), cream = mat(0xf6e7cf);
+        const body = addPart(root, new T.CapsuleGeometry(0.42, 1.1, 6, 12), orange, 0, 0.75, 0);
+        body.rotation.x = Math.PI / 2;
+        [-0.3, 0, 0.3].forEach(z => {
+          const stripe = addPart(root, new T.TorusGeometry(0.43, 0.045, 6, 16, Math.PI), darkMat, 0, 0.77, z);
+          stripe.rotation.y = Math.PI / 2;
+        });
+        [[-0.25, 0.45], [0.25, 0.45], [-0.25, -0.45], [0.25, -0.45]].forEach(([x, z]) => addPart(root, new T.CylinderGeometry(0.11, 0.12, 0.55, 8), orange, x, 0.28, z));
+        const head = new T.Group();
+        head.position.set(0, 1.05, 0.85);
+        addPart(head, new T.SphereGeometry(0.38, 14, 10), orange, 0, 0, 0);
+        addPart(head, new T.SphereGeometry(0.2, 10, 8), cream, 0, -0.08, 0.28);
+        addPart(head, new T.SphereGeometry(0.06, 8, 6), darkMat, 0, 0, 0.45);
+        [-0.24, 0.24].forEach(x => addPart(head, new T.SphereGeometry(0.11, 8, 6), orange, x, 0.3, 0));
+        eyes(head, 0.1, 0.32, 0.13, 0.05);
+        root.add(head);
+        const tail = new T.Group();
+        tail.position.set(0, 0.9, -0.95);
+        const tailMesh = addPart(tail, new T.CylinderGeometry(0.05, 0.07, 0.9, 6), orange, 0, 0.3, -0.25);
+        tailMesh.rotation.x = -0.7;
+        root.add(tail);
+        return { root, head, tail, ears: [] };
+      }
+      function buildElephant() {
+        const root = new T.Group();
+        const grey = mat(0x9aa0a6);
+        const earMat = new T.MeshStandardMaterial({ color: 0xb5b9bd, roughness: 0.85, side: T.DoubleSide });
+        const body = addPart(root, new T.SphereGeometry(1, 16, 12), grey, 0, 1.55, 0);
+        body.scale.set(0.95, 0.85, 1.25);
+        [[-0.5, 0.6], [0.5, 0.6], [-0.5, -0.6], [0.5, -0.6]].forEach(([x, z]) => addPart(root, new T.CylinderGeometry(0.26, 0.28, 1.0, 10), grey, x, 0.5, z));
+        const head = new T.Group();
+        head.position.set(0, 2.0, 1.2);
+        addPart(head, new T.SphereGeometry(0.62, 14, 10), grey, 0, 0, 0);
+        const trunk = addPart(head, new T.CylinderGeometry(0.12, 0.2, 1.1, 8), grey, 0, -0.55, 0.55);
+        trunk.rotation.x = 0.35;
+        eyes(head, 0.15, 0.52, 0.25, 0.06);
+        const ears = [-1, 1].map(side => {
+          const ear = new T.Group();
+          ear.position.set(side * 0.5, 0.05, -0.05);
+          const flap = addPart(ear, new T.CircleGeometry(0.55, 14), earMat, side * 0.35, 0, 0);
+          flap.rotation.y = side * 0.3;
+          head.add(ear);
+          return ear;
+        });
+        root.add(head);
+        const tail = new T.Group();
+        tail.position.set(0, 1.6, -1.2);
+        addPart(tail, new T.CylinderGeometry(0.04, 0.05, 0.6, 6), grey, 0, -0.3, 0);
+        root.add(tail);
+        return { root, head, tail, ears };
+      }
+      function buildKangaroo() {
+        const root = new T.Group();
+        const tan = mat(0xc08a5a), light = mat(0xe8c9a3);
+        const body = addPart(root, new T.SphereGeometry(0.55, 14, 10), tan, 0, 1.0, 0);
+        body.scale.set(0.9, 1.3, 0.85);
+        addPart(root, new T.SphereGeometry(0.3, 10, 8), light, 0, 0.85, 0.32);
+        addPart(root, new T.SphereGeometry(0.13, 8, 6), tan, 0, 1.0, 0.55); // joey peeking out
+        [-0.3, 0.3].forEach(x => {
+          const foot = addPart(root, new T.BoxGeometry(0.18, 0.12, 0.7), tan, x, 0.08, 0.15);
+          foot.castShadow = true;
+          addPart(root, new T.SphereGeometry(0.26, 10, 8), tan, x, 0.4, -0.05);
+          const arm = addPart(root, new T.CylinderGeometry(0.06, 0.06, 0.4, 6), tan, x * 0.8, 1.2, 0.35);
+          arm.rotation.x = 0.8;
+        });
+        const head = new T.Group();
+        head.position.set(0, 1.85, 0.1);
+        addPart(head, new T.SphereGeometry(0.27, 12, 10), tan, 0, 0, 0);
+        const snout = addPart(head, new T.SphereGeometry(0.15, 10, 8), light, 0, -0.06, 0.25);
+        snout.scale.z = 1.4;
+        [-0.14, 0.14].forEach(x => {
+          const ear = addPart(head, new T.ConeGeometry(0.08, 0.32, 8), tan, x, 0.32, -0.05);
+          ear.rotation.z = -x;
+        });
+        eyes(head, 0.06, 0.22, 0.1, 0.04);
+        root.add(head);
+        const tail = new T.Group();
+        tail.position.set(0, 0.6, -0.4);
+        const tailMesh = addPart(tail, new T.ConeGeometry(0.16, 1.2, 8), tan, 0, -0.25, -0.45);
+        tailMesh.rotation.x = -1.2;
+        root.add(tail);
+        return { root, head, tail, ears: [], hops: true };
+      }
+      function buildMonkey() {
+        const root = new T.Group();
+        const brown = mat(0x7a5236), face = mat(0xe3c2a0);
+        // Tree stump seat
+        addPart(root, new T.CylinderGeometry(0.55, 0.65, 0.8, 12), woodMat, 0, 0.4, 0);
+        const body = addPart(root, new T.SphereGeometry(0.36, 12, 10), brown, 0, 1.15, 0);
+        body.scale.y = 1.15;
+        [-0.22, 0.22].forEach(x => {
+          addPart(root, new T.SphereGeometry(0.13, 8, 6), brown, x, 0.85, 0.3);
+          const arm = addPart(root, new T.CylinderGeometry(0.05, 0.05, 0.45, 6), brown, x * 1.4, 1.1, 0.12);
+          arm.rotation.z = x > 0 ? -0.5 : 0.5;
+        });
+        const head = new T.Group();
+        head.position.set(0, 1.65, 0.05);
+        addPart(head, new T.SphereGeometry(0.27, 12, 10), brown, 0, 0, 0);
+        addPart(head, new T.SphereGeometry(0.18, 10, 8), face, 0, -0.04, 0.16);
+        [-0.28, 0.28].forEach(x => addPart(head, new T.SphereGeometry(0.1, 8, 6), face, x, 0.02, 0));
+        eyes(head, 0.04, 0.3, 0.07, 0.035);
+        root.add(head);
+        const tail = new T.Group();
+        tail.position.set(0, 1.0, -0.3);
+        const tailMesh = addPart(tail, new T.TorusGeometry(0.3, 0.04, 6, 14, Math.PI * 1.4), brown, 0, 0.1, -0.25);
+        tailMesh.rotation.y = Math.PI / 2;
+        root.add(tail);
+        return { root, head, tail, ears: [] };
+      }
+
+      const ANIMALS = [
+        { id: "zoo-tiger", name: "Tiger", emoji: "🐯", x: -45, z: 37, build: buildTiger, ground: 0x9cb070,
+          fact: "Tigers love to swim in cool water." },
+        { id: "zoo-elephant", name: "Elephant", emoji: "🐘", x: -37, z: 45, build: buildElephant, ground: 0xb7a882,
+          fact: "Elephants say hello with their trunks." },
+        { id: "zoo-kangaroo", name: "Kangaroo", emoji: "🦘", x: -53, z: 45, build: buildKangaroo, ground: 0xc9b07a,
+          fact: "Baby kangaroos ride in their mom's pouch." },
+        { id: "zoo-monkey", name: "Monkey", emoji: "🐒", x: -45, z: 53, build: buildMonkey, ground: 0x86a868,
+          fact: "Monkeys help their friends stay clean." }
+      ];
+      const fenceRadius = 3.2;
+
+      ANIMALS.forEach((animal, index) => {
+        const pen = new T.Group();
+        pen.position.set(animal.x, 0, animal.z);
+        zoo.add(pen);
+        // The default camera looks from +z, so signs and animals face +z for easy reading.
+        const toPlaza = Math.atan2(plaza.x - animal.x, plaza.z - animal.z);
+        const facing = 0;
+
+        const floor = new T.Mesh(new T.CircleGeometry(fenceRadius, 28), mat(animal.ground));
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = 0.04;
+        floor.receiveShadow = true;
+        pen.add(floor);
+
+        // Low wooden fence ring with posts and two rails.
+        const postCount = 18;
+        for (let i = 0; i < postCount; i++) {
+          const a = (i / postCount) * Math.PI * 2;
+          addPart(pen, new T.CylinderGeometry(0.07, 0.08, 1.0, 6), woodMat, Math.sin(a) * fenceRadius, 0.5, Math.cos(a) * fenceRadius);
+        }
+        [0.45, 0.85].forEach(y => {
+          const rail = new T.Mesh(new T.TorusGeometry(fenceRadius, 0.04, 6, 48), woodMat);
+          rail.rotation.x = Math.PI / 2;
+          rail.position.y = y;
+          pen.add(rail);
+        });
+        // Hedge clumps behind the pen.
+        for (let i = 0; i < 5; i++) {
+          const a = toPlaza + Math.PI + (i - 2) * 0.35;
+          const bush = addPart(pen, new T.SphereGeometry(0.55, 10, 8), mat(0x5d8a4e), Math.sin(a) * (fenceRadius + 0.7), 0.45, Math.cos(a) * (fenceRadius + 0.7));
+          bush.scale.y = 0.8;
+        }
+
+        // Name sign outside the fence, on the plaza side.
+        const sign = new T.Group();
+        const signAngle = facing + 0.75; // Beside the view line, so the sign does not hide the animal.
+        sign.position.set(Math.sin(signAngle) * (fenceRadius + 0.8), 0, Math.cos(signAngle) * (fenceRadius + 0.8));
+        sign.rotation.y = facing;
+        addPart(sign, new T.CylinderGeometry(0.07, 0.07, 1.6, 6), woodMat, 0, 0.8, 0);
+        const board = makeSign([{ text: `${animal.emoji} ${animal.name}`, size: 92 }, { text: animal.fact, size: 34 }], 2.8, 1.2);
+        board.position.set(0, 1.75, 0.1);
+        board.rotation.x = -0.55; // Tilt back toward the overhead camera.
+        sign.add(board);
+        pen.add(sign);
+
+        const model = animal.build();
+        model.root.rotation.y = facing;
+        model.root.position.y = 0.04;
+        pen.add(model.root);
+        animal.model = model;
+        animal.phase = index * 1.7;
+        animal.happy = 0;
+        parkObstacles.push({ x: animal.x, z: animal.z, r: fenceRadius + 0.2 });
+      });
+
+      // Gentle idle motion: slow head turns, tail sways, ear flaps, small hops.
+      // The render loop pauses when motion is off, so this stops too.
+      landmarkAnimators.push(dt => {
+        if (calm()) return false;
+        const t = performance.now() * 0.001;
+        ANIMALS.forEach(animal => {
+          const m = animal.model;
+          const p = animal.phase;
+          animal.happy = Math.max(0, animal.happy - dt);
+          const joy = animal.happy > 0 ? Math.sin(animal.happy * 6) * 0.18 : 0;
+          m.head.rotation.y = Math.sin(t * 0.45 + p) * 0.35;
+          m.head.rotation.x = joy;
+          m.tail.rotation.y = Math.sin(t * 1.3 + p) * 0.4;
+          m.ears.forEach((ear, i) => { ear.rotation.y = (i ? -1 : 1) * Math.abs(Math.sin(t * 0.9 + p)) * 0.35; });
+          if (m.hops) {
+            const hop = Math.max(0, Math.sin(t * 0.8 + p));
+            m.root.position.y = 0.04 + Math.pow(hop, 6) * 0.25 + (animal.happy > 0 ? Math.abs(Math.sin(animal.happy * 5)) * 0.15 : 0);
+          }
+        });
+        return true;
+      });
+
+      function greet(animal, who) {
+        animal.happy = 1.6;
+        sayAhaan(`${who === "Vihaan" ? "Vihaan says hi" : "Hi"}, ${animal.name}! ${animal.emoji}`, animal.fact, animal.emoji, "Ahaan's Zoo");
+        wake();
+      }
+
+      return ANIMALS.map(animal => ({
+        id: animal.id,
+        name: animal.name,
+        x: animal.x,
+        z: animal.z,
+        approachRadius: fenceRadius + 2.3,
+        actionLabel: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+        promptText: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+        vihaanPromptText: `Enter: say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+        onActivate: () => greet(animal, "Ahaan"),
+        onVihaan: () => greet(animal, "Vihaan")
+      }));
     }
 
     function buildHeroEnrichments(parent, T) {
@@ -3935,6 +4233,8 @@
         promptText: "Press Enter to Float in Lazy River! 🍩",
         onActivate: () => startPlayActivity("lazyriver")
       },
+      // Zoo animal pens (northwest section)
+      ...zooInteractables,
       // State landmarks generated dynamically from STATES
       ...STATES.map(st => ({
         id: st.id,
@@ -3987,6 +4287,7 @@
       if (vihaanNearbyItem.id === "car") mountCar(V);
       if (vihaanNearbyItem.id === "carRide") dismountCar(V);
       if (vihaanNearbyItem.id === "icecream") openIceCreamPicker(V);
+      if (vihaanNearbyItem.onVihaan) vihaanNearbyItem.onVihaan();
       if (vihaanNearbyItem.id === "trampoline") {
         vihaanBounceTime = 5;
         moveActor(V, -4.85 - V.rig.position.x, 0.2 - V.rig.position.z);
@@ -4056,7 +4357,7 @@
         const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
         if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
       }
-      if (togetherEnabled && !trainState.vihaan && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
+      if (togetherEnabled && !trainState.vihaan && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || item.onVihaan || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
@@ -4068,7 +4369,7 @@
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.id === "trainRide" ? (trainState.dwell > 0 ? "Enter: leave the train." : "Wait for the next station to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
+          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainState.dwell > 0 ? "Enter: leave the train." : "Wait for the next station to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -5998,6 +6299,17 @@
         wake();
       }
     };
+
+    // The "Ahaan's Zoo" menu link (index.html#zoo) starts Ahaan at the zoo gate.
+    function visitZooFromHash() {
+      if (location.hash !== "#zoo") return;
+      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A) return;
+      window.Park3D.teleportAhaan(-36.5, 36.5);
+      const top = document.getElementById("top");
+      if (top) top.scrollIntoView({ block: "start" });
+    }
+    window.addEventListener("hashchange", visitZooFromHash);
+    visitZooFromHash();
 
     hero.classList.add("park-ready");
     greetRandom(true);

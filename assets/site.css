@@ -1966,6 +1966,7 @@
     pointer-events: auto;
     transition: opacity 0.22s ease-out, transform 0.22s ease-out;
   }
+  .activity-hud[hidden], .action-prompt[hidden] { display: none; } /* Hidden overlays must not block taps on the visible prompt pill. */
   .activity-hud.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);

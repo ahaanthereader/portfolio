@@ -46,6 +46,10 @@
 - Skipped a browser rerun after the visual-only model reduction. The train behavior did not change.
 - Re-ran `tests/park-train-browser.cjs` after the model reduction. Desktop and mobile passed for the train, smoke, four sounds, boarding, and independent exits. No browser errors appeared.
 - Inspected the new moving-train screenshots and the Ice Cream Stop screenshot.
+- Merged `origin/main` at `f189875` and kept its zoo prompts while resolving the train prompt overlap.
+- After the merge, `tests/park-train-browser.cjs` passed on desktop and mobile with no browser errors.
+- After the merge, `tests/zoo-browser.cjs` passed on desktop and mobile. It checked four pens and reported no browser errors.
+- Train feature commit: `b7e3c74` (`Add perimeter dinosaur train`). Publishing to main is in progress.
 - `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed after the boarding changes.
 - The first browser attempt found a timing race when the test tried to reboard during the initial station dwell. Updated the check to verify each rider at separate station stops.
 - The next browser attempt reached Bridge Stop with Vihaan aboard. The test radius missed the rear carriage, so I widened the position check to cover the train length.
@@ -124,11 +128,33 @@ Execute in this order. Build, publish, live-verify on driver authority (Nishant'
 Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WITH a screenshot of the live feature — no entry without its screenshot; (b) every new feature/page goes under an existing menu tab at publish time — no orphan/random separate pages — and gets a visible "NEW" tag (nav entry + home card) for its first 7 days so the kids know what to try.
 
 1. **Click-to-go for ALL vehicles + chopper sound/design/default height** — `FEATURE-BRIEF-chopper-click-to-fly.md`. TOP OF QUEUE — execute first.
-2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`.
-3. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
-4. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`.
-5. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 4).
-6. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
+2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. IN FLIGHT on worker 0004 (worktree `feature-park-train-and-cars`).
+3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage).
+4. **Garage + 1.5x speed + lifelike vehicles + rider seating** — `FEATURE-BRIEF-park-garage-speed-positions.md` (garage near the picnic area for chopper/bike/bicycle/car — train stays outside; everything 1.5x faster; fix odd rider seating positions).
+5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`. PUBLISHED live Nov 22, 2026 (feature 94d3cce, Pages run 45034019201 success, live-verified desktop + mobile, zero page errors; Fresh Drops entry with live screenshot).
+6. **Water park (4 big rides, diagonally opposite the zoo)** — `FEATURE-BRIEF-park-water-park.md` (the diagonally opposite section of the 4-section plan).
+7. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
+8. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`. NOTE: lay out the 4-section plan here (zoo = one section, water park = diagonally opposite) so briefs 5–6 attach cleanly.
+9. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 8).
+10. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
+
+## Zoo section — Nov 22, 2026
+
+- Worktree `.worktrees/feature-park-zoo` on `feature/park-zoo`, from `origin/main` `e5f3aa6`.
+- BMAD spec: `_bmad-output/implementation-artifacts/spec-park-zoo.md` (gitignored).
+- Animals (Ahaan's own picks): tiger, elephant, kangaroo, monkey. Each pen has a wooden fence ring, a hedge, a tilted name sign with the fact, and a gentle idle animation (head turns, tail sway, ear flaps, small kangaroo hops). No animal sounds.
+- Location: the **southwest** corner, outside the planned train loop and the rim trees. Plaza (-45, 45), gate (-38, 38), pens tiger (-45, 37), elephant (-37, 45), kangaroo (-53, 45), monkey (-45, 53). A gravel path runs from the Texas edge (-27, 19) through the rim-tree gap (-29.5, 33) to the gate.
+- Why not northwest: the north clouds (y about 20, z -18 to -28) sit between the default camera and anything far north, so they hid the zoo. **The water park (brief 6) goes in the diagonally opposite corner: northeast.** The water-park worker must handle the north clouds (move or fade them).
+- Prompt pill near a pen: "Say hi to the <animal>". E, Enter, or a tap shows the speech bubble with the kind fact. In Play together, Vihaan gets his own prompt and Enter greets the animal.
+- Pens are `parkObstacles`, so vehicles go around them. Walking is not blocked, the same as trees.
+- Play menu: new link "🐯 Ahaan's Zoo" (`index.html#zoo`, NEW tag for 7 days). The `#zoo` hash starts Ahaan at the zoo gate.
+- Fixed a tap blocker: hidden `.activity-hud` and hidden `.action-prompt` elements kept `display: flex` and blocked clicks and taps on the visible prompt pill. `site.css` now sets `display: none` for both when hidden.
+- New check: `tests/zoo-browser.cjs` (desktop 1280x800 + mobile 390x844, all four pens, fact text, Enter key, Vihaan in Play together, `#zoo` link, zero page errors) — PASS.
+- Published: pushed `e5f3aa6..94d3cce` to `main` as a fast-forward. Pages run `45034019201` completed with success in 22 s.
+- Live verified: `tests/zoo-browser.cjs` with `BASE_URL=https://ahaanthereader.github.io/portfolio/index.html` PASS (desktop + mobile, four pens, facts, Vihaan, `#zoo` link, zero page errors). Live `assets/park3d.js` has the zoo code.
+- Fresh Drops: new top entry "Ahaan's Zoo" ("You asked for this!") with the live screenshot `public/fresh-drops/2026-11-22-zoo.jpg` (from `/tmp/ahaan-zoo/live/desktop-overview.png`). Local check: desktop + mobile, image loads, NEW tag shows, zero errors.
+- Fresh Drops publish: commit `b6431f4`, Pages run `45034266531` success. Live `fresh-drops.html`: zoo card first, image 200, NEW tag shows, desktop + mobile, zero errors.
+- Regression: `two-player-browser.cjs` PASS, `quad-browser.cjs` PASS. `chopper-click-browser.cjs` FAILS at the 20 s chopper-arrival wait. The same failure happens on unchanged `origin/main` `e5f3aa6`, so the zoo change did not cause it.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
