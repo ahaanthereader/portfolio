@@ -1,5 +1,27 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Garage + speed + vehicle positions — Nov 22, 2026
+
+- Started `.worktrees/feature-park-garage-speed-positions` on `feature/park-garage-speed-positions` from `origin/main` at `faac9d1`.
+- Read `FEATURE-BRIEF-park-garage-speed-positions.md`. The garage must sit near the picnic area, outside the Arkansas center circle. The train stays on its perimeter track.
+- Baseline vehicle parking: bike `(-0.65, 6.2)`, quad `(23, 20)`, e-bike `(-13, 7)`, car `(-20, -14)`, chopper `(23, -20)`. No separate bicycle state exists.
+- Checked the nearby obstacle map. The first garage site near `(-12.5, -1)` fell in the vehicle-blocked ring around the center lake, so I moved the garage southeast.
+- Browser inspection showed the southeast garage view behind the Tennessee state label. I moved the garage to a clear southwest site.
+- The final garage sits at `(-15.75, 9.5)`. Its footprint is `x -21.25..-10.25, z 2.8..16.2`, outside the `10.4 m` vehicle-blocked ring and clear of nearby trees and rocks.
+- Built a west-facing garage with a wide rear bay for the chopper and four marked stalls for smaller rides.
+- Raised the garage sign above the rider view so the stalls and seated riders remain visible.
+- Moved the bike to `(-18.55, 4.4)`, Vihaan's quad to `(-18.55, 7.8)`, e-bike to `(-18.55, 11.2)`, car to `(-18.55, 14.6)`, and chopper to `(-12.75, 9.5)`. The four smaller rides face the open exit. The train stays on its perimeter track.
+- No separate bicycle state exists. The existing pedal bike is the bicycle in the brief.
+- Set the 1.5x top speeds: pedal bike `8.25 m/s` (boost `12`), quad `18`, e-bike `15.6`, car `24`, chopper `18`, and train `5.7`.
+- Added `Park3D.getVehicleSpeedLimits()` so browser checks can verify the configured limits.
+- The first desktop browser check found that Vihaan's quad pose bent his arms but left his legs straight. Added matching seated hip and knee bends, and reset both legs on exit.
+- Final browser check passed at desktop `1280x800` and mobile `390x844`. It checked all five parking spots, mounting, rider limb poses, movement on each ride, all speed limits, and train speed above the prior `3.8 m/s` cap and below `5.7 m/s`. Browser page errors: none.
+- Re-ran the desktop and mobile check after raising the garage sign. Both sizes passed again with zero browser page errors.
+- Syntax and whitespace checks passed: `node --check assets/park3d.js` and `git diff --check`.
+- Screenshots: `/tmp/ahaan-garage-check/garage-1280.png`, `garage-390.png`, plus `bike`, `ebike`, `car`, `chopper`, and `quad` screenshots at both viewport sizes. I inspected the garage and rider screenshots.
+- Ponytail full is active: reuse the existing park helpers and keep the implementation small. Skipped new dependencies and vehicle abstractions.
+- Garage work is ready for local commit. Desktop and mobile checks passed before commit.
+
 ## Park train loop brief — Nov 22, 2026
 
 - Started branch `feature/park-train-and-cars` from published main commit `7b9dced`.

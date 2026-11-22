@@ -3154,7 +3154,15 @@
     const actionPromptText = document.getElementById("actionPromptText");
     const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
 
-    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0, target: null };
+    const PARK_SPEEDS = Object.freeze({ bike: 8.25, bikeBoost: 12, quad: 18, eBike: 15.6, car: 24, chopper: 18, train: 5.7 });
+    const garageParking = {
+      bike: { x: -18.55, z: 4.4, heading: -Math.PI / 2 },
+      quad: { x: -18.55, z: 7.8, heading: -Math.PI / 2 },
+      eBike: { x: -18.55, z: 11.2, heading: -Math.PI / 2 },
+      car: { x: -18.55, z: 14.6, heading: -Math.PI / 2 },
+      chopper: { x: -12.75, z: 9.5, heading: 0 }
+    };
+    const bikeState = { ...garageParking.bike, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0, target: null };
     const bikeKeys = { up: false, down: false, left: false, right: false };
     const bikeRoot = new T.Group();
     const bikeFrameMat = new T.MeshStandardMaterial({ color: 0x7b3440, roughness: 0.72, metalness: 0.12 });
@@ -3218,6 +3226,7 @@
       bikeRoot.add(pedal);
     });
     bikeRoot.position.set(bikeState.x, 0.06, bikeState.z);
+    bikeRoot.rotation.y = bikeState.heading;
     mapGroup.add(bikeRoot);
     registerInteractive(bikeRoot, {
       name: "Ahaan's bike",
@@ -3225,7 +3234,7 @@
     });
 
     // Reuse Vihaan's red quad at a clear outer parking spot.
-    const quadState = { x: 23, z: 20, heading: 0, speed: 0, riding: false, wheels: [], target: null };
+    const quadState = { ...garageParking.quad, speed: 0, riding: false, wheels: [], target: null };
     const quadKeys = { up: false, down: false, left: false, right: false };
     const quadRoot = new T.Group();
     const quadRedMat = new T.MeshStandardMaterial({ color: 0xc92f38, roughness: 0.62, metalness: 0.08 });
@@ -3257,10 +3266,11 @@
     });
     bikeRod(quadRoot, [-0.38, 1.28, 0.48], [0.38, 1.28, 0.48], 0.055, quadMetalMat);
     quadRoot.position.set(quadState.x, 0.02, quadState.z);
+    quadRoot.rotation.y = quadState.heading;
     mapGroup.add(quadRoot);
     registerInteractive(quadRoot, { name: "Vihaan's quad", onInteract: () => { if (togetherEnabled) toggleQuadRide(); } });
 
-    const eBikeParking = { x: -13, z: 7, heading: Math.PI / 2 };
+    const eBikeParking = garageParking.eBike;
     const eBikeState = { ...eBikeParking, speed: 0, rider: null, wheels: [], target: null };
     const eBikeKeys = { up: false, down: false, left: false, right: false };
     const eBikeRoot = new T.Group();
@@ -3312,7 +3322,7 @@
       }
     });
 
-    const carParking = { x: -20, z: -14, heading: 0 };
+    const carParking = garageParking.car;
     const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [], target: null };
     const carKeys = { up: false, down: false, left: false, right: false };
     const carRoot = new T.Group();
@@ -3375,6 +3385,7 @@
       carRoot.add(lamp);
     });
     carRoot.position.set(carState.x, 0.06, carState.z);
+    carRoot.rotation.y = carState.heading;
     mapGroup.add(carRoot);
     registerInteractive(carRoot, {
       name: "Two-seat car",
@@ -3383,6 +3394,56 @@
         mountCar(actor);
       }
     });
+
+    const garage = new T.Group();
+    garage.position.set(-15.75, 0, 9.5);
+    const garageStoneMat = new T.MeshStandardMaterial({ color: 0xc7b99e, roughness: 0.9 });
+    const garageWoodMat = new T.MeshStandardMaterial({ color: 0x71533b, roughness: 0.82 });
+    const garageRoofMat = new T.MeshStandardMaterial({ color: 0x557b79, roughness: 0.78, transparent: true, opacity: 0.28, depthWrite: false });
+    const garageFloor = new T.Mesh(new T.BoxGeometry(11, 0.12, 13.4), new T.MeshStandardMaterial({ color: 0xb8aa91, roughness: 0.95 }));
+    garageFloor.position.set(0, 0.08, 0);
+    garageFloor.receiveShadow = true;
+    garage.add(garageFloor);
+    const garageWall = (width, height, depth, x, y, z, material) => {
+      const wall = new T.Mesh(new T.BoxGeometry(width, height, depth), material);
+      wall.position.set(x, y, z);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      garage.add(wall);
+    };
+    garageWall(0.28, 3.1, 13.2, 5.36, 1.62, 0, garageStoneMat);
+    garageWall(11, 3.1, 0.28, 0, 1.62, -6.56, garageStoneMat);
+    garageWall(11, 3.1, 0.28, 0, 1.62, 6.56, garageStoneMat);
+    garageWall(11.8, 0.28, 14.6, 0, 3.28, 0, garageRoofMat);
+    garageWall(0.32, 0.22, 13.2, -5.05, 3.03, 0, garageWoodMat);
+    [-7, 7].forEach(z => garageWall(0.3, 3.05, 0.3, -5.02, 1.58, z, garageWoodMat));
+    for (let i = 1; i < 4; i++) {
+      const z = -6.8 + i * 3.4;
+      garageWall(6.2, 0.025, 0.09, -1.5, 0.16, z, garageStoneMat);
+    }
+    for (let i = 0; i < 4; i++) {
+      const z = -5.1 + i * 3.4;
+      const wheelStop = new T.Mesh(new T.BoxGeometry(0.18, 0.14, 2.2), garageWoodMat);
+      wheelStop.position.set(-0.9, 0.2, z);
+      wheelStop.castShadow = true;
+      garage.add(wheelStop);
+    }
+    const garageSignCanvas = document.createElement("canvas");
+    garageSignCanvas.width = 512;
+    garageSignCanvas.height = 128;
+    const garageSignContext = garageSignCanvas.getContext("2d");
+    garageSignContext.fillStyle = "#f6eddc";
+    garageSignContext.fillRect(0, 0, 512, 128);
+    garageSignContext.fillStyle = "#35565a";
+    garageSignContext.font = "bold 48px Georgia";
+    garageSignContext.textAlign = "center";
+    garageSignContext.fillText("VEHICLE GARAGE", 256, 80);
+    const garageSign = new T.Mesh(new T.PlaneGeometry(4.2, 1.05), new T.MeshBasicMaterial({ map: new T.CanvasTexture(garageSignCanvas) }));
+    garageSign.position.set(-5.22, 3.75, 0);
+    garageSign.rotation.y = -Math.PI / 2;
+    garage.add(garageSign);
+    mapGroup.add(garage);
+    parkObstacles.push({ x: -20.77, z: 2.5, r: 0.2 }, { x: -20.77, z: 16.5, r: 0.2 });
 
     const trainRoute = new T.CatmullRomCurve3([
       [5, -17], [11, -25], [24, -31], [34, -22], [36, -5],
@@ -3622,8 +3683,8 @@
       else {
         const station = trainStations[trainState.nextStation];
         const distance = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
-        const wantedSpeed = Math.min(3.8, Math.sqrt(1.5 * Math.max(0, distance - 0.7)));
-        trainState.speed += Math.max(-0.75 * dt, Math.min(0.75 * dt, wantedSpeed - trainState.speed));
+        const wantedSpeed = Math.min(PARK_SPEEDS.train, Math.sqrt(1.5 * Math.max(0, distance - 0.7)) * 1.5);
+        trainState.speed += Math.max(-1.125 * dt, Math.min(1.125 * dt, wantedSpeed - trainState.speed));
         trainState.progress = (trainState.progress + trainState.speed * dt / trainRouteLength) % 1;
         const remaining = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
         if (remaining < 1.1 && trainState.speed < 0.12) {
@@ -3656,7 +3717,7 @@
       return true;
     }
     updateParkTrain(0);
-    const chopperParking = { x: 23, z: -20, heading: 0 };
+    const chopperParking = garageParking.chopper;
     const chopperSafeAltitude = 10.5;
     const chopperState = { ...chopperParking, altitude: 0, speed: 0, rider: null, riderScale: null, rotorSpeed: 0, target: null };
     const chopperKeys = { up: false, down: false, left: false, right: false, lift: false, descend: false };
@@ -3722,6 +3783,7 @@
       bikeRod(chopperRoot, [side * 0.48, 0.58, -0.65], [side * 0.58, 0.35, -0.72], 0.045, chopperTrimMat);
     });
     chopperRoot.position.set(chopperState.x, bikeSurfaceHeightAt(chopperState.x, chopperState.z), chopperState.z);
+    chopperRoot.rotation.y = chopperState.heading;
     mapGroup.add(chopperRoot);
     registerInteractive(chopperRoot, {
       name: "Chopper",
@@ -4265,11 +4327,19 @@
         V.rig.rotation.y = quadState.heading;
         V.leftArm.arm.rotation.set(-1.25, 0, 0.18);
         V.wavingArm.arm.rotation.set(-1.25, 0, -0.18);
+        V.leftLeg.hip.rotation.set(-0.7, 0, 0);
+        V.rightLeg.hip.rotation.set(-0.7, 0, 0);
+        V.leftLeg.knee.rotation.set(1.15, 0, 0);
+        V.rightLeg.knee.rotation.set(1.15, 0, 0);
         vihaanNearbyItem = { id: "quad" };
       } else {
         V.rig.position.set(quadState.x + Math.cos(quadState.heading) * 1.25, groundHeightAt(quadState.x, quadState.z, rigBaseY), quadState.z - Math.sin(quadState.heading) * 1.25);
         V.leftArm.arm.rotation.set(0, 0, V.leftArm.rest);
         V.wavingArm.arm.rotation.set(0, 0, V.wavingArm.rest);
+        V.leftLeg.hip.rotation.set(0, 0, 0);
+        V.rightLeg.hip.rotation.set(0, 0, 0);
+        V.leftLeg.knee.rotation.set(0, 0, 0);
+        V.rightLeg.knee.rotation.set(0, 0, 0);
         vihaanNearbyItem = null;
       }
       if (vihaanActionPromptText) vihaanActionPromptText.textContent = quadState.riding ? "Enter: park the quad" : "Press Enter to ride the quad.";
@@ -5780,8 +5850,8 @@
 
       // Ride the bike or walk through the park.
       if (bikeState.riding) {
-        const normalTopSpeed = 5.5;
-        const boostTopSpeed = 8;
+        const normalTopSpeed = PARK_SPEEDS.bike;
+        const boostTopSpeed = PARK_SPEEDS.bikeBoost;
         const topSpeed = bikeState.boostHeld ? boostTopSpeed : normalTopSpeed;
         const autoTarget = advanceVehicleTarget(bikeState, dt, topSpeed, bikeState.boostHeld ? 3.2 : 2.6, 5.5, 0.55 + Math.min(1, bikeState.speed / topSpeed) * 1.05);
         if (!autoTarget) {
@@ -5872,7 +5942,7 @@
         chopperState.rotorSpeed += (rotorTarget - chopperState.rotorSpeed) * Math.min(1, dt * 2);
         const climb = (chopperKeys.lift ? 1 : 0) - (chopperKeys.descend ? 1 : 0);
         chopperState.altitude = Math.max(0, Math.min(12.5, chopperState.altitude + climb * 4.2 * dt));
-        const topSpeed = 12;
+        const topSpeed = PARK_SPEEDS.chopper;
         let chopperSteer = (chopperKeys.right ? 1 : 0) - (chopperKeys.left ? 1 : 0);
         let chopperUp = chopperKeys.up, chopperDown = chopperKeys.down;
         if (chopperState.target) {
@@ -5923,7 +5993,7 @@
       }
 
       if (eBikeState.rider) {
-        const topSpeed = 10.4;
+        const topSpeed = PARK_SPEEDS.eBike;
         const autoTarget = advanceVehicleTarget(eBikeState, dt, topSpeed, 3.2, 3, 0.55 + Math.min(1, eBikeState.speed / topSpeed) * 0.9);
         if (!autoTarget) {
           if (eBikeKeys.down) eBikeState.speed = Math.max(0, eBikeState.speed - dt * 3);
@@ -5967,7 +6037,7 @@
       }
 
       if (carState.driver) {
-        const topSpeed = 16;
+        const topSpeed = PARK_SPEEDS.car;
         const autoTarget = advanceVehicleTarget(carState, dt, topSpeed, 4.5, 5.5, 0.32 + Math.min(1, carState.speed / topSpeed) * 0.42);
         if (!autoTarget) {
           if (carKeys.down) carState.speed = Math.max(0, carState.speed - dt * 5.5);
@@ -6010,7 +6080,7 @@
 
       if (togetherEnabled) {
         if (quadState.riding) {
-          const topSpeed = 12;
+          const topSpeed = PARK_SPEEDS.quad;
           const autoTarget = advanceVehicleTarget(quadState, dt, topSpeed, 2.2, 3.2, 0.48 + Math.min(1, quadState.speed / topSpeed) * 0.8);
           if (!autoTarget) {
             if (quadKeys.down) quadState.speed = Math.max(0, quadState.speed - dt * 3.2);
@@ -6271,6 +6341,7 @@
       getVihaanBounceTime: () => vihaanBounceTime,
       getVihaanExitState: () => ({ timer: vihaanWaveTimer, exiting: vihaanExiting, visible: V.rig.visible }),
       getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed, target: bikeState.target && { ...bikeState.target } }),
+      getVehicleSpeedLimits: () => ({ ...PARK_SPEEDS }),
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
