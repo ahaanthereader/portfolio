@@ -8,26 +8,31 @@ const siteRoot = path.resolve(__dirname, '..');
 const evidenceDir = '/tmp/ahaan-park-train';
 const errors = [];
 
-const server = http.createServer((request, response) => {
-  const requestedPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-  const filePath = path.resolve(siteRoot, `.${requestedPath}`);
-  if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
-  fs.readFile(filePath, (error, data) => {
-    if (error) { response.writeHead(404).end(); return; }
-    const type = filePath.endsWith('.html') ? 'text/html' : filePath.endsWith('.css') ? 'text/css' : filePath.endsWith('.js') ? 'text/javascript' : 'application/octet-stream';
-    response.writeHead(200, { 'content-type': type }).end(data);
-  });
-});
+let server;
 
 (async () => {
   fs.mkdirSync(evidenceDir, { recursive: true });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  let baseUrl = process.env.BASE_URL;
+  if (!baseUrl) {
+    server = http.createServer((request, response) => {
+      const requestedPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+      const filePath = path.resolve(siteRoot, `.${requestedPath}`);
+      if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
+      fs.readFile(filePath, (error, data) => {
+        if (error) { response.writeHead(404).end(); return; }
+        const type = filePath.endsWith('.html') ? 'text/html' : filePath.endsWith('.css') ? 'text/css' : filePath.endsWith('.js') ? 'text/javascript' : 'application/octet-stream';
+        response.writeHead(200, { 'content-type': type }).end(data);
+      });
+    });
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    baseUrl = `http://127.0.0.1:${server.address().port}/index.html`;
+  }
   const browser = await chromium.launch({ headless: true });
   try {
     for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
       const page = await browser.newPage({ viewport, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(error.message));
-      await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.Park3D?.getTrainState);
       await page.evaluate(() => Park3D.setCustomCamera({ x: 17, y: 28, z: -2 }, { x: 5, y: 0, z: -17 }));
 
@@ -130,10 +135,10 @@ const server = http.createServer((request, response) => {
     process.stdout.write(JSON.stringify({ desktop: 'pass', mobile: 'pass', dinoEngine: 'pass', smokePuffs: 'pass', stationSounds: 'pass', stationStops: 'pass', boarding: 'pass', independentExits: 'pass', breezePause: 'pass', errors, screenshots: evidenceDir }));
   } finally {
     await browser.close();
-    server.close();
+    if (server) server.close();
   }
 })().catch(error => {
   console.error(error);
-  server.close();
+  if (server) server.close();
   process.exitCode = 1;
 });

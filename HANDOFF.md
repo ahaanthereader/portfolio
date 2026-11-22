@@ -42,14 +42,18 @@
 - Screenshots: `/tmp/ahaan-park-train/dino-smoke-1280.png`, `/tmp/ahaan-park-train/dino-smoke-390.png`, and `/tmp/ahaan-park-train/station-1280.png`.
 - `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed.
 - Ponytail full used on the train work: reused the Sound control and audio helper, added no dependencies, and reduced the dinosaur face to a head, snout, eyes, and three spikes.
-- Skipped the garage queue, commit, publish, and live verification. The garage queue remains untouched.
-- Skipped a browser rerun after the visual-only model reduction. The train behavior did not change.
+- At the ponytail-only step, skipped the garage queue, commit, publish, and live verification. The garage queue remains untouched.
+- At the ponytail-only step, skipped a browser rerun after the visual-only model reduction. The train behavior did not change.
 - Re-ran `tests/park-train-browser.cjs` after the model reduction. Desktop and mobile passed for the train, smoke, four sounds, boarding, and independent exits. No browser errors appeared.
 - Inspected the new moving-train screenshots and the Ice Cream Stop screenshot.
 - Merged `origin/main` at `f189875` and kept its zoo prompts while resolving the train prompt overlap.
 - After the merge, `tests/park-train-browser.cjs` passed on desktop and mobile with no browser errors.
 - After the merge, `tests/zoo-browser.cjs` passed on desktop and mobile. It checked four pens and reported no browser errors.
-- Train feature commit: `b7e3c74` (`Add perimeter dinosaur train`). Publishing to main is in progress.
+- Train feature commit: `b7e3c74` (`Add perimeter dinosaur train`). Merge commit `517751c` includes current main and the train.
+- Pushed merge commit `517751c` to `main`. Pages run `45043472388` completed successfully.
+- Ran the train browser check against the live Pages URL. Desktop and mobile passed all train, smoke, sound, boarding, and exit checks with zero page errors.
+- Captured the live train at the Ice Cream Stop in `public/fresh-drops/2026-11-22-dinosaur-train.png`.
+- Added the dinosaur train entry to `fresh-drops.html` with the live screenshot. The Fresh Drops update still needs its own publish and live check.
 - `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed after the boarding changes.
 - The first browser attempt found a timing race when the test tried to reboard during the initial station dwell. Updated the check to verify each rider at separate station stops.
 - The next browser attempt reached Bridge Stop with Vihaan aboard. The test radius missed the rear carriage, so I widened the position check to cover the train length.
