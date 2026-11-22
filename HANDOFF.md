@@ -67,12 +67,26 @@ Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WIT
 2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. IN FLIGHT on worker 0004 (worktree `feature-park-train-and-cars`).
 3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage).
 4. **Garage + 1.5x speed + lifelike vehicles + rider seating** — `FEATURE-BRIEF-park-garage-speed-positions.md` (garage near the picnic area for chopper/bike/bicycle/car — train stays outside; everything 1.5x faster; fix odd rider seating positions).
-5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`.
+5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`. BUILT Nov 22 (see "Zoo section" below); publish in progress.
 6. **Water park (4 big rides, diagonally opposite the zoo)** — `FEATURE-BRIEF-park-water-park.md` (the diagonally opposite section of the 4-section plan).
 7. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
 8. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`. NOTE: lay out the 4-section plan here (zoo = one section, water park = diagonally opposite) so briefs 5–6 attach cleanly.
 9. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 8).
 10. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
+
+## Zoo section — Nov 22, 2026
+
+- Worktree `.worktrees/feature-park-zoo` on `feature/park-zoo`, from `origin/main` `e5f3aa6`.
+- BMAD spec: `_bmad-output/implementation-artifacts/spec-park-zoo.md` (gitignored).
+- Animals (Ahaan's own picks): tiger, elephant, kangaroo, monkey. Each pen has a wooden fence ring, a hedge, a tilted name sign with the fact, and a gentle idle animation (head turns, tail sway, ear flaps, small kangaroo hops). No animal sounds.
+- Location: the **southwest** corner, outside the planned train loop and the rim trees. Plaza (-45, 45), gate (-38, 38), pens tiger (-45, 37), elephant (-37, 45), kangaroo (-53, 45), monkey (-45, 53). A gravel path runs from the Texas edge (-27, 19) through the rim-tree gap (-29.5, 33) to the gate.
+- Why not northwest: the north clouds (y about 20, z -18 to -28) sit between the default camera and anything far north, so they hid the zoo. **The water park (brief 6) goes in the diagonally opposite corner: northeast.** The water-park worker must handle the north clouds (move or fade them).
+- Prompt pill near a pen: "Say hi to the <animal>". E, Enter, or a tap shows the speech bubble with the kind fact. In Play together, Vihaan gets his own prompt and Enter greets the animal.
+- Pens are `parkObstacles`, so vehicles go around them. Walking is not blocked, the same as trees.
+- Play menu: new link "🐯 Ahaan's Zoo" (`index.html#zoo`, NEW tag for 7 days). The `#zoo` hash starts Ahaan at the zoo gate.
+- Fixed a tap blocker: hidden `.activity-hud` and hidden `.action-prompt` elements kept `display: flex` and blocked clicks and taps on the visible prompt pill. `site.css` now sets `display: none` for both when hidden.
+- New check: `tests/zoo-browser.cjs` (desktop 1280x800 + mobile 390x844, all four pens, fact text, Enter key, Vihaan in Play together, `#zoo` link, zero page errors) — PASS.
+- Regression: `two-player-browser.cjs` PASS, `quad-browser.cjs` PASS. `chopper-click-browser.cjs` FAILS at the 20 s chopper-arrival wait. The same failure happens on unchanged `origin/main` `e5f3aa6`, so the zoo change did not cause it.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
