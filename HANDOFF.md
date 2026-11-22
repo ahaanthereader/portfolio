@@ -1016,3 +1016,9 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Added `tests/story-delete-browser.cjs` with the durable Playwright harness. Desktop and mobile checks passed. The test covered Keep it, Escape, Delete, five-second expiry, page text and sticker restoration, new-book cleanup, dialog bounds, a 44 px Undo target, horizontal width, and zero browser errors.
 - Browser evidence: `/tmp/ahaan-story-studio-delete/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
 - `node --check assets/story.js`, `node --check tests/story-delete-browser.cjs`, and `git diff --check` passed.
+- The dialog says “Delete this page?” because the existing button removes one page, not the whole story.
+- Feature commit: `54884f0` (`Add Story Studio delete undo`).
+- First publish: merged as `385c228`, pushed `6831b03..385c228`. GitHub Pages run `44981555261` completed successfully.
+- First live verification passed with the durable Playwright harness at 1280 × 800 and 390 × 844. Keep it, Escape, delete, undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
+- Live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
+- Added the Nov 21 Fresh Drops entry `Undo a deleted page` with the live desktop screenshot. The home card already has the Nov 21 latest date. The entry publish is pending.
