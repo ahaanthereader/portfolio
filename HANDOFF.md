@@ -1,5 +1,72 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Park train loop brief — Nov 22, 2026
+
+- Started branch `feature/park-train-and-cars` from published main commit `7b9dced`.
+- The feature worktree is `.worktrees/feature-park-train-and-cars`.
+- Queue item 1, click-to-go vehicles, is published and live-verified in merge `7b9dced`.
+- Pages run `45016995946` passed after the bike bridge route fix.
+- The car parking state starts at `(-14, -8)` with heading `0` in `assets/park3d.js`.
+- The brief asks to move the car farther from the center and add a loop train with stations.
+- Initial inspection found no train or station implementation in `assets/park3d.js`.
+- Moved the car parking point to `(-20, -14)`, away from the center route and nearby boulders.
+- Updated the durable vehicle harness to approach the car at `(-20, -14)`.
+- `node --check assets/park3d.js`, `node --check tests/chopper-click-browser.cjs`, and `git diff --check` passed.
+- The durable desktop and mobile vehicle suite passed, including car mount, click-to-go, and manual control.
+- Added a Catmull-Rom loop with four stations near the ice-cream shop, bridge, south grove, and west grove.
+- Added two visible rails, 320 sleepers, bridge supports, four platforms with signs, and a small engine with two carriages.
+- The train starts at the Ice Cream Stop, pauses at each station, then continues at a smooth speed.
+- The Breeze control pauses the train. Train sound stays off until Ahaan enables the Sound control.
+- Added `tests/park-train-browser.cjs` for the loop, station pauses, screenshots, and desktop and mobile checks.
+- `node --check assets/park3d.js`, both browser test files, and `git diff --check` passed.
+- `tests/park-train-browser.cjs` passed on desktop and mobile. The check verified the loop, all four station pauses, and Breeze pause and resume.
+- `tests/chopper-click-browser.cjs` passed on desktop and mobile. The existing vehicle checks passed.
+- `tests/two-player-browser.cjs` passed with zero browser errors. Bridge height matched at `8.000940 m`.
+- `tests/quad-browser.cjs` passed mount, ride, and dismount checks with zero browser errors.
+- Screenshots: `/tmp/ahaan-park-train/station-1280.png` and `/tmp/ahaan-park-train/station-390.png`.
+- Visual inspection shows the train on the rails at the Ice Cream Stop. The track and stations render on mobile.
+- Added independent boarding and station exits for Ahaan (E) and Vihaan (Enter). A rider can leave only during a station stop.
+- Added sit poses and train-follow positions for both riders.
+- Ahaan boards with E at a station and exits with E at any later station. Vihaan boards with Enter and exits with Enter. One boy can leave while the other stays aboard.
+- `tests/park-train-browser.cjs` passed on desktop (1280x800) and mobile (390x844). It verified solo boarding, both boys boarding, independent exits, travel to Bridge Stop, all four stops, and Breeze pause/resume.
+- Repeated `tests/park-train-browser.cjs` after the latest request. Desktop and mobile passed again with no browser errors.
+- `tests/two-player-browser.cjs` passed with no browser errors. Bridge height remained `8.000940 m`.
+- Inspected the desktop and mobile station screenshots at `/tmp/ahaan-park-train/station-1280.png` and `/tmp/ahaan-park-train/station-390.png`.
+- Read `FEATURE-BRIEF-park-train-upgrade-dino.md`. The brief amends the train design in this worktree.
+- Changed the engine to blue and added a friendly dinosaur head, steam chimney, and moving smoke puffs.
+- Added a soft two-tone dinosaur sound at each station arrival. The shared Sound control gates the sound and stays off by default.
+- Extended the train browser check for the blue engine, smoke puffs, and all four sounds when Sound is enabled.
+- First upgrade browser run reached the test's 45-second Bridge Stop timeout before arrival. Raised that wait to the 120-second station-check limit used by the full loop.
+- Final `tests/park-train-browser.cjs` passed on desktop and mobile. It checked the blue engine, moving smoke, sound at all four stops, boarding, and separate exits. There were no browser errors.
+- Visual inspection shows the blue dinosaur face and smoke in the moving train view. The station screenshot shows the train stopped at the Ice Cream Stop.
+- Screenshots: `/tmp/ahaan-park-train/dino-smoke-1280.png`, `/tmp/ahaan-park-train/dino-smoke-390.png`, and `/tmp/ahaan-park-train/station-1280.png`.
+- `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed.
+- Ponytail full used on the train work: reused the Sound control and audio helper, added no dependencies, and reduced the dinosaur face to a head, snout, eyes, and three spikes.
+- At the ponytail-only step, skipped the garage queue, commit, publish, and live verification. The garage queue remains untouched.
+- At the ponytail-only step, skipped a browser rerun after the visual-only model reduction. The train behavior did not change.
+- Re-ran `tests/park-train-browser.cjs` after the model reduction. Desktop and mobile passed for the train, smoke, four sounds, boarding, and independent exits. No browser errors appeared.
+- Inspected the new moving-train screenshots and the Ice Cream Stop screenshot.
+- Merged `origin/main` at `f189875` and kept its zoo prompts while resolving the train prompt overlap.
+- After the merge, `tests/park-train-browser.cjs` passed on desktop and mobile with no browser errors.
+- After the merge, `tests/zoo-browser.cjs` passed on desktop and mobile. It checked four pens and reported no browser errors.
+- Train feature commit: `b7e3c74` (`Add perimeter dinosaur train`). Merge commit `517751c` includes current main and the train.
+- Pushed merge commit `517751c` to `main`. Pages run `45043472388` completed successfully.
+- Ran the train browser check against the live Pages URL. Desktop and mobile passed all train, smoke, sound, boarding, and exit checks with zero page errors.
+- Captured the live train at the Ice Cream Stop in `public/fresh-drops/2026-11-22-dinosaur-train.png`.
+- Added the dinosaur train entry to `fresh-drops.html` with the live screenshot. The Fresh Drops update still needs its own publish and live check.
+- `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed after the boarding changes.
+- The first browser attempt found a timing race when the test tried to reboard during the initial station dwell. Updated the check to verify each rider at separate station stops.
+- The next browser attempt reached Bridge Stop with Vihaan aboard. The test radius missed the rear carriage, so I widened the position check to cover the train length.
+- Ponytail full is active. Keep the implementation small and reuse existing vehicle patterns.
+- The root checkout has unrelated local edits and remains untouched.
+
+### First step
+
+- Recorded the original car parking coordinates and confirmed the train feature is absent.
+- Moved the car's spawn and reset point to `(-20, -14)`.
+- Updated and passed the desktop and mobile vehicle browser check from the new spot.
+- Boarding and independent exit checks pass in the train browser suite.
+
 ## Click-to-go vehicles brief — Nov 22, 2026
 
 - Started from `main` at `a2aabea` in `.worktrees/feature-chopper-click-to-fly`.
@@ -45,7 +112,8 @@
 - The live suite found a bike route that stopped at the east exit of the Mississippi bridge.
 - The route planner allowed a wider bridge lane than collision checks. Widened the shared bridge clearance from 0.94 m to 1.2 m.
 - `node --check assets/park3d.js`, `git diff --check`, and the local desktop and mobile browser suite pass after the fix.
-- Publish and live verification of the bridge clearance fix remain.
+- The bridge clearance fix was published in merge `7b9dced`.
+- Pages run `45016995946` succeeded. The final live desktop and mobile suite passed.
 - Ponytail full kept the fix to one shared collision value and its required checks.
 - Feature commit: `5b01295` (`Add click-to-go park rides`). Verification record commit: `78ca9d0` (`Record click-to-go verification`).
 
