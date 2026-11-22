@@ -20,7 +20,11 @@
 - Syntax and whitespace checks passed: `node --check assets/park3d.js` and `git diff --check`.
 - Screenshots: `/tmp/ahaan-garage-check/garage-1280.png`, `garage-390.png`, plus `bike`, `ebike`, `car`, `chopper`, and `quad` screenshots at both viewport sizes. I inspected the garage and rider screenshots.
 - Ponytail full is active: reuse the existing park helpers and keep the implementation small. Skipped new dependencies and vehicle abstractions.
-- Garage work is ready for local commit. Desktop and mobile checks passed before commit.
+- Committed the garage work as `25c22d9` (`Add park garage and vehicle speed pass`).
+- Published the fast-forward `faac9d1..25c22d9` to `main`. Pages run `45066086444` passed after a rerun; its first attempt failed because the deploy job found no artifact.
+- Live desktop (`1280x800`) and mobile (`390x844`) checks passed for the published garage. The checks verified all five parking coordinates, speed limits, and zero page errors.
+- Live garage screenshots: `/tmp/ahaan-garage-live/garage-1280.png` and `garage-390.png`. Inspected both screenshots.
+- Added the Fresh Drops garage card with the live desktop screenshot at `public/fresh-drops/2026-11-22-park-garage.png`. The Fresh Drops publish and live card check are pending.
 
 ## Park train loop brief — Nov 22, 2026
 
