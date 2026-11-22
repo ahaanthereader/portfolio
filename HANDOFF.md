@@ -15,11 +15,15 @@ Execute in this order. Build, publish, live-verify on driver authority (Nishant'
 Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WITH a screenshot of the live feature — no entry without its screenshot; (b) every new feature/page goes under an existing menu tab at publish time — no orphan/random separate pages — and gets a visible "NEW" tag (nav entry + home card) for its first 7 days so the kids know what to try.
 
 1. **Click-to-go for ALL vehicles + chopper sound/design/default height** — `FEATURE-BRIEF-chopper-click-to-fly.md`. TOP OF QUEUE — execute first.
-2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`.
-3. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
-4. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`.
-5. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 4).
-6. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
+2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. IN FLIGHT on worker 0004 (worktree `feature-park-train-and-cars`).
+3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage).
+4. **Garage + 1.5x speed + lifelike vehicles + rider seating** — `FEATURE-BRIEF-park-garage-speed-positions.md` (garage near the picnic area for chopper/bike/bicycle/car — train stays outside; everything 1.5x faster; fix odd rider seating positions).
+5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`.
+6. **Water park (4 big rides, diagonally opposite the zoo)** — `FEATURE-BRIEF-park-water-park.md` (the diagonally opposite section of the 4-section plan).
+7. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
+8. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`. NOTE: lay out the 4-section plan here (zoo = one section, water park = diagonally opposite) so briefs 5–6 attach cleanly.
+9. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 8).
+10. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
