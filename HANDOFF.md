@@ -33,6 +33,7 @@
 - The browser run passed target arrivals and manual cancellation on desktop and mobile for the bike, e-bike, and car. The quad check passed mount, target, arrow cancellation, manual ride, and dismount.
 - Live obstacle visuals, live screenshots, Fresh Drops publication, and Pages verification remain to verify.
 - The feature is not published. Local feature work remains in progress.
+- Feature commit: `5b01295` (`Add click-to-go park rides`). The branch is ready for merge and live verification.
 
 ## Brief queue — dispatched by Goku (Nov 20, 2026)
 
