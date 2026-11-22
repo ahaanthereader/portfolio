@@ -4,9 +4,9 @@
 
 Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19 drive instruction). Update HANDOFF.md as you go. Fresh Drops standing rule: every publish adds a Fresh Drops entry with its screenshot (from publish verification) — no entry without its screenshot.
 
-1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). TOP OF QUEUE — execute first.
+1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). Completed Nov 21, 2026; published and live-verified.
 2. **Park 2-player + walking improvement pass** — `FEATURE-BRIEF-two-player-walking.md` (Nishant's Nov 20 priority: walking is off — test yourself and fix issues you see).
-3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot).
+3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot). Completed Nov 21, 2026; published and live-verified.
 
 ## Brief queue — overnight drive, dispatched by Goku (Nov 22, 2026)
 
@@ -968,3 +968,77 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Completed R15 in `assets/site.css`: fit-screen intro paragraphs now wrap naturally instead of clipping to one line. This prevents horizontal overflow from long intro text.
 - Completed R3: verified the existing global `button:focus-visible, a:focus-visible` rule in `assets/site.css`. It uses a 3 px `var(--ink)` outline with a 2 px offset. No duplicate rule was needed.
 - Published Nov 19, 2026: merged to main as dd4156a, pushed a435570..dd4156a; GitHub Pages run 44500957374 success in 23 s; live-verified on ahaanthereader.github.io/portfolio with the durable harness — desktop 1280x800 + mobile 390x844: grouped nav (Read/Explore/Play/My stuff), Country Book label, footer "Made with love by Ahaan.", focus outline solid 3px, no horizontal scroll, zero console errors. Acceptance checks run locally before publish (no passing record existed in HANDOFF); desktop footer hidden by the pre-existing .page-home footer rule, copy verified in live HTML and visible on mobile.
+
+## Fresh Drops — Nov 21, 2026
+
+- Goku placed `FEATURE-BRIEF-release-notes.md` at the top of the brief queue.
+- Created `.worktrees/feature-fresh-drops` on `feature/fresh-drops` from main commit `1e8ac9a`.
+- Read the brief and confirmed the seed publish dates against this HANDOFF. The bridge feature published on Nov 10, 2026.
+- First publish, spacing fix, follow-up publish, and live verification passed.
+- Standing rule: add a dated Fresh Drops entry with its live publish screenshot during every future site publish. Do not add an entry without its screenshot. Update the home card's latest date with each new entry.
+- Built `fresh-drops.html` with 13 dated entries in newest-first order. Each entry has a live-site screenshot, kid-readable copy, and a Try it instruction.
+- Added a Fresh Drops link to the home page's My stuff menu and a visible home card. The card shows `NEW` when its latest entry is within seven days.
+- Added date-based `NEW` badges to fresh entries. The Nov 21 local check showed nine fresh entries.
+- Captured 12 seed screenshots from the live site at 1280 × 800. Saved optimized JPEGs in `public/fresh-drops/`.
+- The first publish added a Fresh Drops entry for this page. Its screenshot is `/private/tmp/fresh-drops-live/fresh-drops-desktop.png`, saved as `public/fresh-drops/2026-11-21-fresh-drops.jpg`.
+- Durable local browser check passed: desktop 1280 × 800 and mobile 390 × 844; home card and nav link opened the page; candy drawer opened and closed; all 13 images loaded; no horizontal overflow; zero console or page errors. Screenshots: `/private/tmp/fresh-drops-local/`.
+- `node --check assets/fresh-drops.js` and `git diff --check` passed.
+- Date note: the vehicles branch merged as `a435570` on Nov 18. HANDOFF has no separate Pages run for that feature. The Nov 19 Sally Pages run `44500957374` is the next recorded full-site publish and includes the merge.
+- First publish: merge `7b745ea` (`Publish Fresh Drops release page`), pushed `1e8ac9a..7b745ea`; GitHub Pages run `44885800007` completed successfully.
+- First live verification passed on Nov 21. Desktop and mobile showed 12 entries, eight NEW entry badges, all images loaded, no horizontal overflow, and zero page or console errors. Screenshots: `/private/tmp/fresh-drops-live/`.
+- Visual follow-up: removed inherited section padding that left a large gap above the cards. Added the Nov 21 Fresh Drops page entry with a screenshot from the first live publish. Updated the home card's latest date to Nov 21.
+- The follow-up local browser check passed at 1280 × 800 and 390 × 844. The page showed 13 entries and nine NEW badges. All images loaded. No horizontal overflow or page errors appeared.
+- Feature commits: `470639e` (`Add Fresh Drops release page`) and `0def0a3` (`Polish Fresh Drops page`).
+- Second publish: merged as `6936351`, pushed `7b745ea..6936351`; GitHub Pages run `44891647142` completed successfully.
+- Final live verification passed on desktop 1280 × 800 and mobile 390 × 844. Both views showed 13 entries; desktop showed nine NEW badges. All images loaded, no horizontal overflow appeared, and zero page or console errors appeared.
+- Final live screenshots: `/private/tmp/fresh-drops-live-final/fresh-drops-desktop.png`, `fresh-drops-mobile.png`, `home-desktop.png`, and `home-mobile.png`.
+
+## Park 2-player walking pass — Nov 21, 2026
+
+- Created `.worktrees/feature-two-player-walking` on `feature/two-player-walking` from `origin/main` at `6936351adac1fce1177b4edfa40aa82bfb2ff166`.
+- Ran `tests/two-player-browser.cjs` with the durable browser-check Playwright module. The suite passed on desktop and mobile. Bridge height matched at 8.00094 m. Both players stayed in frame, and page errors were empty. Evidence: `/tmp/ahaan-two-player/`.
+- The walking-direction probe covered all four directions and four diagonals for both boys. Both boys also walked north at the same time. The desktop run sampled only three animation frames in 350 ms.
+- The probe measured 0.68 m of north movement in 350 ms (1.94 m/s), below the 6.8 m/s walking speed. The animation loop capped every frame at 0.05 s, so slow frames dropped walking distance.
+- Earlier probe attempts failed their test thresholds: 0.34 m in 200 ms (<0.70 m), 1.02 m in 600 ms (<2.00 m), and diagonal direction dot 0.952 (<0.96). These limits were too strict for the low-frame sample and sequential key dispatch. The final probe uses browser key event times and a 0.90 diagonal direction threshold.
+- A post-fix speed assertion also failed at 3.71 m/s because it included Playwright dispatch overhead. The final probe measured from browser keydown through keyup instead.
+- Fixed walking displacement and both foot cycles to use elapsed time capped at 0.2 s. Other park animation still uses the existing 0.05 s cap.
+- The post-fix probe passed for both boys in four directions and four diagonals. Both boys walked north together. The 350 ms cardinal sample increased from 0.68 m before the fix to 2.72 m after the fix.
+- Desktop and mobile screenshots show both boys in frame. The probe reported zero page errors. `node --check assets/park3d.js` passed.
+- Screenshots: `/tmp/ahaan-two-player-walking/walking-desktop.png` and `walking-mobile.png`.
+- Feature commit: `b8c349e` (`Fix Park walking speed on slow frames`). Handoff correction commit: `18e15d3` (`Refresh release handoff status`).
+- First publish: merged to main as `0f095c0`, pushed `6936351..0f095c0`. GitHub Pages run `44914958144` completed successfully.
+- First live verification passed with the durable browser harness. Desktop 1280 × 800 and mobile 390 × 844 passed eight-direction movement for both boys and simultaneous walking. Page errors, console errors, and failed requests were empty. Both players remained in frame.
+- Live screenshots: `/tmp/ahaan-two-player-live-walking-44914958144/walking-desktop.jpg` and `walking-mobile.jpg`. The desktop screenshot is saved as `public/fresh-drops/2026-11-21-two-player-walking.jpg`.
+- Mobile visual review found the two player labels overlap when the boys stand close. The Fresh Drops home card also covers part of the Vihaan label. Record this for the next walking review; this publish does not change label placement.
+- Added the Nov 21 Fresh Drops entry `Walk together in the park` with the live desktop screenshot. The home card already has the Nov 21 latest date.
+- Entry commit: `8860622` (`Add walking fix to Fresh Drops`).
+- Second publish: merged as `6d9490a`, pushed `0f095c0..6d9490a`. GitHub Pages run `44918968152` completed successfully.
+- Final live verification passed with the durable browser harness. Desktop and mobile walking probes passed for both boys in four directions and four diagonals. Simultaneous walking passed. Fresh Drops showed 14 entries, the new image loaded at 1280 pixels wide, and the home card date was `2026-11-21`. No horizontal overflow, page errors, console errors, or failed requests appeared.
+- The combined run first captured the Fresh Drops route at 390 pixels wide. A separate check then passed at 1280 × 800 and 390 × 844.
+- Final walking screenshots: `/tmp/ahaan-two-player-final-live-44918968152/walking-desktop.jpg` and `walking-mobile.jpg`.
+- Final Fresh Drops screenshots: `/tmp/fresh-drops-final-desktop-44918968152/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.
+
+## Story Studio delete confirmation and undo — Nov 21, 2026
+
+- Goku placed `FEATURE-BRIEF-story-studio-delete-confirm.md` next in the brief queue.
+- Created `.worktrees/feature-story-studio-delete-undo` on `feature/story-studio-delete-confirm-undo` from `origin/main` at `6831b033f338780cf19ed8165eefdd4b5770bcf5`.
+- Applied the ponytail skill at full level. Reuse existing Story Studio buttons and toast styles. No dependency or shared abstraction is needed.
+- `assets/story.js` deletes the current page and saves the remaining story in local storage. The undo action must restore that page and save it again.
+- Added a native confirmation dialog and a five-second Undo toast. The first browser check failed because the toast's flex style overrode its hidden state. Scoped flex display to the visible toast and kept the failed result recorded.
+- Keep it and Escape close the dialog without changing the story. Delete stores the current page and index. Undo restores both and saves the story. Starting a new book clears a pending undo.
+- Added `tests/story-delete-browser.cjs` with the durable Playwright harness. Desktop and mobile checks passed. The test covered Keep it, Escape, Delete, five-second expiry, page text and sticker restoration, new-book cleanup, dialog bounds, a 44 px Undo target, horizontal width, and zero browser errors.
+- Browser evidence: `/tmp/ahaan-story-studio-delete/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
+- `node --check assets/story.js`, `node --check tests/story-delete-browser.cjs`, and `git diff --check` passed.
+- The dialog says “Delete this page?” because the existing button removes one page, not the whole story.
+- Feature commit: `54884f0` (`Add Story Studio delete undo`).
+- First publish: merged as `385c228`, pushed `6831b03..385c228`. GitHub Pages run `44981555261` completed successfully.
+- First live verification passed with the durable Playwright harness at 1280 × 800 and 390 × 844. Keep it, Escape, delete, undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
+- Live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
+- Added the Nov 21 Fresh Drops entry `Undo a deleted page` with the live desktop screenshot. The home card already has the Nov 21 latest date.
+- Entry commit: `5617747` (`Add Story Studio undo to Fresh Drops`).
+- Second publish: merged as `eb5dc1f`, pushed `385c228..eb5dc1f`.
+- Pages run `44983727222` failed twice. Attempt one found no artifact. Attempt two found duplicate `github-pages` artifacts after rerunning the job.
+- Clean workflow-dispatch Pages run `44991263301` succeeded.
+- Final live Story Studio checks passed at 1280 × 800 and 390 × 844. Keep it, Escape, Delete, Undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
+- Final live Fresh Drops check showed 15 entries. The new image loaded at 1280 pixels wide. Desktop and mobile had no horizontal overflow. The home card date was `2026-11-21`. Page errors, console errors, and failed requests were empty.
+- Final live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`; `/tmp/story-studio-fresh-drops-live-44991263301/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.

@@ -962,6 +962,48 @@
   }
   @media (prefers-reduced-motion: reduce) { .nav-gbtn { transition: none; } }
 
+  /* ============ Fresh Drops ============ */
+  .fresh-drops-nav { display: inline-flex; align-items: center; color: var(--ink); padding: 7px 12px; border-radius: 10px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+  .fresh-drops-nav:hover, .fresh-drops-nav[aria-current="page"] { background: rgba(47,122,91,.12); color: var(--forest-d); }
+  .page-home .nav-links .fresh-drops-nav { color: var(--ink); background: #fff8e8; }
+  .fresh-drops-home { position: fixed; z-index: 120; top: 86px; left: clamp(14px, 3vw, 38px); display: grid; gap: 3px; width: 190px; padding: 13px 16px; border: 1px solid rgba(43,46,33,.18); border-radius: 16px; background: rgba(255,251,242,.96); color: var(--ink); text-decoration: none; box-shadow: 0 8px 24px rgba(40,35,28,.18); }
+  .fresh-drops-home:hover { background: #fff; box-shadow: 0 10px 28px rgba(40,35,28,.22); }
+  .fresh-drops-home:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .fresh-drops-home-top { display: flex; align-items: center; justify-content: space-between; gap: 5px; font-size: .78rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .fresh-drops-home strong { font: 700 1.55rem/1.05 'Instrument Serif', Georgia, serif; }
+  .fresh-drops-home > span:last-child { color: var(--ink-soft); font-size: .9rem; }
+  .fresh-drops-new { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 3px 7px; border-radius: 999px; background: #e8b54a; color: #2b2721; font: 800 .68rem/1.2 'Fredoka', system-ui, sans-serif; letter-spacing: .08em; }
+  .fresh-drops-new[hidden] { display: none; }
+  .page-fresh-drops { min-height: 100vh; background: #f5f0e6; background-image: radial-gradient(circle at 12% 2%, rgba(232,181,74,.13), transparent 32%), radial-gradient(circle at 88% 10%, rgba(106,174,221,.12), transparent 35%); }
+  .page-fresh-drops .nav { position: sticky; top: 0; z-index: 500; background: rgba(245,240,230,.94); }
+  .fresh-drops-main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: clamp(28px, 5vw, 64px) 0 52px; }
+  .fresh-drops-head { max-width: 760px; margin: 0 auto clamp(28px, 5vw, 54px); text-align: center; }
+  .fresh-drops-kicker { margin: 0 0 10px; color: var(--forest-d); font-size: .82rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  .fresh-drops-head h1 { margin: 0; color: var(--ink); font: 400 clamp(3.2rem, 8vw, 6rem)/.95 'Instrument Serif', Georgia, serif; }
+  .fresh-drops-subtitle { margin: 8px 0 12px; color: var(--terra); font: 700 clamp(1.35rem, 3vw, 1.8rem)/1.2 'Newsreader', Georgia, serif; }
+  .fresh-drops-intro { margin: 0 auto; color: var(--ink-soft); font-size: 1.1rem; }
+  .fresh-drops-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; padding: 0; }
+  .fresh-drop { min-width: 0; overflow: hidden; border: 1px solid rgba(43,46,33,.14); border-radius: 18px; background: rgba(255,253,248,.92); box-shadow: 0 6px 20px rgba(43,46,33,.08); }
+  .fresh-drop-image { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #e5dfd3; }
+  .fresh-drop-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .fresh-drop-image .fresh-drops-new { position: absolute; top: 12px; left: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  .fresh-drop-copy { padding: 18px 18px 20px; }
+  .fresh-drop-copy time { color: var(--forest-d); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .fresh-drop-copy h2 { margin: 8px 0; font: 700 1.55rem/1.08 'Instrument Serif', Georgia, serif; }
+  .fresh-drop-copy p { margin: 0 0 12px; color: var(--ink-soft); line-height: 1.5; }
+  .fresh-drop-copy .fresh-drop-try { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink); }
+  .fresh-drops-footer { padding: 0 20px 32px; text-align: center; }
+  .fresh-drops-footer a { color: var(--forest-d); font-weight: 800; }
+  @media (max-width: 900px) { .fresh-drops-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
+  @media (max-width: 680px) {
+    .fresh-drops-home { top: 156px; right: 12px; left: auto; width: 158px; padding: 10px 12px; }
+    .fresh-drops-home strong { font-size: 1.32rem; }
+    .fresh-drops-home > span:last-child { font-size: .8rem; }
+    .fresh-drops-list { grid-template-columns: 1fr; gap: 14px; }
+    .fresh-drops-main { width: min(100% - 24px, 520px); padding-top: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .fresh-drops-home { transition: none; } }
+
   /* ============ Home: gentle breeze (owner decision D9) ============ */
   .scn-anim { will-change: transform; animation-duration: var(--d, 5s); animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
   .scn-leaves-back { animation-name: scnSwayA; --d: 6.5s; }
