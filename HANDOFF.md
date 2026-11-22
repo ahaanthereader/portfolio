@@ -89,6 +89,7 @@ Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WIT
 - Published: pushed `e5f3aa6..94d3cce` to `main` as a fast-forward. Pages run `45034019201` completed with success in 22 s.
 - Live verified: `tests/zoo-browser.cjs` with `BASE_URL=https://ahaanthereader.github.io/portfolio/index.html` PASS (desktop + mobile, four pens, facts, Vihaan, `#zoo` link, zero page errors). Live `assets/park3d.js` has the zoo code.
 - Fresh Drops: new top entry "Ahaan's Zoo" ("You asked for this!") with the live screenshot `public/fresh-drops/2026-11-22-zoo.jpg` (from `/tmp/ahaan-zoo/live/desktop-overview.png`). Local check: desktop + mobile, image loads, NEW tag shows, zero errors.
+- Fresh Drops publish: commit `b6431f4`, Pages run `45034266531` success. Live `fresh-drops.html`: zoo card first, image 200, NEW tag shows, desktop + mobile, zero errors.
 - Regression: `two-player-browser.cjs` PASS, `quad-browser.cjs` PASS. `chopper-click-browser.cjs` FAILS at the 20 s chopper-arrival wait. The same failure happens on unchanged `origin/main` `e5f3aa6`, so the zoo change did not cause it.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
