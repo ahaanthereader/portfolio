@@ -6,7 +6,7 @@ Execute in this order. Build, publish, live-verify on driver authority (Nishant'
 
 1. **Fresh Drops page** — `FEATURE-BRIEF-release-notes.md` (in this folder). Completed Nov 21, 2026; published and live-verified.
 2. **Park 2-player + walking improvement pass** — `FEATURE-BRIEF-two-player-walking.md` (Nishant's Nov 20 priority: walking is off — test yourself and fix issues you see).
-3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot).
+3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot). Completed Nov 21, 2026; published and live-verified.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
@@ -1021,4 +1021,11 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - First publish: merged as `385c228`, pushed `6831b03..385c228`. GitHub Pages run `44981555261` completed successfully.
 - First live verification passed with the durable Playwright harness at 1280 × 800 and 390 × 844. Keep it, Escape, delete, undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
 - Live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
-- Added the Nov 21 Fresh Drops entry `Undo a deleted page` with the live desktop screenshot. The home card already has the Nov 21 latest date. The entry publish is pending.
+- Added the Nov 21 Fresh Drops entry `Undo a deleted page` with the live desktop screenshot. The home card already has the Nov 21 latest date.
+- Entry commit: `5617747` (`Add Story Studio undo to Fresh Drops`).
+- Second publish: merged as `eb5dc1f`, pushed `385c228..eb5dc1f`.
+- Pages run `44983727222` failed twice. Attempt one found no artifact. Attempt two found duplicate `github-pages` artifacts after rerunning the job.
+- Clean workflow-dispatch Pages run `44991263301` succeeded.
+- Final live Story Studio checks passed at 1280 × 800 and 390 × 844. Keep it, Escape, Delete, Undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
+- Final live Fresh Drops check showed 15 entries. The new image loaded at 1280 pixels wide. Desktop and mobile had no horizontal overflow. The home card date was `2026-11-21`. Page errors, console errors, and failed requests were empty.
+- Final live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`; `/tmp/story-studio-fresh-drops-live-44991263301/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.
