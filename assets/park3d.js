@@ -71,6 +71,9 @@
     } else if (type === "riverboat") {
       window.AhaanAudio.bell(523.25, 0, 0.06);
       window.AhaanAudio.bell(659.25, 0.22, 0.05);
+    } else if (type === "dino") {
+      window.AhaanAudio.strike(130.81, { decay: 0.52, peak: 0.035, attack: 0.08, partials: [[1, 1, 1], [1.48, 0.3, 0.8], [2.02, 0.12, 0.6]] });
+      window.AhaanAudio.strike(98, { when: 0.12, decay: 0.42, peak: 0.025, attack: 0.08, partials: [[1, 1, 1], [1.5, 0.25, 0.7]] });
     } else if (type === "wind") {
       window.AhaanAudio.bell(392.00, 0, 0.05);
     } else if (type === "bounce") {
@@ -3011,7 +3014,7 @@
       }
     });
 
-    const carParking = { x: -14, z: -8, heading: 0 };
+    const carParking = { x: -20, z: -14, heading: 0 };
     const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [], target: null };
     const carKeys = { up: false, down: false, left: false, right: false };
     const carRoot = new T.Group();
@@ -3083,6 +3086,278 @@
       }
     });
 
+    const trainRoute = new T.CatmullRomCurve3([
+      [5, -17], [11, -25], [24, -31], [34, -22], [36, -5],
+      [34, 12], [27, 20], [20, 16], [18, 9], [22, 17],
+      [29, 25], [20, 32], [10, 36], [-8, 36], [-24, 30],
+      [-34, 17], [-36, 2], [-34, -14], [-25, -29], [-10, -36], [2, -35]
+    ].map(([x, z]) => new T.Vector3(x, 0.48, z)), true, "centripetal", 0.5);
+    const trainRouteLength = trainRoute.getLength();
+    const trainStationSpecs = [
+      { name: "Ice Cream Stop", x: 5, z: -17 },
+      { name: "Bridge Stop", x: 18, z: 9 },
+      { name: "South Grove", x: 10, z: 36 },
+      { name: "West Grove", x: -36, z: 2 }
+    ];
+    const trainStationProgress = (x, z) => {
+      let closest = { progress: 0, distance: Infinity };
+      for (let i = 0; i <= 800; i++) {
+        const progress = i / 800;
+        const point = trainRoute.getPointAt(progress);
+        const distance = Math.hypot(point.x - x, point.z - z);
+        if (distance < closest.distance) closest = { progress, distance };
+      }
+      return closest.progress;
+    };
+    const trainStations = trainStationSpecs.map(station => ({
+      ...station,
+      progress: trainStationProgress(station.x, station.z)
+    })).sort((a, b) => a.progress - b.progress);
+    const trainState = { progress: trainStations[0].progress, speed: 0, currentStation: 0, nextStation: 1, dwell: 8, ahaan: false, vihaan: false, dinoSounds: 0 };
+    const trainTrackGroup = new T.Group();
+    const trainRailMat = new T.MeshStandardMaterial({ color: 0x514b43, roughness: 0.55, metalness: 0.56 });
+    const sleeperGeometry = new T.BoxGeometry(1.55, 0.13, 0.32);
+    const sleepers = new T.InstancedMesh(sleeperGeometry, new T.MeshStandardMaterial({ color: 0x765333, roughness: 0.88 }), 320);
+    const sleeperPose = new T.Object3D();
+    for (let i = 0; i < sleepers.count; i++) {
+      const progress = i / sleepers.count;
+      const point = trainRoute.getPointAt(progress);
+      const tangent = trainRoute.getTangentAt(progress);
+      sleeperPose.position.set(point.x, 0.34, point.z);
+      sleeperPose.rotation.set(0, Math.atan2(tangent.x, tangent.z), 0);
+      sleeperPose.updateMatrix();
+      sleepers.setMatrixAt(i, sleeperPose.matrix);
+    }
+    sleepers.castShadow = true;
+    sleepers.receiveShadow = true;
+    trainTrackGroup.add(sleepers);
+    [-0.65, 0.65].forEach(offset => {
+      const railPoints = [];
+      for (let i = 0; i < 320; i++) {
+        const progress = i / 320;
+        const point = trainRoute.getPointAt(progress);
+        const tangent = trainRoute.getTangentAt(progress);
+        railPoints.push(new T.Vector3(point.x + tangent.z * offset, 0.49, point.z - tangent.x * offset));
+      }
+      const railCurve = new T.CatmullRomCurve3(railPoints, true, "centripetal", 0.5);
+      const rail = new T.Mesh(new T.TubeGeometry(railCurve, 360, 0.075, 6, true), trainRailMat);
+      rail.castShadow = true;
+      trainTrackGroup.add(rail);
+    });
+    const trestleMat = new T.MeshStandardMaterial({ color: 0x765333, roughness: 0.85 });
+    for (let z = 33; z <= 38; z += 1.6) {
+      const riverX = Math.sin(z * 0.08) * 3 + Math.cos(z * 0.05) * 1.5 + 11.2;
+      const pier = new T.Mesh(new T.BoxGeometry(0.34, 0.52, 0.34), trestleMat);
+      pier.position.set(riverX, 0.05, z);
+      pier.castShadow = true;
+      trainTrackGroup.add(pier);
+    }
+    mapGroup.add(trainTrackGroup);
+
+    const trainStationsGroup = new T.Group();
+    const stationPlatformMat = new T.MeshStandardMaterial({ color: 0xcdbd9e, roughness: 0.92 });
+    const stationPostMat = new T.MeshStandardMaterial({ color: 0x765333, roughness: 0.88 });
+    trainStations.forEach(station => {
+      const point = trainRoute.getPointAt(station.progress);
+      const tangent = trainRoute.getTangentAt(station.progress);
+      const heading = Math.atan2(tangent.x, tangent.z);
+      const sideX = Math.cos(heading), sideZ = -Math.sin(heading);
+      const platform = new T.Group();
+      platform.position.set(point.x + sideX * 2.05, 0, point.z + sideZ * 2.05);
+      platform.rotation.y = heading;
+      const deck = new T.Mesh(new T.BoxGeometry(2.45, 0.28, 5.4), stationPlatformMat);
+      deck.position.y = 0.2;
+      deck.receiveShadow = true;
+      platform.add(deck);
+      [-0.88, 0.88].forEach(x => {
+        const post = new T.Mesh(new T.BoxGeometry(0.12, 1.5, 0.12), stationPostMat);
+        post.position.set(x, 0.94, -1.95);
+        platform.add(post);
+      });
+      const signCanvas = document.createElement("canvas");
+      signCanvas.width = 320;
+      signCanvas.height = 96;
+      const signContext = signCanvas.getContext("2d");
+      signContext.fillStyle = "#f6eddc";
+      signContext.fillRect(0, 0, signCanvas.width, signCanvas.height);
+      signContext.fillStyle = "#553726";
+      signContext.font = "bold 30px Georgia";
+      signContext.textAlign = "center";
+      signContext.textBaseline = "middle";
+      signContext.fillText(station.name, signCanvas.width / 2, signCanvas.height / 2, 300);
+      const signTexture = new T.CanvasTexture(signCanvas);
+      signTexture.encoding = T.sRGBEncoding;
+      const sign = new T.Mesh(new T.PlaneGeometry(2.1, 0.64), new T.MeshBasicMaterial({ map: signTexture, side: T.DoubleSide }));
+      sign.position.set(0, 1.45, -1.95);
+      sign.rotation.y = Math.PI / 2;
+      platform.add(sign);
+      trainStationsGroup.add(platform);
+    });
+    mapGroup.add(trainStationsGroup);
+
+    const trainRoot = new T.Group();
+    const trainBodyMats = [
+      new T.MeshStandardMaterial({ color: 0x287fc0, roughness: 0.62 }),
+      new T.MeshStandardMaterial({ color: 0xc27746, roughness: 0.68 })
+    ];
+    const trainRoofMat = new T.MeshStandardMaterial({ color: 0x315b79, roughness: 0.78 });
+    const trainWindowMat = new T.MeshStandardMaterial({ color: 0xa9d2d8, roughness: 0.3, metalness: 0.08 });
+    const trainWheelMat = new T.MeshStandardMaterial({ color: 0x343535, roughness: 0.82 });
+    const trainSmokePuffs = [];
+    let trainSmokeTime = 0;
+    function makeTrainCarriage(engine = false) {
+      const carriage = new T.Group();
+      const body = new T.Mesh(new T.BoxGeometry(engine ? 1.28 : 1.48, 0.86, engine ? 2.0 : 3.2), trainBodyMats[engine ? 0 : 1]);
+      body.position.y = 0.78;
+      body.castShadow = true;
+      carriage.add(body);
+      const roof = new T.Mesh(new T.BoxGeometry(engine ? 1.34 : 1.56, 0.18, engine ? 1.75 : 2.9), trainRoofMat);
+      roof.position.set(0, 1.28, engine ? -0.1 : 0);
+      carriage.add(roof);
+      if (engine) {
+        const chimney = new T.Mesh(new T.CylinderGeometry(0.16, 0.2, 0.58, 8), trainRoofMat);
+        chimney.position.set(0, 1.62, 0.48);
+        carriage.add(chimney);
+        const dinoHead = new T.Mesh(new T.SphereGeometry(0.44, 14, 11), trainBodyMats[0]);
+        dinoHead.scale.set(1.25, 1.05, 1.35);
+        dinoHead.position.set(0, 1.52, 1.03);
+        dinoHead.castShadow = true;
+        carriage.add(dinoHead);
+        const dinoSnout = new T.Mesh(new T.SphereGeometry(0.3, 12, 9), new T.MeshStandardMaterial({ color: 0x58a8d6, roughness: 0.68 }));
+        dinoSnout.scale.set(0.95, 0.62, 1.28);
+        dinoSnout.position.set(0, 1.43, 1.4);
+        carriage.add(dinoSnout);
+        const dinoEyeWhite = new T.MeshStandardMaterial({ color: 0xfff8e8, roughness: 0.6 });
+        const dinoPupilMat = new T.MeshStandardMaterial({ color: 0x263442, roughness: 0.5 });
+        [-1, 1].forEach(side => {
+          const eye = new T.Mesh(new T.SphereGeometry(0.115, 10, 8), dinoEyeWhite);
+          eye.position.set(side * 0.31, 1.84, 1.12);
+          carriage.add(eye);
+          const pupil = new T.Mesh(new T.SphereGeometry(0.055, 8, 6), dinoPupilMat);
+          pupil.position.set(side * 0.33, 1.89, 1.19);
+          carriage.add(pupil);
+        });
+        const dinoSpikeMat = new T.MeshStandardMaterial({ color: 0x73b5df, roughness: 0.72 });
+        [0.36, 0.62, 0.88].forEach((z, index) => {
+          const spike = new T.Mesh(new T.ConeGeometry(0.14, 0.3, 5), dinoSpikeMat);
+          spike.position.set(0, 1.7, z);
+          spike.rotation.x = -0.32;
+          carriage.add(spike);
+        });
+        for (let i = 0; i < 3; i++) {
+          const puffMat = new T.MeshBasicMaterial({ color: 0xd8d9d5, transparent: true, opacity: 0, depthWrite: false, fog: true });
+          const puff = new T.Mesh(new T.SphereGeometry(0.36, 8, 6), puffMat);
+          puff.visible = false;
+          carriage.add(puff);
+          trainSmokePuffs.push({ mesh: puff, material: puffMat, offset: i / 3 });
+        }
+        const cowcatcher = new T.Mesh(new T.BoxGeometry(1.3, 0.16, 0.32), trainRoofMat);
+        cowcatcher.position.set(0, 0.36, 1.05);
+        carriage.add(cowcatcher);
+      }
+      [-1, 1].forEach(side => [-1, 1].forEach(end => {
+        const wheel = new T.Mesh(new T.CylinderGeometry(0.28, 0.28, 0.16, 10), trainWheelMat);
+        wheel.position.set(side * 0.72, 0.28, end * (engine ? 0.65 : 1.15));
+        wheel.rotation.z = Math.PI / 2;
+        carriage.add(wheel);
+      }));
+      [-1, 1].forEach(side => {
+        const window = new T.Mesh(new T.BoxGeometry(0.04, 0.38, engine ? 0.42 : 0.48), trainWindowMat);
+        window.position.set(side * (engine ? 0.65 : 0.75), 0.94, engine ? -0.2 : 0);
+        carriage.add(window);
+      });
+      trainRoot.add(carriage);
+      return carriage;
+    }
+    const trainCars = [makeTrainCarriage(true), makeTrainCarriage(), makeTrainCarriage()];
+    mapGroup.add(trainRoot);
+    function setTrainRider(actor, seated) {
+      actor.leftArm.arm.rotation.set(seated ? -0.7 : 0, 0, seated ? 0.12 : actor.leftArm.rest);
+      actor.wavingArm.arm.rotation.set(seated ? -0.7 : 0, 0, seated ? -0.12 : actor.wavingArm.rest);
+      actor.leftArm.elbow.rotation.set(seated ? 0.45 : 0, 0, 0);
+      actor.wavingArm.elbow.rotation.set(seated ? 0.45 : 0, 0, 0);
+      actor.leftLeg.hip.rotation.set(seated ? -1.45 : 0, 0, 0);
+      actor.rightLeg.hip.rotation.set(seated ? -1.45 : 0, 0, 0);
+      actor.leftLeg.knee.rotation.set(seated ? 1.65 : 0, 0, 0);
+      actor.rightLeg.knee.rotation.set(seated ? 1.65 : 0, 0, 0);
+    }
+    function positionTrainRider(actor, coachIndex) {
+      const coach = trainCars[coachIndex];
+      const heading = coach.rotation.y;
+      const seatX = coach.position.x - Math.sin(heading) * 0.12;
+      const seatZ = coach.position.z - Math.cos(heading) * 0.12;
+      actor.rig.position.set(seatX, 0.52, seatZ);
+      actor.rig.rotation.set(0, heading + Math.PI, 0);
+    }
+    function boardTrain(actor) {
+      if (!actor || trainState.dwell <= 0 || (actor === V && !togetherEnabled)) return false;
+      const station = trainStations[trainState.currentStation];
+      if (Math.hypot(actor.rig.position.x - station.x, actor.rig.position.z - station.z) > 4.8) return false;
+      if (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || currentActivity)) return false;
+      if (actor === V && (eBikeState.rider === V || carState.driver === V || carState.passenger === V || chopperState.rider === V || quadState.riding || currentActivity)) return false;
+      trainState[actor === A ? "ahaan" : "vihaan"] = true;
+      setTrainRider(actor, true);
+      targetPos = null;
+      if (actor === A) currentNearbyItem = { id: "trainRide" };
+      else vihaanNearbyItem = { id: "trainRide" };
+      wake();
+      return true;
+    }
+    function dismountTrain(actor) {
+      const key = actor === A ? "ahaan" : "vihaan";
+      if (!trainState[key] || trainState.dwell <= 0) return false;
+      trainState[key] = false;
+      const station = trainStations[trainState.currentStation];
+      const actorX = station.x + 2.5;
+      const actorZ = station.z;
+      actor.rig.position.set(actorX, groundHeightAt(actorX, actorZ, rigBaseY), actorZ);
+      actor.rig.rotation.set(0, 0, 0);
+      setTrainRider(actor, false);
+      if (actor === A) currentNearbyItem = null;
+      else vihaanNearbyItem = null;
+      wake();
+      return true;
+    }
+    function updateParkTrain(dt) {
+      if (!breezeOn()) { trainSmokePuffs.forEach(puff => { puff.mesh.visible = false; }); return false; }
+      if (trainState.dwell > 0) trainState.dwell = Math.max(0, trainState.dwell - dt);
+      else {
+        const station = trainStations[trainState.nextStation];
+        const distance = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
+        const wantedSpeed = Math.min(3.8, Math.sqrt(1.5 * Math.max(0, distance - 0.7)));
+        trainState.speed += Math.max(-0.75 * dt, Math.min(0.75 * dt, wantedSpeed - trainState.speed));
+        trainState.progress = (trainState.progress + trainState.speed * dt / trainRouteLength) % 1;
+        const remaining = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
+        if (remaining < 1.1 && trainState.speed < 0.12) {
+          trainState.progress = station.progress;
+          trainState.speed = 0;
+          trainState.currentStation = trainState.nextStation;
+          trainState.nextStation = (trainState.nextStation + 1) % trainStations.length;
+          trainState.dwell = 4.5;
+          if (soundOn) { trainState.dinoSounds++; playSound("dino"); }
+        }
+      }
+      trainCars.forEach((carriage, index) => {
+        const progress = (trainState.progress - index * 4.2 / trainRouteLength + 1) % 1;
+        const point = trainRoute.getPointAt(progress);
+        const tangent = trainRoute.getTangentAt(progress);
+        carriage.position.set(point.x, 0, point.z);
+        carriage.rotation.y = Math.atan2(tangent.x, tangent.z);
+      });
+      if (trainState.ahaan) positionTrainRider(A, 1);
+      if (trainState.vihaan) positionTrainRider(V, 2);
+      trainSmokeTime += dt * Math.max(0.45, trainState.speed);
+      trainSmokePuffs.forEach(puff => {
+        const phase = (trainSmokeTime * 0.72 + puff.offset) % 1;
+        const moving = trainState.speed > 0.12;
+        puff.mesh.visible = moving;
+        puff.mesh.position.set(0, 1.85 + phase * 1.15, 0.48 - phase * 1.35);
+        puff.mesh.scale.setScalar(0.7 + phase * 1.1);
+        puff.material.opacity = moving ? 0.68 * (1 - phase) : 0;
+      });
+      return true;
+    }
+    updateParkTrain(0);
     const chopperParking = { x: 23, z: -20, heading: 0 };
     const chopperSafeAltitude = 10.5;
     const chopperState = { ...chopperParking, altitude: 0, speed: 0, rider: null, riderScale: null, rotorSpeed: 0, target: null };
@@ -3703,6 +3978,8 @@
     }
     function activateVihaanItem() {
       if (!vihaanNearbyItem) return;
+      if (vihaanNearbyItem.id === "trainRide") dismountTrain(V);
+      if (vihaanNearbyItem.id === "train") boardTrain(V);
       if (vihaanNearbyItem.id === "chopper") mountChopper(V);
       if (vihaanNearbyItem.id === "chopperRide") dismountChopper();
       if (vihaanNearbyItem.id === "ebike") mountEbike(V);
@@ -3763,7 +4040,10 @@
     function checkVihaanProximity() {
       let closest = null;
       let minDistance = Infinity;
-      if (togetherEnabled && chopperState.rider === V) {
+      if (trainState.vihaan) {
+        closest = { id: "trainRide" };
+        minDistance = 0;
+      } else if (togetherEnabled && chopperState.rider === V) {
         closest = { id: "chopperRide", x: chopperState.x, z: chopperState.z, approachRadius: Infinity };
         minDistance = 0;
       } else if (togetherEnabled && (carState.driver === V || carState.passenger === V)) {
@@ -3776,14 +4056,19 @@
         const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
         if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
       }
-      if (togetherEnabled && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
+      if (togetherEnabled && !trainState.vihaan && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
+      if (togetherEnabled && !trainState.vihaan && trainState.dwell > 0) {
+        const station = trainStations[trainState.currentStation];
+        const distance = Math.hypot(V.rig.position.x - station.x, V.rig.position.z - station.z);
+        if (distance <= 4.8 && distance < minDistance) { closest = { id: "train" }; minDistance = distance; }
+      }
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
+          vihaanActionPromptText.textContent = closest.id === "trainRide" ? (trainState.dwell > 0 ? "Enter: leave the train." : "Wait for the next station to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸";
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -3795,6 +4080,11 @@
 
     // Detect nearby playground items and landmarks
     function checkProximity() {
+      if (trainState.ahaan) {
+        currentNearbyItem = { id: "trainRide", promptText: trainState.dwell > 0 ? "Press E to leave the train." : "Wait for the next station to leave the train.", onActivate: () => dismountTrain(A) };
+        if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
+        return;
+      }
       if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A) {
         const ridingBike = bikeState.riding;
         const ridingEbike = eBikeState.rider === A;
@@ -3840,12 +4130,17 @@
           closest = item;
         }
       }
+      if (!trainState.ahaan && trainState.dwell > 0) {
+        const station = trainStations[trainState.currentStation];
+        const d = Math.hypot(px - station.x, pz - station.z);
+        if (d <= 4.8 && d < minD) { minD = d; closest = { id: "train", promptText: "Press E to ride the train.", onActivate: () => boardTrain(A) }; }
+      }
 
       if (closest !== currentNearbyItem) {
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream", "train"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -4787,6 +5082,8 @@
         }
       }
       if (calm()) {
+        if (isDown && trainState.ahaan && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) { e.preventDefault(); dismountTrain(A); }
+        if (isDown && trainState.vihaan && (e.code === "Enter" || e.key === "Enter")) { e.preventDefault(); dismountTrain(V); }
         if (isDown && bikeState.riding && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
           e.preventDefault();
           dismountBike();
@@ -4829,7 +5126,9 @@
       if (togetherEnabled && (code === "Enter" || key === "Enter")) {
         if (isDown) {
           e.preventDefault();
-          if (chopperState.rider === V) dismountChopper();
+          if (trainState.vihaan) dismountTrain(V);
+          else if (vihaanNearbyItem && vihaanNearbyItem.id === "train") boardTrain(V);
+          else if (chopperState.rider === V) dismountChopper();
           else if (vihaanNearbyItem && vihaanNearbyItem.id === "chopper") mountChopper(V);
           else if (carState.driver === V || carState.passenger === V) dismountCar(V);
           else if (vihaanNearbyItem && vihaanNearbyItem.id === "car") mountCar(V);
@@ -4845,6 +5144,7 @@
       }
 
       if (isDown && (code === "KeyE" || key.toLowerCase() === "e")) {
+        if (trainState.ahaan) { e.preventDefault(); dismountTrain(A); return; }
         if (chopperState.rider === A) { e.preventDefault(); dismountChopper(); return; }
         if (currentNearbyItem && currentNearbyItem.id === "chopper") { e.preventDefault(); mountChopper(A); return; }
         if (carState.driver === A || carState.passenger === A) {
@@ -4862,6 +5162,7 @@
           dismountEbike();
           return;
         }
+        if (currentNearbyItem && currentNearbyItem.id === "train") { e.preventDefault(); boardTrain(A); return; }
         if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "icecream"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
@@ -5174,6 +5475,7 @@
       const dt = Math.min(0.05, elapsed);
       const walkDt = elapsed;
       last = now;
+      const trainActive = updateParkTrain(elapsed);
 
       // Ride the bike or walk through the park.
       if (bikeState.riding) {
@@ -5230,7 +5532,7 @@
         isWalking = bikeState.speed > 0.06;
         targetPos = null;
         markerMat.opacity = 0;
-      } else if (chopperState.rider !== A) {
+      } else if (chopperState.rider !== A && !trainState.ahaan) {
         let moveX = 0, moveZ = 0;
         if (keys.up) moveZ -= 1;
         if (keys.down) moveZ += 1;
@@ -5436,7 +5738,7 @@
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
         const vihaanInCar = carState.driver === V || carState.passenger === V;
         const vihaanInChopper = chopperState.rider === V;
-        vihaanWalking = vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
+        vihaanWalking = trainState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
         if (!vihaanInCar && !vihaanInChopper && vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
@@ -5447,7 +5749,7 @@
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -5459,7 +5761,8 @@
       if (V.rig.visible) {
         if (vihaanWaveTimer > 0 && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
         const vihaanGround = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
-        if (vihaanBounceTime > 0) {
+        if (trainState.vihaan) positionTrainRider(V, 2);
+        else if (vihaanBounceTime > 0) {
           vihaanBounceTime = Math.max(0, vihaanBounceTime - dt);
           const bounceProgress = 5 - vihaanBounceTime;
           V.rig.position.y = vihaanGround + Math.max(0, Math.sin(bounceProgress * Math.PI * 1.6)) * 1.8;
@@ -5474,7 +5777,8 @@
           }
         }
       }
-      clampPlayerSeparation();
+      if (trainState.ahaan) positionTrainRider(A, 1);
+      if (!trainState.ahaan && !trainState.vihaan) clampPlayerSeparation();
 
       // Smoothly rotate Ahaan towards heading
       const ahaanInCar = carState.driver === A || carState.passenger === A;
@@ -5573,7 +5877,7 @@
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || trainActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -5596,6 +5900,7 @@
     });
     resize();
     render();
+    wake();
 
     // Preserve AhaanFigure global interface for sweet eating & comic interactions
     window.AhaanFigure = {
@@ -5668,6 +5973,7 @@
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
+      getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,

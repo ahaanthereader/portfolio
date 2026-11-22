@@ -134,7 +134,7 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
         assert.equal(await page.evaluate(() => window.rotorStopCalls), 1, 'rotor sound stops on dismount');
         await mountAhaan(-0.65, 6.2, 'bike', 'getBikeState', 'ArrowUp');
         await mountAhaan(-13, 7, 'ebike', 'getEbikeState', 'KeyW');
-        await mountAhaan(-14, -8, 'car', 'getCarState', 'KeyW');
+        await mountAhaan(-20, -14, 'car', 'getCarState', 'KeyW');
         await page.evaluate(() => {
           document.querySelector('#togetherBtn').click();
           const chopper = Park3D.getChopperState();
@@ -171,7 +171,7 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
         await page.waitForFunction(() => !Park3D.getChopperState().riding);
         await mountAhaan(-0.65, 6.2, 'bike', 'getBikeState', 'ArrowUp');
         await mountAhaan(-13, 7, 'ebike', 'getEbikeState', 'KeyW');
-        await mountAhaan(-14, -8, 'car', 'getCarState', 'KeyW');
+        await mountAhaan(-20, -14, 'car', 'getCarState', 'KeyW');
       }
       point = `fresh-drops-${viewport.width}`;
       await page.goto(siteUrl('fresh-drops.html'), { waitUntil: 'domcontentloaded' });
