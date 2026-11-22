@@ -6,6 +6,12 @@
     const age = now.getTime() - date.getTime();
     return age >= 0 && age < 7 * dayMs;
   };
+  document.querySelectorAll("[data-new-date]").forEach(link => {
+    if (isFreshDate(link.dataset.newDate)) {
+      const badge = link.querySelector("[data-fresh-new]");
+      if (badge) badge.hidden = false;
+    }
+  });
   const entries = [...document.querySelectorAll(".fresh-drop time[datetime]")];
   let newestEntryIsFresh = false;
   entries.forEach(time => {

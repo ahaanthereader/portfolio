@@ -7,14 +7,17 @@ const root = path.resolve(__dirname, '..');
 const server = http.createServer((req, res) => {
   const file = path.resolve(root, `.${decodeURIComponent(new URL(req.url, 'http://localhost').pathname)}`);
   if (!file.startsWith(root + path.sep)) return res.writeHead(403).end();
-  fs.readFile(file, (err, data) => res.writeHead(err ? 404 : 200, { 'content-type': file.endsWith('.js') ? 'text/javascript' : 'text/html' }).end(err ? '' : data));
+  const contentTypes = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+  fs.readFile(file, (err, data) => res.writeHead(err ? 404 : 200, { 'content-type': contentTypes[path.extname(file)] || 'application/octet-stream' }).end(err ? '' : data));
 });
 let point = 'server-start';
-const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); process.exit(2); }, 30000);
+const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); process.exit(2); }, 120000);
 (async () => {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch({ headless: true, args: ['--disable-gpu', '--use-gl=swiftshader', '--disable-gpu-sandbox'] });
   const page = await browser.newPage();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   try {
@@ -36,6 +39,30 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
     await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', bubbles: true })));
     console.log('after Enter', await page.evaluate(() => ({ nearby: Park3D.getVihaanNearbyItem(), riding: Park3D.getQuadState().riding })));
     assert.equal((await page.evaluate(() => Park3D.getQuadState())).riding, true, 'mount');
+    point = 'click-target';
+    await page.evaluate(() => {
+      const quad = Park3D.getQuadState();
+      Park3D.setCustomCamera({ x: quad.x + 8, y: 10, z: quad.z + 12 }, { x: quad.x, y: 1, z: quad.z });
+    });
+    const rect = await page.evaluate(() => {
+      window.scrollTo(0, 0);
+      const bounds = document.querySelector('#parkCanvas').getBoundingClientRect();
+      return { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height };
+    });
+    await page.mouse.click(Math.max(1, Math.min(1278, rect.x + rect.width * 0.6)), Math.max(1, Math.min(798, rect.y + rect.height * 0.62)));
+    await page.waitForFunction(() => Park3D.getQuadState().target);
+    const goal = await page.evaluate(() => Park3D.getQuadState().target);
+    point = 'arrive-target';
+    await page.waitForFunction(() => !Park3D.getQuadState().target, undefined, { timeout: 45000 });
+    const arrived = await page.evaluate(() => Park3D.getQuadState());
+    assert.ok(Math.hypot(arrived.x - goal.x, arrived.z - goal.z) < 1.2, 'quad reaches its clicked point');
+    assert.ok(arrived.speed < 0.2, 'quad stops at its clicked point');
+    point = 'cancel-target';
+    await page.mouse.click(Math.max(1, Math.min(1278, rect.x + rect.width * 0.4)), Math.max(1, Math.min(798, rect.y + rect.height * 0.62)));
+    await page.waitForFunction(() => Park3D.getQuadState().target);
+    await page.keyboard.down('ArrowUp');
+    await page.waitForFunction(() => !Park3D.getQuadState().target);
+    await page.keyboard.up('ArrowUp');
     const before = await page.evaluate(() => Park3D.getQuadState());
     await page.keyboard.down('ArrowUp');
     await page.waitForTimeout(900);

@@ -17,7 +17,7 @@
 
   // Sensory-friendly audio settings: silent until enabled
   const SKEY = "ahaanDoorsSound";
-  let soundOn = false, soundVol = null;
+  let soundOn = false, soundVol = null, chopperSoundActive = false;
   try {
     const s = JSON.parse(localStorage.getItem(SKEY));
     if (s) soundOn = !!s.on;
@@ -40,6 +40,9 @@
       syncSoundUI();
       if (soundOn && window.AhaanAudio) {
         window.AhaanAudio.bell(523.25, 0, 0.08);
+        if (chopperSoundActive) window.AhaanAudio.startRotor();
+      } else if (window.AhaanAudio) {
+        window.AhaanAudio.stopRotor();
       }
     });
     syncSoundUI();
@@ -2850,7 +2853,7 @@
     const actionPromptText = document.getElementById("actionPromptText");
     const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
 
-    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0 };
+    const bikeState = { x: -0.65, z: 6.2, heading: 0, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0, target: null };
     const bikeKeys = { up: false, down: false, left: false, right: false };
     const bikeRoot = new T.Group();
     const bikeFrameMat = new T.MeshStandardMaterial({ color: 0x7b3440, roughness: 0.72, metalness: 0.12 });
@@ -2921,7 +2924,7 @@
     });
 
     // Reuse Vihaan's red quad at a clear outer parking spot.
-    const quadState = { x: 23, z: 20, heading: 0, speed: 0, riding: false, wheels: [] };
+    const quadState = { x: 23, z: 20, heading: 0, speed: 0, riding: false, wheels: [], target: null };
     const quadKeys = { up: false, down: false, left: false, right: false };
     const quadRoot = new T.Group();
     const quadRedMat = new T.MeshStandardMaterial({ color: 0xc92f38, roughness: 0.62, metalness: 0.08 });
@@ -2957,7 +2960,7 @@
     registerInteractive(quadRoot, { name: "Vihaan's quad", onInteract: () => { if (togetherEnabled) toggleQuadRide(); } });
 
     const eBikeParking = { x: -13, z: 7, heading: Math.PI / 2 };
-    const eBikeState = { ...eBikeParking, speed: 0, rider: null, wheels: [] };
+    const eBikeState = { ...eBikeParking, speed: 0, rider: null, wheels: [], target: null };
     const eBikeKeys = { up: false, down: false, left: false, right: false };
     const eBikeRoot = new T.Group();
     const eBikeFrameMat = new T.MeshStandardMaterial({ color: 0x315d63, roughness: 0.62, metalness: 0.22 });
@@ -3009,7 +3012,7 @@
     });
 
     const carParking = { x: -14, z: -8, heading: 0 };
-    const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [] };
+    const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [], target: null };
     const carKeys = { up: false, down: false, left: false, right: false };
     const carRoot = new T.Group();
     const carBodyMat = new T.MeshStandardMaterial({ color: 0xc57a45, roughness: 0.58, metalness: 0.18 });
@@ -3081,12 +3084,13 @@
     });
 
     const chopperParking = { x: 23, z: -20, heading: 0 };
-    const chopperState = { ...chopperParking, altitude: 0, speed: 0, rider: null, rotorSpeed: 0 };
+    const chopperSafeAltitude = 10.5;
+    const chopperState = { ...chopperParking, altitude: 0, speed: 0, rider: null, riderScale: null, rotorSpeed: 0, target: null };
     const chopperKeys = { up: false, down: false, left: false, right: false, lift: false, descend: false };
     const chopperRoot = new T.Group();
-    const chopperBodyMat = new T.MeshStandardMaterial({ color: 0x4c806f, roughness: 0.62 });
-    const chopperTrimMat = new T.MeshStandardMaterial({ color: 0x333b3b, roughness: 0.68 });
-    const chopperGlassMat = new T.MeshStandardMaterial({ color: 0x9ec4c5, roughness: 0.24, transparent: true, opacity: 0.72 });
+    const chopperBodyMat = new T.MeshStandardMaterial({ color: 0x287ab5, roughness: 0.58, metalness: 0.08 });
+    const chopperTrimMat = new T.MeshStandardMaterial({ color: 0x273b4a, roughness: 0.68 });
+    const chopperGlassMat = new T.MeshStandardMaterial({ color: 0xa8d6e8, roughness: 0.2, metalness: 0.04, transparent: true, opacity: 0.58 });
     const chopperBody = new T.Mesh(new T.SphereGeometry(0.72, 14, 10), chopperBodyMat);
     chopperBody.scale.set(0.9, 0.76, 1.55);
     chopperBody.position.y = 1.05;
@@ -3096,13 +3100,32 @@
     chopperCabin.scale.set(0.9, 0.8, 0.85);
     chopperCabin.position.set(0, 1.42, 0.35);
     chopperRoot.add(chopperCabin);
+    [-1, 1].forEach(side => {
+      const sideWindow = new T.Mesh(new T.BoxGeometry(0.035, 0.43, 0.62), chopperGlassMat);
+      sideWindow.position.set(side * 0.48, 1.35, 0.43);
+      sideWindow.rotation.x = -0.08;
+      chopperRoot.add(sideWindow);
+    });
     const chopperTail = new T.Mesh(new T.CylinderGeometry(0.1, 0.2, 2.35, 8), chopperBodyMat);
     chopperTail.rotation.x = Math.PI / 2;
     chopperTail.position.set(0, 1.12, -1.8);
     chopperRoot.add(chopperTail);
+    const tailFin = new T.Mesh(new T.BoxGeometry(0.12, 0.68, 0.52), chopperBodyMat);
+    tailFin.position.set(0, 1.48, -2.75);
+    tailFin.castShadow = true;
+    chopperRoot.add(tailFin);
+    const tailPlane = new T.Mesh(new T.BoxGeometry(0.78, 0.12, 0.38), chopperBodyMat);
+    tailPlane.position.set(0, 1.18, -2.55);
+    chopperRoot.add(tailPlane);
+    const rotorMast = new T.Mesh(new T.CylinderGeometry(0.08, 0.1, 0.62, 10), chopperTrimMat);
+    rotorMast.position.y = 2.12;
+    chopperRoot.add(rotorMast);
     const chopperRotor = new T.Group();
-    chopperRotor.position.set(0, 1.82, 0);
+    chopperRotor.position.set(0, 2.42, 0);
     chopperRoot.add(chopperRotor);
+    const rotorHub = new T.Mesh(new T.SphereGeometry(0.18, 10, 8), chopperTrimMat);
+    rotorHub.position.y = 0.04;
+    chopperRotor.add(rotorHub);
     [-1, 1].forEach(side => {
       const blade = new T.Mesh(new T.BoxGeometry(0.18, 0.045, 3.15), chopperTrimMat);
       blade.position.z = side * 1.58;
@@ -3277,6 +3300,7 @@
       if (bikeState.riding || currentActivity || eatingTimer > 0) return;
       bikeState.riding = true; bikeState.speed = 0;
       bikeState.boostHeld = false;
+      bikeState.target = null;
       targetPos = null;
       Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
       currentNearbyItem = null;
@@ -3295,6 +3319,7 @@
       if (!bikeState.riding) return;
       bikeState.riding = false; bikeState.speed = 0;
       bikeState.boostHeld = false;
+      bikeState.target = null;
       Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
       const sideX = Math.cos(bikeState.heading) * 1.55;
       const sideZ = -Math.sin(bikeState.heading) * 1.55;
@@ -3310,6 +3335,7 @@
       if (!actor || eBikeState.rider || currentActivity || (actor === A && (bikeState.riding || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || vihaanEatingTimer > 0))) return;
       eBikeState.rider = actor;
       eBikeState.speed = 0;
+      eBikeState.target = null;
       Object.keys(eBikeKeys).forEach(key => { eBikeKeys[key] = false; });
       if (actor === A) Object.keys(bikeKeys).forEach(key => { bikeKeys[key] = false; });
       else Object.keys(vihaanKeys).forEach(key => { vihaanKeys[key] = false; });
@@ -3331,6 +3357,7 @@
       if (!actor) return;
       eBikeState.rider = null;
       eBikeState.speed = 0;
+      eBikeState.target = null;
       Object.keys(eBikeKeys).forEach(key => { eBikeKeys[key] = false; });
       const sideX = Math.cos(eBikeState.heading) * 1.35;
       const sideZ = -Math.sin(eBikeState.heading) * 1.35;
@@ -3390,7 +3417,10 @@
       const wasEmpty = !carState.driver;
       if (wasEmpty) carState.driver = actor;
       else carState.passenger = actor;
-      if (wasEmpty) Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
+      if (wasEmpty) {
+        carState.target = null;
+        Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
+      }
       targetPos = null;
       currentNearbyItem = null;
       vihaanNearbyItem = null;
@@ -3414,6 +3444,7 @@
         carState.speed = 0;
         carState.driver = carState.passenger;
         carState.passenger = null;
+        if (!carState.driver) carState.target = null;
         Object.keys(carKeys).forEach(key => { carKeys[key] = false; });
         if (carState.driver) { setCarRiderPose(carState.driver); positionCarRider(carState.driver); }
         else carState.speed = 0;
@@ -3436,26 +3467,37 @@
     function mountChopper(actor) {
       if (!actor || chopperState.rider || chopperState.altitude > 0.05 || currentActivity || (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || eBikeState.rider === V || carState.driver === V || carState.passenger === V || vihaanEatingTimer > 0))) return;
       chopperState.rider = actor;
+      chopperState.riderScale = actor.rig.scale.clone();
+      actor.rig.scale.multiplyScalar(0.55);
       chopperState.speed = 0;
+      chopperState.altitude = chopperSafeAltitude;
+      chopperState.target = null;
+      chopperSoundActive = true;
+      if (soundOn && window.AhaanAudio) window.AhaanAudio.startRotor();
       Object.keys(chopperKeys).forEach(key => { chopperKeys[key] = false; });
       targetPos = null;
       currentNearbyItem = null;
       vihaanNearbyItem = null;
-      actor.leftArm.arm.rotation.set(-1.25, 0, 0.2);
-      actor.leftArm.elbow.rotation.set(0.9, 0, 0);
-      actor.wavingArm.arm.rotation.set(-1.25, 0, -0.2);
-      actor.wavingArm.elbow.rotation.set(0.9, 0, 0);
-      actor.leftLeg.hip.rotation.set(-0.92, 0, 0);
-      actor.rightLeg.hip.rotation.set(-0.92, 0, 0);
-      actor.leftLeg.knee.rotation.set(1.25, 0, 0);
-      actor.rightLeg.knee.rotation.set(1.25, 0, 0);
+      actor.leftArm.arm.rotation.set(-1.5, 0, 0.25);
+      actor.leftArm.elbow.rotation.set(1.3, 0, 0);
+      actor.wavingArm.arm.rotation.set(-1.5, 0, -0.25);
+      actor.wavingArm.elbow.rotation.set(1.3, 0, 0);
+      actor.leftLeg.hip.rotation.set(-1.55, 0, 0);
+      actor.rightLeg.hip.rotation.set(-1.55, 0, 0);
+      actor.leftLeg.knee.rotation.set(1.55, 0, 0);
+      actor.rightLeg.knee.rotation.set(1.55, 0, 0);
       wake();
     }
     function dismountChopper() {
       const actor = chopperState.rider;
       if (!actor || chopperState.altitude > 0.05 || chopperState.speed > 0.25) return;
       chopperState.rider = null;
+      if (chopperState.riderScale) actor.rig.scale.copy(chopperState.riderScale);
+      chopperState.riderScale = null;
       chopperState.speed = 0;
+      chopperState.target = null;
+      chopperSoundActive = false;
+      if (window.AhaanAudio) window.AhaanAudio.stopRotor();
       Object.keys(chopperKeys).forEach(key => { chopperKeys[key] = false; });
       const sideX = Math.cos(chopperState.heading) * 1.5;
       const sideZ = -Math.sin(chopperState.heading) * 1.5;
@@ -3641,6 +3683,7 @@
       if (!togetherEnabled) return;
       quadState.riding = !quadState.riding;
       quadState.speed = 0;
+      quadState.target = null;
       Object.keys(quadKeys).forEach(key => { quadKeys[key] = false; });
       if (quadState.riding) {
         V.rig.position.set(quadState.x, groundHeightAt(quadState.x, quadState.z, rigBaseY) - 0.12, quadState.z);
@@ -4479,6 +4522,90 @@
     // Drag to Pan View & Tap to Walk (Mouse, Trackpad, Touch)
     let isPointerDown = false, isDragging = false;
     let dragStart = { x: 0, y: 0 }, downPos = { x: 0, y: 0 };
+    function findVehicleRoute(state, x, z, vehicle) {
+      const blocked = vehicle === carState ? blockedCarPosition : blockedBikePosition;
+      const step = 0.8, minimum = -43.2, count = 109, total = count * count;
+      const nodeX = index => minimum + (index % count) * step;
+      const nodeZ = index => minimum + Math.floor(index / count) * step;
+      const indexAt = (px, pz) => {
+        const ix = Math.max(0, Math.min(count - 1, Math.round((px - minimum) / step)));
+        const iz = Math.max(0, Math.min(count - 1, Math.round((pz - minimum) / step)));
+        return iz * count + ix;
+      };
+      const nearestOpenNode = (px, pz) => {
+        const direct = indexAt(px, pz);
+        if (!blocked(nodeX(direct), nodeZ(direct))) return direct;
+        let nearest = -1, distance = Infinity;
+        for (let index = 0; index < total; index++) {
+          const nx = nodeX(index), nz = nodeZ(index);
+          if (blocked(nx, nz)) continue;
+          const nextDistance = Math.hypot(nx - px, nz - pz);
+          if (nextDistance < distance) { nearest = index; distance = nextDistance; }
+        }
+        return nearest;
+      };
+      const start = nearestOpenNode(state.x, state.z);
+      const end = nearestOpenNode(x, z);
+      if (start < 0 || end < 0) return null;
+      if (start === end) return { x: nodeX(end), z: nodeZ(end), path: [{ x: nodeX(end), z: nodeZ(end) }], pathIndex: 0 };
+
+      const parent = new Int32Array(total);
+      parent.fill(-2);
+      parent[start] = -1;
+      const queue = new Int32Array(total);
+      let read = 0, write = 0;
+      queue[write++] = start;
+      const directions = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+      while (read < write && parent[end] === -2) {
+        const current = queue[read++], cx = current % count, cz = Math.floor(current / count);
+        for (const [dx, dz] of directions) {
+          const ix = cx + dx, iz = cz + dz;
+          if (ix < 0 || ix >= count || iz < 0 || iz >= count) continue;
+          const next = iz * count + ix;
+          if (parent[next] !== -2 || blocked(nodeX(next), nodeZ(next))) continue;
+          if (dx && dz && (blocked(nodeX(cz * count + ix), nodeZ(cz * count + ix)) || blocked(nodeX(iz * count + cx), nodeZ(iz * count + cx)))) continue;
+          parent[next] = current;
+          queue[write++] = next;
+        }
+      }
+      if (parent[end] === -2) return null;
+      const raw = [];
+      for (let node = end; node !== -1; node = parent[node]) raw.push({ x: nodeX(node), z: nodeZ(node) });
+      raw.reverse();
+      const path = [raw[0]];
+      let previousX = 0, previousZ = 0;
+      for (let i = 1; i < raw.length; i++) {
+        const nextX = Math.sign(raw[i].x - raw[i - 1].x), nextZ = Math.sign(raw[i].z - raw[i - 1].z);
+        if (i > 1 && (nextX !== previousX || nextZ !== previousZ)) path.push(raw[i - 1]);
+        previousX = nextX; previousZ = nextZ;
+      }
+      const destination = raw[raw.length - 1];
+      if (path.length === 1 || path[path.length - 1].x !== destination.x || path[path.length - 1].z !== destination.z) path.push(destination);
+      return { x: destination.x, z: destination.z, path, pathIndex: path.length > 1 ? 1 : 0 };
+    }
+    function setRiddenVehicleTarget(x, z) {
+      let target = { x, z };
+      if (chopperState.rider) {
+        chopperState.target = target;
+        targetPos = null;
+        return target;
+      }
+      const riddenVehicles = [
+        bikeState.riding && bikeState,
+        eBikeState.rider && eBikeState,
+        carState.driver && carState,
+        togetherEnabled && quadState.riding && quadState,
+        chopperState.rider && chopperState
+      ].filter(Boolean).sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z));
+      if (!riddenVehicles.length) return false;
+      const vehicle = riddenVehicles[0];
+      target = findVehicleRoute(vehicle, x, z, vehicle);
+      if (!target) return null;
+      vehicle.target = target;
+      vehicle.targetStep = null;
+      targetPos = null;
+      return target;
+    }
 
     hero.addEventListener("pointerdown", e => {
       if (calm()) return;
@@ -4538,9 +4665,18 @@
         if (intHits.length > 0) {
           const hit = intHits[0];
           const data = hit.object.userData;
-          if (bikeState.riding && data && !["Ahaan's bike", "Ice Cream"].includes(data.name)) {
-            isDragging = false;
-            return;
+          const riddenVehicleName = bikeState.riding ? "Ahaan's bike" : eBikeState.rider ? "E-bike" : carState.driver ? "Two-seat car" : quadState.riding ? "Vihaan's quad" : chopperState.rider ? "Chopper" : null;
+          if (riddenVehicleName && data && data.name !== riddenVehicleName) {
+            const groundHit = raycaster.intersectObjects(walkableSurfaces)[0];
+            if (groundHit) {
+              const target = setRiddenVehicleTarget(groundHit.point.x, groundHit.point.z);
+              if (!target) return;
+              marker.position.set(target.x, 0.52, target.z);
+              markerMat.opacity = 0.95;
+              isDragging = false;
+              wake();
+              return;
+            }
           }
           if (data && data.onInteract) {
             if (currentActivity && (!data.activity || data.activity !== currentActivity)) {
@@ -4561,9 +4697,15 @@
         const hits = raycaster.intersectObjects(walkableSurfaces);
         if (hits.length > 0) {
           const hit = hits[0];
-          if (currentActivity) stopPlayActivity();
-          targetPos = new T.Vector3(hit.point.x, rigBaseY, hit.point.z);
-          marker.position.set(hit.point.x, 0.52, hit.point.z);
+          const vehicleTarget = setRiddenVehicleTarget(hit.point.x, hit.point.z);
+          if (vehicleTarget === false) {
+            if (currentActivity) stopPlayActivity();
+            targetPos = new T.Vector3(hit.point.x, rigBaseY, hit.point.z);
+          } else if (!vehicleTarget) {
+            return;
+          } else {
+            marker.position.set(vehicleTarget.x, 0.52, vehicleTarget.z);
+          }
           markerMat.opacity = 0.95;
           wake();
         }
@@ -4578,17 +4720,71 @@
     // ---- Raycasting setup ----
     const raycaster = new T.Raycaster();
     const mouse = new T.Vector2();
+    function advanceVehicleTarget(state, dt, topSpeed, acceleration, braking, turnRate) {
+      if (!state.target) return false;
+      const path = state.target.path || [state.target];
+      const pathIndex = Math.min(state.target.pathIndex || 0, path.length - 1);
+      const waypoint = path[pathIndex];
+      const dx = waypoint.x - state.x;
+      const dz = waypoint.z - state.z;
+      const distance = Math.hypot(dx, dz);
+      state.targetStep = null;
+      if (distance < 0.8) {
+        const desiredHeading = Math.atan2(dx, dz);
+        const headingDiff = Math.atan2(Math.sin(desiredHeading - state.heading), Math.cos(desiredHeading - state.heading));
+        state.heading += Math.max(-turnRate * dt, Math.min(turnRate * dt, headingDiff));
+        state.speed = Math.max(0, state.speed - dt * braking);
+        const travel = Math.min(distance, state.speed * dt);
+        if (distance > 0) state.targetStep = { x: state.x + dx / distance * travel, z: state.z + dz / distance * travel };
+        if (state.speed < 0.12) {
+          state.x = waypoint.x;
+          state.z = waypoint.z;
+          state.targetStep = { x: waypoint.x, z: waypoint.z };
+          if (pathIndex < path.length - 1) state.target.pathIndex = pathIndex + 1;
+          else { state.target = null; markerMat.opacity = 0; }
+        }
+        return true;
+      }
+      const desiredHeading = Math.atan2(dx, dz);
+      const headingDiff = Math.atan2(Math.sin(desiredHeading - state.heading), Math.cos(desiredHeading - state.heading));
+      state.heading += Math.max(-turnRate * dt, Math.min(turnRate * dt, headingDiff));
+      const nextWaypoint = path[pathIndex + 1];
+      let turnSpeed = topSpeed / (1 + Math.abs(headingDiff) * 2 / Math.max(0.2, turnRate));
+      turnSpeed = Math.max(1.4, turnSpeed);
+      if (nextWaypoint && pathIndex > 0) {
+        const incoming = Math.atan2(waypoint.x - path[pathIndex - 1].x, waypoint.z - path[pathIndex - 1].z);
+        const outgoing = Math.atan2(nextWaypoint.x - waypoint.x, nextWaypoint.z - waypoint.z);
+        const corner = Math.abs(Math.atan2(Math.sin(outgoing - incoming), Math.cos(outgoing - incoming)));
+        if (corner > 0.25) turnSpeed = Math.max(1.8, topSpeed * (1 - corner / Math.PI));
+      }
+      const wantedSpeed = Math.min(topSpeed, turnSpeed, Math.sqrt(2 * braking * Math.max(0, distance - 0.35)));
+      state.speed += Math.max(-braking * dt, Math.min(acceleration * dt, wantedSpeed - state.speed));
+      const travel = Math.min(distance, state.speed * dt);
+      if (distance > 0) state.targetStep = { x: state.x + dx / distance * travel, z: state.z + dz / distance * travel };
+      markerMat.opacity = Math.max(0.25, markerMat.opacity - dt * 0.08);
+      return true;
+    }
 
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") shiftHeld = isDown;
       const flightActor = chopperState.rider;
       if (flightActor) {
-        const flightKey = e.code === "KeyW" || e.key === "ArrowUp" ? "up" : e.code === "KeyS" || e.key === "ArrowDown" ? "down" : e.code === "KeyA" || e.key === "ArrowLeft" ? "left" : e.code === "KeyD" || e.key === "ArrowRight" ? "right" : e.code === "Space" ? "lift" : e.code === "ShiftLeft" || e.code === "ShiftRight" ? "descend" : null;
+        const playerKeys = togetherEnabled && flightActor === V
+          ? { up: e.key === "ArrowUp", down: e.key === "ArrowDown", left: e.key === "ArrowLeft", right: e.key === "ArrowRight" }
+          : togetherEnabled && flightActor === A
+            ? { up: e.code === "KeyW", down: e.code === "KeyS", left: e.code === "KeyA", right: e.code === "KeyD" }
+            : { up: e.code === "KeyW" || e.key === "ArrowUp", down: e.code === "KeyS" || e.key === "ArrowDown", left: e.code === "KeyA" || e.key === "ArrowLeft", right: e.code === "KeyD" || e.key === "ArrowRight" };
+        const flightKey = playerKeys.up ? "up" : playerKeys.down ? "down" : playerKeys.left ? "left" : playerKeys.right ? "right" : e.code === "Space" ? "lift" : e.code === "ShiftLeft" || e.code === "ShiftRight" ? "descend" : null;
         const ownExit = flightActor === A ? e.code === "KeyE" || (e.key || "").toLowerCase() === "e" : e.code === "Enter" || e.key === "Enter";
         if (isDown && ownExit) { e.preventDefault(); dismountChopper(); return; }
-        if (flightKey) { chopperKeys[flightKey] = isDown; if (isDown) e.preventDefault(); wake(); return; }
-        if (flightActor === A || flightActor === V) return;
+        if (flightKey) {
+          if (isDown && ["up", "down", "left", "right"].includes(flightKey)) { chopperState.target = null; markerMat.opacity = 0; }
+          chopperKeys[flightKey] = isDown;
+          if (isDown) e.preventDefault();
+          wake();
+          return;
+        }
       }
       if (calm()) {
         if (isDown && bikeState.riding && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
@@ -4620,11 +4816,11 @@
 
       if (togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(key)) {
         const direction = key.slice(5).toLowerCase();
-        if (chopperState.rider === V) chopperKeys[direction] = isDown;
-        else if (carState.driver === V) carKeys[direction] = isDown;
+        if (chopperState.rider === V) { if (isDown) { chopperState.target = null; markerMat.opacity = 0; } chopperKeys[direction] = isDown; }
+        else if (carState.driver === V) { if (isDown) { carState.target = null; markerMat.opacity = 0; } carKeys[direction] = isDown; }
         else if (carState.passenger === V) { if (isDown) e.preventDefault(); return; }
-        else if (eBikeState.rider === V) eBikeKeys[direction] = isDown;
-        else if (quadState.riding) quadKeys[direction] = isDown;
+        else if (eBikeState.rider === V) { if (isDown) { eBikeState.target = null; markerMat.opacity = 0; } eBikeKeys[direction] = isDown; }
+        else if (quadState.riding) { if (isDown) { quadState.target = null; markerMat.opacity = 0; } quadKeys[direction] = isDown; }
         else vihaanKeys[direction] = isDown;
         if (isDown) e.preventDefault();
         wake();
@@ -4666,7 +4862,7 @@
           dismountEbike();
           return;
         }
-        if (currentNearbyItem && (togetherEnabled || ["bike", "icecream"].includes(currentNearbyItem.id))) {
+        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "icecream"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
           return;
@@ -4680,6 +4876,7 @@
           code === "KeyA" || key.toLowerCase() === "a" ? "left" :
           code === "KeyD" || key.toLowerCase() === "d" ? "right" : null;
         if (rideKey) {
+          if (isDown) { carState.target = null; markerMat.opacity = 0; }
           carKeys[rideKey] = isDown;
           if (isDown) e.preventDefault();
           wake();
@@ -4695,6 +4892,7 @@
           code === "KeyA" || key.toLowerCase() === "a" ? "left" :
           code === "KeyD" || key.toLowerCase() === "d" ? "right" : null;
         if (rideKey) {
+          if (isDown) { eBikeState.target = null; markerMat.opacity = 0; }
           eBikeKeys[rideKey] = isDown;
           if (isDown) e.preventDefault();
           wake();
@@ -4710,6 +4908,7 @@
           code === "KeyD" || key.toLowerCase() === "d" ? "right" :
           !togetherEnabled && (key === "ArrowUp" || key === "ArrowDown" || key === "ArrowLeft" || key === "ArrowRight") ? key.slice(5).toLowerCase() : null;
         if (rideKey) {
+          if (isDown) { bikeState.target = null; markerMat.opacity = 0; }
           bikeKeys[rideKey] = isDown;
           if (isDown) e.preventDefault();
           wake();
@@ -4981,15 +5180,19 @@
         const normalTopSpeed = 5.5;
         const boostTopSpeed = 8;
         const topSpeed = bikeState.boostHeld ? boostTopSpeed : normalTopSpeed;
-        if (bikeKeys.down) bikeState.speed = Math.max(0, bikeState.speed - dt * 2.4);
-        else if (!bikeState.boostHeld && bikeState.speed > normalTopSpeed) bikeState.speed = Math.max(normalTopSpeed, bikeState.speed - dt * 0.65);
-        else if (bikeKeys.up) bikeState.speed = Math.min(topSpeed, bikeState.speed + dt * (bikeState.boostHeld ? 3.2 : 2.6));
-        else bikeState.speed = Math.max(0, bikeState.speed - dt * 0.48);
-        const steer = (bikeKeys.right ? 1 : 0) - (bikeKeys.left ? 1 : 0);
+        const autoTarget = advanceVehicleTarget(bikeState, dt, topSpeed, bikeState.boostHeld ? 3.2 : 2.6, 5.5, 0.55 + Math.min(1, bikeState.speed / topSpeed) * 1.05);
+        if (!autoTarget) {
+          if (bikeKeys.down) bikeState.speed = Math.max(0, bikeState.speed - dt * 2.4);
+          else if (!bikeState.boostHeld && bikeState.speed > normalTopSpeed) bikeState.speed = Math.max(normalTopSpeed, bikeState.speed - dt * 0.65);
+          else if (bikeKeys.up) bikeState.speed = Math.min(topSpeed, bikeState.speed + dt * (bikeState.boostHeld ? 3.2 : 2.6));
+          else bikeState.speed = Math.max(0, bikeState.speed - dt * 0.48);
+        }
+        const steer = autoTarget ? 0 : (bikeKeys.right ? 1 : 0) - (bikeKeys.left ? 1 : 0);
         const turnRate = 0.55 + Math.min(1, bikeState.speed / topSpeed) * 1.05;
-        bikeState.heading += steer * turnRate * dt;
-        const nextX = bikeState.x + Math.sin(bikeState.heading) * bikeState.speed * dt;
-        const nextZ = bikeState.z + Math.cos(bikeState.heading) * bikeState.speed * dt;
+        if (!autoTarget) bikeState.heading += steer * turnRate * dt;
+        const bikeStep = autoTarget ? bikeState.targetStep : null;
+        const nextX = bikeStep ? bikeStep.x : bikeState.x + Math.sin(bikeState.heading) * bikeState.speed * dt;
+        const nextZ = bikeStep ? bikeStep.z : bikeState.z + Math.cos(bikeState.heading) * bikeState.speed * dt;
         if (bikePositionAllowed(nextX, nextZ)) {
           bikeState.x = nextX;
           bikeState.z = nextZ;
@@ -5005,6 +5208,7 @@
             bikeState.speed = Math.max(0, bikeState.speed - dt * 1.8);
           } else {
             bikeState.speed = Math.max(0, bikeState.speed - dt * 5.5);
+            if (bikeState.target) { bikeState.target = null; markerMat.opacity = 0; }
           }
         }
         const bikeGround = bikeSurfaceHeightAt(bikeState.x, bikeState.z);
@@ -5066,21 +5270,44 @@
         const climb = (chopperKeys.lift ? 1 : 0) - (chopperKeys.descend ? 1 : 0);
         chopperState.altitude = Math.max(0, Math.min(12.5, chopperState.altitude + climb * 4.2 * dt));
         const topSpeed = 12;
-        if (chopperKeys.down) chopperState.speed = Math.max(0, chopperState.speed - dt * 4.5);
-        else if (chopperKeys.up) chopperState.speed = Math.min(topSpeed, chopperState.speed + dt * 3.8);
+        let chopperSteer = (chopperKeys.right ? 1 : 0) - (chopperKeys.left ? 1 : 0);
+        let chopperUp = chopperKeys.up, chopperDown = chopperKeys.down;
+        if (chopperState.target) {
+          const dx = chopperState.target.x - chopperState.x;
+          const dz = chopperState.target.z - chopperState.z;
+          const distance = Math.hypot(dx, dz);
+          if (distance < 0.25) {
+            chopperUp = false;
+            chopperDown = true;
+            if (chopperState.speed < 0.12) {
+              chopperState.target = null;
+              markerMat.opacity = 0;
+            }
+          } else {
+            const desiredHeading = Math.atan2(dx, dz);
+            const headingDiff = Math.atan2(Math.sin(desiredHeading - chopperState.heading), Math.cos(desiredHeading - chopperState.heading));
+            const turnRate = 0.55 + Math.min(1, chopperState.speed / topSpeed) * 0.7;
+            chopperSteer = Math.max(-1, Math.min(1, headingDiff / Math.max(0.001, turnRate * dt)));
+            chopperUp = true;
+            chopperDown = false;
+            chopperState.speed = Math.min(chopperState.speed, Math.sqrt((distance - 0.15) * 9));
+            markerMat.opacity = Math.max(0.25, markerMat.opacity - dt * 0.08);
+          }
+        }
+        if (chopperDown) chopperState.speed = Math.max(0, chopperState.speed - dt * 4.5);
+        else if (chopperUp) chopperState.speed = Math.min(topSpeed, chopperState.speed + dt * 3.8);
         else chopperState.speed = Math.max(0, chopperState.speed - dt * 1.6);
-        const steer = (chopperKeys.right ? 1 : 0) - (chopperKeys.left ? 1 : 0);
-        chopperState.heading += steer * (0.55 + Math.min(1, chopperState.speed / topSpeed) * 0.7) * dt;
+        chopperState.heading += chopperSteer * (0.55 + Math.min(1, chopperState.speed / topSpeed) * 0.7) * dt;
         const nextX = chopperState.x + Math.sin(chopperState.heading) * chopperState.speed * dt;
         const nextZ = chopperState.z + Math.cos(chopperState.heading) * chopperState.speed * dt;
-        if (!blockedBikePosition(nextX, nextZ)) { chopperState.x = nextX; chopperState.z = nextZ; }
+        if (chopperState.altitude >= chopperSafeAltitude || !blockedBikePosition(nextX, nextZ)) { chopperState.x = nextX; chopperState.z = nextZ; }
         else chopperState.speed = Math.max(0, chopperState.speed - dt * 5.5);
         const baseY = bikeSurfaceHeightAt(chopperState.x, chopperState.z);
         chopperRoot.position.set(chopperState.x, baseY + chopperState.altitude, chopperState.z);
         chopperRoot.rotation.y = chopperState.heading;
         chopperRotor.rotation.y += chopperState.rotorSpeed * dt;
         tailRotor.rotation.z += chopperState.rotorSpeed * dt * 1.7;
-        rider.rig.position.set(chopperState.x, groundHeightAt(chopperState.x, chopperState.z, rigBaseY) + chopperState.altitude + 0.25, chopperState.z);
+        rider.rig.position.set(chopperState.x, chopperRoot.position.y + 1.35, chopperState.z + 0.3);
         rider.rig.rotation.set(0, chopperState.heading, 0);
         if (rider === A) { isWalking = false; targetPos = null; }
         else vihaanWalking = false;
@@ -5094,13 +5321,17 @@
 
       if (eBikeState.rider) {
         const topSpeed = 10.4;
-        if (eBikeKeys.down) eBikeState.speed = Math.max(0, eBikeState.speed - dt * 3);
-        else if (eBikeKeys.up) eBikeState.speed = Math.min(topSpeed, eBikeState.speed + dt * 3.2);
-        else eBikeState.speed = Math.max(0, eBikeState.speed - dt * 0.65);
-        const steer = (eBikeKeys.right ? 1 : 0) - (eBikeKeys.left ? 1 : 0);
-        eBikeState.heading += steer * (0.55 + Math.min(1, eBikeState.speed / topSpeed) * 0.9) * dt;
-        const nextX = eBikeState.x + Math.sin(eBikeState.heading) * eBikeState.speed * dt;
-        const nextZ = eBikeState.z + Math.cos(eBikeState.heading) * eBikeState.speed * dt;
+        const autoTarget = advanceVehicleTarget(eBikeState, dt, topSpeed, 3.2, 3, 0.55 + Math.min(1, eBikeState.speed / topSpeed) * 0.9);
+        if (!autoTarget) {
+          if (eBikeKeys.down) eBikeState.speed = Math.max(0, eBikeState.speed - dt * 3);
+          else if (eBikeKeys.up) eBikeState.speed = Math.min(topSpeed, eBikeState.speed + dt * 3.2);
+          else eBikeState.speed = Math.max(0, eBikeState.speed - dt * 0.65);
+        }
+        const steer = autoTarget ? 0 : (eBikeKeys.right ? 1 : 0) - (eBikeKeys.left ? 1 : 0);
+        if (!autoTarget) eBikeState.heading += steer * (0.55 + Math.min(1, eBikeState.speed / topSpeed) * 0.9) * dt;
+        const eBikeStep = autoTarget ? eBikeState.targetStep : null;
+        const nextX = eBikeStep ? eBikeStep.x : eBikeState.x + Math.sin(eBikeState.heading) * eBikeState.speed * dt;
+        const nextZ = eBikeStep ? eBikeStep.z : eBikeState.z + Math.cos(eBikeState.heading) * eBikeState.speed * dt;
         if (eBikePositionAllowed(nextX, nextZ)) {
           eBikeState.x = nextX;
           eBikeState.z = nextZ;
@@ -5116,6 +5347,7 @@
             eBikeState.speed = Math.max(0, eBikeState.speed - dt * 1.8);
           } else {
             eBikeState.speed = Math.max(0, eBikeState.speed - dt * 5.5);
+            if (eBikeState.target) { eBikeState.target = null; markerMat.opacity = 0; }
           }
         }
         eBikeRoot.position.set(eBikeState.x, bikeSurfaceHeightAt(eBikeState.x, eBikeState.z), eBikeState.z);
@@ -5133,13 +5365,17 @@
 
       if (carState.driver) {
         const topSpeed = 16;
-        if (carKeys.down) carState.speed = Math.max(0, carState.speed - dt * 5.5);
-        else if (carKeys.up) carState.speed = Math.min(topSpeed, carState.speed + dt * 4.5);
-        else carState.speed = Math.max(0, carState.speed - dt * 0.8);
-        const steer = (carKeys.right ? 1 : 0) - (carKeys.left ? 1 : 0);
-        carState.heading += steer * (0.32 + Math.min(1, carState.speed / topSpeed) * 0.42) * dt;
-        const nextX = carState.x + Math.sin(carState.heading) * carState.speed * dt;
-        const nextZ = carState.z + Math.cos(carState.heading) * carState.speed * dt;
+        const autoTarget = advanceVehicleTarget(carState, dt, topSpeed, 4.5, 5.5, 0.32 + Math.min(1, carState.speed / topSpeed) * 0.42);
+        if (!autoTarget) {
+          if (carKeys.down) carState.speed = Math.max(0, carState.speed - dt * 5.5);
+          else if (carKeys.up) carState.speed = Math.min(topSpeed, carState.speed + dt * 4.5);
+          else carState.speed = Math.max(0, carState.speed - dt * 0.8);
+        }
+        const steer = autoTarget ? 0 : (carKeys.right ? 1 : 0) - (carKeys.left ? 1 : 0);
+        if (!autoTarget) carState.heading += steer * (0.32 + Math.min(1, carState.speed / topSpeed) * 0.42) * dt;
+        const carStep = autoTarget ? carState.targetStep : null;
+        const nextX = carStep ? carStep.x : carState.x + Math.sin(carState.heading) * carState.speed * dt;
+        const nextZ = carStep ? carStep.z : carState.z + Math.cos(carState.heading) * carState.speed * dt;
         if (carPositionAllowed(nextX, nextZ)) {
           carState.x = nextX;
           carState.z = nextZ;
@@ -5155,6 +5391,7 @@
             carState.speed = Math.max(0, carState.speed - dt * 1.8);
           } else {
             carState.speed = Math.max(0, carState.speed - dt * 5.5);
+            if (carState.target) { carState.target = null; markerMat.opacity = 0; }
           }
         }
         carRoot.position.set(carState.x, bikeSurfaceHeightAt(carState.x, carState.z), carState.z);
@@ -5171,15 +5408,22 @@
       if (togetherEnabled) {
         if (quadState.riding) {
           const topSpeed = 12;
-          if (quadKeys.down) quadState.speed = Math.max(0, quadState.speed - dt * 3.2);
-          else if (quadKeys.up) quadState.speed = Math.min(topSpeed, quadState.speed + dt * 2.2);
-          else quadState.speed = Math.max(0, quadState.speed - dt * 0.55);
-          const steer = (quadKeys.right ? 1 : 0) - (quadKeys.left ? 1 : 0);
-          quadState.heading += steer * (0.48 + Math.min(1, quadState.speed / topSpeed) * 0.8) * dt;
-          const nextX = quadState.x + Math.sin(quadState.heading) * quadState.speed * dt;
-          const nextZ = quadState.z + Math.cos(quadState.heading) * quadState.speed * dt;
+          const autoTarget = advanceVehicleTarget(quadState, dt, topSpeed, 2.2, 3.2, 0.48 + Math.min(1, quadState.speed / topSpeed) * 0.8);
+          if (!autoTarget) {
+            if (quadKeys.down) quadState.speed = Math.max(0, quadState.speed - dt * 3.2);
+            else if (quadKeys.up) quadState.speed = Math.min(topSpeed, quadState.speed + dt * 2.2);
+            else quadState.speed = Math.max(0, quadState.speed - dt * 0.55);
+          }
+          const steer = autoTarget ? 0 : (quadKeys.right ? 1 : 0) - (quadKeys.left ? 1 : 0);
+          if (!autoTarget) quadState.heading += steer * (0.48 + Math.min(1, quadState.speed / topSpeed) * 0.8) * dt;
+        const quadStep = autoTarget ? quadState.targetStep : null;
+        const nextX = quadStep ? quadStep.x : quadState.x + Math.sin(quadState.heading) * quadState.speed * dt;
+        const nextZ = quadStep ? quadStep.z : quadState.z + Math.cos(quadState.heading) * quadState.speed * dt;
           if (!blockedBikePosition(nextX, nextZ)) { quadState.x = nextX; quadState.z = nextZ; }
-          else quadState.speed = Math.max(0, quadState.speed - dt * 3.4);
+          else {
+            quadState.speed = Math.max(0, quadState.speed - dt * 3.4);
+            if (quadState.target) { quadState.target = null; markerMat.opacity = 0; }
+          }
           quadRoot.position.set(quadState.x, bikeSurfaceHeightAt(quadState.x, quadState.z), quadState.z);
           quadRoot.rotation.y = quadState.heading;
           quadState.wheels.forEach(wheel => { wheel.rotation.x += quadState.speed * dt / 0.48; });
@@ -5420,9 +5664,11 @@
       },
       getVihaanBounceTime: () => vihaanBounceTime,
       getVihaanExitState: () => ({ timer: vihaanWaveTimer, exiting: vihaanExiting, visible: V.rig.visible }),
-      getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed }),
-      getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed }),
-      getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed }),
+      getBikeState: () => ({ riding: bikeState.riding, x: bikeState.x, z: bikeState.z, speed: bikeState.speed, target: bikeState.target && { ...bikeState.target } }),
+      getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
+      getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
+      getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
+      getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
       getGroundHeight: (x, z) => groundHeightAt(x, z, rigBaseY),

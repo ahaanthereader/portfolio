@@ -1,5 +1,39 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Click-to-go vehicles brief — Nov 22, 2026
+
+- Started from `main` at `a2aabea` in `.worktrees/feature-chopper-click-to-fly`.
+- The active branch is `feature/chopper-click-to-fly`.
+- The root `FEATURE-BRIEF-chopper-click-to-fly.md` defines the top queue item.
+- The feature covers click-to-go for five vehicles, plus chopper sound, design, and safe height.
+- The root checkout has unrelated untracked briefs and an edited `AGENTS.md`. Those files remain untouched.
+- Initial inspection found bike, quad, e-bike, car, and chopper code in `assets/park3d.js`.
+- Chopper clicks on walkable ground now set a fly-to point. Arrow or WASD input cancels that point.
+- The chopper turns toward the point, slows near it, and clears the marker after it stops.
+- Mounting sets the default flight height to 10.5 m. The rotor and tail rotor spin up as before.
+- Chopper body and canopy colors now use Ahaan's blue palette.
+- Added a soft rotor tone to the shared audio helper. It starts only when the Sound setting is on and stops on dismount.
+- Added light cabin windows, tail fins, a rotor mast, and a hub. Adjusted the rider scale and seated limb pose for the cabin. The dismount restores the rider's original scale.
+- Ground clicks now route to the ridden vehicle. A grid route uses shared obstacle checks and bridge decks for bike, e-bike, quad, and car targets.
+- E now mounts the e-bike and car in solo mode. Existing E and Enter exit controls remain active.
+- The durable chopper browser check passed at desktop and mobile sizes. It checked target arrival, arrow cancellation, 10.5 m height, rotor start and stop, and rider scale restoration.
+- Mobile touch checks passed for the chopper, bike, e-bike, and car.
+- In two-player mode, Vihaan can set a chopper target while Ahaan keeps WASD walking. Ahaan's keys do not cancel Vihaan's target.
+- The chopper takes target clicks while mounted, even when another ride is occupied.
+- Initial durable checks passed desktop and mobile target setting for the bike, e-bike, car, and chopper.
+- Ground-ride tests found that clicks on obstacles needed a clear destination. The route planner moves blocked clicks to a nearby open point and avoids blocked cells.
+- The two-player browser check passed. Bridge height matched at 8.000940 m and browser errors were empty.
+- The quad browser check passed target arrival, stop, arrow cancellation, manual ride, and dismount.
+- The expanded durable check passed desktop and mobile. Bike, e-bike, and car reached their clicked point, stopped, and accepted manual steering after a new target.
+- The Fresh Drops comparison loaded both images at desktop and mobile. The two images fit without horizontal overflow. The NEW badge appeared.
+- The chopper screenshots are in `/tmp/ahaan-chopper-click`. The inspected target screenshots show the blue chopper design and target marker.
+- Added a before-and-after Fresh Drops card. The before image shows the original green chopper. The local after image shows the blue chopper during click-to-go. Replace the after image with a live publish screenshot after deployment.
+- `node --check` passed for `assets/park3d.js`, `assets/audio.js`, `assets/fresh-drops.js`, and both browser checks. `git diff --check` passed.
+- The desktop chopper route reached its clicked point at 10.5 m. The test checked the default height, arrow movement, and target cancellation.
+- The browser run passed target arrivals and manual cancellation on desktop and mobile for the bike, e-bike, and car. The quad check passed mount, target, arrow cancellation, manual ride, and dismount.
+- Live obstacle visuals, live screenshots, Fresh Drops publication, and Pages verification remain to verify.
+- The feature is not published. Local feature work remains in progress.
+
 ## Brief queue — dispatched by Goku (Nov 20, 2026)
 
 Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19 drive instruction). Update HANDOFF.md as you go. Fresh Drops standing rule: every publish adds a Fresh Drops entry with its screenshot (from publish verification) — no entry without its screenshot.
