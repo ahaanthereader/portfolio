@@ -1004,3 +1004,15 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - The combined run first captured the Fresh Drops route at 390 pixels wide. A separate check then passed at 1280 × 800 and 390 × 844.
 - Final walking screenshots: `/tmp/ahaan-two-player-final-live-44918968152/walking-desktop.jpg` and `walking-mobile.jpg`.
 - Final Fresh Drops screenshots: `/tmp/fresh-drops-final-desktop-44918968152/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.
+
+## Story Studio delete confirmation and undo — Nov 21, 2026
+
+- Goku placed `FEATURE-BRIEF-story-studio-delete-confirm.md` next in the brief queue.
+- Created `.worktrees/feature-story-studio-delete-undo` on `feature/story-studio-delete-confirm-undo` from `origin/main` at `6831b033f338780cf19ed8165eefdd4b5770bcf5`.
+- Applied the ponytail skill at full level. Reuse existing Story Studio buttons and toast styles. No dependency or shared abstraction is needed.
+- `assets/story.js` deletes the current page and saves the remaining story in local storage. The undo action must restore that page and save it again.
+- Added a native confirmation dialog and a five-second Undo toast. The first browser check failed because the toast's flex style overrode its hidden state. Scoped flex display to the visible toast and kept the failed result recorded.
+- Keep it and Escape close the dialog without changing the story. Delete stores the current page and index. Undo restores both and saves the story. Starting a new book clears a pending undo.
+- Added `tests/story-delete-browser.cjs` with the durable Playwright harness. Desktop and mobile checks passed. The test covered Keep it, Escape, Delete, five-second expiry, page text and sticker restoration, new-book cleanup, dialog bounds, a 44 px Undo target, horizontal width, and zero browser errors.
+- Browser evidence: `/tmp/ahaan-story-studio-delete/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`.
+- `node --check assets/story.js`, `node --check tests/story-delete-browser.cjs`, and `git diff --check` passed.

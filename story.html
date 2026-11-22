@@ -90,6 +90,17 @@
         </div>
       </div>
     </div>
+    <dialog class="story-delete-dialog" id="deleteDialog" aria-labelledby="deleteDialogTitle">
+      <h3 id="deleteDialogTitle">Delete this page?</h3>
+      <p>You can undo this for a few seconds.</p>
+      <div class="story-delete-actions">
+        <button class="sbtn add" id="keepPage" type="button" autofocus>Keep it</button>
+        <button class="sbtn" id="confirmDelete" type="button">Delete</button>
+      </div>
+    </dialog>
+    <div class="reward-toast story-undo-toast" id="storyUndoToast" role="status" aria-live="polite" hidden>
+      <span>Page deleted.</span><button class="sbtn" id="undoDelete" type="button">Undo</button>
+    </div>
   </div>
 </section>
 </main>

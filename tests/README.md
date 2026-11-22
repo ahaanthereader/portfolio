@@ -10,3 +10,5 @@ Set `BASE_URL` to use a running local site instead of the test's local server.
 Run `node tests/two-player-browser.cjs`.
 The check saves desktop and mobile screenshots under `/tmp/ahaan-two-player`.
 The check covers solo controls, twin controls, ice cream, trampoline, bridge height, camera bounds, toggle cleanup, and browser errors.
+
+Run `PLAYWRIGHT_MODULE=/path/to/playwright node tests/story-delete-browser.cjs` for Story Studio delete confirmation and undo checks.
