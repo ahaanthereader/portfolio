@@ -8,6 +8,19 @@ Execute in this order. Build, publish, live-verify on driver authority (Nishant'
 2. **Park 2-player + walking improvement pass** — `FEATURE-BRIEF-two-player-walking.md` (Nishant's Nov 20 priority: walking is off — test yourself and fix issues you see).
 3. **Story Studio delete confirm + undo** — `FEATURE-BRIEF-story-studio-delete-confirm.md` (Sally R4; do NOT touch games.html Math Dash — that stays the Codex cloud pilot).
 
+## Brief queue — overnight drive, dispatched by Goku (Nov 22, 2026)
+
+Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19/20 drive instruction). Update HANDOFF.md as you go.
+
+Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WITH a screenshot of the live feature — no entry without its screenshot; (b) every new feature/page goes under an existing menu tab at publish time — no orphan/random separate pages — and gets a visible "NEW" tag (nav entry + home card) for its first 7 days so the kids know what to try.
+
+1. **Click-to-go for ALL vehicles + chopper sound/design/default height** — `FEATURE-BRIEF-chopper-click-to-fly.md`. TOP OF QUEUE — execute first.
+2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`.
+3. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
+4. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`.
+5. **Lazy river boat (canal style, both boys sit, hop on/off)** — `FEATURE-BRIEF-lazy-river-boat.md` (depends on brief 4).
+6. **Day/night cycle + weather (park lights, rain, puddles)** — `FEATURE-BRIEF-park-day-night-weather.md`.
+
 ## Reading Nook Aesop link — Nov 16–17, 2026
 
 - The active brief is `FEATURE-BRIEF-reading-aesop-link.md`.
