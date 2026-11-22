@@ -3734,7 +3734,7 @@
       if (parkObstacles.some(obstacle => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.55)) return true;
       const lazyBridge = withinBridge(x, z, [[0,-8.8,0],[8.8,0,Math.PI/2],[0,8.8,0],[-8.8,0,Math.PI/2]], 4.6, 0.92);
       const riverBridges = [[11.5,-4.9,1.98],[14.2,8.15,1.05]];
-      const onRiverBridge = withinBridge(x, z, riverBridges, 6.8, 0.94);
+      const onRiverBridge = withinBridge(x, z, riverBridges, 6.8, 1.2);
       const lazyRadius = Math.hypot(x, z);
       if (!lazyBridge && !onRiverBridge && lazyRadius >= 7.15 && lazyRadius <= 10.4) return true;
       if (!onRiverBridge && Math.abs(z) <= 39) {
