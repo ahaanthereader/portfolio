@@ -1,6 +1,6 @@
 /* ---- Shared soft-audio helper: one context, a volume ceiling, a limiter, and a mute switch ---- */
 window.AhaanAudio = (function () {
-  let ctx = null, master = null, volume = 0.5, muted = false;
+  let ctx = null, master = null, volume = 0.5, muted = false, rotor = null;
   const CEILING = 0.3;                                   // loudest the master can ever be
   const level = () => (muted ? 0 : volume * CEILING);
   function ensure() {
@@ -15,6 +15,15 @@ window.AhaanAudio = (function () {
     return true;
   }
   function apply() { if (master) master.gain.setTargetAtTime(level(), ctx.currentTime, 0.03); }
+  function stopRotor() {
+    if (!rotor || !ctx) return;
+    const sound = rotor;
+    rotor = null;
+    const end = ctx.currentTime + 0.14;
+    sound.gain.gain.cancelScheduledValues(ctx.currentTime);
+    sound.gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.04);
+    sound.oscillators.forEach(function (osc) { try { osc.stop(end); } catch (e) {} });
+  }
   return {
     // A bell with its own timbre. partials: [ratio, gain, decayFactor]. Always soft: capped peak, slow fade-in, fade-out.
     strike(freq, o) {
@@ -45,6 +54,25 @@ window.AhaanAudio = (function () {
         g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);             // ~2 s fade-out
         o.connect(g); g.connect(master); o.start(t); o.stop(t + 2.3);
       });
-    }
+    },
+    startRotor() {
+      if (rotor || muted || volume === 0 || !ensure()) return;
+      const gain = ctx.createGain(), pulse = ctx.createOscillator(), pulseGain = ctx.createGain();
+      gain.gain.value = 0.009;
+      gain.connect(master);
+      pulse.type = "sine"; pulse.frequency.value = 6.4;
+      pulseGain.gain.value = 0.006;
+      pulse.connect(pulseGain); pulseGain.connect(gain.gain);
+      pulse.start();
+      const oscillators = [pulse];
+      [92, 98].forEach(function (freq) {
+        const osc = ctx.createOscillator();
+        osc.type = "sine"; osc.frequency.value = freq;
+        osc.connect(gain); osc.start();
+        oscillators.push(osc);
+      });
+      rotor = { gain: gain, oscillators: oscillators };
+    },
+    stopRotor: stopRotor
   };
 })();

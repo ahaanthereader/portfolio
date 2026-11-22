@@ -1,5 +1,54 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Click-to-go vehicles brief — Nov 22, 2026
+
+- Started from `main` at `a2aabea` in `.worktrees/feature-chopper-click-to-fly`.
+- The active branch is `feature/chopper-click-to-fly`.
+- The root `FEATURE-BRIEF-chopper-click-to-fly.md` defines the top queue item.
+- The feature covers click-to-go for five vehicles, plus chopper sound, design, and safe height.
+- The root checkout has unrelated untracked briefs and an edited `AGENTS.md`. Those files remain untouched.
+- Initial inspection found bike, quad, e-bike, car, and chopper code in `assets/park3d.js`.
+- Chopper clicks on walkable ground now set a fly-to point. Arrow or WASD input cancels that point.
+- The chopper turns toward the point, slows near it, and clears the marker after it stops.
+- Mounting sets the default flight height to 10.5 m. The rotor and tail rotor spin up as before.
+- Chopper body and canopy colors now use Ahaan's blue palette.
+- Added a soft rotor tone to the shared audio helper. It starts only when the Sound setting is on and stops on dismount.
+- Added light cabin windows, tail fins, a rotor mast, and a hub. Adjusted the rider scale and seated limb pose for the cabin. The dismount restores the rider's original scale.
+- Ground clicks now route to the ridden vehicle. A grid route uses shared obstacle checks and bridge decks for bike, e-bike, quad, and car targets.
+- E now mounts the e-bike and car in solo mode. Existing E and Enter exit controls remain active.
+- The durable chopper browser check passed at desktop and mobile sizes. It checked target arrival, arrow cancellation, 10.5 m height, rotor start and stop, and rider scale restoration.
+- Mobile touch checks passed for the chopper, bike, e-bike, and car.
+- In two-player mode, Vihaan can set a chopper target while Ahaan keeps WASD walking. Ahaan's keys do not cancel Vihaan's target.
+- The chopper takes target clicks while mounted, even when another ride is occupied.
+- Initial durable checks passed desktop and mobile target setting for the bike, e-bike, car, and chopper.
+- Ground-ride tests found that clicks on obstacles needed a clear destination. The route planner moves blocked clicks to a nearby open point and avoids blocked cells.
+- The two-player browser check passed. Bridge height matched at 8.000940 m and browser errors were empty.
+- The quad browser check passed target arrival, stop, arrow cancellation, manual ride, and dismount.
+- The expanded durable check passed desktop and mobile. Bike, e-bike, and car reached their clicked point, stopped, and accepted manual steering after a new target.
+- The Fresh Drops comparison loaded both images at desktop and mobile. The two images fit without horizontal overflow. The NEW badge appeared.
+- The chopper screenshots are in `/tmp/ahaan-chopper-click`. The inspected target screenshots show the blue chopper design and target marker.
+- Added a before-and-after Fresh Drops card. The before image shows the original green chopper. The local after image shows the blue chopper during click-to-go. Replace the after image with a live publish screenshot after deployment.
+- `node --check` passed for `assets/park3d.js`, `assets/audio.js`, `assets/fresh-drops.js`, and both browser checks. `git diff --check` passed.
+- The desktop chopper route reached its clicked point at 10.5 m. The test checked the default height, arrow movement, and target cancellation.
+- The browser run passed target arrivals and manual cancellation on desktop and mobile for the bike, e-bike, and car. The quad check passed mount, target, arrow cancellation, manual ride, and dismount.
+- Merged the feature into `main` as `1f054bb` (`Publish click-to-go park rides`).
+- Pushed `1f054bb` to `origin/main`.
+- GitHub Pages run `45013437262` completed with success.
+- The durable browser check passed on the live site at desktop 1280 × 800 and mobile 390 × 844.
+- Live checks passed chopper click-to-go, manual cancel, safe height, rotor start and stop, rider scale, ground vehicle routes, Fresh Drops images, and NEW badges.
+- Live browser errors: none. Screenshots: `/tmp/ahaan-chopper-click/`.
+- Replaced the Fresh Drops after image with the live target screenshot at `public/fresh-drops/2026-11-22-chopper-after.jpg`.
+- The live target screenshot shows the blue chopper near the target. The overhead camera partly hides Ahaan.
+- Ponytail full was used. It kept the change to the live screenshot and deployment record.
+- Follow-up screenshot commit `a3f0d60` was published in merge `1efbf16`.
+- Pages run `45015727425` completed with success after the screenshot update.
+- The live suite found a bike route that stopped at the east exit of the Mississippi bridge.
+- The route planner allowed a wider bridge lane than collision checks. Widened the shared bridge clearance from 0.94 m to 1.2 m.
+- `node --check assets/park3d.js`, `git diff --check`, and the local desktop and mobile browser suite pass after the fix.
+- Publish and live verification of the bridge clearance fix remain.
+- Ponytail full kept the fix to one shared collision value and its required checks.
+- Feature commit: `5b01295` (`Add click-to-go park rides`). Verification record commit: `78ca9d0` (`Record click-to-go verification`).
+
 ## Brief queue — dispatched by Goku (Nov 20, 2026)
 
 Execute in this order. Build, publish, live-verify on driver authority (Nishant's Nov 19 drive instruction). Update HANDOFF.md as you go. Fresh Drops standing rule: every publish adds a Fresh Drops entry with its screenshot (from publish verification) — no entry without its screenshot.
