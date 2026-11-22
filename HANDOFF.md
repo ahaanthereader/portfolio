@@ -31,9 +31,17 @@
 - `node --check` passed for `assets/park3d.js`, `assets/audio.js`, `assets/fresh-drops.js`, and both browser checks. `git diff --check` passed.
 - The desktop chopper route reached its clicked point at 10.5 m. The test checked the default height, arrow movement, and target cancellation.
 - The browser run passed target arrivals and manual cancellation on desktop and mobile for the bike, e-bike, and car. The quad check passed mount, target, arrow cancellation, manual ride, and dismount.
-- Live obstacle visuals, live screenshots, Fresh Drops publication, and Pages verification remain to verify.
-- The feature is not published. Local feature work remains in progress.
-- Feature commit: `5b01295` (`Add click-to-go park rides`). The branch is ready for merge and live verification.
+- Merged the feature into `main` as `1f054bb` (`Publish click-to-go park rides`).
+- Pushed `1f054bb` to `origin/main`.
+- GitHub Pages run `45013437262` completed with success.
+- The durable browser check passed on the live site at desktop 1280 × 800 and mobile 390 × 844.
+- Live checks passed chopper click-to-go, manual cancel, safe height, rotor start and stop, rider scale, ground vehicle routes, Fresh Drops images, and NEW badges.
+- Live browser errors: none. Screenshots: `/tmp/ahaan-chopper-click/`.
+- Replaced the Fresh Drops after image with the live target screenshot at `public/fresh-drops/2026-11-22-chopper-after.jpg`.
+- The live target screenshot shows the blue chopper near the target. The overhead camera partly hides Ahaan.
+- Ponytail full was used. It kept the change to the live screenshot and deployment record.
+- Follow-up screenshot commit and publish remain. Repeat the Pages and live Fresh Drops checks after that publish.
+- Feature commit: `5b01295` (`Add click-to-go park rides`). Verification record commit: `78ca9d0` (`Record click-to-go verification`).
 
 ## Brief queue — dispatched by Goku (Nov 20, 2026)
 
