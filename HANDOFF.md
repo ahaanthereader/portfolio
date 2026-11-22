@@ -67,7 +67,7 @@ Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WIT
 2. **Park train loop + stations, cars moved further from center** — `FEATURE-BRIEF-park-train-and-cars.md`. IN FLIGHT on worker 0004 (worktree `feature-park-train-and-cars`).
 3. **Dinosaur train upgrade (AMENDMENT to brief 2 — fold into the in-flight train work)** — `FEATURE-BRIEF-park-train-upgrade-dino.md` (Ahaan + Nishant, Nov 22 voice call: blue dinosaur steam engine, smoke puffs, friendly dinosaur sound at each of the 4 perimeter stops; train stays outside, never in the garage).
 4. **Garage + 1.5x speed + lifelike vehicles + rider seating** — `FEATURE-BRIEF-park-garage-speed-positions.md` (garage near the picnic area for chopper/bike/bicycle/car — train stays outside; everything 1.5x faster; fix odd rider seating positions).
-5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`. BUILT Nov 22 (see "Zoo section" below); publish in progress.
+5. **Zoo section (4–5 animals, each its own area)** — `FEATURE-BRIEF-park-zoo.md` (one section of the 4-section park plan; sits outside the train track on its side). Dispatched to a Claude worker in parallel, Nov 22 — worktree `feature-park-zoo`. PUBLISHED live Nov 22, 2026 (feature 94d3cce, Pages run 45034019201 success, live-verified desktop + mobile, zero page errors; Fresh Drops entry with live screenshot).
 6. **Water park (4 big rides, diagonally opposite the zoo)** — `FEATURE-BRIEF-park-water-park.md` (the diagonally opposite section of the 4-section plan).
 7. **Improve the car + fire truck (Ahaan drives, Vihaan sprays)** — `FEATURE-BRIEF-park-car-improve-fire-truck.md`.
 8. **Bigger center, expand the park, realistic rippling water, lazy river + splash zone** — `FEATURE-BRIEF-park-expand-water.md`. NOTE: lay out the 4-section plan here (zoo = one section, water park = diagonally opposite) so briefs 5–6 attach cleanly.
@@ -86,6 +86,9 @@ Standing rules (Nishant, Nov 21): (a) every publish adds a Fresh Drops entry WIT
 - Play menu: new link "🐯 Ahaan's Zoo" (`index.html#zoo`, NEW tag for 7 days). The `#zoo` hash starts Ahaan at the zoo gate.
 - Fixed a tap blocker: hidden `.activity-hud` and hidden `.action-prompt` elements kept `display: flex` and blocked clicks and taps on the visible prompt pill. `site.css` now sets `display: none` for both when hidden.
 - New check: `tests/zoo-browser.cjs` (desktop 1280x800 + mobile 390x844, all four pens, fact text, Enter key, Vihaan in Play together, `#zoo` link, zero page errors) — PASS.
+- Published: pushed `e5f3aa6..94d3cce` to `main` as a fast-forward. Pages run `45034019201` completed with success in 22 s.
+- Live verified: `tests/zoo-browser.cjs` with `BASE_URL=https://ahaanthereader.github.io/portfolio/index.html` PASS (desktop + mobile, four pens, facts, Vihaan, `#zoo` link, zero page errors). Live `assets/park3d.js` has the zoo code.
+- Fresh Drops: new top entry "Ahaan's Zoo" ("You asked for this!") with the live screenshot `public/fresh-drops/2026-11-22-zoo.jpg` (from `/tmp/ahaan-zoo/live/desktop-overview.png`). Local check: desktop + mobile, image loads, NEW tag shows, zero errors.
 - Regression: `two-player-browser.cjs` PASS, `quad-browser.cjs` PASS. `chopper-click-browser.cjs` FAILS at the 20 s chopper-arrival wait. The same failure happens on unchanged `origin/main` `e5f3aa6`, so the zoo change did not cause it.
 
 ## Reading Nook Aesop link — Nov 16–17, 2026
