@@ -40,7 +40,13 @@
 - Replaced the Fresh Drops after image with the live target screenshot at `public/fresh-drops/2026-11-22-chopper-after.jpg`.
 - The live target screenshot shows the blue chopper near the target. The overhead camera partly hides Ahaan.
 - Ponytail full was used. It kept the change to the live screenshot and deployment record.
-- Follow-up screenshot commit and publish remain. Repeat the Pages and live Fresh Drops checks after that publish.
+- Follow-up screenshot commit `a3f0d60` was published in merge `1efbf16`.
+- Pages run `45015727425` completed with success after the screenshot update.
+- The live suite found a bike route that stopped at the east exit of the Mississippi bridge.
+- The route planner allowed a wider bridge lane than collision checks. Widened the shared bridge clearance from 0.94 m to 1.2 m.
+- `node --check assets/park3d.js`, `git diff --check`, and the local desktop and mobile browser suite pass after the fix.
+- Publish and live verification of the bridge clearance fix remain.
+- Ponytail full kept the fix to one shared collision value and its required checks.
 - Feature commit: `5b01295` (`Add click-to-go park rides`). Verification record commit: `78ca9d0` (`Record click-to-go verification`).
 
 ## Brief queue — dispatched by Goku (Nov 20, 2026)
