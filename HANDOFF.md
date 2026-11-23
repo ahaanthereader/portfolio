@@ -11,7 +11,11 @@
 - `node --check assets/park3d.js`, `node --check tests/park-pyramid-browser.cjs`, and `git diff --check` passed.
 - The local desktop and mobile browser checks passed. They verified the site, pyramid, sign, path, NEW menu link, direct arrival, and zero page errors.
 - Inspected `/tmp/ahaan-park-pyramid/pyramid-1280.png` and `/tmp/ahaan-park-pyramid/pyramid-390.png`. The pyramid fits both views.
-- Local implementation is verified. Commit, publish, and live verification are in progress.
+- Committed the pyramid as `5c4d8a6` (`Add pyramid to the park`) and pushed it to `main`.
+- Pages run `45157903155` succeeded.
+- Live desktop and mobile browser checks passed. They verified the pyramid site, body, sign, path, NEW menu link, direct arrival, and zero page errors.
+- Inspected live screenshots at `/tmp/ahaan-park-pyramid/pyramid-1280.png` and `/tmp/ahaan-park-pyramid/pyramid-390.png`.
+- Added a Fresh Drops card using the live desktop screenshot at `public/fresh-drops/2026-11-23-park-pyramid.png`. Fresh Drops publish and live card verification are in progress.
 
 ## Guided train: one boarding station — Nov 23, 2026
 
