@@ -12,6 +12,11 @@
 - Added `tests/movie-theater-browser.cjs`. Desktop and mobile checks passed. They verified touch entry and exit, two seats, independent keyboard exits, scene selection, silent start, optional sound, and zero page errors.
 - `node --check assets/park3d.js`, `node --check tests/movie-theater-browser.cjs`, and `git diff --check` passed.
 - Inspected screenshots: `/tmp/ahaan-movie-theater/theater-two-riders-desktop.png` and `/tmp/ahaan-movie-theater/theater-seated-mobile.png`.
+- Committed the theater as `6427433` (`Add park movie theater`) and pushed it to `main`. Pages run `45118933276` passed.
+- The live desktop and mobile theater checks passed. They verified both seats, independent exits, a gentle screen, silent start, optional sound, and zero page errors.
+- The first live check exposed a cleanup error after the browser checks passed. Updated the harness to close its server only when the harness starts a local server.
+- Inspected live screenshots at `/tmp/ahaan-movie-theater/theater-two-riders-desktop.png` and `/tmp/ahaan-movie-theater/theater-seated-mobile.png`.
+- Added the Fresh Drops theater card with the live desktop screenshot at `public/fresh-drops/2026-11-22-movie-theater.png`. The Fresh Drops publish and live card check are pending.
 
 # HANDOFF — Ahaan's Portfolio
 

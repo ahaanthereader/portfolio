@@ -11,7 +11,8 @@ let server;
 
 (async () => {
   fs.mkdirSync(evidenceDir, { recursive: true });
-  server = http.createServer((request, response) => {
+  let baseUrl = process.env.BASE_URL;
+  if (!baseUrl) server = http.createServer((request, response) => {
     const requestedPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const filePath = path.resolve(siteRoot, `.${requestedPath}`);
     if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
@@ -21,14 +22,17 @@ let server;
       response.writeHead(200, { 'content-type': type }).end(data);
     });
   });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  if (server) {
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    baseUrl = `http://127.0.0.1:${server.address().port}/index.html`;
+  }
   const browser = await chromium.launch({ headless: true });
   try {
     for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
       const page = await browser.newPage({ viewport, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(error.message));
       await page.addInitScript(() => localStorage.removeItem('ahaanDoorsSound'));
-      await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.Park3D?.getMovieTheaterState);
       assert.equal(await page.locator('#soundBtn').getAttribute('aria-pressed'), 'false', 'shared sound starts off');
       await page.evaluate(() => Park3D.teleportAhaan(-40, -32.8));
@@ -98,7 +102,7 @@ let server;
     process.stdout.write(JSON.stringify({ desktop: 'pass', mobile: 'pass', twoSeats: 'pass', independentExits: 'pass', gentleScreen: 'pass', silentByDefault: 'pass', optionalSound: 'pass', errors, screenshots: evidenceDir }));
   } finally {
     await browser.close();
-    server.close();
+    if (server) server.close();
   }
 })().catch(error => {
   console.error(error);
