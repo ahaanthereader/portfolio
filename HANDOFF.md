@@ -1,5 +1,41 @@
 # HANDOFF — Ahaan's Portfolio
 
+## Train guided tour upgrade — Nov 22, 2026
+
+- Started `.worktrees/feature-park-train-guided-tour` on `feature/park-train-guided-tour` from published `origin/main` at `721ad39`.
+- Read `FEATURE-BRIEF-park-train-guided-tour.md` and the queue. This brief follows the published garage work.
+- Inspected the existing train code. It has one engine, two passenger cars, independent E and Enter exits, and camera tracking through rider positions.
+- First implementation step: enlarged the existing engine and passenger cars by 12% in width and 45% in length. Increased train spacing from `4.2` to `5.2` meters to prevent overlap.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- The first browser run failed at its 120-second Bridge Stop wait. A local browser check showed the train passed the stop without braking enough.
+- Fixed the braking target to match `1.125 m/s²` deceleration at the garage's `5.7 m/s` train speed.
+- The train browser suite then passed on desktop and mobile. It verified four station stops, sounds, smoke, boarding, independent exits, Breeze pause, and zero browser errors.
+- Inspected the new station screenshots at desktop and mobile. The larger cars stay separated and visible on the loop.
+- Checks passed: `node --check assets/park3d.js`, `git diff --check`, and `tests/park-train-browser.cjs`.
+- Camera tracking, moving sound, and guided tour narration are verified in the local browser suite.
+- Added a paired, short low-tone choo-choo pulse through `AhaanAudio.strike`. It plays every `1.2` seconds only while the train moves and Sound is on.
+- Added `trainChuffs` to train state and browser checks for silence by default, sound while moving with Sound on, and silence with Sound off.
+- The first sound-check run placed its Sound-off assertion in the desktop flow after Sound was enabled. Moved the assertion to mobile and reset the preference before each viewport.
+- `tests/park-train-browser.cjs` passed on desktop and mobile. It verified no chuffs at startup, chuffs while moving with Sound on, silence while moving with Sound off, station sounds, stops, boarding, independent exits, Breeze pause, and zero browser errors.
+- `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed.
+- Added an accessible live caption for the guided tour. The caption stays hidden until someone boards and clears when both riders exit.
+- Added route cues for the ice cream shop, a wooden bridge, the Mississippi River, and Ahaan's Zoo. Each caption names the left or right side when the landmark has a clear side.
+- Extended the park-train browser check to verify the welcome message and tour captions at the four landmarks. Desktop and mobile checks passed.
+- The first narration run found that the start caption could consume the Ice Cream cue while the train waited at the station. Narration cues now advance only after the train moves.
+- The next browser run verified all four tour captions, then failed when the final E key went to the focused Breeze button. The harness now clears focus before testing train exits.
+- The full desktop and mobile park-train browser suite passed. It verified four landmark captions, silent-by-default sound, station stops, and independent exits.
+- Inspected `/tmp/ahaan-park-train/both-riding-1280.png`. The welcome tour caption is readable above the ride prompts.
+- Added a mobile screenshot check for the welcome caption. The park-train suite passed again on desktop and mobile with zero browser errors.
+- Inspected `/tmp/ahaan-park-train/tour-caption-390.png`. The caption fits the mobile view and stays readable above the ride prompt.
+- Syntax and whitespace checks passed for `assets/park3d.js` and `tests/park-train-browser.cjs`.
+- Added a camera check to `tests/park-train-browser.cjs`. Both riders project around the screen center while the train moves.
+- The first updated run passed the camera assertions. It then tried to dismount Ahaan before a station stop, so I moved that exit check to Bridge Stop.
+- Verified camera tracking in Play together while the train moved. The projected midpoint of Ahaan and Vihaan stayed within `0.12` normalized screen units of center. Both riders stayed within `0.5` horizontal units.
+- The updated `tests/park-train-browser.cjs` passed on desktop and mobile. It checked camera centering, train stops, boarding, independent exits, smoke, station sounds, Breeze pause, and zero page errors.
+- Inspected `/tmp/ahaan-park-train/both-riding-1280.png`. The moving train and both riders stayed in the view.
+- `node --check tests/park-train-browser.cjs` and `git diff --check` passed.
+- Ponytail full is active. Reuse the existing train, rider, camera, and audio code. Add no dependencies.
+
 ## Garage + speed + vehicle positions — Nov 22, 2026
 
 - Started `.worktrees/feature-park-garage-speed-positions` on `feature/park-garage-speed-positions` from `origin/main` at `faac9d1`.

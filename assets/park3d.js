@@ -74,6 +74,9 @@
     } else if (type === "dino") {
       window.AhaanAudio.strike(130.81, { decay: 0.52, peak: 0.035, attack: 0.08, partials: [[1, 1, 1], [1.48, 0.3, 0.8], [2.02, 0.12, 0.6]] });
       window.AhaanAudio.strike(98, { when: 0.12, decay: 0.42, peak: 0.025, attack: 0.08, partials: [[1, 1, 1], [1.5, 0.25, 0.7]] });
+    } else if (type === "train") {
+      window.AhaanAudio.strike(196, { decay: 0.34, peak: 0.035, attack: 0.05, partials: [[1, 1, 1], [1.5, 0.12, 0.5]] });
+      window.AhaanAudio.strike(246.94, { when: 0.24, decay: 0.3, peak: 0.03, attack: 0.05, partials: [[1, 1, 1], [1.5, 0.1, 0.5]] });
     } else if (type === "wind") {
       window.AhaanAudio.bell(392.00, 0, 0.05);
     } else if (type === "bounce") {
@@ -3472,7 +3475,21 @@
       ...station,
       progress: trainStationProgress(station.x, station.z)
     })).sort((a, b) => a.progress - b.progress);
-    const trainState = { progress: trainStations[0].progress, speed: 0, currentStation: 0, nextStation: 1, dwell: 8, ahaan: false, vihaan: false, dinoSounds: 0 };
+    const trainTourStops = [
+      { x: 5, z: -17, line: "The ice cream shop is on your right. Pick a flavor at our stop!" },
+      { x: 14.2, z: 8.15, line: "Look right. A little wooden bridge crosses the water." },
+      { x: 11.5, z: 35, line: "We are crossing the Mississippi River on a wooden bridge." },
+      { x: -34, z: 17, line: "Ahaan's Zoo is on your left, beyond the trees." }
+    ].map(stop => ({ ...stop, progress: trainStationProgress(stop.x, stop.z) })).sort((a, b) => a.progress - b.progress);
+    let trainTourIndex = 0;
+    const trainState = { progress: trainStations[0].progress, speed: 0, currentStation: 0, nextStation: 1, dwell: 8, ahaan: false, vihaan: false, dinoSounds: 0, trainChuffs: 0 };
+    let trainChuffTime = 0;
+    const trainTourCaption = document.createElement("div");
+    trainTourCaption.className = "train-tour-caption";
+    trainTourCaption.setAttribute("role", "status");
+    trainTourCaption.setAttribute("aria-live", "polite");
+    trainTourCaption.hidden = true;
+    hero.appendChild(trainTourCaption);
     const trainTrackGroup = new T.Group();
     const trainRailMat = new T.MeshStandardMaterial({ color: 0x514b43, roughness: 0.55, metalness: 0.56 });
     const sleeperGeometry = new T.BoxGeometry(1.55, 0.13, 0.32);
@@ -3555,6 +3572,7 @@
     mapGroup.add(trainStationsGroup);
 
     const trainRoot = new T.Group();
+    const trainCarSpacing = 5.2;
     const trainBodyMats = [
       new T.MeshStandardMaterial({ color: 0x287fc0, roughness: 0.62 }),
       new T.MeshStandardMaterial({ color: 0xc27746, roughness: 0.68 })
@@ -3566,6 +3584,7 @@
     let trainSmokeTime = 0;
     function makeTrainCarriage(engine = false) {
       const carriage = new T.Group();
+      carriage.scale.set(1.12, 1, 1.45);
       const body = new T.Mesh(new T.BoxGeometry(engine ? 1.28 : 1.48, 0.86, engine ? 2.0 : 3.2), trainBodyMats[engine ? 0 : 1]);
       body.position.y = 0.78;
       body.castShadow = true;
@@ -3656,6 +3675,8 @@
       if (actor === V && (eBikeState.rider === V || carState.driver === V || carState.passenger === V || chopperState.rider === V || quadState.riding || currentActivity)) return false;
       trainState[actor === A ? "ahaan" : "vihaan"] = true;
       setTrainRider(actor, true);
+      trainTourCaption.textContent = "Welcome aboard! Look left and right as we explore the park.";
+      trainTourCaption.hidden = false;
       targetPos = null;
       if (actor === A) currentNearbyItem = { id: "trainRide" };
       else vihaanNearbyItem = { id: "trainRide" };
@@ -3666,6 +3687,10 @@
       const key = actor === A ? "ahaan" : "vihaan";
       if (!trainState[key] || trainState.dwell <= 0) return false;
       trainState[key] = false;
+      if (!trainState.ahaan && !trainState.vihaan) {
+        trainTourCaption.textContent = "";
+        trainTourCaption.hidden = true;
+      }
       const station = trainStations[trainState.currentStation];
       const actorX = station.x + 2.5;
       const actorZ = station.z;
@@ -3679,11 +3704,12 @@
     }
     function updateParkTrain(dt) {
       if (!breezeOn()) { trainSmokePuffs.forEach(puff => { puff.mesh.visible = false; }); return false; }
+      const previousProgress = trainState.progress;
       if (trainState.dwell > 0) trainState.dwell = Math.max(0, trainState.dwell - dt);
       else {
         const station = trainStations[trainState.nextStation];
         const distance = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
-        const wantedSpeed = Math.min(PARK_SPEEDS.train, Math.sqrt(1.5 * Math.max(0, distance - 0.7)) * 1.5);
+        const wantedSpeed = Math.min(PARK_SPEEDS.train, Math.sqrt(2 * 1.125 * Math.max(0, distance - 0.7)));
         trainState.speed += Math.max(-1.125 * dt, Math.min(1.125 * dt, wantedSpeed - trainState.speed));
         trainState.progress = (trainState.progress + trainState.speed * dt / trainRouteLength) % 1;
         const remaining = ((station.progress - trainState.progress + 1) % 1) * trainRouteLength;
@@ -3697,7 +3723,7 @@
         }
       }
       trainCars.forEach((carriage, index) => {
-        const progress = (trainState.progress - index * 4.2 / trainRouteLength + 1) % 1;
+        const progress = (trainState.progress - index * trainCarSpacing / trainRouteLength + 1) % 1;
         const point = trainRoute.getPointAt(progress);
         const tangent = trainRoute.getTangentAt(progress);
         carriage.position.set(point.x, 0, point.z);
@@ -3705,6 +3731,24 @@
       });
       if (trainState.ahaan) positionTrainRider(A, 1);
       if (trainState.vihaan) positionTrainRider(V, 2);
+      const traveled = (trainState.progress - previousProgress + 1) % 1;
+      if ((trainState.ahaan || trainState.vihaan) && traveled > 0) {
+        const stop = trainTourStops[trainTourIndex];
+        const untilStop = (stop.progress - previousProgress + 1) % 1;
+        if (untilStop <= traveled + 0.000001) {
+          trainTourCaption.textContent = stop.line;
+          trainTourCaption.hidden = false;
+          trainTourIndex = (trainTourIndex + 1) % trainTourStops.length;
+        }
+      }
+      if (trainState.speed > 0.12 && soundOn) {
+        trainChuffTime += dt;
+        if (trainChuffTime >= 1.2) {
+          trainChuffTime -= 1.2;
+          trainState.trainChuffs++;
+          playSound("train");
+        }
+      } else trainChuffTime = 0;
       trainSmokeTime += dt * Math.max(0.45, trainState.speed);
       trainSmokePuffs.forEach(puff => {
         const phase = (trainSmokeTime * 0.72 + puff.offset) % 1;
@@ -6345,7 +6389,7 @@
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
-      getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
+      getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,

@@ -32,6 +32,7 @@ let server;
     for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
       const page = await browser.newPage({ viewport, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(error.message));
+      await page.addInitScript(() => localStorage.removeItem('ahaanDoorsSound'));
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.Park3D?.getTrainState);
       await page.evaluate(() => Park3D.setCustomCamera({ x: 17, y: 28, z: -2 }, { x: 5, y: 0, z: -17 }));
@@ -47,10 +48,13 @@ let server;
       assert.ok(initial.dwell > 0, 'train waits at its station');
       assert.equal(initial.engineColor, 0x287fc0, 'engine uses Ahaan blue');
       assert.equal(initial.dinoSounds, 0, 'station sound count starts at zero');
+      assert.equal(initial.trainChuffs, 0, 'moving train sound starts silent');
+      assert.equal(initial.tourMessage, '', 'tour caption stays hidden before boarding');
+      assert.equal(await page.locator('#soundBtn').getAttribute('aria-pressed'), 'false', 'sound starts off');
       if (viewport.width === 1280) {
-        assert.equal(await page.locator('#soundBtn').getAttribute('aria-pressed'), 'false', 'sound starts off');
         await page.locator('#soundBtn').click();
       }
+      await page.evaluate(() => Park3D.setCustomCamera());
       await page.evaluate(() => Park3D.teleportAhaan(5, -17));
       if (viewport.width === 1280) {
         await page.locator('#togetherBtn').click();
@@ -61,23 +65,26 @@ let server;
           const riders = Park3D.getTrainState().riders;
           return riders.ahaan && riders.vihaan;
         });
-        await page.keyboard.press('E');
-        await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan && Park3D.getTrainState().riders.vihaan);
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).tourMessage, 'Welcome aboard! Look left and right as we explore the park.');
+        await page.waitForFunction(() => Park3D.getTrainState().speed > 0.2, null, { timeout: 20000 });
+        await page.waitForFunction(() => Park3D.getTrainState().tourMessage.includes('ice cream shop'), null, { timeout: 20000 });
+        await page.waitForFunction(() => Park3D.getTrainState().trainChuffs > 0, null, { timeout: 5000 });
+        await page.waitForTimeout(500);
+        const ridingFrame = await page.evaluate(() => Park3D.projectPlayers());
+        const centerX = (ridingFrame.ahaan.x + ridingFrame.vihaan.x) / 2;
+        const centerY = (ridingFrame.ahaan.y + ridingFrame.vihaan.y) / 2;
+        assert.ok(Math.abs(centerX) < 0.12 && Math.abs(centerY) < 0.12, 'camera centers both riders on the moving train');
+        assert.ok(Math.abs(ridingFrame.ahaan.x) < 0.5 && Math.abs(ridingFrame.vihaan.x) < 0.5, 'both riders stay in the center view');
+        await page.screenshot({ path: path.join(evidenceDir, 'both-riding-1280.png') });
         await page.waitForFunction(() => Park3D.getTrainState().currentStation === 'Bridge Stop' && Park3D.getTrainState().dwell > 2.2, null, { timeout: 120000 });
         assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 1, 'friendly sound plays at Bridge Stop when enabled');
+        assert.ok((await page.evaluate(() => Park3D.getTrainState())).tourMessage.includes('wooden bridge'), 'tour describes the bridge on the right');
         assert.ok(await page.evaluate(() => Math.hypot(Park3D.getV().rig.position.x - 18, Park3D.getV().rig.position.z - 9) < 12), 'Vihaan follows train to Bridge Stop');
-        await page.evaluate(() => Park3D.teleportAhaan(18, 9));
-        await page.waitForFunction(() => Park3D.getCurrentNearbyItem()?.id === 'train');
-        await page.keyboard.press('E');
-        await page.waitForFunction(() => Park3D.getTrainState().riders.ahaan);
-        await page.keyboard.press('E');
-        await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan && Park3D.getTrainState().riders.vihaan);
-        await page.keyboard.press('Enter');
-        await page.waitForFunction(() => !Park3D.getTrainState().riders.vihaan);
-        await page.locator('#togetherBtn').click();
       } else {
         await page.keyboard.press('E');
         await page.waitForFunction(() => Park3D.getTrainState().riders.ahaan);
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).tourMessage, 'Welcome aboard! Look left and right as we explore the park.');
+        await page.screenshot({ path: path.join(evidenceDir, 'tour-caption-390.png') });
         await page.keyboard.press('E');
         await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan);
       }
@@ -100,18 +107,33 @@ let server;
         });
         await page.waitForTimeout(500);
         await page.screenshot({ path: path.join(evidenceDir, 'dino-smoke-1280.png') });
-        await page.evaluate(() => Park3D.setCustomCamera({ x: 17, y: 28, z: -2 }, { x: 5, y: 0, z: -17 }));
+        await page.evaluate(() => Park3D.setCustomCamera());
 
-        for (const station of ['South Grove', 'West Grove', 'Ice Cream Stop']) {
+        for (const [station, line] of [['South Grove', 'Mississippi River'], ['West Grove', "Ahaan's Zoo"], ['Ice Cream Stop', 'ice cream shop']]) {
           await page.waitForFunction(name => {
             const state = Park3D.getTrainState();
             return state.currentStation === name && state.dwell > 2.2;
           }, station, { timeout: 120000 });
           assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, ['South Grove', 'West Grove', 'Ice Cream Stop'].indexOf(station) + 2, `friendly sound plays at ${station}`);
+          assert.ok((await page.evaluate(() => Park3D.getTrainState())).tourMessage.includes(line), `tour narration appears at ${station}`);
         }
         assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 4, 'friendly sound plays at all four perimeter stops');
+        await page.evaluate(() => document.activeElement?.blur());
+        await page.keyboard.press('E');
+        await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan && Park3D.getTrainState().riders.vihaan);
+        await page.evaluate(() => Park3D.teleportAhaan(5, -17));
+        await page.waitForFunction(() => Park3D.getCurrentNearbyItem()?.id === 'train');
+        await page.keyboard.press('E');
+        await page.waitForFunction(() => Park3D.getTrainState().riders.ahaan);
+        await page.keyboard.press('E');
+        await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan && Park3D.getTrainState().riders.vihaan);
+        await page.keyboard.press('Enter');
+        await page.waitForFunction(() => !Park3D.getTrainState().riders.vihaan);
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).tourMessage, '', 'tour caption clears after both riders exit');
+        await page.locator('#togetherBtn').click();
       } else {
         await page.waitForFunction(() => Park3D.getTrainState().speed > 0.2 && Park3D.getTrainState().smokePuffs > 0, null, { timeout: 20000 });
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).trainChuffs, 0, 'mobile train stays silent when Sound is off');
         await page.evaluate(() => {
           Park3D.teleportAhaan(-30, -35);
           const { x, z } = Park3D.getTrainState().enginePosition;
