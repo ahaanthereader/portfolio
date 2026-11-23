@@ -1,3 +1,18 @@
+## Park pyramid — Nov 23, 2026
+
+- Read the overnight queue and `FEATURE-BRIEF-park-pyramid.md`. The pyramid follows the one-boarding train fix.
+- Created `.worktrees/feature-park-pyramid` on `feature/park-pyramid` from `origin/main` at `38a8c30`.
+- First concrete step: checked the southeast lawn against the train route, rim trees, zoo, movie theater, and planned water park.
+- Selected the clear southeast lawn at `(38, 42)`. The zoo is in the southwest, the planned water park is in the northeast, and the train route stays farther inward.
+- Inspected `/tmp/park-pyramid-site-check.png` from the live park. The candidate lawn is open and visible from the train loop.
+- Built a sandy square pyramid with a 16 m base, 11.5 m height, three stone bands, a front sign, and a short walk-up path. Added a vehicle obstacle around the structure.
+- Added a Play menu link with a seven-day NEW badge. `index.html#pyramid` places Ahaan at the path.
+- Added `Park3D.getPyramidState()` and `tests/park-pyramid-browser.cjs` for placement and visual checks.
+- `node --check assets/park3d.js`, `node --check tests/park-pyramid-browser.cjs`, and `git diff --check` passed.
+- The local desktop and mobile browser checks passed. They verified the site, pyramid, sign, path, NEW menu link, direct arrival, and zero page errors.
+- Inspected `/tmp/ahaan-park-pyramid/pyramid-1280.png` and `/tmp/ahaan-park-pyramid/pyramid-390.png`. The pyramid fits both views.
+- Local implementation is verified. Commit, publish, and live verification are in progress.
+
 ## Guided train: one boarding station — Nov 23, 2026
 
 - Created `.worktrees/feature-park-train-single-boarding` on `feature/park-train-single-boarding` from `origin/main` at `a052a0b`.

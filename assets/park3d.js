@@ -3657,6 +3657,51 @@
       onVihaan: () => movieTheaterState.vihaan ? leaveMovieTheater(V) : enterMovieTheater(V)
     };
 
+    const pyramidState = { x: 38, z: 42, baseSize: 16, height: 11.5 };
+    const pyramid = new T.Group();
+    pyramid.position.set(pyramidState.x, 0, pyramidState.z);
+    const pyramidBase = new T.Mesh(new T.BoxGeometry(16.8, 0.2, 16.8), new T.MeshStandardMaterial({ color: 0xb59562, roughness: 0.94 }));
+    pyramidBase.position.y = 0.08;
+    pyramidBase.receiveShadow = true;
+    pyramid.add(pyramidBase);
+    const pyramidStone = new T.MeshStandardMaterial({ color: 0xc7a066, roughness: 0.96, flatShading: true });
+    const pyramidBody = new T.Mesh(new T.ConeGeometry(11.2, pyramidState.height, 4, 1), pyramidStone);
+    pyramidBody.position.y = pyramidState.height / 2 + 0.18;
+    pyramidBody.rotation.y = Math.PI / 4;
+    pyramidBody.castShadow = true;
+    pyramidBody.receiveShadow = true;
+    pyramid.add(pyramidBody);
+    const pyramidBandMat = new T.MeshStandardMaterial({ color: 0xa98954, roughness: 0.92 });
+    [2.8, 5.6, 8.4].forEach(y => {
+      const radius = 11.2 * (1 - y / pyramidState.height);
+      const band = new T.Mesh(new T.CylinderGeometry(radius - 0.02, radius + 0.16, 0.16, 4), pyramidBandMat);
+      band.position.y = y + 0.18;
+      band.rotation.y = Math.PI / 4;
+      band.castShadow = true;
+      pyramid.add(band);
+    });
+    const pyramidPath = new T.Mesh(new T.PlaneGeometry(5.2, 6.5), new T.MeshStandardMaterial({ color: 0xd9c79e, roughness: 0.96 }));
+    pyramidPath.rotation.x = -Math.PI / 2;
+    pyramidPath.position.set(38, 0.025, 53.35);
+    pyramidPath.receiveShadow = true;
+    mapGroup.add(pyramidPath, pyramid);
+    const pyramidSignCanvas = document.createElement("canvas");
+    pyramidSignCanvas.width = 512;
+    pyramidSignCanvas.height = 128;
+    const pyramidSignContext = pyramidSignCanvas.getContext("2d");
+    pyramidSignContext.fillStyle = "#f4e5c3";
+    pyramidSignContext.fillRect(0, 0, 512, 128);
+    pyramidSignContext.fillStyle = "#705333";
+    pyramidSignContext.font = "bold 56px Georgia";
+    pyramidSignContext.textAlign = "center";
+    pyramidSignContext.fillText("THE PYRAMID", 256, 82);
+    const pyramidFaceSlope = Math.atan(7.92 / pyramidState.height);
+    const pyramidSign = new T.Mesh(new T.PlaneGeometry(4.8, 1.1), new T.MeshBasicMaterial({ map: new T.CanvasTexture(pyramidSignCanvas), side: T.DoubleSide }));
+    pyramidSign.position.set(0, 5.4, 7.92 * (1 - 5.4 / pyramidState.height) + 0.22);
+    pyramidSign.rotation.x = -pyramidFaceSlope;
+    pyramid.add(pyramidSign);
+    parkObstacles.push({ x: pyramidState.x, z: pyramidState.z, r: 8.8 });
+
     const trainRoute = new T.CatmullRomCurve3([
       [5, -17], [11, -25], [24, -31], [34, -22], [36, -5],
       [34, 12], [27, 20], [20, 16], [18, 9], [22, 17],
@@ -6638,6 +6683,7 @@
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
       getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getMovieTheaterState: () => ({ riders: { ahaan: !!movieTheaterState.ahaan, vihaan: !!movieTheaterState.vihaan }, seatHeight: theaterSeatHeight, rigOriginHeight: { ahaan: movieTheaterRigHeight(A), vihaan: movieTheaterRigHeight(V) }, scene: movieTheaterState.scene, sceneTitle: theaterScenes[movieTheaterState.scene], soundRequests: movieTheaterState.soundRequests, soundOn, controlsVisible: !movieTheaterControls.hidden, screenVisible: theaterScreen.visible, seats: 2, position: { x: -40, z: -38 }, riderPositions: { ahaan: { x: A.rig.position.x, y: A.rig.position.y, z: A.rig.position.z }, vihaan: { x: V.rig.position.x, y: V.rig.position.y, z: V.rig.position.z } } }),
+      getPyramidState: () => ({ position: { x: pyramid.position.x, z: pyramid.position.z }, baseSize: pyramidState.baseSize, height: pyramidState.height, color: pyramidStone.color.getHex(), visible: pyramidBody.visible, signVisible: pyramidSign.visible, pathVisible: pyramidPath.visible }),
       getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
@@ -6673,6 +6719,16 @@
     }
     window.addEventListener("hashchange", visitZooFromHash);
     visitZooFromHash();
+
+    function visitPyramidFromHash() {
+      if (location.hash !== "#pyramid") return;
+      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || trainState.ahaan) return;
+      window.Park3D.teleportAhaan(pyramidState.x, 55.5);
+      const top = document.getElementById("top");
+      if (top) top.scrollIntoView({ block: "start" });
+    }
+    window.addEventListener("hashchange", visitPyramidFromHash);
+    visitPyramidFromHash();
 
     hero.classList.add("park-ready");
     greetRandom(true);
