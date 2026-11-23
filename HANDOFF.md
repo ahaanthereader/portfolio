@@ -12,7 +12,11 @@
 - Pages run `45132388510` succeeded.
 - The live desktop and mobile train suite passed. It verified four tour stops, blocked exits at South Grove and West Grove, blocked boarding at Bridge Stop, and allowed boarding and exits at Ice Cream Stop. Browser errors: none.
 - Inspected the live screenshot `/tmp/ahaan-park-train/both-riding-1280.png`. The riders see the wait prompt while the train travels.
-- Added a Fresh Drops card with that live screenshot at `public/fresh-drops/2026-11-23-train-single-station.png` and updated the home card date. Fresh Drops publish and live card verification are in progress.
+- Added a Fresh Drops card with that live screenshot at `public/fresh-drops/2026-11-23-train-single-station.png` and updated the home card date.
+- Published Fresh Drops commit `3a8a505` (`Add single station train Fresh Drops entry`). Pages run `45136018063` succeeded.
+- Live Fresh Drops checks passed at desktop (`1280x800`) and mobile (`390x844`). The first card title, screenshot, NEW badge, and home date were correct. Browser errors: none.
+- Inspected `/tmp/ahaan-park-train/fresh-drops-1280.png`. The single-stop card appears first with its live train screenshot.
+- The handoff update is complete. A final record-only commit and Pages check remain.
 
 ## Park movie theater — Nov 22, 2026
 
