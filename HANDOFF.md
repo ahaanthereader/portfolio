@@ -16,7 +16,10 @@
 - The live desktop and mobile theater checks passed. They verified both seats, independent exits, a gentle screen, silent start, optional sound, and zero page errors.
 - The first live check exposed a cleanup error after the browser checks passed. Updated the harness to close its server only when the harness starts a local server.
 - Inspected live screenshots at `/tmp/ahaan-movie-theater/theater-two-riders-desktop.png` and `/tmp/ahaan-movie-theater/theater-seated-mobile.png`.
-- Added the Fresh Drops theater card with the live desktop screenshot at `public/fresh-drops/2026-11-22-movie-theater.png`. The Fresh Drops publish and live card check are pending.
+- Added the Fresh Drops theater card with the live desktop screenshot at `public/fresh-drops/2026-11-22-movie-theater.png`.
+- Published Fresh Drops commit `4fa9e42` (`Add movie theater Fresh Drops entry`). Pages run `45122022477` passed.
+- Live Fresh Drops checks passed at desktop (`1280x800`) and mobile (`390x844`). Both checks found the theater card first, loaded its image, and reported no browser errors.
+- Inspected `/tmp/ahaan-movie-theater/fresh-drops-1280.png`. The theater card appears first with its live screenshot and a NEW badge.
 
 # HANDOFF — Ahaan's Portfolio
 
