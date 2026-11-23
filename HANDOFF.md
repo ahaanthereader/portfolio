@@ -8,7 +8,11 @@
 - `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed.
 - The desktop and mobile train suite passed. It verified four tour stops, blocked exits at South Grove and West Grove, blocked boarding at Bridge Stop, and boarding plus exits at Ice Cream Stop. Browser errors: none.
 - Inspected `/tmp/ahaan-park-train/both-riding-1280.png` and `/tmp/ahaan-park-train/station-1280.png`.
-- Local implementation is verified. Commit, publish, and live verification are in progress.
+- Committed the train fix as `6becc40` (`Restrict train boarding to Ice Cream Stop`) and pushed it to `main`.
+- Pages run `45132388510` succeeded.
+- The live desktop and mobile train suite passed. It verified four tour stops, blocked exits at South Grove and West Grove, blocked boarding at Bridge Stop, and allowed boarding and exits at Ice Cream Stop. Browser errors: none.
+- Inspected the live screenshot `/tmp/ahaan-park-train/both-riding-1280.png`. The riders see the wait prompt while the train travels.
+- Added a Fresh Drops card with that live screenshot at `public/fresh-drops/2026-11-23-train-single-station.png` and updated the home card date. Fresh Drops publish and live card verification are in progress.
 
 ## Park movie theater — Nov 22, 2026
 
