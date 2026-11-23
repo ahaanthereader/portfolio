@@ -1,3 +1,18 @@
+## Park movie theater — Nov 22, 2026
+
+- Goku started this queue item after the guided tour went live. The movie theater brief follows the guided tour.
+- Read `FEATURE-BRIEF-park-movie-theater.md` in the main checkout and the current queue in `HANDOFF.md`. The brief requires a walk-up theater with a kid-friendly screen, seats for both boys, gentle light, no strobe, and no sound until chosen.
+- Created `.worktrees/feature-park-movie-theater` on `feature/park-movie-theater` from `origin/main` at `a819a3f`.
+- First concrete step: checked park sections, trees, garage, and train route for a clear theater site. Selected the northwest outer lawn at `(-40, -38)`. This keeps the building away from the southwest zoo, northeast water park area, garage at `(-15.75, 9.5)`, train route, and nearest rim tree at `(-34, -28)`.
+- Built an open-roof, walk-up theater with an entry path, two cushioned seats, and a large screen. The cutaway room keeps the screen and riders visible in the park view.
+- Added independent seating. Ahaan enters and exits with E. Vihaan enters and exits with Enter in Play together mode. Each boy returns to his saved position.
+- The screen shows four hand-drawn park scenes. It starts after a boy sits. It changes scenes slowly and follows the Breeze and motion settings.
+- Movie sound stays off by default. The soft train sound plays only after someone selects Play a soft sound and enables the shared Sound control.
+- The camera centers the theater while a boy watches. The mobile view uses wider framing. Screen controls fit the mobile view.
+- Added `tests/movie-theater-browser.cjs`. Desktop and mobile checks passed. They verified touch entry and exit, two seats, independent keyboard exits, scene selection, silent start, optional sound, and zero page errors.
+- `node --check assets/park3d.js`, `node --check tests/movie-theater-browser.cjs`, and `git diff --check` passed.
+- Inspected screenshots: `/tmp/ahaan-movie-theater/theater-two-riders-desktop.png` and `/tmp/ahaan-movie-theater/theater-seated-mobile.png`.
+
 # HANDOFF — Ahaan's Portfolio
 
 ## Train guided tour upgrade — Nov 22, 2026

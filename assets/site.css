@@ -1889,6 +1889,30 @@
     pointer-events: none;
   }
   .train-tour-caption[hidden] { display: none; }
+  .movie-theater-controls {
+    position: absolute;
+    left: 50%;
+    bottom: 178px;
+    z-index: 57;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: min(92%, 620px);
+    padding: 10px 12px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(43, 39, 33, 0.18);
+    border-radius: 16px;
+    background: rgba(252, 249, 242, 0.96);
+    box-shadow: 0 10px 30px rgba(60, 48, 30, 0.12);
+  }
+  .movie-theater-controls[hidden] { display: none; }
+  .movie-theater-status { flex: 1 0 100%; margin: 0; color: var(--ink); font: 600 0.98rem/1.3 'Newsreader', Georgia, serif; text-align: center; }
+  .movie-theater-control { min-height: 42px; padding: 8px 14px; border: 1px solid rgba(43, 39, 33, 0.2); border-radius: 999px; background: #fffdf8; color: var(--ink); font: 600 0.95rem 'Newsreader', Georgia, serif; cursor: pointer; }
+  .movie-theater-control:focus-visible { outline: 3px solid #123b60; outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .movie-theater-control { transition: none; } }
+  html[data-motion="off"] .movie-theater-control { transition: none; }
   .action-prompt {
     position: absolute;
     bottom: 74px;
@@ -2108,6 +2132,9 @@
   }
   @media (max-width: 600px) {
     .train-tour-caption { bottom: 154px; width: calc(100% - 28px); max-width: 360px; padding: 9px 12px; font-size: 0.94rem; }
+    .movie-theater-controls { bottom: 130px; flex-wrap: nowrap; width: calc(100% - 24px); padding: 6px; gap: 6px; }
+    .movie-theater-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .movie-theater-control { min-height: 44px; padding: 8px 10px; font-size: 0.9rem; }
     .action-prompt, .activity-hud {
       bottom: 66px;
       width: calc(100% - 24px);

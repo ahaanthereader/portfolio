@@ -3448,6 +3448,215 @@
     mapGroup.add(garage);
     parkObstacles.push({ x: -20.77, z: 2.5, r: 0.2 }, { x: -20.77, z: 16.5, r: 0.2 });
 
+    const movieTheaterState = { ahaan: null, vihaan: null, scene: 0, sceneTime: 0, fadeTime: 0, soundRequests: 0 };
+    const movieTheater = new T.Group();
+    movieTheater.position.set(-40, 0, -38);
+    mapGroup.add(movieTheater);
+    const theaterStone = new T.MeshStandardMaterial({ color: 0xc8b99c, roughness: 0.9 });
+    const theaterWood = new T.MeshStandardMaterial({ color: 0x71533b, roughness: 0.82 });
+    const theaterRoof = new T.MeshStandardMaterial({ color: 0x587c79, roughness: 0.85 });
+    const theaterScreenFrame = new T.MeshStandardMaterial({ color: 0x594530, roughness: 0.82 });
+    const theaterFloor = new T.Mesh(new T.BoxGeometry(11.2, 0.14, 11.2), new T.MeshStandardMaterial({ color: 0xb5a487, roughness: 0.94 }));
+    theaterFloor.position.set(0, 0.08, 0);
+    theaterFloor.receiveShadow = true;
+    movieTheater.add(theaterFloor);
+    const theaterWall = (w, h, d, x, y, z, material) => {
+      const wall = new T.Mesh(new T.BoxGeometry(w, h, d), material);
+      wall.position.set(x, y, z);
+      wall.castShadow = true;
+      wall.receiveShadow = true;
+      movieTheater.add(wall);
+    };
+    theaterWall(0.32, 4.9, 10.8, -5.4, 2.52, 0, theaterStone);
+    theaterWall(0.32, 4.9, 10.8, 5.4, 2.52, 0, theaterStone);
+    theaterWall(11.2, 4.9, 0.32, 0, 2.52, -5.4, theaterStone);
+    // Open roof keeps the room, screen, and seated riders visible from the park view.
+    [-5.15, 5.15].forEach(x => theaterWall(0.22, 0.24, 11.0, x, 5.04, 0, theaterRoof));
+    theaterWall(10.5, 0.24, 0.22, 0, 5.04, -5.15, theaterRoof);
+    [-4.9, 4.9].forEach(x => [-4.9, 4.9].forEach(z => theaterWall(0.36, 4.8, 0.36, x, 2.4, z, theaterWood)));
+    const screenCanvas = document.createElement("canvas");
+    screenCanvas.width = 960;
+    screenCanvas.height = 540;
+    const screenContext = screenCanvas.getContext("2d");
+    const screenTexture = new T.CanvasTexture(screenCanvas);
+    screenTexture.encoding = T.sRGBEncoding;
+    const screenFrame = new T.Mesh(new T.BoxGeometry(6.0, 3.5, 0.22), theaterScreenFrame);
+    screenFrame.position.set(0, 3.35, -5.05);
+    movieTheater.add(screenFrame);
+    const theaterScreen = new T.Mesh(new T.PlaneGeometry(5.55, 3.05), new T.MeshBasicMaterial({ map: screenTexture, toneMapped: false, side: T.DoubleSide }));
+    theaterScreen.position.set(0, 3.35, -4.91);
+    movieTheater.add(theaterScreen);
+    const chairMat = new T.MeshStandardMaterial({ color: 0x7b4e4c, roughness: 0.88 });
+    const chairWood = new T.MeshStandardMaterial({ color: 0x594632, roughness: 0.9 });
+    [-1.7, 1.7].forEach(x => {
+      const chair = new T.Group();
+      chair.position.set(x, 0, 0.9);
+      const seat = new T.Mesh(new T.BoxGeometry(1.2, 0.22, 1.0), chairMat);
+      seat.position.y = 0.7;
+      const legs = new T.Mesh(new T.BoxGeometry(0.92, 0.62, 0.78), chairWood);
+      legs.position.set(0, 0.33, 0);
+      chair.add(seat, legs);
+      [-0.52, 0.52].forEach(x => {
+        const armrest = new T.Mesh(new T.BoxGeometry(0.16, 0.34, 0.94), chairWood);
+        armrest.position.set(x, 0.9, 0.02);
+        chair.add(armrest);
+      });
+      movieTheater.add(chair);
+    });
+    const theaterSignCanvas = document.createElement("canvas");
+    theaterSignCanvas.width = 640;
+    theaterSignCanvas.height = 160;
+    const theaterSignContext = theaterSignCanvas.getContext("2d");
+    theaterSignContext.fillStyle = "#f6eddc";
+    theaterSignContext.fillRect(0, 0, 640, 160);
+    theaterSignContext.fillStyle = "#35565a";
+    theaterSignContext.font = "bold 54px Georgia";
+    theaterSignContext.textAlign = "center";
+    theaterSignContext.fillText("MOVIE THEATER", 320, 102);
+    const theaterSign = new T.Mesh(new T.PlaneGeometry(3.0, 0.9), new T.MeshBasicMaterial({ map: new T.CanvasTexture(theaterSignCanvas), side: T.DoubleSide }));
+    theaterSign.position.set(-4.0, 3.1, 5.64);
+    movieTheater.add(theaterSign);
+    const theaterPath = new T.Mesh(new T.PlaneGeometry(3.2, 7.5), new T.MeshStandardMaterial({ color: 0xd6c5a2, roughness: 0.96 }));
+    theaterPath.rotation.x = -Math.PI / 2;
+    theaterPath.position.set(-40, 0.025, -30.8);
+    mapGroup.add(theaterPath);
+    parkObstacles.push({ x: -40, z: -38, r: 6.2 });
+    const theaterScenes = ["A LITTLE PARK ADVENTURE", "THE WOODEN BRIDGE", "A VISIT TO THE ZOO", "THE BLUE TRAIN" ];
+    function drawTheaterScene(index, progress) {
+      const ctx = screenContext;
+      const sky = ctx.createLinearGradient(0, 0, 0, 540);
+      sky.addColorStop(0, "#9bb7b5");
+      sky.addColorStop(1, "#d6c9a9");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 960, 540);
+      ctx.fillStyle = "#7b9a71";
+      ctx.beginPath(); ctx.moveTo(0, 340); ctx.quadraticCurveTo(240, 250, 480, 350); ctx.quadraticCurveTo(720, 250, 960, 330); ctx.lineTo(960, 540); ctx.lineTo(0, 540); ctx.fill();
+      ctx.fillStyle = "#5f7d60";
+      ctx.beginPath(); ctx.moveTo(0, 425); ctx.quadraticCurveTo(300, 340, 570, 435); ctx.quadraticCurveTo(780, 360, 960, 410); ctx.lineTo(960, 540); ctx.lineTo(0, 540); ctx.fill();
+      if (index === 1) {
+        ctx.fillStyle = "#7197a0"; ctx.fillRect(0, 405, 960, 135);
+        ctx.fillStyle = "#765538"; ctx.beginPath(); ctx.moveTo(165, 415); ctx.lineTo(285, 295); ctx.lineTo(675, 295); ctx.lineTo(795, 415); ctx.lineTo(740, 415); ctx.lineTo(650, 340); ctx.lineTo(310, 340); ctx.lineTo(220, 415); ctx.fill();
+      } else if (index === 2) {
+        ctx.fillStyle = "#c8b99c"; ctx.fillRect(330, 330, 300, 160);
+        ctx.fillStyle = "#7c5b41"; ctx.fillRect(300, 300, 360, 36);
+        ctx.fillStyle = "#5c7a56"; [[200,350],[760,360],[130,450],[835,450]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,48,0,Math.PI*2);ctx.fill();});
+        ctx.fillStyle = "#e09a55"; ctx.beginPath(); ctx.ellipse(480, 430, 52, 24, 0, 0, Math.PI*2); ctx.fill();
+      } else {
+        const trainX = index === 3 ? 115 + ((progress * 1.2) % 1) * 650 : 450 + Math.sin(progress * Math.PI * 2) * 24;
+        ctx.strokeStyle = "#765538"; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(70, 455); ctx.lineTo(890, 455); ctx.stroke();
+        ctx.fillStyle = "#4f7890"; ctx.fillRect(trainX, 365, 190, 82);
+        ctx.fillStyle = "#e4d4b4"; ctx.fillRect(trainX + 22, 382, 44, 28); ctx.fillRect(trainX + 88, 382, 44, 28);
+        ctx.fillStyle = "#353432"; [trainX + 38, trainX + 150].forEach(x=>{ctx.beginPath();ctx.arc(x,448,18,0,Math.PI*2);ctx.fill();});
+        ctx.fillStyle = "#e1d6bd"; ctx.beginPath(); ctx.arc(trainX + 38, 352, 17 + Math.sin(progress * Math.PI * 4) * 2, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = "rgba(42, 57, 48, 0.76)";
+      ctx.fillRect(26, 24, 908, 76);
+      ctx.fillStyle = "#f5eddd";
+      ctx.font = "bold 34px Georgia";
+      ctx.textAlign = "center";
+      ctx.fillText(theaterScenes[index], 480, 73);
+    }
+    function paintTheaterScreen(dt = 0) {
+      const active = !!(movieTheaterState.ahaan || movieTheaterState.vihaan);
+      const motion = active && !calm() && breezeOn();
+      const progress = movieTheaterState.sceneTime / 9;
+      if (motion && movieTheaterState.sceneTime >= 9) {
+        movieTheaterState.sceneTime = 0;
+        movieTheaterState.fadeTime = 1.8;
+        movieTheaterState.scene = (movieTheaterState.scene + 1) % theaterScenes.length;
+      }
+      screenContext.clearRect(0, 0, screenCanvas.width, screenCanvas.height);
+      const previous = (movieTheaterState.scene + theaterScenes.length - 1) % theaterScenes.length;
+      if (movieTheaterState.fadeTime > 0 && motion) {
+        const blend = Math.min(1, 1 - movieTheaterState.fadeTime / 1.8);
+        screenContext.globalAlpha = 1 - blend;
+        drawTheaterScene(previous, 0);
+        screenContext.globalAlpha = blend;
+        drawTheaterScene(movieTheaterState.scene, progress);
+        screenContext.globalAlpha = 1;
+        movieTheaterState.fadeTime = Math.max(0, movieTheaterState.fadeTime - dt);
+      } else drawTheaterScene(movieTheaterState.scene, progress);
+      screenTexture.needsUpdate = true;
+    }
+    const theaterSeatHeight = 0.82;
+    function movieTheaterRigHeight(actor) { return theaterSeatHeight + 3.92 * actor.rig.scale.y; }
+    function enterMovieTheater(actor) {
+      const isAhaan = actor === A;
+      const key = isAhaan ? "ahaan" : "vihaan";
+      if ((isAhaan && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || trainState.ahaan || currentActivity)) || (!isAhaan && (!togetherEnabled || eBikeState.rider === V || carState.driver === V || carState.passenger === V || chopperState.rider === V || trainState.vihaan || quadState.riding || currentActivity))) return false;
+      movieTheaterState[key] = { position: actor.rig.position.clone(), rotation: actor.rig.rotation.clone() };
+      actor.rig.position.set(isAhaan ? -41.7 : -38.3, movieTheaterRigHeight(actor), -37.8);
+      actor.rig.rotation.set(0, Math.PI, 0);
+      setTrainRider(actor, true);
+      if (isAhaan) targetPos = null;
+      movieTheaterState.sceneTime = 0;
+      paintTheaterScreen();
+      movieTheaterControls.hidden = false;
+      movieTheaterStatus.textContent = "Silent movie playing. Choose a scene or request a soft sound.";
+      wake();
+      return true;
+    }
+    function leaveMovieTheater(actor) {
+      const key = actor === A ? "ahaan" : "vihaan";
+      const saved = movieTheaterState[key];
+      if (!saved) return false;
+      movieTheaterState[key] = null;
+      setTrainRider(actor, false);
+      actor.rig.position.copy(saved.position);
+      actor.rig.rotation.copy(saved.rotation);
+      if (!movieTheaterState.ahaan && !movieTheaterState.vihaan) movieTheaterControls.hidden = true;
+      wake();
+      return true;
+    }
+    function positionMovieRider(actor, index) {
+      if (!movieTheaterState[index]) return;
+      actor.rig.position.set(index === "ahaan" ? -41.7 : -38.3, movieTheaterRigHeight(actor), -37.8);
+      actor.rig.rotation.set(0, Math.PI, 0);
+      setTrainRider(actor, true);
+      if (actor.updateWalk) actor.updateWalk(false, 8.5, 0.05);
+    }
+    const movieTheaterControls = document.createElement("div");
+    movieTheaterControls.className = "movie-theater-controls";
+    movieTheaterControls.hidden = true;
+    movieTheaterControls.innerHTML = '<p class="movie-theater-status" role="status" aria-live="polite"></p><button type="button" class="movie-theater-control" data-movie-next>Next scene</button><button type="button" class="movie-theater-control" data-movie-sound>Play a soft sound</button>';
+    hero.appendChild(movieTheaterControls);
+    const movieTheaterStatus = movieTheaterControls.querySelector(".movie-theater-status");
+    movieTheaterControls.querySelector("[data-movie-next]").addEventListener("click", () => {
+      movieTheaterState.scene = (movieTheaterState.scene + 1) % theaterScenes.length;
+      movieTheaterState.sceneTime = 0;
+      movieTheaterState.fadeTime = 1.8;
+      paintTheaterScreen();
+      wake();
+    });
+    movieTheaterControls.querySelector("[data-movie-sound]").addEventListener("click", () => {
+      if (!soundOn) {
+        movieTheaterStatus.textContent = "Park sound is off. No sound played.";
+        return;
+      }
+      movieTheaterState.soundRequests++;
+      playSound("train");
+      movieTheaterStatus.textContent = "A soft train sound played once.";
+    });
+    function updateMovieTheater(dt) {
+      if (!movieTheaterState.ahaan && !movieTheaterState.vihaan) return false;
+      const animated = !calm() && breezeOn();
+      if (animated) movieTheaterState.sceneTime += dt;
+      paintTheaterScreen(dt);
+      return animated;
+    }
+    const movieTheaterItem = {
+      id: "movieTheater",
+      name: "Park Movie Theater",
+      x: -40,
+      z: -32.8,
+      approachRadius: 4.2,
+      actionLabel: "Enter the movie theater",
+      promptText: "Press E to take a theater seat.",
+      vihaanPromptText: "Press Enter to take a theater seat.",
+      onActivate: () => movieTheaterState.ahaan ? leaveMovieTheater(A) : enterMovieTheater(A),
+      onVihaan: () => movieTheaterState.vihaan ? leaveMovieTheater(V) : enterMovieTheater(V)
+    };
+
     const trainRoute = new T.CatmullRomCurve3([
       [5, -17], [11, -25], [24, -31], [34, -22], [36, -5],
       [34, 12], [27, 20], [20, 16], [18, 9], [22, 17],
@@ -4299,6 +4508,7 @@
         promptText: "Press E to choose ice cream.",
         onActivate: openIceCreamPicker
       },
+      movieTheaterItem,
       {
         id: "trampoline",
         name: "Spring Trampoline",
@@ -4393,6 +4603,7 @@
     function activateVihaanItem() {
       if (!vihaanNearbyItem) return;
       if (vihaanNearbyItem.id === "trainRide") dismountTrain(V);
+      if (vihaanNearbyItem.id === "movieTheaterRide") leaveMovieTheater(V);
       if (vihaanNearbyItem.id === "train") boardTrain(V);
       if (vihaanNearbyItem.id === "chopper") mountChopper(V);
       if (vihaanNearbyItem.id === "chopperRide") dismountChopper();
@@ -4455,7 +4666,10 @@
     function checkVihaanProximity() {
       let closest = null;
       let minDistance = Infinity;
-      if (trainState.vihaan) {
+      if (movieTheaterState.vihaan) {
+        closest = { id: "movieTheaterRide", vihaanPromptText: "Enter: leave your theater seat.", onVihaan: () => leaveMovieTheater(V) };
+        minDistance = 0;
+      } else if (trainState.vihaan) {
         closest = { id: "trainRide" };
         minDistance = 0;
       } else if (togetherEnabled && chopperState.rider === V) {
@@ -4495,6 +4709,11 @@
 
     // Detect nearby playground items and landmarks
     function checkProximity() {
+      if (movieTheaterState.ahaan) {
+        currentNearbyItem = { id: "movieTheaterRide", promptText: "Press E to leave the theater.", onActivate: () => leaveMovieTheater(A) };
+        if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
+        return;
+      }
       if (trainState.ahaan) {
         currentNearbyItem = { id: "trainRide", promptText: trainState.dwell > 0 ? "Press E to leave the train." : "Wait for the next station to leave the train.", onActivate: () => dismountTrain(A) };
         if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
@@ -4555,7 +4774,7 @@
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream", "train"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream", "train", "movieTheater"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -5150,7 +5369,20 @@
 
     function updateCameraPosition(dt) {
       let desiredTarget, desiredPos;
-      if (togetherEnabled) {
+      if (cameraMode === "action" || cameraMode === "landmark" || cameraMode === "custom") {
+        desiredTarget = actionCamTarget;
+        desiredPos = actionCamPos;
+      } else if (movieTheaterState.ahaan || movieTheaterState.vihaan) {
+        const riders = [movieTheaterState.ahaan && A, movieTheaterState.vihaan && V].filter(Boolean);
+        const mobileTheater = window.innerWidth < 600;
+        const targetX = riders.reduce((sum, actor) => sum + actor.rig.position.x, 0) / riders.length + (mobileTheater ? 4.5 : 0);
+        const targetZ = riders.reduce((sum, actor) => sum + actor.rig.position.z, 0) / riders.length - (mobileTheater ? 2 : 0);
+        const theaterZoom = zoomLevel * (mobileTheater ? 1.55 : 1);
+        normalCamTarget.set(targetX, 0.7, targetZ);
+        normalCamPos.set(targetX, 0.7 + baseCamY * theaterZoom, targetZ + baseCamZ * theaterZoom);
+        desiredTarget = normalCamTarget;
+        desiredPos = normalCamPos;
+      } else if (togetherEnabled) {
         const targetX = (A.rig.position.x + V.rig.position.x) * 0.5;
         const targetZ = (A.rig.position.z + V.rig.position.z) * 0.5;
         const targetY = (A.rig.position.y + V.rig.position.y) * 0.5;
@@ -5160,9 +5392,6 @@
         normalCamPos.set(targetX, targetY + baseCamY * duoZoom, targetZ + baseCamZ * duoZoom);
         desiredTarget = normalCamTarget;
         desiredPos = normalCamPos;
-      } else if (cameraMode === "action" || cameraMode === "landmark" || cameraMode === "custom") {
-        desiredTarget = actionCamTarget;
-        desiredPos = actionCamPos;
       } else {
         const targetX = A.rig.position.x * 0.78 + panOffset.x;
         const targetZ = A.rig.position.z * 0.78 + panOffset.y;
@@ -5478,6 +5707,20 @@
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") shiftHeld = isDown;
+      const theaterOwnExit = (movieTheaterState.ahaan && (e.code === "KeyE" || (e.key || "").toLowerCase() === "e"))
+        ? A
+        : movieTheaterState.vihaan && (e.code === "Enter" || e.key === "Enter") ? V : null;
+      if (isDown && theaterOwnExit) {
+        e.preventDefault();
+        leaveMovieTheater(theaterOwnExit);
+        return;
+      }
+      const ahaanMoveKey = /^(KeyW|KeyA|KeyS|KeyD)$/.test(e.code) || (!togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key));
+      const vihaanMoveKey = togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key);
+      if ((movieTheaterState.ahaan && ahaanMoveKey) || (movieTheaterState.vihaan && vihaanMoveKey)) {
+        if (isDown) e.preventDefault();
+        return;
+      }
       const flightActor = chopperState.rider;
       if (flightActor) {
         const playerKeys = togetherEnabled && flightActor === V
@@ -5578,7 +5821,7 @@
           return;
         }
         if (currentNearbyItem && currentNearbyItem.id === "train") { e.preventDefault(); boardTrain(A); return; }
-        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "icecream"].includes(currentNearbyItem.id))) {
+        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "icecream", "movieTheater"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
           return;
@@ -5891,6 +6134,7 @@
       const walkDt = elapsed;
       last = now;
       const trainActive = updateParkTrain(elapsed);
+      const movieTheaterActive = updateMovieTheater(elapsed);
 
       // Ride the bike or walk through the park.
       if (bikeState.riding) {
@@ -5947,7 +6191,7 @@
         isWalking = bikeState.speed > 0.06;
         targetPos = null;
         markerMat.opacity = 0;
-      } else if (chopperState.rider !== A && !trainState.ahaan) {
+      } else if (chopperState.rider !== A && !trainState.ahaan && !movieTheaterState.ahaan) {
         let moveX = 0, moveZ = 0;
         if (keys.up) moveZ -= 1;
         if (keys.down) moveZ += 1;
@@ -6153,7 +6397,7 @@
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
         const vihaanInCar = carState.driver === V || carState.passenger === V;
         const vihaanInChopper = chopperState.rider === V;
-        vihaanWalking = trainState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
+        vihaanWalking = trainState.vihaan || movieTheaterState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
         if (!vihaanInCar && !vihaanInChopper && vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
@@ -6164,7 +6408,7 @@
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan && !movieTheaterState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -6176,7 +6420,8 @@
       if (V.rig.visible) {
         if (vihaanWaveTimer > 0 && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
         const vihaanGround = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
-        if (trainState.vihaan) positionTrainRider(V, 2);
+      if (movieTheaterState.vihaan) positionMovieRider(V, "vihaan");
+      else if (trainState.vihaan) positionTrainRider(V, 2);
         else if (vihaanBounceTime > 0) {
           vihaanBounceTime = Math.max(0, vihaanBounceTime - dt);
           const bounceProgress = 5 - vihaanBounceTime;
@@ -6192,8 +6437,9 @@
           }
         }
       }
-      if (trainState.ahaan) positionTrainRider(A, 1);
-      if (!trainState.ahaan && !trainState.vihaan) clampPlayerSeparation();
+      if (movieTheaterState.ahaan) positionMovieRider(A, "ahaan");
+      else if (trainState.ahaan) positionTrainRider(A, 1);
+      if (!movieTheaterState.ahaan && !movieTheaterState.vihaan && !trainState.ahaan && !trainState.vihaan) clampPlayerSeparation();
 
       // Smoothly rotate Ahaan towards heading
       const ahaanInCar = carState.driver === A || carState.passenger === A;
@@ -6212,12 +6458,12 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && A.updateWave && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWave && (!currentActivity || activityPhase === 0)) {
         wavingActive = A.updateWave(dt, isWalking, calm());
       }
 
       // Update leg and arm walk cycle
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && A.updateWalk && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWalk && (!currentActivity || activityPhase === 0)) {
         A.updateWalk(isWalking, 8.5, walkDt);
       }
 
@@ -6237,7 +6483,7 @@
         updatePlayActivity(dt);
       }
 
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && (!currentActivity || activityPhase === 0)) {
         A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
       }
 
@@ -6292,7 +6538,7 @@
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || trainActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -6390,6 +6636,7 @@
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
       getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
+      getMovieTheaterState: () => ({ riders: { ahaan: !!movieTheaterState.ahaan, vihaan: !!movieTheaterState.vihaan }, seatHeight: theaterSeatHeight, rigOriginHeight: { ahaan: movieTheaterRigHeight(A), vihaan: movieTheaterRigHeight(V) }, scene: movieTheaterState.scene, sceneTitle: theaterScenes[movieTheaterState.scene], soundRequests: movieTheaterState.soundRequests, soundOn, controlsVisible: !movieTheaterControls.hidden, screenVisible: theaterScreen.visible, seats: 2, position: { x: -40, z: -38 }, riderPositions: { ahaan: { x: A.rig.position.x, y: A.rig.position.y, z: A.rig.position.z }, vihaan: { x: V.rig.position.x, y: V.rig.position.y, z: V.rig.position.z } } }),
       getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
