@@ -3876,8 +3876,9 @@
       actor.rig.position.set(seatX, 0.52, seatZ);
       actor.rig.rotation.set(0, heading + Math.PI, 0);
     }
+    const trainStopAllowsRiderExit = () => trainState.currentStation === 0 && trainState.dwell > 0;
     function boardTrain(actor) {
-      if (!actor || trainState.dwell <= 0 || (actor === V && !togetherEnabled)) return false;
+      if (!actor || !trainStopAllowsRiderExit() || (actor === V && !togetherEnabled)) return false;
       const station = trainStations[trainState.currentStation];
       if (Math.hypot(actor.rig.position.x - station.x, actor.rig.position.z - station.z) > 4.8) return false;
       if (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || currentActivity)) return false;
@@ -3894,7 +3895,7 @@
     }
     function dismountTrain(actor) {
       const key = actor === A ? "ahaan" : "vihaan";
-      if (!trainState[key] || trainState.dwell <= 0) return false;
+      if (!trainState[key] || !trainStopAllowsRiderExit()) return false;
       trainState[key] = false;
       if (!trainState.ahaan && !trainState.vihaan) {
         trainTourCaption.textContent = "";
@@ -4689,7 +4690,7 @@
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
-      if (togetherEnabled && !trainState.vihaan && trainState.dwell > 0) {
+      if (togetherEnabled && !trainState.vihaan && trainStopAllowsRiderExit()) {
         const station = trainStations[trainState.currentStation];
         const distance = Math.hypot(V.rig.position.x - station.x, V.rig.position.z - station.z);
         if (distance <= 4.8 && distance < minDistance) { closest = { id: "train" }; minDistance = distance; }
@@ -4697,7 +4698,7 @@
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainState.dwell > 0 ? "Enter: leave the train." : "Wait for the next station to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
+          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainStopAllowsRiderExit() ? "Enter: leave the train." : "Wait for Ice Cream Stop to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -4715,7 +4716,7 @@
         return;
       }
       if (trainState.ahaan) {
-        currentNearbyItem = { id: "trainRide", promptText: trainState.dwell > 0 ? "Press E to leave the train." : "Wait for the next station to leave the train.", onActivate: () => dismountTrain(A) };
+        currentNearbyItem = { id: "trainRide", promptText: trainStopAllowsRiderExit() ? "Press E to leave the train." : "Wait for Ice Cream Stop to leave the train.", onActivate: () => dismountTrain(A) };
         if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
         return;
       }
@@ -4764,7 +4765,7 @@
           closest = item;
         }
       }
-      if (!trainState.ahaan && trainState.dwell > 0) {
+      if (!trainState.ahaan && trainStopAllowsRiderExit()) {
         const station = trainStations[trainState.currentStation];
         const d = Math.hypot(px - station.x, pz - station.z);
         if (d <= 4.8 && d < minD) { minD = d; closest = { id: "train", promptText: "Press E to ride the train.", onActivate: () => boardTrain(A) }; }

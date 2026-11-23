@@ -1,3 +1,15 @@
+## Guided train: one boarding station — Nov 23, 2026
+
+- Created `.worktrees/feature-park-train-single-boarding` on `feature/park-train-single-boarding` from `origin/main` at `a052a0b`.
+- Read the queue amendment after the movie theater. It requires boarding and exits at the Ice Cream Stop only. The train must keep all four tour stops.
+- First concrete check: inspected `boardTrain`, `dismountTrain`, and both ride prompts. The baseline allows boarding and exits at every station dwell and prompts riders to leave at every stop.
+- Restricted boarding and exits to the Ice Cream Stop. E and Enter now show a wait prompt at every other stop.
+- Extended `tests/park-train-browser.cjs` to try both exit keys at South Grove and West Grove, and to try boarding at Bridge Stop.
+- `node --check assets/park3d.js`, `node --check tests/park-train-browser.cjs`, and `git diff --check` passed.
+- The desktop and mobile train suite passed. It verified four tour stops, blocked exits at South Grove and West Grove, blocked boarding at Bridge Stop, and boarding plus exits at Ice Cream Stop. Browser errors: none.
+- Inspected `/tmp/ahaan-park-train/both-riding-1280.png` and `/tmp/ahaan-park-train/station-1280.png`.
+- Local implementation is verified. Commit, publish, and live verification are in progress.
+
 ## Park movie theater — Nov 22, 2026
 
 - Goku started this queue item after the guided tour went live. The movie theater brief follows the guided tour.

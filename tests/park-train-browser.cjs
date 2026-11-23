@@ -116,6 +116,15 @@ let server;
           }, station, { timeout: 120000 });
           assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, ['South Grove', 'West Grove', 'Ice Cream Stop'].indexOf(station) + 2, `friendly sound plays at ${station}`);
           assert.ok((await page.evaluate(() => Park3D.getTrainState())).tourMessage.includes(line), `tour narration appears at ${station}`);
+          if (station !== 'Ice Cream Stop') {
+            await page.evaluate(() => document.activeElement?.blur());
+            await page.keyboard.press('E');
+            await page.keyboard.press('Enter');
+            const stoppedRiders = await page.evaluate(() => Park3D.getTrainState().riders);
+            assert.equal(stoppedRiders.ahaan, true, `Ahaan cannot exit at ${station}`);
+            assert.equal(stoppedRiders.vihaan, true, `Vihaan cannot exit at ${station}`);
+            assert.match(await page.locator('#actionPromptText').textContent(), /Wait for Ice Cream Stop/);
+          }
         }
         assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 4, 'friendly sound plays at all four perimeter stops');
         await page.evaluate(() => document.activeElement?.blur());
@@ -130,6 +139,12 @@ let server;
         await page.keyboard.press('Enter');
         await page.waitForFunction(() => !Park3D.getTrainState().riders.vihaan);
         assert.equal((await page.evaluate(() => Park3D.getTrainState())).tourMessage, '', 'tour caption clears after both riders exit');
+        await page.evaluate(() => Park3D.teleportAhaan(18, 9));
+        await page.waitForFunction(() => Park3D.getTrainState().currentStation === 'Bridge Stop' && Park3D.getTrainState().dwell > 2.2, null, { timeout: 120000 });
+        assert.notEqual(await page.evaluate(() => Park3D.getCurrentNearbyItem()?.id), 'train', 'boarding prompt stays hidden at Bridge Stop');
+        await page.keyboard.press('E');
+        await page.waitForTimeout(150);
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).riders.ahaan, false, 'Ahaan cannot board at Bridge Stop');
         await page.locator('#togetherBtn').click();
       } else {
         await page.waitForFunction(() => Park3D.getTrainState().speed > 0.2 && Park3D.getTrainState().smokePuffs > 0, null, { timeout: 20000 });
