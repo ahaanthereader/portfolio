@@ -15,7 +15,11 @@
 - Pages run `45157903155` succeeded.
 - Live desktop and mobile browser checks passed. They verified the pyramid site, body, sign, path, NEW menu link, direct arrival, and zero page errors.
 - Inspected live screenshots at `/tmp/ahaan-park-pyramid/pyramid-1280.png` and `/tmp/ahaan-park-pyramid/pyramid-390.png`.
-- Added a Fresh Drops card using the live desktop screenshot at `public/fresh-drops/2026-11-23-park-pyramid.png`. Fresh Drops publish and live card verification are in progress.
+- Added a Fresh Drops card using the live desktop screenshot at `public/fresh-drops/2026-11-23-park-pyramid.png`.
+- Published Fresh Drops commit `62e1c8d` (`Add pyramid to Fresh Drops`). Pages run `45164590464` succeeded.
+- Live Fresh Drops checks passed at desktop (`1280x800`) and mobile (`390x844`). They verified the first card, image load, NEW badge, home date, and zero browser errors.
+- Inspected `/tmp/ahaan-park-pyramid/fresh-drops-1280.png`. The pyramid card appears first with the live screenshot.
+- The worktree is complete. A final handoff record commit and Pages check remain.
 
 ## Guided train: one boarding station — Nov 23, 2026
 
