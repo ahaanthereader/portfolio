@@ -28,6 +28,10 @@
 - Added a mobile screenshot check for the welcome caption. The park-train suite passed again on desktop and mobile with zero browser errors.
 - Inspected `/tmp/ahaan-park-train/tour-caption-390.png`. The caption fits the mobile view and stays readable above the ride prompt.
 - Syntax and whitespace checks passed for `assets/park3d.js` and `tests/park-train-browser.cjs`.
+- Guided-tour commit `c722bd3` (`Add guided narration to park train`) was published as a fast-forward from `721ad39`. Pages run `45094211198` succeeded.
+- The live park-train browser suite passed on desktop and mobile. It verified all four tour captions, train sound, station stops, both riders, independent exits, and zero browser errors.
+- Live tour screenshots: `/tmp/ahaan-park-train/both-riding-1280.png` and `/tmp/ahaan-park-train/tour-caption-390.png`. I inspected both.
+- Added a Fresh Drops card with the live desktop screenshot at `public/fresh-drops/2026-11-22-guided-train-tour.png`. The card publish and live Fresh Drops check are pending.
 - Added a camera check to `tests/park-train-browser.cjs`. Both riders project around the screen center while the train moves.
 - The first updated run passed the camera assertions. It then tried to dismount Ahaan before a station stop, so I moved that exit check to Bridge Stop.
 - Verified camera tracking in Play together while the train moved. The projected midpoint of Ahaan and Vihaan stayed within `0.12` normalized screen units of center. Both riders stayed within `0.5` horizontal units.
