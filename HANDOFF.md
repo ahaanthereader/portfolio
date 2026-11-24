@@ -36,8 +36,15 @@
 - Reran `tests/park-expand-water-browser.cjs` after the final water changes. Desktop and mobile passed. Ripple motion, both boys' splash effects, and zero browser errors passed.
 - `tests/park-pyramid-browser.cjs` passed on desktop and mobile. The southeast section, sign, path, menu link, and direct arrival passed with zero browser errors.
 - Final checks passed: `node --check assets/park3d.js`, `node --check tests/park-expand-water-browser.cjs`, `node --check tests/chopper-click-browser.cjs`, `node --check tests/quad-browser.cjs`, `node --check tests/park-pyramid-browser.cjs`, and `git diff --check`.
-- Ready for a local feature commit and publish.
-- Next: rerun the chopper check and check the southeast section after scene expansion. Then run final checks and prepare local commits.
+- Committed the park expansion and water work as `09b8b5b` (`Expand park and add gentle water`).
+- Merged the feature into `main` with publish commit `dc4fcb9` and pushed the change.
+- Pages run `45347857789` failed once because the deploy step found no artifact. Retry 2 passed.
+- Live `tests/park-expand-water-browser.cjs` passed on desktop and mobile. Ripples, both splash triggers, silent default, and zero browser errors passed.
+- Inspected the live screenshots in `/tmp/ahaan-park-expand-water-live`.
+- Added the Nov 24 Fresh Drops card and the live screenshot at `public/fresh-drops/2026-11-24-park-expand-water.png`. Updated the home card date.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new card and date. The desktop and mobile check passed with the loaded image, NEW badges, no overflow, and zero browser errors.
+- Inspected `/tmp/ahaan-park-expand-water-fresh-drops/fresh-drops-desktop.png`.
+- Next: commit the Fresh Drops entry, publish it, wait for Pages, and verify the live card on desktop and mobile.
 
 ## Park car and fire truck — Nov 23, 2026
 

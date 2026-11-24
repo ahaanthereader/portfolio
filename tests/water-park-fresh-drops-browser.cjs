@@ -40,23 +40,23 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
       await page.goto(`${baseUrl}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
       const firstCard = page.locator('.fresh-drop').first();
-      assert.match(await firstCard.locator('h2').textContent(), /water park/i, `${viewport.name}: water park card is first`);
-      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-23');
+      assert.match(await firstCard.locator('h2').textContent(), /bigger park with gentle water/i, `${viewport.name}: park expansion card is first`);
+      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-24');
       assert.equal(await firstCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: NEW badge is visible`);
       const screenshot = firstCard.locator('img');
-      assert.match(await screenshot.getAttribute('src'), /2026-11-23-water-park\.png$/);
+      assert.match(await screenshot.getAttribute('src'), /2026-11-24-park-expand-water\.png$/);
       assert.ok(await screenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: live screenshot loads at full width`);
       await page.screenshot({ path: path.join(evidenceDir, `fresh-drops-${viewport.name}.png`) });
 
       await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
-      assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-23');
+      assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-24');
       assert.equal(await page.locator('.fresh-drops-home [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: home card shows NEW`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${viewport.name}: no horizontal overflow`);
       await page.screenshot({ path: path.join(evidenceDir, `home-${viewport.name}.png`) });
       await page.close();
     }
     assert.deepEqual(errors, [], `Browser errors: ${errors.join(' | ')}`);
-    console.log(`water-park-fresh-drops-browser: PASS (desktop + mobile, image, NEW labels, zero browser errors). Evidence: ${evidenceDir}`);
+    console.log(`park-expand-water-fresh-drops-browser: PASS (desktop + mobile, image, NEW labels, zero browser errors). Evidence: ${evidenceDir}`);
   } finally {
     await browser.close();
     if (server) server.close();
