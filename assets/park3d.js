@@ -461,6 +461,7 @@
     buildNature(mapGroup, T);
     buildHeroEnrichments(mapGroup, T);
     const zooInteractables = buildZoo(mapGroup, T);
+const waterParkInteractables = buildWaterPark(mapGroup, T);
 
     // ==========================================
     // 3D Storytelling Reading Props (Arkansas)
@@ -1567,7 +1568,7 @@
       cloudConfigs.forEach(cfg => {
         const cGroup = new T.Group();
         cGroup.position.set(cfg.x, cfg.y, cfg.z);
-        cGroup.userData = { speed: cfg.speed, baseZ: cfg.z };
+        cGroup.userData = { speed: cfg.speed, baseZ: cfg.z, blocksWaterPark: cfg.z <= -18 };
 
         // Fluffy cumulus cloud lobes
         const s0 = new T.Mesh(new T.SphereGeometry(2.4 * cfg.s, 10, 8), cloudMat);
@@ -2177,6 +2178,127 @@
         vihaanPromptText: `Enter: say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
         onActivate: () => greet(animal, "Ahaan"),
         onVihaan: () => greet(animal, "Vihaan")
+      }));
+    }
+
+    function buildWaterPark(parent, T) {
+      const waterMat = new T.MeshStandardMaterial({ color: 0x65c8d2, roughness: 0.28, metalness: 0.08, transparent: true, opacity: 0.86 });
+      const paleWaterMat = new T.MeshStandardMaterial({ color: 0x8de0df, roughness: 0.3, transparent: true, opacity: 0.9 });
+      const stoneMat = new T.MeshStandardMaterial({ color: 0xe4d4b4, roughness: 0.94 });
+      const woodMat = new T.MeshStandardMaterial({ color: 0x9b6947, roughness: 0.88 });
+      const rideData = [
+        { id: "water-slide", name: "Big Splash Slide", x: 40, z: -35, prompt: "Press E to ride the splash slide.", vihaanPrompt: "Press Enter to ride the splash slide.", seat: [40.4, 0.9, -32.6], heading: 0 },
+        { id: "wave-pool", name: "Wave Pool", x: 34, z: -42, prompt: "Press E to play in the wave pool.", vihaanPrompt: "Press Enter to play in the wave pool.", seat: [34, 0.28, -42], heading: 0 },
+        { id: "lazy-river-water-park", name: "Water Park Lazy River", x: 43, z: -43, prompt: "Press E to float in the lazy river.", vihaanPrompt: "Press Enter to float in the lazy river.", seat: [43, 0.42, -43], heading: 0 },
+        { id: "dump-tower", name: "Gentle Dump Tower", x: 32, z: -35, prompt: "Press E to visit the gentle dump tower.", vihaanPrompt: "Press Enter to visit the gentle dump tower.", seat: [32, 0.25, -35], heading: 0 }
+      ];
+      const group = new T.Group();
+      parent.add(group);
+      function add(mesh, x, y, z, cast = true) {
+        mesh.position.set(x, y, z);
+        mesh.castShadow = cast;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+        return mesh;
+      }
+      // A sandy promenade joins all four rides in the northeast park corner.
+      const deck = add(new T.Mesh(new T.BoxGeometry(20, 0.18, 20), stoneMat), 39, 0.08, -39);
+      deck.receiveShadow = true;
+      const accessPath = add(new T.Mesh(new T.PlaneGeometry(18.4, 2.6), new T.MeshStandardMaterial({ color: 0xd6c5a2, roughness: 0.96 })), 23, 0.035, -22, false);
+      accessPath.rotation.x = -Math.PI / 2;
+      accessPath.rotation.z = Math.atan2(14, 12);
+
+      // Tall stair tower and a broad, low-curvature slide end in a shallow pool.
+      add(new T.Mesh(new T.BoxGeometry(3.3, 5.2, 3.0), new T.MeshStandardMaterial({ color: 0xf3c75f, roughness: 0.72 })), 40, 2.7, -36.1);
+      add(new T.Mesh(new T.BoxGeometry(2.3, 5.5, 0.22), woodMat), 38.65, 2.8, -36.1);
+      for (let i = 0; i < 8; i++) add(new T.Mesh(new T.BoxGeometry(1.65, 0.14, 0.36), stoneMat), 39.25, 0.62 + i * 0.55, -37.25 + i * 0.32);
+      const slideCurve = new T.CatmullRomCurve3([new T.Vector3(40, 5.2, -36), new T.Vector3(40.2, 4.6, -34.7), new T.Vector3(40.7, 3.1, -33.2), new T.Vector3(41.6, 1.15, -32.1)]);
+      add(new T.Mesh(new T.TubeGeometry(slideCurve, 28, 0.48, 10, false), paleWaterMat), 0, 0, 0, false);
+      const slidePool = add(new T.Mesh(new T.CylinderGeometry(2.8, 2.8, 0.28, 32), waterMat), 42.7, 0.25, -31.9, false);
+      slidePool.scale.z = 0.72;
+      add(new T.Mesh(new T.TorusGeometry(2.8, 0.25, 8, 32), stoneMat), 42.7, 0.3, -31.9, false).rotation.x = Math.PI / 2;
+
+      // The wave pool has a shallow oval basin with soft fountain sprays.
+      const waveBasin = add(new T.Mesh(new T.CylinderGeometry(4.35, 4.1, 0.38, 40), stoneMat), 34, 0.18, -42, false);
+      waveBasin.scale.z = 0.76;
+      const waveWater = add(new T.Mesh(new T.CircleGeometry(3.95, 40), waterMat), 34, 0.42, -42, false);
+      waveWater.rotation.x = -Math.PI / 2;
+      waveWater.scale.set(1, 0.76, 1);
+      [[32.5, -42], [34, -42], [35.5, -42]].forEach(([x, z], i) => {
+        add(new T.Mesh(new T.CylinderGeometry(0.08, 0.18, 0.22, 12), woodMat), x, 0.48, z, false);
+        const jet = add(new T.Mesh(new T.CylinderGeometry(0.06, 0.12, 1.15 + (i === 1 ? 0.25 : 0), 10), paleWaterMat), x, 1.15, z, false);
+        jet.userData.waterJet = true;
+      });
+
+      // A wide oval canal forms a clear, slow floating route.
+      const riverBed = add(new T.Mesh(new T.TorusGeometry(4.8, 1.25, 10, 56), stoneMat), 43, 0.12, -43, false);
+      riverBed.scale.set(1.1, 0.78, 1);
+      const riverWater = add(new T.Mesh(new T.TorusGeometry(4.8, 0.92, 12, 56), waterMat), 43, 0.34, -43, false);
+      riverWater.scale.set(1.1, 0.78, 1);
+      riverBed.rotation.x = Math.PI / 2;
+      riverWater.rotation.x = Math.PI / 2;
+      const lazyRide = rideData.find(ride => ride.id === "lazy-river-water-park");
+      lazyRide.rings = {};
+      ["ahaan", "vihaan"].forEach((rider, index) => {
+        const ring = add(new T.Mesh(new T.TorusGeometry(0.58, 0.16, 10, 24), new T.MeshStandardMaterial({ color: index ? 0xf1a45f : 0xf5d06e, roughness: 0.58 })), 43, 0.57, -43, false);
+        ring.rotation.x = Math.PI / 2;
+        ring.visible = false;
+        lazyRide.rings[rider] = ring;
+      });
+
+      // The bucket tips slowly and pours a thin, predictable waterfall.
+      add(new T.Mesh(new T.CylinderGeometry(0.32, 0.42, 0.46, 16), woodMat), 31.5, 0.45, -35, false);
+      const tower = add(new T.Mesh(new T.CylinderGeometry(0.24, 0.34, 6.4, 12), new T.MeshStandardMaterial({ color: 0xd8e3dc, roughness: 0.7 })), 31.5, 3.35, -35);
+      const bucketPivot = new T.Group();
+      bucketPivot.position.set(31.5, 6.55, -35);
+      group.add(bucketPivot);
+      const bucket = new T.Mesh(new T.CylinderGeometry(0.86, 0.7, 0.85, 18, 1, true), new T.MeshStandardMaterial({ color: 0xf0a65d, roughness: 0.68, side: T.DoubleSide }));
+      bucket.rotation.x = Math.PI;
+      bucket.castShadow = true;
+      bucketPivot.add(bucket);
+      const bucketWater = new T.Mesh(new T.CircleGeometry(0.7, 18), paleWaterMat);
+      bucketWater.rotation.x = -Math.PI / 2;
+      bucketWater.position.y = -0.24;
+      bucketPivot.add(bucketWater);
+      const spill = add(new T.Mesh(new T.CylinderGeometry(0.38, 0.72, 2.1, 12), paleWaterMat), 31.5, 1.65, -35, false);
+      spill.visible = false;
+      const dumpPool = add(new T.Mesh(new T.CylinderGeometry(2.1, 2.0, 0.25, 28), waterMat), 31.5, 0.28, -35, false);
+      dumpPool.scale.z = 0.72;
+
+      const rideSigns = ["SPLASH SLIDE", "WAVE POOL", "LAZY RIVER", "GENTLE DUMP TOWER"];
+      rideData.forEach((ride, i) => {
+        const signWidth = i === 3 ? 3.8 : 3.0;
+        add(new T.Mesh(new T.BoxGeometry(signWidth, 0.8, 0.15), new T.MeshStandardMaterial({ color: 0xfff0c8, roughness: 0.86 })), ride.x, 2.2, ride.z + 2.5);
+        const labelCanvas = document.createElement("canvas");
+        labelCanvas.width = 512;
+        labelCanvas.height = 128;
+        const labelContext = labelCanvas.getContext("2d");
+        labelContext.fillStyle = "#fff0c8";
+        labelContext.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+        labelContext.fillStyle = "#36566a";
+        labelContext.font = "bold 34px Georgia";
+        labelContext.textAlign = "center";
+        labelContext.textBaseline = "middle";
+        labelContext.fillText(rideSigns[i], 256, 64, 480);
+        const label = add(new T.Mesh(new T.PlaneGeometry(signWidth - 0.14, 0.66), new T.MeshBasicMaterial({ map: new T.CanvasTexture(labelCanvas), side: T.DoubleSide })), ride.x, 2.2, ride.z + 2.405, false);
+        ride.label = rideSigns[i];
+        ride.approachRadius = 3.6;
+      });
+      landmarkAnimators.push(dt => {
+        if (calm()) return false;
+        const t = performance.now() * 0.001;
+        bucketPivot.rotation.x = Math.sin(t * 0.32) * 0.14;
+        spill.visible = Math.sin(t * 0.32) > 0.74;
+        waveWater.material.opacity = 0.82 + Math.sin(t * 0.7) * 0.05;
+        return true;
+      });
+      parkObstacles.push({ x: 40, z: -35, r: 4.2 }, { x: 34, z: -42, r: 4.5 }, { x: 43, z: -43, r: 5.8 }, { x: 31.5, z: -35, r: 2.4 });
+      return rideData.map(ride => ({
+        id: ride.id, name: ride.name, x: ride.x, z: ride.z, approachRadius: ride.approachRadius,
+        promptText: ride.prompt, vihaanPromptText: ride.vihaanPrompt,
+        onActivate: () => toggleWaterRide(A, ride),
+        onVihaan: () => toggleWaterRide(V, ride),
+        ride
       }));
     }
 
@@ -3124,6 +3246,7 @@
     // Playground Activities State & Controls
     // ==========================================
     let currentActivity = null; // null | "slide" | "swing" | "trampoline"
+    const waterRideState = { ahaan: null, vihaan: null };
     let activityPhase = 0;      // 0 = approach, 1 = climb/mount, 2 = play, 3 = exit
     let activityTimer = 0;
     let lastApexChime = 0;
@@ -3711,6 +3834,7 @@
     const trainRouteLength = trainRoute.getLength();
     const trainStationSpecs = [
       { name: "Ice Cream Stop", x: 5, z: -17 },
+      { name: "Water Park Stop", x: 28, z: -29 },
       { name: "Bridge Stop", x: 18, z: 9 },
       { name: "South Grove", x: 10, z: 36 },
       { name: "West Grove", x: -36, z: 2 }
@@ -3731,6 +3855,7 @@
     })).sort((a, b) => a.progress - b.progress);
     const trainTourStops = [
       { x: 5, z: -17, line: "The ice cream shop is on your right. Pick a flavor at our stop!" },
+      { x: 28, z: -29, line: "The water park is just ahead. Try the splash slide, wave pool, lazy river, and gentle dump tower." },
       { x: 14.2, z: 8.15, line: "Look right. A little wooden bridge crosses the water." },
       { x: 11.5, z: 35, line: "We are crossing the Mississippi River on a wooden bridge." },
       { x: -34, z: 17, line: "Ahaan's Zoo is on your left, beyond the trees." }
@@ -3913,6 +4038,60 @@
       actor.leftLeg.knee.rotation.set(seated ? 1.65 : 0, 0, 0);
       actor.rightLeg.knee.rotation.set(seated ? 1.65 : 0, 0, 0);
     }
+    function toggleWaterRide(actor, ride) {
+      if (!actor || (actor === V && !togetherEnabled)) return;
+      const key = actor === A ? "ahaan" : "vihaan";
+      const active = waterRideState[key];
+      if (active) {
+        if (active.ride.rings) active.ride.rings[key].visible = false;
+        actor.rig.position.copy(active.position);
+        actor.rig.rotation.copy(active.rotation);
+        waterRideState[key] = null;
+        setTrainRider(actor, false);
+        if (actor.updateWalk) actor.updateWalk(false, 8.5, 0.05);
+        sayAhaan(`${actor === A ? "Ahaan" : "Vihaan"} finished the ${active.ride.name.toLowerCase()}!`, "Choose another ride when you are ready.", "💦", "Water Park");
+      } else {
+        waterRideState[key] = { ride, position: actor.rig.position.clone(), rotation: actor.rig.rotation.clone(), elapsed: 0 };
+        if (ride.rings) ride.rings[key].visible = true;
+        if (actor === A) {
+          targetPos = null;
+          Object.keys(keys).forEach(name => { keys[name] = false; });
+        } else {
+          Object.keys(vihaanKeys).forEach(name => { vihaanKeys[name] = false; });
+        }
+        actor.rig.position.set(ride.seat[0], ride.seat[1], ride.seat[2]);
+        actor.rig.rotation.set(0, ride.heading, 0);
+        setTrainRider(actor, true);
+        if (actor.updateWalk) actor.updateWalk(false, 8.5, 0.05);
+        sayAhaan(`${actor === A ? "Ahaan" : "Vihaan"} is on the ${ride.name.toLowerCase()}!`, "Press E or Enter to get off.", "💦", "Water Park");
+      }
+      wake();
+    }
+    function updateWaterRideRiders(dt) {
+      [waterRideState.ahaan && { actor: A, state: waterRideState.ahaan }, waterRideState.vihaan && { actor: V, state: waterRideState.vihaan }].filter(Boolean).forEach(({ actor, state }) => {
+        const ride = state.ride;
+        state.elapsed += dt;
+        if (ride.id === "water-slide") {
+          const cycle = state.elapsed % 7;
+          if (cycle < 2.6) {
+            const t = cycle / 2.6;
+            actor.rig.position.set(40.15, 0.5 + t * 4.7, -36.1 - t * 0.15);
+          } else if (cycle < 5.2) {
+            const t = (cycle - 2.6) / 2.6;
+            actor.rig.position.set(40.15 + t * 2.55, 5.2 - t * 4.3, -36.25 + t * 4.15);
+          } else {
+            actor.rig.position.set(42.7, 0.9, -32.1);
+          }
+        } else if (ride.id === "lazy-river-water-park") {
+          const angle = state.elapsed * (calm() ? 0.13 : 0.2);
+          actor.rig.position.set(43 + Math.cos(angle) * 3.65, 0.55 + Math.sin(state.elapsed * 1.4) * 0.035, -43 + Math.sin(angle) * 2.45);
+          actor.rig.rotation.y = -angle;
+          if (ride.rings) ride.rings[actor === A ? "ahaan" : "vihaan"].position.set(actor.rig.position.x, 0.32, actor.rig.position.z);
+        } else if (ride.id === "wave-pool") {
+          actor.rig.position.set(34 + Math.sin(state.elapsed * 0.28) * 0.45, 0.42 + Math.sin(state.elapsed * 1.1) * 0.035, -42 + Math.cos(state.elapsed * 0.23) * 0.32);
+        }
+      });
+    }
     function positionTrainRider(actor, coachIndex) {
       const coach = trainCars[coachIndex];
       const heading = coach.rotation.y;
@@ -3921,9 +4100,10 @@
       actor.rig.position.set(seatX, 0.52, seatZ);
       actor.rig.rotation.set(0, heading + Math.PI, 0);
     }
-    const trainStopAllowsRiderExit = () => trainState.currentStation === 0 && trainState.dwell > 0;
+    const trainStopAllowsRiderExit = () => ["Ice Cream Stop", "Water Park Stop"].includes(trainStations[trainState.currentStation]?.name) && trainState.dwell > 0;
+    const trainStopAllowsBoarding = () => trainStations[trainState.currentStation]?.name === "Ice Cream Stop" && trainState.dwell > 0;
     function boardTrain(actor) {
-      if (!actor || !trainStopAllowsRiderExit() || (actor === V && !togetherEnabled)) return false;
+      if (!actor || !trainStopAllowsBoarding() || (actor === V && !togetherEnabled)) return false;
       const station = trainStations[trainState.currentStation];
       if (Math.hypot(actor.rig.position.x - station.x, actor.rig.position.z - station.z) > 4.8) return false;
       if (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || currentActivity)) return false;
@@ -4597,6 +4777,7 @@
       },
       // Zoo animal pens (northwest section)
       ...zooInteractables,
+      ...waterParkInteractables,
       // State landmarks generated dynamically from STATES
       ...STATES.map(st => ({
         id: st.id,
@@ -4712,7 +4893,10 @@
     function checkVihaanProximity() {
       let closest = null;
       let minDistance = Infinity;
-      if (movieTheaterState.vihaan) {
+      if (waterRideState.vihaan) {
+        closest = { id: "waterRide", vihaanPromptText: "Enter: leave this water ride.", onVihaan: () => toggleWaterRide(V, waterRideState.vihaan.ride) };
+        minDistance = 0;
+      } else if (movieTheaterState.vihaan) {
         closest = { id: "movieTheaterRide", vihaanPromptText: "Enter: leave your theater seat.", onVihaan: () => leaveMovieTheater(V) };
         minDistance = 0;
       } else if (trainState.vihaan) {
@@ -4735,7 +4919,7 @@
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
-      if (togetherEnabled && !trainState.vihaan && trainStopAllowsRiderExit()) {
+      if (togetherEnabled && !trainState.vihaan && trainStopAllowsBoarding()) {
         const station = trainStations[trainState.currentStation];
         const distance = Math.hypot(V.rig.position.x - station.x, V.rig.position.z - station.z);
         if (distance <= 4.8 && distance < minDistance) { closest = { id: "train" }; minDistance = distance; }
@@ -4755,6 +4939,11 @@
 
     // Detect nearby playground items and landmarks
     function checkProximity() {
+      if (waterRideState.ahaan) {
+        currentNearbyItem = { id: "waterRide", promptText: "Press E to leave this water ride.", onActivate: () => toggleWaterRide(A, waterRideState.ahaan.ride) };
+        if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
+        return;
+      }
       if (movieTheaterState.ahaan) {
         currentNearbyItem = { id: "movieTheaterRide", promptText: "Press E to leave the theater.", onActivate: () => leaveMovieTheater(A) };
         if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
@@ -4810,7 +4999,7 @@
           closest = item;
         }
       }
-      if (!trainState.ahaan && trainStopAllowsRiderExit()) {
+      if (!trainState.ahaan && trainStopAllowsBoarding()) {
         const station = trainStations[trainState.currentStation];
         const d = Math.hypot(px - station.x, pz - station.z);
         if (d <= 4.8 && d < minD) { minD = d; closest = { id: "train", promptText: "Press E to ride the train.", onActivate: () => boardTrain(A) }; }
@@ -5752,6 +5941,19 @@
 
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
+      const waterExitActor = waterRideState.ahaan && (e.code === "KeyE" || (e.key || "").toLowerCase() === "e")
+        ? A
+        : waterRideState.vihaan && togetherEnabled && (e.code === "Enter" || e.key === "Enter") ? V : null;
+      if (isDown && waterExitActor) {
+        e.preventDefault();
+        const active = waterRideState[waterExitActor === A ? "ahaan" : "vihaan"];
+        toggleWaterRide(waterExitActor, active.ride);
+        return;
+      }
+      if ((waterRideState.ahaan || (togetherEnabled && waterRideState.vihaan)) && isDown && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code || e.key)) {
+        e.preventDefault();
+        return;
+      }
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") shiftHeld = isDown;
       const theaterOwnExit = (movieTheaterState.ahaan && (e.code === "KeyE" || (e.key || "").toLowerCase() === "e"))
         ? A
@@ -6443,7 +6645,7 @@
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
         const vihaanInCar = carState.driver === V || carState.passenger === V;
         const vihaanInChopper = chopperState.rider === V;
-        vihaanWalking = trainState.vihaan || movieTheaterState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
+        vihaanWalking = trainState.vihaan || movieTheaterState.vihaan || waterRideState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
         if (!vihaanInCar && !vihaanInChopper && vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
@@ -6454,7 +6656,7 @@
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan && !movieTheaterState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan && !movieTheaterState.vihaan && !waterRideState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -6490,7 +6692,7 @@
       // Smoothly rotate Ahaan towards heading
       const ahaanInCar = carState.driver === A || carState.passenger === A;
       const ahaanInChopper = chopperState.rider === A;
-      if (isWalking && !bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
+      if (isWalking && !bikeState.riding && eBikeState.rider !== A && !waterRideState.ahaan && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
         const curRot = A.rig.rotation.y;
         let diff = ahaanAngle - curRot;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -6504,12 +6706,12 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWave && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !waterRideState.ahaan && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWave && (!currentActivity || activityPhase === 0)) {
         wavingActive = A.updateWave(dt, isWalking, calm());
       }
 
       // Update leg and arm walk cycle
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWalk && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !waterRideState.ahaan && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWalk && (!currentActivity || activityPhase === 0)) {
         A.updateWalk(isWalking, 8.5, walkDt);
       }
 
@@ -6528,6 +6730,7 @@
       if (currentActivity) {
         updatePlayActivity(dt);
       }
+      updateWaterRideRiders(dt);
 
       if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && (!currentActivity || activityPhase === 0)) {
         A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
@@ -6565,6 +6768,10 @@
           if (cl.position.x > 75) cl.position.x = -75;
         });
       }
+      const waterParkInView = A.rig.position.x > 25 && A.rig.position.z < -25;
+      clouds.forEach(cl => {
+        if (cl.userData.blocksWaterPark) cl.visible = !waterParkInView;
+      });
 
       // Update landmark and story prop animations
       let anyAnimActive = false;
@@ -6684,6 +6891,7 @@
       getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getMovieTheaterState: () => ({ riders: { ahaan: !!movieTheaterState.ahaan, vihaan: !!movieTheaterState.vihaan }, seatHeight: theaterSeatHeight, rigOriginHeight: { ahaan: movieTheaterRigHeight(A), vihaan: movieTheaterRigHeight(V) }, scene: movieTheaterState.scene, sceneTitle: theaterScenes[movieTheaterState.scene], soundRequests: movieTheaterState.soundRequests, soundOn, controlsVisible: !movieTheaterControls.hidden, screenVisible: theaterScreen.visible, seats: 2, position: { x: -40, z: -38 }, riderPositions: { ahaan: { x: A.rig.position.x, y: A.rig.position.y, z: A.rig.position.z }, vihaan: { x: V.rig.position.x, y: V.rig.position.y, z: V.rig.position.z } } }),
       getPyramidState: () => ({ position: { x: pyramid.position.x, z: pyramid.position.z }, baseSize: pyramidState.baseSize, height: pyramidState.height, color: pyramidStone.color.getHex(), visible: pyramidBody.visible, signVisible: pyramidSign.visible, pathVisible: pyramidPath.visible }),
+      getWaterParkState: () => ({ rides: waterParkInteractables.map(item => ({ id: item.id, name: item.name, x: item.x, z: item.z })), riders: { ahaan: waterRideState.ahaan?.ride.id || null, vihaan: waterRideState.vihaan?.ride.id || null }, obstructingCloudsVisible: clouds.filter(cloud => cloud.userData.blocksWaterPark).map(cloud => cloud.visible), groupVisible: waterParkInteractables.length === 4 }),
       getChopperState: () => ({ riding: !!chopperState.rider, x: chopperState.x, z: chopperState.z, heading: chopperState.heading, altitude: chopperState.altitude, speed: chopperState.speed, rotorSpeed: chopperState.rotorSpeed, target: chopperState.target && { ...chopperState.target } }),
       getVihaanNearbyItem: () => vihaanNearbyItem && vihaanNearbyItem.id,
       getSeparationLimit: maxPlayerSeparation,
@@ -6729,6 +6937,16 @@
     }
     window.addEventListener("hashchange", visitPyramidFromHash);
     visitPyramidFromHash();
+
+    function visitWaterParkFromHash() {
+      if (location.hash !== "#waterpark") return;
+      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A || trainState.ahaan) return;
+      window.Park3D.teleportAhaan(29, -30);
+      const top = document.getElementById("top");
+      if (top) top.scrollIntoView({ block: "start" });
+    }
+    window.addEventListener("hashchange", visitWaterParkFromHash);
+    visitWaterParkFromHash();
 
     hero.classList.add("park-ready");
     greetRandom(true);
