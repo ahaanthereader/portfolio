@@ -42,7 +42,10 @@
 - Added the live night screenshot at `public/fresh-drops/2026-11-24-park-day-night-weather.png` and a new Fresh Drops card.
 - Updated the Fresh Drops browser check for the new top card. `node --check tests/water-park-fresh-drops-browser.cjs` passed.
 - The Fresh Drops check passed on desktop and mobile. The image loaded, the NEW badge appeared, and there were zero browser errors.
-- Next: commit the Fresh Drops card, screenshot, and check; push; then live-check the card and NEW badge.
+- Fresh Drops commit: `1f8c27eff551262736304cbe144ccd3ed1289e18` (`Add Park weather to Fresh Drops`).
+- Push-triggered Pages run `45436153079` failed because GitHub found no artifact. Clean run `45436862763` succeeded.
+- Live Fresh Drops verification passed on desktop and mobile. The new card is first, its 1280 px screenshot loads, NEW appears, Park rides keeps NEW, and browser errors are empty.
+- Queue item 13 is complete and live.
 
 ## Lazy river boat — Nov 24, 2026
 
