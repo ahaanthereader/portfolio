@@ -194,6 +194,7 @@
     const parkLights = [];
     const parkPuddles = [];
     const rainDrops = [];
+    let sunbeamMaterial = null;
     const dayLooks = {
       day: { top: "#628ea6", mid: "#a2c0d6", bottom: "#ece7dc", fog: "#ece7dc", sun: "#fff5e2", hemi: "#fcf8ee", ground: "#8a997d", sunPower: 1.35, hemiPower: 1.15, rimPower: 0.4 },
       evening: { top: "#6b5276", mid: "#d58a68", bottom: "#efd0a4", fog: "#efd0a4", sun: "#ffd09a", hemi: "#ffe3ca", ground: "#806b65", sunPower: 0.82, hemiPower: 0.9, rimPower: 0.3 },
@@ -230,6 +231,7 @@
       const phase = phaseNow;
       const nightTarget = phase < 1 ? 0 : phase < 2 ? phase - 1 : Math.max(0, 3 - phase);
       nightMix += (nightTarget - nightMix) * Math.min(1, dt * 0.8);
+      if (sunbeamMaterial) sunbeamMaterial.opacity = 0.08 * (1 - nightMix);
       const fromIndex = Math.floor(phase) % 3, blend = phase - Math.floor(phase);
       const names = ["day", "evening", "night"];
       const from = dayLooks[names[fromIndex]], to = dayLooks[names[(fromIndex + 1) % 3]];
@@ -275,7 +277,7 @@
         }
       });
       parkPuddles.forEach(item => {
-        item.level = Math.max(0, Math.min(1, item.level + (raining ? dt * 0.12 : activeWeather === "sunny" ? -dt * 0.04 : 0)));
+        item.level = Math.max(0, Math.min(1, item.level + (raining ? dt * 0.22 : activeWeather === "sunny" ? -dt * 0.08 : 0)));
         item.puddle.material.opacity = item.level * 0.55;
         item.ripple += dt * (raining && item.level > 0.08 ? 0.6 : 0);
         const pulse = item.ripple % 1;
@@ -673,7 +675,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     // 3D Sky: Storybook Clouds & Sunbeams
     // ==========================================
     const clouds = buildClouds(scene, T);
-    buildSunbeams(scene, T);
+    sunbeamMaterial = buildSunbeams(scene, T);
 
     function buildPaths(parent, states, T, walkables) {
       const pathMat = new T.MeshStandardMaterial({ color: 0xdcd0b6, roughness: 0.94, flatShading: true });
@@ -1988,6 +1990,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         beam.rotation.x = 0.35;
         beamsGroup.add(beam);
       });
+      return beamMat;
     }
 
     function buildNature(parent, T) {

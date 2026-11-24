@@ -28,8 +28,13 @@
 - Final desktop and mobile checks passed after the lighting and ripple updates. Both viewports tested day, evening, night, rain, puddle fill and drain, Auto, reduced motion, sound off, and zero page errors.
 - Final headless rate sample measured 5.4 FPS desktop and 6.6 FPS mobile. The same harness measured 6.0 FPS desktop and 7.8 FPS mobile on `origin/main` earlier.
 - The headless rate is low on both revisions. The durable browser harness does not verify hardware-accelerated phone performance.
+- Screenshot review found that the existing sunlight beams stayed visible at night. The day/night update now fades the beams as night approaches.
+- Increased rain fill and sunny drainage rates after the live check showed slow progress. Both remain gradual.
 - Reduced-motion support applies direct day/weather selections immediately and keeps rain motion hidden.
-- Final browser test now includes direct controls in reduced-motion mode.
+- Final local desktop and mobile checks passed. They include direct controls in reduced-motion mode, puddle fill and drainage, sound off, and zero page errors.
+- Pages run `45411509540` and clean run `45412440780` failed because GitHub found no uploaded artifact. Clean run `45415563213` succeeded.
+- First live browser check showed rain and puddle fill. It did not allow enough time for sunny drainage. The updated check uses longer intervals.
+- Next: commit the beam and rain timing fixes, publish them, and rerun live verification.
 
 ## Lazy river boat — Nov 24, 2026
 
