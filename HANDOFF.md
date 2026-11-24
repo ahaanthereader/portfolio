@@ -28,7 +28,10 @@
 - Committed the cab seat correction as `627780b` and merged it into main as `d24b4c5`. Pages run `45322674329` succeeded.
 - Live desktop and mobile checks passed for car driving, fire truck driving, and solo spray. The desktop check also passed passenger boarding, aiming without steering, moving spray, and exits. Both viewports had zero browser errors.
 - Captured the live moving spray image at `/tmp/ahaan-car-fire-truck/moving-spray-desktop.png`.
-- Added the Fresh Drops card and screenshot at `public/fresh-drops/2026-11-23-car-fire-truck.png`. The card still needs publishing and live verification.
+- Added the Fresh Drops card and live screenshot at `public/fresh-drops/2026-11-23-car-fire-truck.png` in commit `4563f99`.
+- Pages run `45326307851` succeeded after the Fresh Drops push.
+- Live Fresh Drops checks passed on desktop and mobile. The fire truck card appears first, its screenshot loads, NEW badges appear, and no browser errors or horizontal overflow occur.
+- Inspected live Fresh Drops screenshots at `/tmp/ahaan-car-fire-truck-fresh-drops/fresh-drops-desktop.png` and `/tmp/ahaan-car-fire-truck-fresh-drops/fresh-drops-mobile.png`.
 
 ## Park pyramid — Nov 23, 2026
 
