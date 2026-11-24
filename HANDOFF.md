@@ -1,3 +1,27 @@
+## Park car and fire truck — Nov 23, 2026
+
+- Read queue item 10 and `FEATURE-BRIEF-park-car-improve-fire-truck.md` from the main folder.
+- Created `.worktrees/feature-park-car-fire-truck` on `feature/park-car-fire-truck` from `origin/main` at `c465a36`.
+- Copied the existing `_bmad` folder into the worktree before BMAD setup.
+- Started the BMAD build workflow. The worktree has no planning or implementation artifacts.
+- BMAD scope review found two independent deliverables: improve the existing car, and add the fire truck with passenger spraying.
+- Goku chose to keep both goals. The prior step implemented section 1.
+- Replaced the boxy car shell with a bevelled body profile. Changed the finish to blue, with side glass, angled front and rear glass, a grille, bumpers, headlights, and tail lights.
+- Added visible five-spoke alloy rims and rotated the four tires around their axle groups.
+- Kept the existing driver and passenger seats, car state, click-to-go target, arrow controls, and reset logic unchanged.
+- `node --check assets/park3d.js` and `git diff --check` passed.
+- Added a fire truck outside the garage at `(-27, 12)`. The model has a red body, cab glass, four wheels, steady lights, a roof ladder, and a hose reel.
+- Ahaan drives the truck with arrows in solo mode, WASD in Play together mode, or click-to-go. The truck uses the shared ground, obstacle, and edge-slide checks. Top speed is `16 m/s`.
+- Vihaan can board the passenger seat in Play together mode. His arrows aim the hose to each side, and holding Enter sprays while the truck moves or stops.
+- Added a curved water stream and ground splash. The lights stay steady. The fire truck has no siren or sound.
+- Ahaan can spray forward with Enter in solo mode. Q lets Vihaan leave the operator seat. E lets Ahaan leave the truck.
+- `node --check assets/park3d.js` passed after section 2.
+- The existing `tests/chopper-click-browser.cjs` check stopped at its chopper mount wait on desktop. Its test position does not match this branch's chopper parking position, so it did not reach the car checks.
+- Ran a focused Playwright check with `/Users/Nishant/dev-tools/browser-check/node_modules/playwright` against the local worktree. Desktop and mobile passed car driving, fire truck driving, solo spray, and zero page errors.
+- The desktop check also passed Play together boarding, Vihaan aiming without steering, spray while moving, and independent exits. The first run exposed a null reference after boarding. Capturing the nearby item before its callback fixed the error.
+- Inspected screenshots in `/tmp/ahaan-car-fire-truck`: parked desktop and mobile, car driving desktop and mobile, solo spray, and moving passenger spray.
+- No files were published. The focused browser check passed on desktop and mobile.
+
 ## Park pyramid — Nov 23, 2026
 
 - Read the overnight queue and `FEATURE-BRIEF-park-pyramid.md`. The pyramid follows the one-boarding train fix.
