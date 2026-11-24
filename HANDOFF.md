@@ -44,7 +44,12 @@
 - Added the Nov 24 Fresh Drops card and the live screenshot at `public/fresh-drops/2026-11-24-park-expand-water.png`. Updated the home card date.
 - Updated `tests/water-park-fresh-drops-browser.cjs` for the new card and date. The desktop and mobile check passed with the loaded image, NEW badges, no overflow, and zero browser errors.
 - Inspected `/tmp/ahaan-park-expand-water-fresh-drops/fresh-drops-desktop.png`.
-- Next: commit the Fresh Drops entry, publish it, wait for Pages, and verify the live card on desktop and mobile.
+- Committed the Fresh Drops card as `0fdbcf7` (`Add park expansion to Fresh Drops`) and merged it to `main` with publish commit `a1e4b0c`.
+- Pushed the Fresh Drops change. Pages run `45353960797` passed.
+- The first live Fresh Drops check read the image before its lazy load completed. Updated the check to wait for image decoding.
+- The corrected live Fresh Drops check passed on desktop and mobile. The image loaded, NEW badges appeared, the home date matched, no overflow occurred, and no browser errors occurred.
+- Inspected `/tmp/ahaan-park-expand-water-fresh-drops-live/fresh-drops-mobile.png`.
+- Next: commit and publish the image-load wait and final release record.
 
 ## Park car and fire truck — Nov 23, 2026
 
