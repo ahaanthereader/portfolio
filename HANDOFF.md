@@ -22,7 +22,10 @@
 - Existing `tests/quad-browser.cjs` passed mount, ride, and dismount checks. Browser errors were empty.
 - `node --check` passed for the boat, two-player, and quad checks. `git diff --check` passed.
 - Final local under-bridge screenshots: `/tmp/ahaan-lazy-river-boat-side/desktop-under-south-bridge.png` and `mobile-under-south-bridge.png`.
-- Next: commit the feature, publish it, live-verify desktop and mobile, and add the Fresh Drops entry with a live screenshot.
+- Feature implementation commit: `8d327a1` (`Add two-seat lazy river boat`).
+- Created `.worktrees/lazy-river-boat-publish` on `publish/lazy-river-boat` from `origin/main` at `6bc0df5`.
+- Fast-forwarded the publish worktree to feature commit `8d327a1`. It is ready for the first publish.
+- Next: push the feature, wait for Pages, live-verify desktop and mobile, and add the Fresh Drops entry with a live screenshot.
 
 ## Park expansion and water — Nov 23, 2026
 
