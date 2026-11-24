@@ -20,7 +20,9 @@
 - Ran a focused Playwright check with `/Users/Nishant/dev-tools/browser-check/node_modules/playwright` against the local worktree. Desktop and mobile passed car driving, fire truck driving, solo spray, and zero page errors.
 - The desktop check also passed Play together boarding, Vihaan aiming without steering, spray while moving, and independent exits. The first run exposed a null reference after boarding. Capturing the nearby item before its callback fixed the error.
 - Inspected screenshots in `/tmp/ahaan-car-fire-truck`: parked desktop and mobile, car driving desktop and mobile, solo spray, and moving passenger spray.
-- No files were published. The focused browser check passed on desktop and mobile.
+- The focused browser check passed on desktop and mobile. No files were published in that step.
+- Live screenshot review showed both riders behind the fire truck cab seats. Shifted both rider positions into the cab.
+- After the seat adjustment, `node --check assets/park3d.js` and the focused desktop and mobile browser checks passed again.
 
 ## Park pyramid — Nov 23, 2026
 
