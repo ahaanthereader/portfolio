@@ -4722,7 +4722,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     function fireTruckSeatPosition(actor) {
       const side = fireTruckState.driver === actor ? -0.48 : 0.48;
       const cos = Math.cos(fireTruckState.heading), sin = Math.sin(fireTruckState.heading);
-      return { x: fireTruckState.x + side * cos, z: fireTruckState.z - side * sin };
+      return { x: fireTruckState.x + side * cos + 1.02 * sin, z: fireTruckState.z - side * sin + 1.02 * cos };
     }
     function positionFireTruckRider(actor) {
       if (!actor) return;
