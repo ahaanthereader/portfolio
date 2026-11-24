@@ -48,6 +48,13 @@
 - Inspected the desktop overview and ride screenshots. The clouds no longer block the water rides.
 - Updated the train browser check for five stations. `park-train-browser.cjs` passed on desktop and mobile, including the station sound and one-station boarding checks. It reported zero errors.
 - Final pre-publish `node --check` passed for `assets/park3d.js`, `tests/park-water-park-browser.cjs`, and `tests/park-train-browser.cjs`. `git diff --check` passed.
+- Feature commit `1d2b34b` (`Add water park rides to the park`) was pushed to `main`.
+- Push Pages run `45295248049` failed because the deploy job found no `github-pages` artifact. Clean workflow-dispatch run `45298950451` succeeded and uploaded the artifact.
+- Live `tests/park-water-park-browser.cjs` passed at desktop and mobile. All four rides, Play together, the NEW link, direct arrival, train stop, and zero browser or console errors passed. Evidence: `/tmp/ahaan-water-park-live/`.
+- Inspected the live desktop wave pool screenshot. Copied it to `public/fresh-drops/2026-11-23-water-park.png` for the Fresh Drops entry.
+- Added the Fresh Drops card first in the list with the live screenshot and `You asked for a water park!` copy. The home date is already Nov 23, 2026.
+- Added `tests/water-park-fresh-drops-browser.cjs`. Local desktop and mobile checks passed for the image, first card, NEW badges, no horizontal overflow, and zero browser errors. Evidence: `/tmp/ahaan-water-park-fresh-drops/`.
+- Fresh Drops commit and second Pages publish remain.
 
 ## Guided train: one boarding station — Nov 23, 2026
 
