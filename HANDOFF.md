@@ -25,7 +25,16 @@
 - Feature implementation commit: `8d327a1` (`Add two-seat lazy river boat`).
 - Created `.worktrees/lazy-river-boat-publish` on `publish/lazy-river-boat` from `origin/main` at `6bc0df5`.
 - Fast-forwarded the publish worktree to feature commit `8d327a1`. It is ready for the first publish.
-- Next: push the feature, wait for Pages, live-verify desktop and mobile, and add the Fresh Drops entry with a live screenshot.
+- Pushed `6bc0df5..c673010` to `main`.
+- Pages run `45383627945` failed. The deploy step could not find the `github-pages` artifact, even though upload reported success.
+- The GitHub connector could not rerun the job. Clean workflow-dispatch Pages run `45388251645` succeeded for `c673010`.
+- Live `tests/lazy-river-boat-browser.cjs` passed on desktop and mobile. Both riders crossed all four bridges, click-to-go and keys worked, exits stayed independent, and sound stayed off.
+- Live bridge clearance passed. The desktop screenshot shows the boat beneath the south bridge. Browser errors were empty.
+- Live screenshots: `/tmp/ahaan-lazy-river-boat-live/desktop-under-south-bridge.png` and `mobile-under-south-bridge.png`.
+- Copied the live desktop screenshot to `public/fresh-drops/2026-11-24-lazy-river-boat.png` in the publish worktree.
+- Added the boat card to the top of Fresh Drops. Updated the Park rides menu date to Nov 24. The home Fresh Drops card already has the Nov 24 date.
+- `tests/water-park-fresh-drops-browser.cjs` passed on desktop and mobile. The new screenshot loaded, NEW badges appeared, and browser errors were empty.
+- Next: commit the Fresh Drops update, publish it, and verify the live card and image.
 
 ## Park expansion and water — Nov 23, 2026
 
