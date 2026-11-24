@@ -1,3 +1,34 @@
+## Park day/night and weather — Nov 24, 2026
+
+- Read queue item 13 and `FEATURE-BRIEF-park-day-night-weather.md`.
+- Queue item 12 is complete and live. This feature follows the lazy river boat.
+- Created `.worktrees/feature-park-day-night-weather` on `feature/park-day-night-weather` from `origin/main` at `9bd0d4b`.
+- First concrete step: inspected scene lighting, sky setup, Park controls, and the event-driven animation loop.
+- The park uses a fixed sky shader, a hemisphere light, a directional sun, and a warm rim light. The renderer exposure is `1.05`.
+- The visible Park controls are Breeze, Sound, and Play together. No day, weather, or puddle controls exist.
+- The river already has soft ripple rings. `groundHeightAt` provides the shared ground height for actors and vehicles.
+- Added a Park settings disclosure with direct Day, Evening, Night, Auto, Sunny, Cloudy, Light rain, and Auto choices.
+- Added a smooth three-phase sky, fog, and lighting cycle. Auto advances through the phases in 240 seconds.
+- Added moving sun and moon objects, six warm lamp posts, six puddle patches, and a pooled set of 18 rain streaks.
+- Rain fills puddles gradually and animates ripple rings. Sunny weather drains puddles gradually. Auto weather cycles through sunny, cloudy, and light rain.
+- Added a steady emissive glow at the Ice Cream sign.
+- Browser testing found that the initial direct phase transition ran too slowly under the frame clamp. Sky and weather updates now use capped elapsed time.
+- The first night check also found that lamps were on during day. Corrected the night blend range.
+- `node --check assets/park3d.js` and `git diff --check` passed after those fixes.
+- Desktop and mobile checks passed for day, evening, night, rain, sun drainage, Auto, sound-off state, screenshots, and page errors.
+- Rain increases the speed and opacity of existing Mississippi and lazy-river ripples by 55%.
+- Inspected desktop and mobile screenshots. Day, evening, and night use distinct palettes. Rain fills path puddles, and sunny mode drains them.
+- `tests/two-player-browser.cjs` passed on desktop and mobile with zero errors. Bridge height matched at `8.000940 m`.
+- `tests/quad-browser.cjs` passed mount, ride, and dismount with zero errors.
+- Headless frame-rate comparison: feature measured 5.5 FPS desktop and 7.8 FPS mobile. `origin/main` measured 6.0 FPS desktop and 7.8 FPS mobile in the same harness.
+- The frame-rate harness does not represent hardware-accelerated phone performance. It shows no mobile regression, but real-device smoothness still needs live verification.
+- Removed added point lights after the first frame-rate check. Lamp and sign glows use emissive materials and ground halos instead.
+- Final desktop and mobile checks passed after the lighting and ripple updates. Both viewports tested day, evening, night, rain, puddle fill and drain, Auto, reduced motion, sound off, and zero page errors.
+- Final headless rate sample measured 5.4 FPS desktop and 6.6 FPS mobile. The same harness measured 6.0 FPS desktop and 7.8 FPS mobile on `origin/main` earlier.
+- The headless rate is low on both revisions. The durable browser harness does not verify hardware-accelerated phone performance.
+- Reduced-motion support applies direct day/weather selections immediately and keeps rain motion hidden.
+- Final browser test now includes direct controls in reduced-motion mode.
+
 ## Lazy river boat — Nov 24, 2026
 
 - Read queue item 12 and `FEATURE-BRIEF-lazy-river-boat.md`.

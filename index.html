@@ -28,6 +28,21 @@
         <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a><a class="fresh-drops-nav" href="fresh-drops.html">✨ Fresh Drops</a></div></div>
     </div>
     <div class="nav-controls">
+      <details class="park-weather-controls">
+        <summary aria-label="Park day and weather settings">☀️ Park</summary>
+        <div class="park-weather-panel">
+          <label>Day and night
+            <select id="parkDayMode" aria-label="Day and night mode">
+              <option value="auto">Auto</option><option value="day">Day</option><option value="evening">Evening</option><option value="night">Night</option>
+            </select>
+          </label>
+          <label>Weather
+            <select id="parkWeatherMode" aria-label="Weather mode">
+              <option value="auto">Auto</option><option value="sunny">Sunny</option><option value="cloudy">Cloudy</option><option value="rain">Light rain</option>
+            </select>
+          </label>
+        </div>
+      </details>
       <button type="button" class="breeze-pill breeze-btn" id="breezeBtn" aria-pressed="true">🍃 Breeze: on</button>
       <button type="button" class="breeze-pill sound-btn" id="soundBtn" aria-pressed="false">🔔 Sound: off</button>
       <button type="button" class="breeze-pill together-btn" id="togetherBtn" aria-pressed="false" aria-label="Play together. Ahaan uses WASD and E. Vihaan uses arrow keys and Enter." title="Ahaan: WASD and E. Vihaan: arrows and Enter.">Play together: Off</button>

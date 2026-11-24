@@ -151,7 +151,7 @@
     const camera = new T.PerspectiveCamera(40, 1, 0.1, 450);
 
     // ---- Sky Dome: Soft Watercolor Wash Gradient ----
-    scene.add(new T.Mesh(new T.SphereGeometry(200, 32, 16), new T.ShaderMaterial({
+    const skyMaterial = new T.ShaderMaterial({
       side: T.BackSide, depthWrite: false, fog: false,
       uniforms: {
         top: { value: new T.Color("#628ea6") },       // Cerulean ink wash
@@ -160,10 +160,15 @@
       },
       vertexShader: "varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
       fragmentShader: "uniform vec3 top; uniform vec3 mid; uniform vec3 bottom; varying vec3 vP; void main(){ float h = vP.y; vec3 c = h > 0.05 ? mix(mid, top, smoothstep(0.05, 0.55, h)) : mix(bottom, mid, smoothstep(-0.04, 0.05, h)); gl_FragColor = vec4(c, 1.0);\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}"
-    })));
+    });
+    scene.add(new T.Mesh(new T.SphereGeometry(200, 32, 16), skyMaterial));
+    const sunOrb = new T.Mesh(new T.SphereGeometry(4.2, 20, 12), new T.MeshBasicMaterial({ color: 0xffd77b }));
+    const moonOrb = new T.Mesh(new T.SphereGeometry(3.1, 20, 12), new T.MeshBasicMaterial({ color: 0xe8efff }));
+    scene.add(sunOrb, moonOrb);
 
     // ---- Lighting: Warm Golden Watercolor Sun & Ambient Meadow Bounce ----
-    scene.add(new T.HemisphereLight(0xfcf8ee, 0x8a997d, 1.15));
+    const hemi = new T.HemisphereLight(0xfcf8ee, 0x8a997d, 1.15);
+    scene.add(hemi);
     const sun = new T.DirectionalLight(0xfff5e2, 1.35);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -176,6 +181,119 @@
     const rimSun = new T.DirectionalLight(0xf2e0c9, 0.40);
     rimSun.position.set(30, 24, -32);
     scene.add(rimSun);
+
+    const dayModeControl = document.getElementById("parkDayMode");
+    const weatherModeControl = document.getElementById("parkWeatherMode");
+    let dayMode = dayModeControl ? dayModeControl.value : "auto";
+    let weatherMode = weatherModeControl ? weatherModeControl.value : "auto";
+    let dayClock = 0;
+    let weatherClock = 0;
+    let phaseNow = 0;
+    let nightMix = 0;
+    let rainRippleBoost = 1;
+    const parkLights = [];
+    const parkPuddles = [];
+    const rainDrops = [];
+    const dayLooks = {
+      day: { top: "#628ea6", mid: "#a2c0d6", bottom: "#ece7dc", fog: "#ece7dc", sun: "#fff5e2", hemi: "#fcf8ee", ground: "#8a997d", sunPower: 1.35, hemiPower: 1.15, rimPower: 0.4 },
+      evening: { top: "#6b5276", mid: "#d58a68", bottom: "#efd0a4", fog: "#efd0a4", sun: "#ffd09a", hemi: "#ffe3ca", ground: "#806b65", sunPower: 0.82, hemiPower: 0.9, rimPower: 0.3 },
+      night: { top: "#172b4b", mid: "#405875", bottom: "#89929a", fog: "#89929a", sun: "#b9d0ef", hemi: "#d4dded", ground: "#596a76", sunPower: 0.34, hemiPower: 0.58, rimPower: 0.18 }
+    };
+    const nightColors = Object.fromEntries(["top", "mid", "bottom", "fog", "sun", "hemi", "ground"].map(key => [key, new T.Color()]));
+    const dayColorLooks = Object.fromEntries(Object.entries(dayLooks).map(([name, look]) => [name, Object.fromEntries(["top", "mid", "bottom", "fog", "sun", "hemi", "ground"].map(key => [key, new T.Color(look[key])]))]));
+    let previousCloudy = null;
+    const setDayControl = () => {
+      dayMode = dayModeControl.value;
+      dayClock = 0;
+      if (calm() && dayMode !== "auto") {
+        phaseNow = { day: 0, evening: 1, night: 2 }[dayMode];
+        nightMix = dayMode === "night" ? 1 : 0;
+        updateParkSky(0);
+        updateParkWeather(0);
+        render();
+      } else wake();
+    };
+    const setWeatherControl = () => {
+      weatherMode = weatherModeControl.value;
+      if (calm()) { updateParkWeather(0); render(); }
+      else wake();
+    };
+    if (dayModeControl) dayModeControl.addEventListener("change", setDayControl);
+    if (weatherModeControl) weatherModeControl.addEventListener("change", setWeatherControl);
+    function updateParkSky(dt) {
+      if (dayMode === "auto") dayClock = (dayClock + dt / 240) % 1;
+      const targetPhase = dayMode === "auto" ? dayClock * 3 : ({ day: 0, evening: 1, night: 2 }[dayMode] || 0);
+      let phaseDelta = targetPhase - phaseNow;
+      if (dayMode === "auto" && phaseDelta < -1.5) phaseDelta += 3;
+      if (dayMode === "auto" && phaseDelta > 1.5) phaseDelta -= 3;
+      phaseNow = (phaseNow + Math.sign(phaseDelta) * Math.min(Math.abs(phaseDelta), dt * 0.65) + 3) % 3;
+      const phase = phaseNow;
+      const nightTarget = phase < 1 ? 0 : phase < 2 ? phase - 1 : Math.max(0, 3 - phase);
+      nightMix += (nightTarget - nightMix) * Math.min(1, dt * 0.8);
+      const fromIndex = Math.floor(phase) % 3, blend = phase - Math.floor(phase);
+      const names = ["day", "evening", "night"];
+      const from = dayLooks[names[fromIndex]], to = dayLooks[names[(fromIndex + 1) % 3]];
+      const colors = { top: skyMaterial.uniforms.top.value, mid: skyMaterial.uniforms.mid.value, bottom: skyMaterial.uniforms.bottom.value, fog: scene.fog.color, sun: sun.color, hemi: hemi.color, ground: hemi.groundColor };
+      Object.keys(colors).forEach(key => {
+        nightColors[key].copy(dayColorLooks[names[fromIndex]][key]).lerp(dayColorLooks[names[(fromIndex + 1) % 3]][key], blend);
+        colors[key].copy(nightColors[key]);
+      });
+      sun.intensity = from.sunPower + (to.sunPower - from.sunPower) * blend;
+      hemi.intensity = from.hemiPower + (to.hemiPower - from.hemiPower) * blend;
+      rimSun.intensity = from.rimPower + (to.rimPower - from.rimPower) * blend;
+      sun.position.set(-25 + Math.sin(phase * Math.PI / 3) * 36, 48 - (names[fromIndex] === "night" ? 12 : 0), 28);
+      const arc = (phase + 0.5) * Math.PI / 1.5;
+      sunOrb.position.set(Math.cos(arc) * 88, Math.sin(arc) * 62, -110);
+      moonOrb.position.set(-sunOrb.position.x, Math.max(18, -sunOrb.position.y), -108);
+      sunOrb.visible = phase < 1.85 || phase > 2.85;
+      moonOrb.visible = phase > 1.45 && phase < 2.75;
+      return dayMode === "auto" || Math.abs(phaseDelta) > 0.002;
+    }
+
+    function updateParkWeather(dt) {
+      weatherClock += dt;
+      let activeWeather = weatherMode;
+      if (weatherMode === "auto") {
+        const cycle = weatherClock % 120;
+        activeWeather = cycle < 72 ? "sunny" : cycle < 96 ? "cloudy" : "rain";
+      }
+      const raining = activeWeather === "rain";
+      const cloudy = activeWeather === "cloudy";
+      rainRippleBoost = raining ? 1.55 : 1;
+      const rainCenterX = A ? A.rig.position.x : 0;
+      const rainCenterZ = A ? A.rig.position.z : 0;
+      rainDrops.forEach(drop => {
+        drop.visible = raining && !calm();
+        if (!drop.visible) return;
+        const data = drop.userData;
+        drop.position.set(rainCenterX + data.x, data.y, rainCenterZ + data.z);
+        data.y -= data.speed * dt;
+        if (data.y < 0.5) {
+          data.y = 5 + (data.x % 3);
+          data.x = Math.sin(weatherClock + data.speed) * 9;
+          data.z = Math.cos(weatherClock * 0.7 + data.speed) * 9;
+        }
+      });
+      parkPuddles.forEach(item => {
+        item.level = Math.max(0, Math.min(1, item.level + (raining ? dt * 0.12 : activeWeather === "sunny" ? -dt * 0.04 : 0)));
+        item.puddle.material.opacity = item.level * 0.55;
+        item.ripple += dt * (raining && item.level > 0.08 ? 0.6 : 0);
+        const pulse = item.ripple % 1;
+        item.ring.scale.setScalar(0.8 + pulse * 1.8);
+        item.ring.material.opacity = raining && item.level > 0.08 ? (1 - pulse) * 0.42 : 0;
+      });
+      parkLights.forEach(({ globe, glow }) => {
+        globe.material.emissiveIntensity = nightMix * 0.8;
+        if (glow) glow.material.opacity = nightMix * 0.2;
+      });
+      if (clouds && previousCloudy !== cloudy) {
+        clouds.forEach(cloud => cloud.traverse(node => {
+          if (node.isMesh && node.material && node.material.color && node.geometry.type === "SphereGeometry") node.material.color.set(cloudy ? 0xb5c0c8 : 0xffffff);
+        }));
+        previousCloudy = cloudy;
+      }
+      return raining || weatherMode === "auto";
+    }
 
     // ==========================================
     // 3D Arkansas & Neighboring States Map Data
@@ -460,6 +578,7 @@
     // 3D Connecting Trails & Roads
     // ==========================================
     buildPaths(mapGroup, STATES, T, walkableSurfaces);
+    buildParkWeatherProps(mapGroup, T, STATES);
 
     // ==========================================
     // 3D Nature: Lush Trees, Rocks & Wildflowers
@@ -608,6 +727,61 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       });
     }
 
+    function buildParkWeatherProps(parent, T, states) {
+      const poleMat = new T.MeshStandardMaterial({ color: 0x56616a, roughness: 0.72 });
+      const globeMat = new T.MeshStandardMaterial({ color: 0xffe4a8, emissive: 0xffb95e, emissiveIntensity: 0, roughness: 0.35 });
+      const lampPoints = [[0, -9], [9, 0], [0, 9], [-9, 0], [5, -17], [18, 9]];
+      const glowGeo = new T.CircleGeometry(1.15, 12);
+      glowGeo.rotateX(-Math.PI / 2);
+      const glowMat = new T.MeshBasicMaterial({ color: 0xffbd70, transparent: true, opacity: 0, depthWrite: false });
+      lampPoints.forEach(([x, z]) => {
+        const pole = new T.Mesh(new T.CylinderGeometry(0.07, 0.12, 3.1, 6), poleMat);
+        pole.position.set(x, 1.55, z);
+        pole.castShadow = true;
+        parent.add(pole);
+        const arm = new T.Mesh(new T.BoxGeometry(0.6, 0.08, 0.08), poleMat);
+        arm.position.set(x + 0.24, 3.05, z);
+        parent.add(arm);
+        const globe = new T.Mesh(new T.SphereGeometry(0.24, 8, 6), globeMat);
+        globe.position.set(x + 0.48, 3.02, z);
+        parent.add(globe);
+        const glow = new T.Mesh(glowGeo, glowMat.clone());
+        glow.position.set(x + 0.48, 0.445, z);
+        parent.add(glow);
+        parkLights.push({ globe, glow });
+      });
+
+      const puddleMat = new T.MeshBasicMaterial({ color: 0x94c6d6, transparent: true, opacity: 0, depthWrite: false });
+      const ringMat = new T.MeshBasicMaterial({ color: 0xe4f6fb, transparent: true, opacity: 0, depthWrite: false, side: T.DoubleSide });
+      const ringGeo = new T.RingGeometry(0.08, 0.13, 16);
+      ringGeo.rotateX(-Math.PI / 2);
+      const puddleGeo = new T.CircleGeometry(0.72, 20);
+      puddleGeo.rotateX(-Math.PI / 2);
+      const ar = states.find(state => state.id === "AR");
+      states.filter(state => state.id !== "AR").slice(0, 6).map(state => [
+        ar.x + (state.x - ar.x) * 0.48,
+        ar.z + (state.z - ar.z) * 0.48
+      ]).forEach(([x, z]) => {
+        const puddle = new T.Mesh(puddleGeo, puddleMat.clone());
+        puddle.position.set(x, 0.435, z);
+        parent.add(puddle);
+        const ring = new T.Mesh(ringGeo, ringMat.clone());
+        ring.position.set(x, 0.442, z);
+        parent.add(ring);
+        parkPuddles.push({ puddle, ring, level: 0, ripple: 0 });
+      });
+
+      const rainMat = new T.MeshBasicMaterial({ color: 0x90b9ce, transparent: true, opacity: 0.72, depthWrite: false });
+      const rainGeo = new T.BoxGeometry(0.05, 0.75, 0.05);
+      for (let i = 0; i < 18; i++) {
+        const drop = new T.Mesh(rainGeo, rainMat);
+        drop.visible = false;
+        drop.userData = { x: Math.sin(i * 19.7) * 9, z: Math.cos(i * 13.1) * 9, y: 2 + (i % 6) * 0.7, speed: 4 + (i % 4) * 0.6 };
+        parent.add(drop);
+        rainDrops.push(drop);
+      }
+    }
+
     // One profile drives bridge geometry and the walking route height.
     function bridgeDeckHeight(u, bankY = 0.32) {
       const t = Math.max(0, Math.min(1, u));
@@ -698,12 +872,12 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       });
       let rippleTime = 0;
       landmarkAnimators.push(dt => {
-        rippleTime = (rippleTime + dt * 0.12) % 1;
+        rippleTime = (rippleTime + dt * 0.12 * rainRippleBoost) % 1;
         ripples.forEach(({ ring, ringMat }) => {
           const phase = (rippleTime + ring.userData.phase) % 1;
           const size = 0.55 + phase * 4.0;
           ring.scale.set(size, size, size);
-          ringMat.opacity = (1 - phase) * 0.28;
+          ringMat.opacity = (1 - phase) * 0.28 * rainRippleBoost;
         });
         return true;
       });
@@ -811,12 +985,12 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       }
       let currentTime = 0;
       landmarkAnimators.push(dt => {
-        currentTime = (currentTime + dt * 0.1) % 1;
+        currentTime = (currentTime + dt * 0.1 * rainRippleBoost) % 1;
         currentRings.forEach(({ ring, ringMat }) => {
           const phase = (currentTime + ring.userData.phase) % 1;
           const size = 0.5 + phase * 3.4;
           ring.scale.set(size, size, size);
-          ringMat.opacity = (1 - phase) * 0.22;
+          ringMat.opacity = (1 - phase) * 0.22 * rainRippleBoost;
         });
         return true;
       });
@@ -4613,6 +4787,10 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     const shopState = { x: 4.2, z: -13.5 };
     const shopRoot = new T.Group();
     shopRoot.position.set(shopState.x, 0, shopState.z);
+    const shopGlow = new T.Mesh(new T.SphereGeometry(0.22, 8, 6), new T.MeshStandardMaterial({ color: 0xffe7b4, emissive: 0xffb95e, emissiveIntensity: 0 }));
+    shopGlow.position.set(0, 4.7, 0.45);
+    shopRoot.add(shopGlow);
+    parkLights.push({ globe: shopGlow, glow: null });
     const woodMat = new T.MeshStandardMaterial({ color: 0x79533a, roughness: 0.9 });
     const creamMat = new T.MeshStandardMaterial({ color: 0xf6eddc, roughness: 0.92 });
     const berryMat = new T.MeshStandardMaterial({ color: 0xb54e58, roughness: 0.85 });
@@ -6921,6 +7099,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       const dt = Math.min(0.05, elapsed);
       const walkDt = elapsed;
       last = now;
+      const parkSkyActive = updateParkSky(elapsed);
+      const parkWeatherActive = updateParkWeather(elapsed);
       const trainActive = updateParkTrain(elapsed);
       const movieTheaterActive = updateMovieTheater(elapsed);
 
@@ -7390,7 +7570,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(fireTruckKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || (fireTruckState.driver && fireTruckState.speed > 0.02) || fireTruckState.spraying || (lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan || lazyRiverBoatState.targetAngle !== null) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (parkSkyActive || parkWeatherActive || cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(fireTruckKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || (fireTruckState.driver && fireTruckState.speed > 0.02) || fireTruckState.spraying || (lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan || lazyRiverBoatState.targetAngle !== null) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -7446,6 +7626,16 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       interactiveMeshes,
       STATES,
       INTERACTABLES,
+      getDayWeatherState: () => ({
+        dayMode,
+        weatherMode,
+        phase: phaseNow,
+        nightMix,
+        sunIntensity: sun.intensity,
+        rainVisible: rainDrops.some(drop => drop.visible),
+        averagePuddleFill: parkPuddles.reduce((sum, item) => sum + item.level, 0) / Math.max(1, parkPuddles.length),
+        lampIntensity: parkLights[0] ? parkLights[0].globe.material.emissiveIntensity : 0
+      }),
       openDiscoveryModal,
       closeDiscoveryModal,
       playSound,
