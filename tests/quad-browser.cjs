@@ -26,11 +26,17 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
     point = 'park-ready';
     await page.waitForFunction(() => window.Park3D?.getQuadState);
     point = 'enable-together';
-    await page.evaluate(() => Park3D.teleportAhaan(23, 23));
+    await page.evaluate(() => {
+      const quad = Park3D.getQuadState();
+      Park3D.teleportAhaan(quad.x + 2.5, quad.z);
+    });
     await page.evaluate(() => document.querySelector('#togetherBtn').click());
     await page.waitForFunction(() => Park3D.isTogetherEnabled());
     point = 'move-vihaan-near-quad';
-    await page.evaluate(() => Park3D.teleportVihaan(23, 20));
+    await page.evaluate(() => {
+      const quad = Park3D.getQuadState();
+      Park3D.teleportVihaan(quad.x, quad.z);
+    });
     console.log('immediately after teleport', await page.evaluate(() => ({ nearby: Park3D.getVihaanNearbyItem(), position: [Park3D.getV().rig.position.x, Park3D.getV().rig.position.z], together: Park3D.isTogetherEnabled() })));
     await page.waitForFunction(() => Park3D.getVihaanNearbyItem() === 'quad');
     point = 'mount';
