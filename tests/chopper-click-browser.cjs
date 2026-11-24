@@ -44,7 +44,10 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
       if (viewport.width === 1280) await page.screenshot({ path: path.join(evidenceDir, 'parked-desktop.png') });
       else await page.screenshot({ path: path.join(evidenceDir, 'parked-mobile.png') });
       point = `mount-${viewport.width}`;
-      await page.evaluate(() => Park3D.teleportAhaan(23, -20));
+      await page.evaluate(() => {
+        const chopper = Park3D.getChopperState();
+        Park3D.teleportAhaan(chopper.x, chopper.z);
+      });
       const normalAhaanScale = await page.evaluate(() => Park3D.getA().rig.scale.x);
       await page.waitForFunction(() => Park3D.getCurrentNearbyItem()?.id === 'chopper');
       await page.keyboard.press('e');
@@ -62,11 +65,27 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
           });
           const clickX = Math.max(1, Math.min(viewport.width - 2, rect.x + rect.width * xRatio));
           const clickY = Math.max(1, Math.min(viewport.height - 2, rect.y + rect.height * yRatio));
+          const hitsCanvas = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.id === 'parkCanvas', { x: clickX, y: clickY });
+          if (!hitsCanvas) return false;
           if (viewport.width === 390) await page.touchscreen.tap(clickX, clickY);
           else await page.mouse.click(clickX, clickY);
+          return true;
         };
-        await clickAt(stateName === 'getChopperState' ? 0.9 : 0.6, stateName === 'getChopperState' ? 0.9 : 0.62);
-        await page.waitForFunction(name => Park3D[name]().target, stateName, { timeout: 5000 });
+        const clickPoints = stateName === 'getChopperState'
+          ? [[0.9, 0.9], [0.68, 0.48], [0.42, 0.44]]
+          : viewport.width === 390
+            ? [[0.38, 0.55], [0.42, 0.44], [0.25, 0.4], [0.25, 0.55], [0.45, 0.35], [0.3, 0.5], [0.52, 0.55], [0.5, 0.4]]
+            : [[0.6, 0.62], [0.68, 0.46], [0.42, 0.44]];
+        let hasTarget = false;
+        for (const [x, y] of clickPoints) {
+          if (!await clickAt(x, y)) continue;
+          try {
+            await page.waitForFunction(name => Park3D[name]().target, stateName, { timeout: 1500 });
+            hasTarget = true;
+            break;
+          } catch {}
+        }
+        assert.ok(hasTarget, `${stateName} receives a click target: ${JSON.stringify(await page.evaluate(name => Park3D[name](), stateName))}`);
         const goal = await page.evaluate(name => Park3D[name]().target, stateName);
         if (stateName === 'getChopperState') {
           await page.evaluate(() => {
@@ -111,7 +130,11 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
         if (stateName === 'getChopperState') assert.ok(Math.abs(cancelState.altitude - 10.5) < 0.1, 'arrow flight stays at safe cruising height');
         await page.keyboard.up(key);
       };
-      const mountAhaan = async (x, z, id, stateName, key) => {
+      const mountAhaan = async (id, stateName, key) => {
+        const [x, z] = await page.evaluate(name => {
+          const state = Park3D[name]();
+          return [state.x, state.z];
+        }, stateName);
         await page.evaluate(([px, pz]) => Park3D.teleportAhaan(px, pz), [x, z]);
         await page.evaluate(([px, pz]) => Park3D.setCustomCamera({ x: px + 8, y: 10, z: pz + 12 }, { x: px, y: 1, z: pz }), [x, z]);
         await page.waitForFunction(name => Park3D.getCurrentNearbyItem()?.id === name, id);
@@ -132,9 +155,9 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
         await page.waitForFunction(() => !Park3D.getChopperState().riding);
         assert.ok(Math.abs((await page.evaluate(() => Park3D.getA().rig.scale.x)) - normalAhaanScale) < 0.001, 'Ahaan returns to normal size after dismount');
         assert.equal(await page.evaluate(() => window.rotorStopCalls), 1, 'rotor sound stops on dismount');
-        await mountAhaan(-0.65, 6.2, 'bike', 'getBikeState', 'ArrowUp');
-        await mountAhaan(-13, 7, 'ebike', 'getEbikeState', 'KeyW');
-        await mountAhaan(-20, -14, 'car', 'getCarState', 'KeyW');
+        await mountAhaan('bike', 'getBikeState', 'ArrowUp');
+        await mountAhaan('ebike', 'getEbikeState', 'KeyW');
+        await mountAhaan('car', 'getCarState', 'KeyW');
         await page.evaluate(() => {
           document.querySelector('#togetherBtn').click();
           const chopper = Park3D.getChopperState();
@@ -169,12 +192,13 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
         await page.keyboard.up('ShiftLeft');
         await page.keyboard.press('e');
         await page.waitForFunction(() => !Park3D.getChopperState().riding);
-        await mountAhaan(-0.65, 6.2, 'bike', 'getBikeState', 'ArrowUp');
-        await mountAhaan(-13, 7, 'ebike', 'getEbikeState', 'KeyW');
-        await mountAhaan(-20, -14, 'car', 'getCarState', 'KeyW');
+        await mountAhaan('bike', 'getBikeState', 'ArrowUp');
+        await mountAhaan('ebike', 'getEbikeState', 'KeyW');
+        await mountAhaan('car', 'getCarState', 'KeyW');
       }
       point = `fresh-drops-${viewport.width}`;
       await page.goto(siteUrl('fresh-drops.html'), { waitUntil: 'domcontentloaded' });
+      await page.locator('.fresh-drop-comparison').scrollIntoViewIfNeeded();
       await page.waitForFunction(() => [...document.querySelectorAll('.fresh-drop-comparison img')].every(image => image.complete && image.naturalWidth > 0));
       assert.equal(await page.locator('.fresh-drop-comparison figure').count(), 2, 'Fresh Drops shows before and after images');
       assert.equal(await page.locator('.fresh-drop-comparison').evaluate(el => el.scrollWidth > el.clientWidth), false, 'before and after images fit the card');

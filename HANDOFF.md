@@ -1,3 +1,44 @@
+## Park expansion and water — Nov 23, 2026
+
+- Read queue item 11 and `FEATURE-BRIEF-park-expand-water.md`.
+- Created `.worktrees/feature-park-expand-water` on `feature/park-expand-water` from `origin/main` at `2094a58`.
+- Copied the existing `_bmad` folder into the worktree before setup.
+- First concrete step: mapped the current center, water, train, vehicle, and outer-section coordinates.
+- Four-section plan: movie theater northwest, water park northeast, zoo southwest, and pyramid southeast. Keep these sections outside the train loop.
+- Keep Arkansas and the existing lazy river as the center hub. Existing state centers, roads, river crossings, vehicles, and train route use many fixed coordinates. Coordinate expansion must update those systems together.
+- The Mississippi water and existing lazy river have static surfaces. Reuse their meshes for gentle ripple motion and respect Calm mode.
+- Existing center play items and paths need more space. The current lazy river occupies radii 7.5–10.1 around Arkansas.
+- Expanded the full park group by 20% on the ground plane. This spreads state circles, paths, the center play area, the train, vehicles, and all four sections together.
+- Spread the central play and picnic props by another 22% around Arkansas. Updated their prompt positions, collision points, and activity paths.
+- Enlarged the sun shadow area for the expanded park. Kept the scene height unchanged.
+- Updated camera positioning and ground raycasts for the expanded scene. Kept click-to-go coordinates in park space.
+- Moved both rider models into the scaled park group. Updated rider labels and project checks to use world positions.
+- Added slow, low-contrast ripple rings over the Mississippi and lazy river. The existing Calm mode pauses the animation loop.
+- Added a small splash pad south of the center lazy river. Three soft water arcs and entry-triggered droplets and foot ripples work for both actors.
+- `node --check assets/park3d.js` passed. `git diff --check` passed.
+- Added `tests/park-expand-water-browser.cjs` for expanded layout, water motion, both splash triggers, desktop, and mobile.
+- The desktop and mobile `tests/two-player-browser.cjs` check passed. Both boys moved independently, stayed in frame, and crossed the Mississippi bridge at deck height. No browser errors occurred.
+- `tests/park-water-park-browser.cjs` passed on desktop and mobile. All four rides and Play together passed with zero browser or console errors.
+- `tests/park-train-browser.cjs` passed on desktop and mobile. Train stops, boarding, independent exits, smoke, and breeze pause passed with zero browser errors.
+- Updated `tests/quad-browser.cjs` to use the quad's current reported parking position. The mount, ride, and dismount check passed.
+- The first `tests/park-expand-water-browser.cjs` run passed on desktop and mobile. It verified the 20% scene scale, all 13 ripple rings, ripple motion, both splash triggers, silent default, and zero browser errors. Screenshots are in `/tmp/ahaan-park-expand-water`.
+- Increased central play and picnic spacing by 22%. Kept prop sizes unchanged. Updated movement, collision, and prompt positions.
+- Increased water ring size and contrast after screenshot inspection. Made the splash pad and arcs easier to see.
+- Reran `tests/two-player-browser.cjs` after the center change. Desktop and mobile passed, including independent play, trampoline, labels, and bridge height.
+- Reran `tests/park-expand-water-browser.cjs` after the center and water changes. Desktop and mobile passed. Both boys triggered droplets and foot ripples. The ripple opacity changed over time. The sound toggle stayed off. There were zero browser errors.
+- Inspected `/tmp/ahaan-park-expand-water/desktop-park.png` and `desktop-splash-zone.png`. The center props have more space. The water pad and both riders fit in the center view.
+- `node --check assets/park3d.js`, `node --check tests/park-expand-water-browser.cjs`, `node --check tests/quad-browser.cjs`, and `git diff --check` passed after the center change.
+- The first `tests/chopper-click-browser.cjs` run stopped at mount. Its chopper, bike, e-bike, and car coordinates were old. Updated the check to read each current parking state.
+- The next vehicle-check run reached the mobile car check but a fallback tap hit the Fresh Drops overlay. The check now skips points where an overlay covers the canvas.
+- The following run passed all vehicle controls on desktop and mobile. Its mobile Fresh Drops wait timed out because comparison images use lazy loading. The check now scrolls the images into view before waiting.
+- The final `tests/chopper-click-browser.cjs` check passed on desktop and mobile. Chopper, bike, e-bike, car, click targets, manual controls, safe height, arrow cancellation, and rotor sound passed. No browser errors occurred.
+- Added shallow edge bands beside the Mississippi water to make the depth edge clearer. Increased splash droplet size and airtime for visual inspection.
+- Reran `tests/park-expand-water-browser.cjs` after the final water changes. Desktop and mobile passed. Ripple motion, both boys' splash effects, and zero browser errors passed.
+- `tests/park-pyramid-browser.cjs` passed on desktop and mobile. The southeast section, sign, path, menu link, and direct arrival passed with zero browser errors.
+- Final checks passed: `node --check assets/park3d.js`, `node --check tests/park-expand-water-browser.cjs`, `node --check tests/chopper-click-browser.cjs`, `node --check tests/quad-browser.cjs`, `node --check tests/park-pyramid-browser.cjs`, and `git diff --check`.
+- Ready for a local feature commit and publish.
+- Next: rerun the chopper check and check the southeast section after scene expansion. Then run final checks and prepare local commits.
+
 ## Park car and fire truck — Nov 23, 2026
 
 - Read queue item 10 and `FEATURE-BRIEF-park-car-improve-fire-truck.md` from the main folder.

@@ -167,7 +167,7 @@
     const sun = new T.DirectionalLight(0xfff5e2, 1.35);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -48, right: 48, top: 48, bottom: -48, near: 1, far: 130 });
+    Object.assign(sun.shadow.camera, { left: -68, right: 68, top: 68, bottom: -68, near: 1, far: 150 });
     sun.shadow.bias = -0.0003;
     sun.position.set(-25, 48, 28);
     scene.add(sun);
@@ -318,6 +318,11 @@
     }
 
     const mapGroup = new T.Group();
+    const PARK_EXPANSION = 1.2;
+    const CENTER_SPREAD = 1.22;
+    const centerX = value => value * CENTER_SPREAD;
+    const centerZ = value => value * CENTER_SPREAD;
+    mapGroup.scale.set(PARK_EXPANSION, 1, PARK_EXPANSION);
     scene.add(mapGroup);
 
     // Procedural watercolor meadow wash texture (Singapore Sketchbook aesthetic)
@@ -508,7 +513,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         p.visible = true;
         const ang = Math.random() * Math.PI * 2;
         const rad = 0.2 + Math.random() * 0.7;
-        p.position.set(-4.3 + Math.cos(ang) * rad, 0.58, 0.2 + Math.sin(ang) * rad);
+        p.position.set(centerX(-4.3 + Math.cos(ang) * rad), 0.58, centerZ(0.2 + Math.sin(ang) * rad));
         p.userData.vx = Math.cos(ang) * (0.8 + Math.random() * 1.2);
         p.userData.vy = 2.4 + Math.random() * 1.8;
         p.userData.vz = Math.sin(ang) * (0.8 + Math.random() * 1.2);
@@ -661,6 +666,47 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       river.position.y = 0.14;
       parent.add(river);
 
+      const shallowEdgeMat = new T.MeshStandardMaterial({ color: 0x80a6a0, roughness: 0.82, transparent: true, opacity: 0.72 });
+      [-1, 1].forEach(side => {
+        const edgeGeo = new T.PlaneGeometry(0.56, 78, 1, 48);
+        edgeGeo.rotateX(-Math.PI / 2);
+        const edgePos = edgeGeo.attributes.position;
+        for (let i = 0; i < edgePos.count; i++) {
+          const z = edgePos.getZ(i);
+          const curve = Math.sin(z * 0.08) * 3 + Math.cos(z * 0.05) * 1.5;
+          edgePos.setX(i, edgePos.getX(i) + curve + 11.2 + side * 2.58);
+        }
+        edgeGeo.computeVertexNormals();
+        const edge = new T.Mesh(edgeGeo, shallowEdgeMat);
+        edge.position.y = 0.12;
+        parent.add(edge);
+      });
+
+      const ripples = [];
+      [-28, -14, 0, 14, 28].forEach((z, index) => {
+        const x = Math.sin(z * 0.08) * 3 + Math.cos(z * 0.05) * 1.5 + 11.2;
+        const ringGeo = new T.RingGeometry(0.06, 0.12, 28);
+        ringGeo.rotateX(-Math.PI / 2);
+        const ringMat = new T.MeshBasicMaterial({ color: 0xe3f5f3, transparent: true, opacity: 0.26, depthWrite: false });
+        const ring = new T.Mesh(ringGeo, ringMat);
+        ring.name = "mississippi-ripple";
+        ring.position.set(x, 0.17, z);
+        ring.userData.phase = index / 5;
+        parent.add(ring);
+        ripples.push({ ring, ringMat });
+      });
+      let rippleTime = 0;
+      landmarkAnimators.push(dt => {
+        rippleTime = (rippleTime + dt * 0.12) % 1;
+        ripples.forEach(({ ring, ringMat }) => {
+          const phase = (rippleTime + ring.userData.phase) % 1;
+          const size = 0.55 + phase * 4.0;
+          ring.scale.set(size, size, size);
+          ringMat.opacity = (1 - phase) * 0.28;
+        });
+        return true;
+      });
+
       function makeBridge(bx, bz, rot, length = 6.4, width = 2.6, bankY = 0.32) {
         const b = new T.Group();
         b.position.set(bx, 0, bz);
@@ -747,6 +793,31 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       lazyRiverWater = new T.Mesh(waterGeo, waterMat);
       lazyRiverWater.position.y = 0.16;
       riverGroup.add(lazyRiverWater);
+
+      const currentRings = [];
+      for (let i = 0; i < 8; i++) {
+        const angle = i / 8 * Math.PI * 2;
+        const ringGeo = new T.RingGeometry(0.05, 0.10, 24);
+        ringGeo.rotateX(-Math.PI / 2);
+        const ringMat = new T.MeshBasicMaterial({ color: 0xd8efed, transparent: true, opacity: 0.22, depthWrite: false });
+        const ring = new T.Mesh(ringGeo, ringMat);
+        ring.name = "lazy-river-ripple";
+        ring.position.set(Math.cos(angle) * canalMidR, 0.18, Math.sin(angle) * canalMidR);
+        ring.userData.phase = i / 8;
+        riverGroup.add(ring);
+        currentRings.push({ ring, ringMat });
+      }
+      let currentTime = 0;
+      landmarkAnimators.push(dt => {
+        currentTime = (currentTime + dt * 0.1) % 1;
+        currentRings.forEach(({ ring, ringMat }) => {
+          const phase = (currentTime + ring.userData.phase) % 1;
+          const size = 0.5 + phase * 3.4;
+          ring.scale.set(size, size, size);
+          ringMat.opacity = (1 - phase) * 0.22;
+        });
+        return true;
+      });
 
       // Pebble riverbanks along inner and outer canal perimeters
       const pebbleMat = new T.MeshStandardMaterial({ color: 0x8f7d6a, roughness: 0.9 });
@@ -942,6 +1013,114 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       });
     }
 
+    function buildSplashZone(parent, T) {
+      const center = { x: 0, z: 14.5 };
+      const zone = new T.Group();
+      zone.name = "park-splash-zone";
+      zone.position.set(center.x, 0, center.z);
+      parent.add(zone);
+
+      const pad = new T.Mesh(
+        new T.CircleGeometry(3.2, 40),
+        new T.MeshStandardMaterial({ color: 0x6eabb4, roughness: 0.34, metalness: 0.04, transparent: true, opacity: 0.84 })
+      );
+      pad.rotation.x = -Math.PI / 2;
+      pad.position.y = 0.08;
+      zone.add(pad);
+
+      const edge = new T.Mesh(
+        new T.RingGeometry(3.12, 3.34, 40),
+        new T.MeshStandardMaterial({ color: 0xe2d1a8, roughness: 0.9 })
+      );
+      edge.rotation.x = -Math.PI / 2;
+      edge.position.y = 0.1;
+      zone.add(edge);
+
+      const jetMat = new T.MeshBasicMaterial({ color: 0xd9f8f7, transparent: true, opacity: 0.88 });
+      const jetPoints = [[-1.5, -0.5], [0, 1.5], [1.5, -0.5]];
+      jetPoints.forEach(([x, z], index) => {
+        const curve = new T.QuadraticBezierCurve3(
+          new T.Vector3(x, 0.14, z),
+          new T.Vector3(x * 0.85, 1.18 + (index === 1 ? 0.16 : 0), z * 0.85),
+          new T.Vector3(x * 0.45, 0.18, z * 0.45)
+        );
+        const arc = new T.Mesh(new T.TubeGeometry(curve, 16, 0.075, 6, false), jetMat);
+        zone.add(arc);
+      });
+
+      const actorEffects = [A, V].map(actor => {
+        const ripple = new T.Mesh(
+          new T.RingGeometry(0.18, 0.24, 24),
+          new T.MeshBasicMaterial({ color: 0xe1f5ef, transparent: true, opacity: 0, depthWrite: false })
+        );
+        ripple.rotation.x = -Math.PI / 2;
+        ripple.visible = false;
+        parent.add(ripple);
+        const droplets = Array.from({ length: 5 }, () => {
+          const material = new T.MeshBasicMaterial({ color: 0xf0ffff, transparent: true, opacity: 0 });
+          const mesh = new T.Mesh(new T.SphereGeometry(0.12, 8, 6), material);
+          mesh.name = actor === A ? "splash-droplet-ahaan" : "splash-droplet-vihaan";
+          mesh.visible = false;
+          parent.add(mesh);
+          return { mesh, material };
+        });
+        return { actor, ripple, droplets, inside: false, cooldown: 0, burst: 0, x: 0, z: 0 };
+      });
+
+      let fountainPhase = 0;
+      return dt => {
+        fountainPhase += dt * 0.9;
+        zone.children.forEach((child, index) => {
+          if (index >= 2 && child.isMesh && child.geometry.type === "TubeGeometry") {
+            child.position.y = Math.sin(fountainPhase + index) * 0.035;
+          }
+        });
+        actorEffects.forEach(effect => {
+          const world = effect.actor.rig.getWorldPosition(new T.Vector3());
+          const local = parent.worldToLocal(world);
+          const dx = local.x - center.x;
+          const dz = local.z - center.z;
+          const inside = Math.hypot(dx, dz) <= 3.6;
+          effect.x = local.x;
+          effect.z = local.z;
+          effect.cooldown = Math.max(0, effect.cooldown - dt);
+          if (inside && (!effect.inside || effect.cooldown === 0)) {
+            effect.burst = 0.8;
+            effect.cooldown = 1.05;
+            effect.droplets.forEach(({ mesh }, index) => {
+              const angle = index / effect.droplets.length * Math.PI * 2;
+              mesh.position.set(local.x, 0.35, local.z);
+              mesh.userData.vx = Math.cos(angle) * 0.75;
+              mesh.userData.vy = 1.0 + (index % 2) * 0.3;
+              mesh.userData.vz = Math.sin(angle) * 0.75;
+              mesh.visible = true;
+            });
+          }
+          effect.inside = inside;
+          effect.ripple.visible = inside;
+          if (inside) {
+            effect.ripple.position.set(local.x, 0.13, local.z);
+            const pulse = 1 + (Math.sin(fountainPhase * 1.5) + 1) * 0.18;
+            effect.ripple.scale.set(pulse, pulse, pulse);
+            effect.ripple.material.opacity = 0.3;
+          }
+          if (effect.burst > 0) {
+            effect.burst = Math.max(0, effect.burst - dt);
+            effect.droplets.forEach(({ mesh, material }) => {
+              mesh.position.x += mesh.userData.vx * dt;
+              mesh.position.y += mesh.userData.vy * dt;
+              mesh.position.z += mesh.userData.vz * dt;
+              mesh.userData.vy -= 2.1 * dt;
+              material.opacity = Math.min(0.85, effect.burst * 1.5);
+              mesh.visible = effect.burst > 0;
+            });
+          } else {
+            effect.droplets.forEach(({ mesh }) => { mesh.visible = false; });
+          }
+        });
+      };
+    }
+
     function buildStoryProps(parent, T, walkables) {
       const storyGroup = new T.Group();
       parent.add(storyGroup);
@@ -964,14 +1143,14 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       const blanketMat = new T.MeshStandardMaterial({ map: blanketTex, roughness: 0.9 });
       const blanket = new T.Mesh(new T.BoxGeometry(3.6, 0.05, 2.6), blanketMat);
-      blanket.position.set(2.4, 0.46, 1.4);
+      blanket.position.set(centerX(2.4), 0.46, centerZ(1.4));
       blanket.receiveShadow = true;
       storyGroup.add(blanket);
       if (walkables) walkables.push(blanket);
 
       // 2. Open Hardcover Storybook (Interactive Page Flip)
       const bookGroup = new T.Group();
-      bookGroup.position.set(2.0, 0.50, 1.2);
+      bookGroup.position.set(centerX(2.0), 0.50, centerZ(1.2));
       bookGroup.rotation.y = -0.25;
       const coverMat = new T.MeshStandardMaterial({ color: 0x1d3557, roughness: 0.7 });
       const pagesMat = new T.MeshStandardMaterial({ color: 0xfffaee, roughness: 0.8 });
@@ -1020,7 +1199,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         });
         wake();
       };
-      registerInteractive(bookGroup, { name: "Storybook", x: 2.0, z: 1.2, onInteract: triggerBook });
+      registerInteractive(bookGroup, { name: "Storybook", x: centerX(2.0), z: centerZ(1.2), onInteract: triggerBook });
 
       landmarkAnimators.push((dt) => {
         if (bookFlipT > 0.001) {
@@ -1067,7 +1246,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // 4. Stargazing Brass Telescope on Tripod
       const teleGroup = new T.Group();
-      teleGroup.position.set(-2.2, 0.45, 2.6);
+      teleGroup.position.set(centerX(-2.2), 0.45, centerZ(2.6));
       const woodMat = new T.MeshStandardMaterial({ color: 0x6e4428, roughness: 0.85 });
       const brassMat = new T.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
       for (let leg = 0; leg < 3; leg++) {
@@ -1111,13 +1290,13 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
             </div>
           `,
           actionLabel: "Aim Skyward",
-          x: -2.2,
-          z: 2.6,
+          x: centerX(-2.2),
+          z: centerZ(2.6),
           onInteract: triggerTele
         });
         wake();
       };
-      registerInteractive(teleGroup, { name: "Brass Telescope", x: -2.2, z: 2.6, onInteract: triggerTele });
+      registerInteractive(teleGroup, { name: "Brass Telescope", x: centerX(-2.2), z: centerZ(2.6), onInteract: triggerTele });
 
       landmarkAnimators.push((dt) => {
         if (teleTiltT > 0.001) {
@@ -1131,7 +1310,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // 5. Picnic Basket with Shiny Red Apple
       const basketGroup = new T.Group();
-      basketGroup.position.set(1.5, 0.46, 2.2);
+      basketGroup.position.set(centerX(1.5), 0.46, centerZ(2.2));
       const wickerMat = new T.MeshStandardMaterial({ color: 0xb58249, roughness: 0.9 });
       const basket = new T.Mesh(new T.BoxGeometry(0.85, 0.55, 0.65), wickerMat);
       basket.position.y = 0.28;
@@ -1155,7 +1334,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         showToast("🍎 CRUNCH! Delicious sweet Honeycrisp apple!");
         wake();
       };
-      registerInteractive(basketGroup, { name: "Picnic Apple", x: 1.5, z: 2.2, onInteract: triggerApple });
+      registerInteractive(basketGroup, { name: "Picnic Apple", x: centerX(1.5), z: centerZ(2.2), onInteract: triggerApple });
 
       landmarkAnimators.push((dt) => {
         if (appleBounceT > 0.001) {
@@ -1169,7 +1348,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // 6. Garden Lantern (Interactive PointLight Toggle)
       const lanternGroup = new T.Group();
-      lanternGroup.position.set(-2.0, 0.45, -1.6);
+      lanternGroup.position.set(centerX(-2.0), 0.45, centerZ(-1.6));
       const metalMat = new T.MeshStandardMaterial({ color: 0x333333, metalness: 0.6, roughness: 0.4 });
       const baseLantern = new T.Mesh(new T.CylinderGeometry(0.2, 0.24, 0.1, 8), metalMat); baseLantern.position.y = 0.05;
       const capLantern = new T.Mesh(new T.ConeGeometry(0.26, 0.22, 8), metalMat); capLantern.position.y = 0.7;
@@ -1179,7 +1358,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       lanternGroup.add(baseLantern, glass, capLantern);
 
       const lanternLight = new T.PointLight(0xffa726, 1.4, 8.0);
-      lanternLight.position.set(-2.0, 0.9, -1.6);
+      lanternLight.position.set(centerX(-2.0), 0.9, centerZ(-1.6));
       lanternLight.castShadow = true;
       parent.add(lanternLight);
       storyGroup.add(lanternGroup);
@@ -1193,7 +1372,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         showToast(`💡 Lantern ${lanternOn ? "turned on" : "turned off"}!`);
         wake();
       };
-      registerInteractive(lanternGroup, { name: "Garden Lantern", x: -2.0, z: -1.6, onInteract: triggerLantern });
+      registerInteractive(lanternGroup, { name: "Garden Lantern", x: centerX(-2.0), z: centerZ(-1.6), onInteract: triggerLantern });
 
       // 7. Dandelions with Floating Seed Tufts
       const dandelionSeeds = [];
@@ -1270,9 +1449,9 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     // ==========================================
     function buildPlayground(parent, T, walkables) {
       parkObstacles.push(
-        { x: -2.6, z: -3.2, r: 1.55 },
-        { x: 3.2, z: -2.8, r: 2.05 },
-        { x: -4.3, z: 0.2, r: 2.35 }
+        { x: centerX(-2.6), z: centerZ(-3.2), r: 1.55 },
+        { x: centerX(3.2), z: centerZ(-2.8), r: 2.05 },
+        { x: centerX(-4.3), z: centerZ(0.2), r: 2.35 }
       );
       const playGroup = new T.Group();
       parent.add(playGroup);
@@ -1296,7 +1475,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       // 1. Playground Slide (North-West Lawn: x = -2.6, z = -3.2)
       // ------------------------------------------
       const slideGroup = new T.Group();
-      slideGroup.position.set(-2.6, 0.45, -3.2);
+      slideGroup.position.set(centerX(-2.6), 0.45, centerZ(-3.2));
       playGroup.add(slideGroup);
 
       // Four cedar timber tower posts
@@ -1368,7 +1547,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       // 2. Cedar A-Frame Swing Set (East Lawn: x = 3.2, z = -2.8)
       // ------------------------------------------
       const swingGroup = new T.Group();
-      swingGroup.position.set(3.2, 0.45, -2.8);
+      swingGroup.position.set(centerX(3.2), 0.45, centerZ(-2.8));
       playGroup.add(swingGroup);
 
       // Soft cedar mulch safety bed
@@ -1447,7 +1626,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       // 3. Backyard Trampoline (West Lawn: x = -4.3, z = 0.2)
       // ------------------------------------------
       const trampGroup = new T.Group();
-      trampGroup.position.set(-4.3, 0.45, 0.2);
+      trampGroup.position.set(centerX(-4.3), 0.45, centerZ(0.2));
       playGroup.add(trampGroup);
 
       // Steel circular frame ring
@@ -1516,8 +1695,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       registerInteractive(trampGroup, {
         name: "Spring Trampoline",
         activity: "trampoline",
-        x: -2.95,
-        z: 0.2,
+        x: centerX(-2.95),
+        z: centerZ(0.2),
         onInteract: () => startPlayActivity("trampoline")
       });
 
@@ -2834,18 +3013,19 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     const markerMat = new T.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0 });
     const marker = new T.Mesh(markerGeo, markerMat);
     marker.position.y = 0.52;
-    scene.add(marker);
+    mapGroup.add(marker);
 
     // ==========================================
     // 3D Ahaan Character Setup
     // ==========================================
     const A = window.AhaanModel.build(T);
     const V = window.AhaanModel.build(T, { shirt: 0xc9363e, collar: 0x92232d });
+    const splashZoneUpdate = buildSplashZone(mapGroup, T);
     const ahaanScale = 0.62; // Bold, prominent hero scale
     A.rig.scale.setScalar(ahaanScale);
     V.rig.scale.setScalar(ahaanScale);
     V.rig.visible = false;
-    scene.add(V.rig);
+    mapGroup.add(V.rig);
     const playerLabelAhaan = document.getElementById("playerLabelAhaan");
     const playerLabelVihaan = document.getElementById("playerLabelVihaan");
     const togetherBtn = document.getElementById("togetherBtn");
@@ -2890,7 +3070,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     function updatePlayerLabels() {
       [[A, playerLabelAhaan], [V, playerLabelVihaan]].forEach(([actor, label]) => {
         if (!label || !togetherEnabled) return;
-        playerLabelVector.set(actor.rig.position.x, actor.rig.position.y + 3.4, actor.rig.position.z).project(camera);
+        playerLabelVector.set(actor.rig.position.x, actor.rig.position.y + 3.4, actor.rig.position.z);
+        mapGroup.localToWorld(playerLabelVector).project(camera);
         const rect = hero.getBoundingClientRect();
         const labelMargin = (label.offsetWidth || 48) * 0.5 + 10;
         const labelX = Math.max(labelMargin, Math.min(rect.width - labelMargin, (playerLabelVector.x * 0.5 + 0.5) * rect.width));
@@ -2955,7 +3136,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
     let ahaanAngle = 0; // 0 = facing South toward camera
     A.rig.rotation.y = ahaanAngle;
-    scene.add(A.rig);
+    mapGroup.add(A.rig);
 
     // ==========================================
     // International Greetings & Interactive Waving
@@ -4947,8 +5128,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       {
         id: "trampoline",
         name: "Spring Trampoline",
-        x: -4.3,
-        z: 0.2,
+        x: centerX(-4.3),
+        z: centerZ(0.2),
         approachRadius: 3.4,
         actionLabel: "Jump! 🤸",
         promptText: "Press Enter to Jump! 🤸",
@@ -4957,8 +5138,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       {
         id: "swing",
         name: "Cedar Swings",
-        x: 2.15,
-        z: -1.5,
+        x: centerX(2.15),
+        z: centerZ(-1.5),
         approachRadius: 3.5,
         actionLabel: "Swing! 🪁",
         promptText: "Press Enter to Swing! 🪁",
@@ -4967,8 +5148,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       {
         id: "slide",
         name: "Playground Slide",
-        x: -2.6,
-        z: -3.2,
+        x: centerX(-2.6),
+        z: centerZ(-3.2),
         approachRadius: 3.4,
         actionLabel: "Slide! 🛝",
         promptText: "Press Enter to Slide! 🛝",
@@ -5267,26 +5448,26 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       lastApexChime = 0;
 
       if (type === "slide") {
-        targetPos = new T.Vector3(-2.6, rigBaseY, -3.8);
-        marker.position.set(-2.6, 0.52, -3.8);
+        targetPos = new T.Vector3(centerX(-2.6), rigBaseY, centerZ(-3.8));
+        marker.position.set(centerX(-2.6), 0.52, centerZ(-3.8));
         markerMat.opacity = 0.95;
         cameraMode = "action";
-        actionCamTarget.set(-2.6, 1.6, -2.4);
-        actionCamPos.set(-2.6 + 6.2, 5.5, -2.4 + 7.5);
+        actionCamTarget.set(centerX(-2.6), 1.6, centerZ(-2.4));
+        actionCamPos.set(centerX(-2.6) + 6.2, 5.5, centerZ(-2.4) + 7.5);
         sayAhaan("Let us slide! 🛝", "Climb up to the top!", "🛝", "Playground Slide");
       } else if (type === "swing") {
-        targetPos = new T.Vector3(2.05, rigBaseY, -1.6);
-        marker.position.set(2.05, 0.52, -1.6);
+        targetPos = new T.Vector3(centerX(2.05), rigBaseY, centerZ(-1.6));
+        marker.position.set(centerX(2.05), 0.52, centerZ(-1.6));
         markerMat.opacity = 0.95;
         swingAngle = 0.35;
         swingVelocity = 1.4;
         cameraMode = "action";
-        actionCamTarget.set(2.05, 4.3, -2.8);
-        actionCamPos.set(2.05 - 10.2, 5.8, -2.8 + 10.2);
+        actionCamTarget.set(centerX(2.05), 4.3, centerZ(-2.8));
+        actionCamPos.set(centerX(2.05) - 10.2, 5.8, centerZ(-2.8) + 10.2);
         sayAhaan("Let us swing! 🪁", "Pump legs to touch the sky!", "🪁", "Cedar Swings");
       } else if (type === "trampoline") {
-        targetPos = new T.Vector3(-2.95, rigBaseY, 0.2);
-        marker.position.set(-2.95, 0.52, 0.2);
+        targetPos = new T.Vector3(centerX(-2.95), rigBaseY, centerZ(0.2));
+        marker.position.set(centerX(-2.95), 0.52, centerZ(0.2));
         markerMat.opacity = 0.95;
         trampY = 0.56;
         trampVy = 7.0;
@@ -5296,8 +5477,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         trampFlip = 0;
         cameraMode = "action";
         // Wide-angle zoomed out camera framing trampoline, ladder, full bounce arc & headroom
-        actionCamTarget.set(-4.3, 3.8, 0.2);
-        actionCamPos.set(-4.3 + 12.2, 11.2, 0.2 + 15.6);
+        actionCamTarget.set(centerX(-4.3), 3.8, centerZ(0.2));
+        actionCamPos.set(centerX(-4.3) + 12.2, 11.2, centerZ(0.2) + 15.6);
         sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high! Press Space to jump higher!", "🤸", "Spring Trampoline");
       } else if (type === "lazyriver") {
         targetPos = new T.Vector3(7.0, rigBaseY, 0.8);
@@ -5345,19 +5526,19 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       }
 
       if (A.resetLimbs) A.resetLimbs();
-      if (A.rig.parent !== scene) scene.add(A.rig);
+      if (A.rig.parent !== mapGroup) mapGroup.add(A.rig);
       A.rig.scale.setScalar(ahaanScale);
       A.rig.rotation.set(0, 0, 0);
       A.rig.position.y = rigBaseY;
 
       if (prev === "trampoline") {
-        A.rig.position.set(-2.95, rigBaseY, 0.2);
+        A.rig.position.set(centerX(-2.95), rigBaseY, centerZ(0.2));
         if (trampMat) trampMat.position.y = 0.54;
       } else if (prev === "swing") {
-        A.rig.position.set(2.05, rigBaseY, -1.6);
+        A.rig.position.set(centerX(2.05), rigBaseY, centerZ(-1.6));
         if (swingPivot) swingPivot.rotation.x = 0;
       } else if (prev === "slide") {
-        A.rig.position.set(-2.6, rigBaseY, -1.1);
+        A.rig.position.set(centerX(-2.6), rigBaseY, centerZ(-1.1));
       } else if (prev === "lazyriver") {
         A.rig.position.set(7.0, rigBaseY, 0.8);
         A.rig.rotation.set(0, -Math.PI / 2, 0);
@@ -5405,14 +5586,14 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       if (currentActivity === "slide") {
         // Phase 0: Approach ladder
         if (activityPhase === 0) {
-          const dist = Math.hypot(A.rig.position.x - (-2.6), A.rig.position.z - (-3.8));
+          const dist = Math.hypot(A.rig.position.x - centerX(-2.6), A.rig.position.z - centerZ(-3.8));
           if (dist < 0.65 || !targetPos) {
             activityPhase = 1;
             activityTimer = 0;
             targetPos = null;
             isWalking = false;
             markerMat.opacity = 0;
-            A.rig.position.set(-2.6, rigBaseY, -3.8);
+            A.rig.position.set(centerX(-2.6), rigBaseY, centerZ(-3.8));
             A.rig.rotation.y = 0;
           }
         }
@@ -5421,7 +5602,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           activityTimer += dt;
           const climbDuration = calm() ? 1.6 : 1.1;
           const t = Math.min(1, activityTimer / climbDuration);
-          A.rig.position.set(-2.6, rigBaseY + t * 1.55, -3.8 + t * 0.6);
+          A.rig.position.set(centerX(-2.6), rigBaseY + t * 1.55, centerZ(-3.8 + t * 0.6));
           A.rig.rotation.y = 0;
 
           const cycle = t * Math.PI * 4;
@@ -5435,7 +5616,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           if (t >= 1) {
             activityPhase = 2;
             activityTimer = 0;
-            A.rig.position.set(-2.6, rigBaseY + 1.55, -3.2);
+            A.rig.position.set(centerX(-2.6), rigBaseY + 1.55, centerZ(-3.2));
             A.leftLeg.hip.rotation.x = -1.4;
             A.rightLeg.hip.rotation.x = -1.4;
             A.leftLeg.knee.rotation.x = 0.2;
@@ -5460,10 +5641,10 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           const slideDuration = calm() ? 1.8 : 1.1;
           const st = Math.min(1, activityTimer / slideDuration);
 
-          const startZ = -2.85, endZ = -1.25;
+          const startZ = centerZ(-2.85), endZ = centerZ(-1.25);
           const curZ = startZ + st * (endZ - startZ);
           const hFactor = Math.pow(1 - st, 1.8);
-          A.rig.position.set(-2.6, rigBaseY + hFactor * 1.55, curZ);
+          A.rig.position.set(centerX(-2.6), rigBaseY + hFactor * 1.55, curZ);
           A.rig.rotation.y = 0;
 
           A.leftArm.arm.rotation.z = 2.4;
@@ -5478,7 +5659,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
             activityPhase = 4;
             activityTimer = 0;
             if (A.resetLimbs) A.resetLimbs();
-            A.rig.position.set(-2.6, rigBaseY, -1.1);
+            A.rig.position.set(centerX(-2.6), rigBaseY, centerZ(-1.1));
             A.rig.rotation.y = 0;
           }
         }
@@ -5488,7 +5669,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           const hopTime = 0.65;
           const hopProgress = Math.min(1, activityTimer / hopTime);
           const hopHeight = Math.sin(hopProgress * Math.PI) * 0.35;
-          A.rig.position.set(-2.6, rigBaseY + hopHeight, -1.1);
+          A.rig.position.set(centerX(-2.6), rigBaseY + hopHeight, centerZ(-1.1));
           if (activityTimer >= hopTime) {
             stopPlayActivity();
           }
@@ -5496,7 +5677,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       } else if (currentActivity === "swing") {
         // Phase 0: Approach swing
         if (activityPhase === 0) {
-          const dist = Math.hypot(A.rig.position.x - 2.05, A.rig.position.z - (-1.6));
+          const dist = Math.hypot(A.rig.position.x - centerX(2.05), A.rig.position.z - centerZ(-1.6));
           if (dist < 0.75 || !targetPos) {
             activityPhase = 1;
             activityTimer = 0;
@@ -5580,14 +5761,14 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       } else if (currentActivity === "trampoline") {
         // Phase 0: Approach access ladder
         if (activityPhase === 0) {
-          const dist = Math.hypot(A.rig.position.x - (-2.95), A.rig.position.z - 0.2);
+          const dist = Math.hypot(A.rig.position.x - centerX(-2.95), A.rig.position.z - centerZ(0.2));
           if (dist < 0.95 || !targetPos) {
             activityPhase = 1;
             activityTimer = 0;
             targetPos = null;
             isWalking = false;
             markerMat.opacity = 0;
-            A.rig.position.set(-2.95, rigBaseY, 0.2);
+            A.rig.position.set(centerX(-2.95), rigBaseY, centerZ(0.2));
             A.rig.rotation.y = 0;
           }
         }
@@ -5596,9 +5777,9 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           activityTimer += dt;
           const hopTime = 0.50;
           const t = Math.min(1, activityTimer / hopTime);
-          const curX = -2.95 + t * (-4.3 - (-2.95));
+          const curX = centerX(-2.95 + t * (-4.3 - (-2.95)));
           const arcY = Math.sin(t * Math.PI) * 0.45;
-          A.rig.position.set(curX, rigBaseY + t * 0.54 + arcY, 0.2);
+          A.rig.position.set(curX, rigBaseY + t * 0.54 + arcY, centerZ(0.2));
           A.rig.rotation.y = 0;
 
           if (t >= 1) {
@@ -5606,7 +5787,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
             activityTimer = 0;
             trampY = 0.56;
             trampVy = 7.0;
-            A.rig.position.set(-4.3, rigBaseY + 0.54, 0.2);
+            A.rig.position.set(centerX(-4.3), rigBaseY + 0.54, centerZ(0.2));
             playSound("bounce");
             spawnTrampParticles();
             sayAhaan("Boing! Boing! 🤸", "I can touch the clouds!", "🤸", "Spring Trampoline");
@@ -5708,7 +5889,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
             }
           }
 
-          A.rig.position.set(-4.3, rigBaseY + (trampY - MAT_BASE_Y) + 0.54, 0.2);
+          A.rig.position.set(centerX(-4.3), rigBaseY + (trampY - MAT_BASE_Y) + 0.54, centerZ(0.2));
           A.rig.rotation.y = 0;
         }
       } else if (currentActivity === "lazyriver") {
@@ -5850,6 +6031,10 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         desiredTarget = normalCamTarget;
         desiredPos = normalCamPos;
       }
+
+      desiredTarget = mapGroup.localToWorld(desiredTarget.clone());
+      desiredPos = mapGroup.localToWorld(desiredPos.clone());
+      desiredPos.y = desiredTarget.y + (desiredPos.y - desiredTarget.y) * PARK_EXPANSION;
 
       if (!calm()) {
         const factor = Math.min(1, (dt || 0.016) * 4.5);
@@ -6059,7 +6244,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           if (riddenVehicleName && data && data.name !== riddenVehicleName) {
             const groundHit = raycaster.intersectObjects(walkableSurfaces)[0];
             if (groundHit) {
-              const target = setRiddenVehicleTarget(groundHit.point.x, groundHit.point.z);
+              const groundLocal = mapGroup.worldToLocal(groundHit.point.clone());
+              const target = setRiddenVehicleTarget(groundLocal.x, groundLocal.z);
               if (!target) return;
               marker.position.set(target.x, 0.52, target.z);
               markerMat.opacity = 0.95;
@@ -6087,10 +6273,11 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         const hits = raycaster.intersectObjects(walkableSurfaces);
         if (hits.length > 0) {
           const hit = hits[0];
-          const vehicleTarget = setRiddenVehicleTarget(hit.point.x, hit.point.z);
+          const hitLocal = mapGroup.worldToLocal(hit.point.clone());
+          const vehicleTarget = setRiddenVehicleTarget(hitLocal.x, hitLocal.z);
           if (vehicleTarget === false) {
             if (currentActivity) stopPlayActivity();
-            targetPos = new T.Vector3(hit.point.x, rigBaseY, hit.point.z);
+            targetPos = new T.Vector3(hitLocal.x, rigBaseY, hitLocal.z);
           } else if (!vehicleTarget) {
             return;
           } else {
@@ -7097,6 +7284,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // Update landmark and story prop animations
       let anyAnimActive = false;
+      splashZoneUpdate(dt);
       landmarkAnimators.forEach(fn => {
         if (fn(dt)) anyAnimActive = true;
       });
@@ -7222,7 +7410,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       attemptVihaanMove: (dx, dz) => moveActor(V, dx, dz),
       projectPlayers: () => {
         const project = actor => {
-          const point = actor.rig.position.clone().project(camera);
+          const point = mapGroup.localToWorld(actor.rig.position.clone()).project(camera);
           return { x: point.x, y: point.y };
         };
         return { ahaan: project(A), vihaan: project(V) };
