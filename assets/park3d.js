@@ -297,10 +297,11 @@
     const windGrassTufts = [];
     const windFlowers = [];
 
-    // Lazy River floating state
-    let lazyRiverAngle = 0.1;
-    let lazyRiverSpeed = 0.35;
-    let lazyRiverInflatable = null;
+    // Lazy River boat state
+    const lazyRiverBoatState = { angle: 0.1, speed: 0, direction: 1, targetAngle: null, ahaan: false, vihaan: false, elapsed: 0, bridgePasses: { north: 0, east: 0, south: 0, west: 0 } };
+    const lazyRiverBoatKeys = { ahaan: { up: false, down: false, left: false, right: false }, vihaan: { up: false, down: false, left: false, right: false } };
+    let lazyRiverBoatRoot = null;
+    let lazyRiverWakeMeshes = [];
     let lazyRiverWater = null;
 
     // Playground animation anchors
@@ -793,6 +794,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       lazyRiverWater = new T.Mesh(waterGeo, waterMat);
       lazyRiverWater.position.y = 0.16;
       riverGroup.add(lazyRiverWater);
+      registerInteractive(lazyRiverWater, { name: "Lazy River Water", id: "riverWaterTarget", onInteract: () => {} });
 
       const currentRings = [];
       for (let i = 0; i < 8; i++) {
@@ -860,7 +862,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       post.castShadow = true;
       dockGroup.add(post);
 
-      // Signpost: "Lazy River Float 🍩"
+      // Signpost for the two-seat canal boat.
       const signCanvas = document.createElement("canvas");
       signCanvas.width = 160; signCanvas.height = 64;
       const sg = signCanvas.getContext("2d");
@@ -871,9 +873,9 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       sg.fillStyle = "#3a2618";
       sg.font = "bold 18px sans-serif";
       sg.textAlign = "center";
-      sg.fillText("🍩 Lazy River", 80, 28);
+      sg.fillText("Lazy River Boat", 80, 28);
       sg.font = "14px sans-serif";
-      sg.fillText("Hop in & Float!", 80, 48);
+      sg.fillText("Two seats · E or Enter", 80, 48);
       const signTex = new T.CanvasTexture(signCanvas);
       const signBoard = new T.Mesh(
         new T.PlaneGeometry(1.2, 0.48),
@@ -884,58 +886,64 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       dockGroup.add(signBoard);
       riverGroup.add(dockGroup);
 
-      // Cheerful circular inflatable tube (doughnut swim ring lounger)
-      lazyRiverInflatable = new T.Group();
-      lazyRiverInflatable.position.set(canalMidR, 0.22, 0);
-
-      // Ring body: unbleached cotton canvas with hand-painted watercolor stripes
-      const tubeMat = new T.MeshStandardMaterial({
-        color: 0xede6db, // Natural warm canvas
-        roughness: 0.88,
-        metalness: 0.02
+      // Flat-bottomed canal boat with a pointed bow and two bench seats.
+      lazyRiverBoatRoot = new T.Group();
+      lazyRiverBoatRoot.name = "lazy-river-canal-boat";
+      const boatHullShape = new T.Shape();
+      boatHullShape.moveTo(-0.5, -1.15);
+      boatHullShape.lineTo(0.5, -1.15);
+      boatHullShape.lineTo(0.58, 0.62);
+      boatHullShape.quadraticCurveTo(0.5, 1.0, 0, 1.35);
+      boatHullShape.quadraticCurveTo(-0.5, 1.0, -0.58, 0.62);
+      boatHullShape.closePath();
+      const boatHullGeometry = new T.ExtrudeGeometry(boatHullShape, { depth: 0.34, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 });
+      boatHullGeometry.translate(0, 0, -0.17);
+      boatHullGeometry.rotateX(Math.PI / 2);
+      const boatHullMat = new T.MeshStandardMaterial({ color: 0x9d5f38, roughness: 0.78, metalness: 0.02 });
+      const boatHull = new T.Mesh(boatHullGeometry, boatHullMat);
+      boatHull.position.y = 0.62;
+      boatHull.castShadow = true;
+      boatHull.receiveShadow = true;
+      lazyRiverBoatRoot.add(boatHull);
+      const boatInsideMat = new T.MeshStandardMaterial({ color: 0xd9b980, roughness: 0.9 });
+      const boatFloor = new T.Mesh(new T.BoxGeometry(0.86, 0.07, 1.95), boatInsideMat);
+      boatFloor.position.set(0, 0.53, 0.02);
+      lazyRiverBoatRoot.add(boatFloor);
+      const boatBenchMat = new T.MeshStandardMaterial({ color: 0x68452f, roughness: 0.82 });
+      [-0.48, 0.48].forEach(z => {
+        const bench = new T.Mesh(new T.BoxGeometry(0.92, 0.14, 0.3), boatBenchMat);
+        bench.position.set(0, 0.78, z);
+        bench.castShadow = true;
+        lazyRiverBoatRoot.add(bench);
       });
-      const tubeMesh = new T.Mesh(new T.TorusGeometry(1.02, 0.32, 20, 36), tubeMat);
-      tubeMesh.rotation.x = Math.PI / 2;
-      tubeMesh.castShadow = true;
-      lazyRiverInflatable.add(tubeMesh);
-
-      // Decorative hand-painted watercolor stripes around tube (terracotta, sage, slate, ochre)
-      const stripeColors = [0x9e5445, 0x567b55, 0x587a8e, 0xc8a265];
-      for (let st = 0; st < 8; st++) {
-        const sang = (st / 8) * Math.PI * 2;
-        const stripeMat = new T.MeshStandardMaterial({ color: stripeColors[st % stripeColors.length], roughness: 0.85 });
-        const sprinkle = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.22, 8), stripeMat);
-        sprinkle.position.set(Math.cos(sang) * 1.02, 0.30, Math.sin(sang) * 1.02);
-        sprinkle.rotation.z = Math.PI / 2;
-        sprinkle.rotation.y = sang;
-        lazyRiverInflatable.add(sprinkle);
+      [-1, 1].forEach(side => {
+        const gunwale = new T.Mesh(new T.BoxGeometry(0.09, 0.24, 1.72), boatBenchMat);
+        gunwale.position.set(side * 0.49, 0.69, -0.04);
+        lazyRiverBoatRoot.add(gunwale);
+        const oar = new T.Group();
+        oar.position.set(side * 0.66, 0.76, 0.12);
+        const shaft = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 1.15, 8), boatBenchMat);
+        shaft.rotation.x = Math.PI / 2;
+        shaft.rotation.z = side * -0.2;
+        oar.add(shaft);
+        const blade = new T.Mesh(new T.BoxGeometry(0.12, 0.04, 0.34), boatInsideMat);
+        blade.position.set(0, 0, 0.56);
+        oar.add(blade);
+        lazyRiverBoatRoot.add(oar);
+      });
+      lazyRiverWakeMeshes = [];
+      for (let i = 0; i < 3; i++) {
+        const wake = new T.Mesh(new T.RingGeometry(0.18, 0.28, 20), new T.MeshBasicMaterial({ color: 0xd7efed, transparent: true, opacity: 0, depthWrite: false }));
+        wake.rotation.x = -Math.PI / 2;
+        wake.position.set(0, 0.28 - i * 0.005, 1.25 + i * 0.32);
+        lazyRiverBoatRoot.add(wake);
+        lazyRiverWakeMeshes.push(wake);
       }
-
-      // Plush headrest / backrest pillow cushion on rear rim for lazy river lounging
-      const pillowMat = new T.MeshStandardMaterial({ color: 0x9e5445, roughness: 0.88 }); // Terracotta canvas
-      const pillow = new T.Mesh(new T.CapsuleGeometry(0.18, 0.65, 8, 16), pillowMat);
-      pillow.position.set(0, 0.34, -0.96);
-      pillow.rotation.z = Math.PI / 2;
-      lazyRiverInflatable.add(pillow);
-
-      // Supportive suspended lounger seat mesh inside the tube hole
-      const seatMeshMat = new T.MeshStandardMaterial({ color: 0x2b3e50, roughness: 0.90 }); // Deep indigo canvas
-      const seatMesh = new T.Mesh(new T.CylinderGeometry(0.70, 0.62, 0.06, 24), seatMeshMat);
-      seatMesh.position.set(0, -0.06, 0);
-      lazyRiverInflatable.add(seatMesh);
-
-      // Dual white molded safety grab handles on sides
-      [-1, 1].forEach(s => {
-        const handle = new T.Mesh(
-          new T.TorusGeometry(0.16, 0.028, 8, 14, Math.PI),
-          new T.MeshStandardMaterial({ color: 0xfcf8ee, roughness: 0.5 })
-        );
-        handle.position.set(s * 1.26, 0.16, 0);
-        handle.rotation.z = s > 0 ? 0 : Math.PI;
-        lazyRiverInflatable.add(handle);
-      });
-
-      riverGroup.add(lazyRiverInflatable);
+      const dockAngle = Math.atan2(0.8, canalMidR);
+      lazyRiverBoatState.angle = dockAngle;
+      lazyRiverBoatRoot.position.set(Math.cos(dockAngle) * canalMidR, 0.22, Math.sin(dockAngle) * canalMidR);
+      lazyRiverBoatRoot.rotation.y = -dockAngle;
+      riverGroup.add(lazyRiverBoatRoot);
 
       // 4 Arched wooden footbridges crossing over the circular lazy river
       // High parabolic arch (clearance y = 2.42m) gives generous open headroom for floating underneath!
@@ -1005,11 +1013,18 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // Register interactive float dock
       registerInteractive(dockGroup, {
-        name: "Lazy River Float",
-        activity: "lazyriver",
+        name: "Lazy River Boat",
+        id: "riverBoat",
         x: 7.0,
         z: 0.8,
-        onInteract: () => startPlayActivity("lazyriver")
+        onInteract: () => { if (!lazyRiverBoatState.ahaan) mountLazyRiverBoat(A); }
+      });
+      registerInteractive(lazyRiverBoatRoot, {
+        name: "Lazy River Boat",
+        id: "riverBoat",
+        x: 7.0,
+        z: 0.8,
+        onInteract: () => { if (!lazyRiverBoatState.ahaan) mountLazyRiverBoat(A); }
       });
     }
 
@@ -3100,6 +3115,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         V.rig.position.set(A.rig.position.x + vihaanStart.x, groundLevelY - V.footY * ahaanScale, A.rig.position.z + vihaanStart.z);
         if (!calm() && V.startWave) { V.startWave(); vihaanWaveTimer = 2.8; }
       } else {
+        if (lazyRiverBoatState.vihaan) dismountLazyRiverBoat(V);
         parkEbike();
         parkCar();
         parkChopper();
@@ -5156,14 +5172,16 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         onActivate: () => startPlayActivity("slide")
       },
       {
-        id: "lazyriver",
-        name: "Lazy River Float",
+        id: "riverBoat",
+        name: "Lazy River Boat",
         x: 7.0,
         z: 0.8,
-        approachRadius: 3.5,
-        actionLabel: "Float in Lazy River! 🍩",
-        promptText: "Press Enter to Float in Lazy River! 🍩",
-        onActivate: () => startPlayActivity("lazyriver")
+        approachRadius: 3.8,
+        actionLabel: "Ride the lazy river boat 🚣",
+        promptText: "Press E to ride the boat.",
+        vihaanPromptText: "Press Enter to ride the boat.",
+        onActivate: () => mountLazyRiverBoat(A),
+        onVihaan: () => mountLazyRiverBoat(V)
       },
       // Zoo animal pens (northwest section)
       ...zooInteractables,
@@ -5187,6 +5205,131 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     const vihaanActionPrompt = document.getElementById("vihaanActionPrompt");
     const vihaanActionPromptBtn = document.getElementById("vihaanActionPromptBtn");
     const vihaanActionPromptText = document.getElementById("vihaanActionPromptText");
+    function resetLazyRiverBoatPose(actor) {
+      actor.leftArm.arm.rotation.set(0, 0, actor.leftArm.rest);
+      actor.leftArm.elbow.rotation.set(0, 0, 0);
+      actor.wavingArm.arm.rotation.set(0, 0, actor.wavingArm.rest);
+      actor.wavingArm.elbow.rotation.set(0, 0, 0);
+      actor.leftLeg.hip.rotation.set(0, 0, 0);
+      actor.rightLeg.hip.rotation.set(0, 0, 0);
+      actor.leftLeg.knee.rotation.set(0, 0, 0);
+      actor.rightLeg.knee.rotation.set(0, 0, 0);
+      actor.head.rotation.set(0, 0, 0);
+    }
+    function setLazyRiverBoatPose(actor) {
+      actor.leftArm.arm.rotation.set(-0.75, 0, 0.18);
+      actor.leftArm.elbow.rotation.set(0.46, 0, 0);
+      actor.wavingArm.arm.rotation.set(-0.75, 0, -0.18);
+      actor.wavingArm.elbow.rotation.set(0.46, 0, 0);
+      actor.leftLeg.hip.rotation.set(-0.72, 0, 0);
+      actor.rightLeg.hip.rotation.set(-0.72, 0, 0);
+      actor.leftLeg.knee.rotation.set(0.78, 0, 0);
+      actor.rightLeg.knee.rotation.set(0.78, 0, 0);
+      actor.head.rotation.set(0, 0, 0);
+      if (actor.stopWave) actor.stopWave();
+      if (actor === A) waveTimer = 0;
+      else vihaanWaveTimer = 0;
+    }
+    function actorOnLazyRiverBoat(actor) {
+      return actor === A ? lazyRiverBoatState.ahaan : lazyRiverBoatState.vihaan;
+    }
+    function mountLazyRiverBoat(actor) {
+      if (!actor || (actor === V && !togetherEnabled) || actorOnLazyRiverBoat(actor) || currentActivity) return false;
+      if (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || fireTruckState.driver === A || fireTruckState.passenger === A || chopperState.rider === A || trainState.ahaan || waterRideState.ahaan || movieTheaterState.ahaan || eatingTimer > 0)) return false;
+      if (actor === V && (quadState.riding || eBikeState.rider === V || carState.driver === V || carState.passenger === V || fireTruckState.driver === V || fireTruckState.passenger === V || chopperState.rider === V || trainState.vihaan || waterRideState.vihaan || movieTheaterState.vihaan || vihaanEatingTimer > 0)) return false;
+      const key = actor === A ? "ahaan" : "vihaan";
+      lazyRiverBoatState[key] = true;
+      Object.keys(lazyRiverBoatKeys[key]).forEach(direction => { lazyRiverBoatKeys[key][direction] = false; });
+      setLazyRiverBoatPose(actor);
+      actor.rig.scale.setScalar(ahaanScale);
+      targetPos = null;
+      if (actor === A) currentNearbyItem = { id: "riverBoatRide", promptText: "Press E to hop off the boat.", onActivate: () => dismountLazyRiverBoat(A) };
+      else vihaanNearbyItem = { id: "riverBoatRide", vihaanPromptText: "Press Enter to hop off the boat.", onVihaan: () => dismountLazyRiverBoat(V) };
+      if (lazyRiverBoatState.speed < 0.45) lazyRiverBoatState.speed = 0.45;
+      if (actor === A) sayAhaan("Let us ride the canal boat! 🚣", "We can float under the bridges. Press E to hop off.", "🚣", "Lazy River Boat");
+      wake();
+      return true;
+    }
+    function dismountLazyRiverBoat(actor) {
+      if (!actor || !actorOnLazyRiverBoat(actor)) return false;
+      const key = actor === A ? "ahaan" : "vihaan";
+      lazyRiverBoatState[key] = false;
+      Object.keys(lazyRiverBoatKeys[key]).forEach(direction => { lazyRiverBoatKeys[key][direction] = false; });
+      const angle = lazyRiverBoatState.angle;
+      const side = actor === A ? -0.58 : 0.58;
+      const exitX = Math.cos(angle) * 10.85 - Math.sin(angle) * side;
+      const exitZ = Math.sin(angle) * 10.85 + Math.cos(angle) * side;
+      actor.rig.position.set(exitX, groundHeightAt(exitX, exitZ, rigBaseY), exitZ);
+      actor.rig.rotation.set(0, lazyRiverBoatState.direction > 0 ? -angle : Math.PI - angle, 0);
+      actor.rig.scale.setScalar(ahaanScale);
+      resetLazyRiverBoatPose(actor);
+      if (actor === A) currentNearbyItem = null;
+      else vihaanNearbyItem = null;
+      if (!lazyRiverBoatState.ahaan && !lazyRiverBoatState.vihaan) lazyRiverBoatState.speed = 0;
+      wake();
+      return true;
+    }
+    function updateLazyRiverBoat(dt) {
+      if (!lazyRiverBoatRoot) return;
+      const riding = lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan;
+      const keys = [lazyRiverBoatState.ahaan && lazyRiverBoatKeys.ahaan, lazyRiverBoatState.vihaan && lazyRiverBoatKeys.vihaan].filter(Boolean);
+      if (riding) {
+        const up = keys.some(key => key.up), down = keys.some(key => key.down);
+        const steer = (keys.some(key => key.right) ? 1 : 0) - (keys.some(key => key.left) ? 1 : 0);
+        if (steer) { lazyRiverBoatState.direction = steer > 0 ? 1 : -1; lazyRiverBoatState.targetAngle = null; }
+        if (up) lazyRiverBoatState.speed = Math.min(1.8, lazyRiverBoatState.speed + dt * 0.75);
+        else if (down) lazyRiverBoatState.speed = Math.max(0.28, lazyRiverBoatState.speed - dt * 1.2);
+        else lazyRiverBoatState.speed = Math.max(0.48, lazyRiverBoatState.speed - dt * 0.16);
+        if (!breezeOn()) lazyRiverBoatState.speed = Math.min(lazyRiverBoatState.speed, 0.48);
+        const previous = lazyRiverBoatState.angle;
+        let delta = lazyRiverBoatState.direction * lazyRiverBoatState.speed * dt / 8.8;
+        if (lazyRiverBoatState.targetAngle !== null) {
+          const remaining = Math.atan2(Math.sin(lazyRiverBoatState.targetAngle - previous), Math.cos(lazyRiverBoatState.targetAngle - previous));
+          if (Math.abs(remaining) <= Math.abs(delta)) {
+            lazyRiverBoatState.angle = lazyRiverBoatState.targetAngle;
+            lazyRiverBoatState.targetAngle = null;
+            lazyRiverBoatState.speed = 0.48;
+            delta = Math.atan2(Math.sin(lazyRiverBoatState.angle - previous), Math.cos(lazyRiverBoatState.angle - previous));
+          } else delta = Math.sign(remaining) * Math.abs(delta);
+        }
+        lazyRiverBoatState.angle = (previous + delta + Math.PI * 2) % (Math.PI * 2);
+        const crossings = [
+          ["east", 0], ["south", Math.PI / 2], ["west", Math.PI], ["north", Math.PI * 1.5]
+        ];
+        for (const [name, angle] of crossings) {
+          const distance = lazyRiverBoatState.direction > 0
+            ? (angle - previous + Math.PI * 2) % (Math.PI * 2)
+            : (previous - angle + Math.PI * 2) % (Math.PI * 2);
+          if (distance > 0 && distance <= Math.abs(delta) + 0.002) lazyRiverBoatState.bridgePasses[name]++;
+        }
+        lazyRiverBoatState.elapsed += dt;
+      }
+      const angle = lazyRiverBoatState.angle;
+      const x = Math.cos(angle) * 8.8;
+      const z = Math.sin(angle) * 8.8;
+      const bob = riding ? Math.sin(lazyRiverBoatState.elapsed * 2.1) * 0.035 : 0;
+      const heading = (lazyRiverBoatState.direction > 0 ? -angle : Math.PI - angle);
+      lazyRiverBoatRoot.position.set(x, 0.22 + bob, z);
+      lazyRiverBoatRoot.rotation.set(0, heading, riding ? Math.sin(lazyRiverBoatState.elapsed * 1.4) * 0.012 : 0);
+      const boatItem = INTERACTABLES.find(item => item.id === "riverBoat");
+      if (boatItem) { boatItem.x = x; boatItem.z = z; }
+      lazyRiverWakeMeshes.forEach((wakeMesh, index) => {
+        const fade = riding ? Math.max(0, 1 - index * 0.26) * Math.min(0.18, lazyRiverBoatState.speed * 0.1) : 0;
+        wakeMesh.material.opacity = fade;
+        const size = 0.8 + ((lazyRiverBoatState.elapsed * 0.55 + index * 0.27) % 1) * 0.75;
+        wakeMesh.scale.set(size, size, size);
+      });
+      const positionRider = (actor, rear) => {
+        const seatOffset = rear ? 0.43 : -0.48;
+        actor.rig.position.set(x + Math.sin(heading) * seatOffset, 0.72 + bob, z + Math.cos(heading) * seatOffset);
+        actor.rig.rotation.set(0, heading, 0);
+        setLazyRiverBoatPose(actor);
+        if (actor === A) { isWalking = false; targetPos = null; }
+        else vihaanWalking = false;
+      };
+      if (lazyRiverBoatState.ahaan) positionRider(A, false);
+      if (lazyRiverBoatState.vihaan) positionRider(V, true);
+    }
     function toggleQuadRide() {
       if (!togetherEnabled) return;
       quadState.riding = !quadState.riding;
@@ -5305,6 +5448,9 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       } else if (togetherEnabled && eBikeState.rider === V) {
         closest = { id: "ebikeRide", x: eBikeState.x, z: eBikeState.z, approachRadius: Infinity };
         minDistance = 0;
+      } else if (togetherEnabled && lazyRiverBoatState.vihaan) {
+        closest = { id: "riverBoatRide", vihaanPromptText: "Press Enter to hop off the boat." };
+        minDistance = 0;
       } else if (togetherEnabled && !quadState.riding) {
         const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
         if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
@@ -5321,7 +5467,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainStopAllowsRiderExit() ? "Enter: leave the train." : "Wait for Ice Cream Stop to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "fireTruck" ? "Press Enter to ride as operator." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
+          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainStopAllowsRiderExit() ? "Enter: leave the train." : "Wait for Ice Cream Stop to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "riverBoat" ? "Press Enter to ride the boat." : closest.id === "riverBoatRide" ? "Press Enter to hop off the boat." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "fireTruck" ? "Press Enter to ride as operator." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -5345,6 +5491,11 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       }
       if (trainState.ahaan) {
         currentNearbyItem = { id: "trainRide", promptText: trainStopAllowsRiderExit() ? "Press E to leave the train." : "Wait for Ice Cream Stop to leave the train.", onActivate: () => dismountTrain(A) };
+        if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
+        return;
+      }
+      if (lazyRiverBoatState.ahaan) {
+        currentNearbyItem = { id: "riverBoatRide", promptText: "Press E to hop off the boat.", onActivate: () => dismountLazyRiverBoat(A) };
         if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
         return;
       }
@@ -5405,7 +5556,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "fireTruck", "chopper", "icecream", "train", "movieTheater"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "fireTruck", "chopper", "icecream", "train", "movieTheater", "riverBoat"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -5480,22 +5631,12 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         actionCamTarget.set(centerX(-4.3), 3.8, centerZ(0.2));
         actionCamPos.set(centerX(-4.3) + 12.2, 11.2, centerZ(0.2) + 15.6);
         sayAhaan("Trampoline time! 🤸", "Boing! Let us bounce high! Press Space to jump higher!", "🤸", "Spring Trampoline");
-      } else if (type === "lazyriver") {
-        targetPos = new T.Vector3(7.0, rigBaseY, 0.8);
-        marker.position.set(7.0, 0.52, 0.8);
-        markerMat.opacity = 0.95;
-        lazyRiverAngle = 0.08;
-        lazyRiverSpeed = 0.35;
-        cameraMode = "action";
-        actionCamTarget.set(7.0, 1.8, 0.8);
-        actionCamPos.set(7.0 + 8.2, 8.5, 0.8 + 10.5);
-        sayAhaan("Lazy River Float! 🍩", "Hop into the tube and relax! Water ripples around Arkansas!", "🍩", "Lazy River");
       }
 
-      if (type === "trampoline" || type === "swing" || type === "lazyriver") {
+      if (type === "trampoline" || type === "swing") {
         if (activityHud) {
           if (actBoostLabel) {
-            actBoostLabel.textContent = type === "trampoline" ? "Bounce Higher! ⬆️" : (type === "swing" ? "Swing Higher! 🪁" : "Paddle Faster! 🍩");
+            actBoostLabel.textContent = type === "trampoline" ? "Bounce Higher! ⬆️" : "Swing Higher! 🪁";
           }
           activityHud.hidden = false;
           requestAnimationFrame(() => activityHud.classList.add("show"));
@@ -5539,17 +5680,13 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         if (swingPivot) swingPivot.rotation.x = 0;
       } else if (prev === "slide") {
         A.rig.position.set(centerX(-2.6), rigBaseY, centerZ(-1.1));
-      } else if (prev === "lazyriver") {
-        A.rig.position.set(7.0, rigBaseY, 0.8);
-        A.rig.rotation.set(0, -Math.PI / 2, 0);
-        if (A.updateWalk) A.updateWalk(false, 0, 0);
       }
 
       sayAhaan("That was great fun! ✨", "Walk around the park to explore more.", "🎈", "Park");
       wake();
     }
 
-    // Boost bounce height, swing momentum, or lazy river speed
+    // Boost bounce height or swing momentum.
     function boostCurrentActivity() {
       if (!currentActivity) return;
       if (currentActivity === "trampoline") {
@@ -5570,11 +5707,6 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         if (Math.abs(swingVelocity) > 4.6) swingVelocity = Math.sign(swingVelocity) * 4.6;
         playSound("breeze");
         sayAhaan("Wheeee! Swing higher! 🪁", "Fly high into the sky!", "🪁", "Cedar Swings");
-        wake();
-      } else if (currentActivity === "lazyriver") {
-        lazyRiverSpeed = Math.min(1.2, lazyRiverSpeed + 0.35);
-        playSound("riverboat");
-        sayAhaan("Splash! Paddle faster! 🍩", "Wheee! Floating down the lazy river!", "🍩", "Lazy River");
         wake();
       }
     }
@@ -5892,100 +6024,6 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           A.rig.position.set(centerX(-4.3), rigBaseY + (trampY - MAT_BASE_Y) + 0.54, centerZ(0.2));
           A.rig.rotation.y = 0;
         }
-      } else if (currentActivity === "lazyriver") {
-        const canalR = 8.8;
-
-        // Phase 0: Approach wooden float dock
-        if (activityPhase === 0) {
-          const dist = Math.hypot(A.rig.position.x - 7.0, A.rig.position.z - 0.8);
-          if (dist < 0.85 || !targetPos) {
-            activityPhase = 1;
-            activityTimer = 0;
-            targetPos = null;
-            isWalking = false;
-            markerMat.opacity = 0;
-            A.rig.position.set(7.0, rigBaseY, 0.8);
-            A.rig.rotation.y = -Math.PI / 2;
-          }
-        }
-        // Phase 1: Hop onto circular inflatable tube
-        else if (activityPhase === 1) {
-          activityTimer += dt;
-          const hopTime = 0.55;
-          const t = Math.min(1, activityTimer / hopTime);
-          const targetX = Math.cos(lazyRiverAngle) * canalR;
-          const targetZ = Math.sin(lazyRiverAngle) * canalR;
-          const curX = 7.0 + t * (targetX - 7.0);
-          const curZ = 0.8 + t * (targetZ - 0.8);
-          const arcY = Math.sin(t * Math.PI) * 0.45;
-          A.rig.position.set(curX, rigBaseY + arcY, curZ);
-
-          if (t >= 1) {
-            activityPhase = 2;
-            activityTimer = 0;
-            if (lazyRiverInflatable) {
-              lazyRiverInflatable.add(A.rig);
-              A.rig.position.set(0, 1.48, -0.52);
-              A.rig.rotation.set(-0.36, 0, 0);
-              A.rig.scale.setScalar(ahaanScale);
-            }
-            playSound("riverboat");
-            sayAhaan("Floating smoothly! 🍩", "Gentle water ripples around Arkansas!", "🍩", "Lazy River");
-          }
-        }
-        // Phase 2: Gentle circular floating along the canal on top of the tube
-        else if (activityPhase === 2) {
-          activityTimer += dt;
-          const baseSpd = calm() ? 0.22 : 0.38;
-          lazyRiverAngle += (baseSpd + (lazyRiverSpeed - 0.35)) * dt;
-          if (lazyRiverSpeed > 0.35) {
-            lazyRiverSpeed = Math.max(0.35, lazyRiverSpeed - dt * 0.2);
-          }
-
-          const fx = Math.cos(lazyRiverAngle) * canalR;
-          const fz = Math.sin(lazyRiverAngle) * canalR;
-          const bob = Math.sin(activityTimer * 2.8) * 0.04;
-          const roll = Math.sin(activityTimer * 1.6) * 0.035;
-          const pitch = Math.cos(activityTimer * 2.2) * 0.025;
-          const waterY = 0.22 + bob;
-
-          if (lazyRiverInflatable) {
-            lazyRiverInflatable.position.set(fx, waterY, fz);
-            lazyRiverInflatable.rotation.y = -lazyRiverAngle + Math.PI / 2;
-            lazyRiverInflatable.rotation.z = roll;
-            lazyRiverInflatable.rotation.x = pitch;
-
-            // Ensure Ahaan is mounted on top of the inflatable tube
-            if (A.rig.parent !== lazyRiverInflatable) {
-              lazyRiverInflatable.add(A.rig);
-              A.rig.scale.setScalar(ahaanScale);
-            }
-            // Position Ahaan lounging comfortably on top of the tube
-            A.rig.position.set(0, 1.48, -0.52);
-            A.rig.rotation.set(-0.36, 0, 0);
-          }
-
-          // Relaxed sunbather lazy river posture:
-          // Legs kicked forward resting over the front tube cushion into the breeze
-          const legKick = Math.sin(activityTimer * 3.0) * 0.05;
-          A.leftLeg.hip.rotation.set(-1.24 + legKick, 0, -0.10);
-          A.rightLeg.hip.rotation.set(-1.24 - legKick, 0, 0.10);
-          A.leftLeg.knee.rotation.set(0.42, 0, 0);
-          A.rightLeg.knee.rotation.set(0.42, 0, 0);
-
-          // Arms resting comfortably on the sides of the inflatable ring
-          A.leftArm.arm.rotation.set(-0.18, 0, 0.76);
-          A.wavingArm.arm.rotation.set(-0.18, 0, -0.76);
-          A.leftArm.elbow.rotation.set(0.62, 0, 0);
-          A.wavingArm.elbow.rotation.set(0.62, 0, 0);
-
-          // Head tilted naturally in line with relaxed spine
-          A.head.rotation.set(-0.06, 0, 0);
-
-          // Camera smoothly tracks Ahaan floating in circular canal
-          actionCamTarget.set(fx, 1.2, fz);
-          actionCamPos.set(fx + Math.cos(lazyRiverAngle + 0.6) * 9.5, 6.8, fz + Math.sin(lazyRiverAngle + 0.6) * 9.5);
-        }
       }
     }
 
@@ -6159,6 +6197,21 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     }
     function setRiddenVehicleTarget(x, z) {
       let target = { x, z };
+      if (lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan) {
+        const radius = Math.hypot(x, z);
+        if (radius < 7.4 || radius > 10.2) return null;
+        const angle = Math.atan2(z, x);
+        const delta = Math.atan2(Math.sin(angle - lazyRiverBoatState.angle), Math.cos(angle - lazyRiverBoatState.angle));
+        lazyRiverBoatState.direction = delta >= 0 ? 1 : -1;
+        lazyRiverBoatState.targetAngle = angle;
+        lazyRiverBoatState.speed = Math.max(0.7, lazyRiverBoatState.speed);
+        target = { x: Math.cos(angle) * 8.8, z: Math.sin(angle) * 8.8 };
+        marker.position.set(target.x, 0.52, target.z);
+        markerMat.opacity = 0.95;
+        targetPos = null;
+        wake();
+        return target;
+      }
       if (chopperState.rider) {
         chopperState.target = target;
         targetPos = null;
@@ -6240,7 +6293,13 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         if (intHits.length > 0) {
           const hit = intHits[0];
           const data = hit.object.userData;
-          const riddenVehicleName = bikeState.riding ? "Ahaan's bike" : eBikeState.rider ? "E-bike" : carState.driver ? "Two-seat car" : fireTruckState.driver ? "Fire truck" : quadState.riding ? "Vihaan's quad" : chopperState.rider ? "Chopper" : null;
+          if (data && data.id === "riverWaterTarget") {
+            const waterLocal = mapGroup.worldToLocal(hit.point.clone());
+            setRiddenVehicleTarget(waterLocal.x, waterLocal.z);
+            isDragging = false;
+            return;
+          }
+          const riddenVehicleName = bikeState.riding ? "Ahaan's bike" : eBikeState.rider ? "E-bike" : carState.driver ? "Two-seat car" : fireTruckState.driver ? "Fire truck" : quadState.riding ? "Vihaan's quad" : chopperState.rider ? "Chopper" : (lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan) ? "Lazy River Boat" : null;
           if (riddenVehicleName && data && data.name !== riddenVehicleName) {
             const groundHit = raycaster.intersectObjects(walkableSurfaces)[0];
             if (groundHit) {
@@ -6344,6 +6403,35 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
     // ---- Top-View Keyboard Navigation (Up=North, Down=South, Left=West, Right=East) ----
     function handleKey(e, isDown) {
+      const isE = e.code === "KeyE" || (e.key || "").toLowerCase() === "e";
+      const isEnter = e.code === "Enter" || e.key === "Enter";
+      if (isDown && lazyRiverBoatState.ahaan && isE) {
+        e.preventDefault();
+        dismountLazyRiverBoat(A);
+        return;
+      }
+      if (isDown && togetherEnabled && lazyRiverBoatState.vihaan && isEnter) {
+        e.preventDefault();
+        dismountLazyRiverBoat(V);
+        return;
+      }
+      const boatDirection = e.code === "KeyW" || e.key === "ArrowUp" ? "up"
+        : e.code === "KeyS" || e.key === "ArrowDown" ? "down"
+          : e.code === "KeyA" || e.key === "ArrowLeft" ? "left"
+            : e.code === "KeyD" || e.key === "ArrowRight" ? "right" : null;
+      const boatInputActor = togetherEnabled && lazyRiverBoatState.vihaan && /^Arrow(Up|Down|Left|Right)$/.test(e.key)
+        ? V
+        : lazyRiverBoatState.ahaan && (/[WASD]/i.test(e.code.replace("Key", "")) || (!togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key))) ? A : null;
+      if (boatInputActor && boatDirection) {
+        const controls = lazyRiverBoatKeys[boatInputActor === A ? "ahaan" : "vihaan"];
+        if (isDown) lazyRiverBoatState.targetAngle = null;
+        controls[boatDirection] = isDown;
+        if (isDown) e.preventDefault();
+        wake();
+        return;
+      }
+      if (lazyRiverBoatState.ahaan && (isE || e.code.startsWith("Key") && /[WASD]/i.test(e.code.replace("Key", "")))) return;
+      if (togetherEnabled && lazyRiverBoatState.vihaan && (/^Arrow(Up|Down|Left|Right)$/.test(e.key) || isEnter)) return;
       const waterExitActor = waterRideState.ahaan && (e.code === "KeyE" || (e.key || "").toLowerCase() === "e")
         ? A
         : waterRideState.vihaan && togetherEnabled && (e.code === "Enter" || e.key === "Enter") ? V : null;
@@ -6506,7 +6594,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           return;
         }
         if (currentNearbyItem && currentNearbyItem.id === "train") { e.preventDefault(); boardTrain(A); return; }
-        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "fireTruck", "icecream", "movieTheater"].includes(currentNearbyItem.id))) {
+        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "fireTruck", "icecream", "movieTheater", "riverBoat"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
           return;
@@ -6593,13 +6681,13 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         }
       }
 
-      // Space key to boost bounce or swing or lazy river float
+      // Space key boosts the trampoline or swing.
       if (isDown && (code === "Space" || key === " " || key === "Spacebar")) {
         if (discModal && !discModal.hidden) {
           closeDiscoveryModal();
           return;
         }
-        if (currentActivity === "trampoline" || currentActivity === "swing" || currentActivity === "lazyriver") {
+        if (currentActivity === "trampoline" || currentActivity === "swing") {
           e.preventDefault();
           boostCurrentActivity();
           return;
@@ -6633,7 +6721,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
       // Up = North (towards Missouri, -Z) or boost active equipment
       if (code === "ArrowUp" || key === "ArrowUp" || code === "KeyW" || key === "w" || key === "W") {
-        if (isDown && (currentActivity === "trampoline" || currentActivity === "swing" || currentActivity === "lazyriver")) {
+        if (isDown && (currentActivity === "trampoline" || currentActivity === "swing")) {
           e.preventDefault();
           boostCurrentActivity();
           return;
@@ -7240,8 +7328,9 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         updatePlayActivity(dt);
       }
       updateWaterRideRiders(dt);
+      updateLazyRiverBoat(dt);
 
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && !lazyRiverBoatState.ahaan && (!currentActivity || activityPhase === 0)) {
         A.rig.position.y = groundHeightAt(A.rig.position.x,A.rig.position.z,rigBaseY);
       }
 
@@ -7301,7 +7390,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(fireTruckKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || (fireTruckState.driver && fireTruckState.speed > 0.02) || fireTruckState.spraying || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(fireTruckKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || (fireTruckState.driver && fireTruckState.speed > 0.02) || fireTruckState.spraying || (lazyRiverBoatState.ahaan || lazyRiverBoatState.vihaan || lazyRiverBoatState.targetAngle !== null) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -7384,6 +7473,11 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       boostCurrentActivity,
       getA: () => A,
       getV: () => V,
+      projectParkPoint: (x, z) => {
+        const point = mapGroup.localToWorld(new T.Vector3(x, 0.16, z)).project(camera);
+        const rect = canvas.getBoundingClientRect();
+        return { x: rect.left + (point.x + 1) * rect.width / 2, y: rect.top + (1 - point.y) * rect.height / 2 };
+      },
       isTogetherEnabled: () => togetherEnabled,
       teleportVihaan: (x, z) => {
         vihaanBounceTime = 0;
@@ -7398,6 +7492,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
+      getLazyRiverBoatState: () => ({ x: lazyRiverBoatRoot.position.x, y: lazyRiverBoatRoot.position.y, z: lazyRiverBoatRoot.position.z, angle: lazyRiverBoatState.angle, targetAngle: lazyRiverBoatState.targetAngle, speed: lazyRiverBoatState.speed, riders: { ahaan: lazyRiverBoatState.ahaan, vihaan: lazyRiverBoatState.vihaan }, seats: 2, radius: Math.hypot(lazyRiverBoatRoot.position.x, lazyRiverBoatRoot.position.z), bridgePasses: { ...lazyRiverBoatState.bridgePasses }, headY: Math.max(lazyRiverBoatState.ahaan ? A.head.getWorldPosition(new T.Vector3()).y + 0.2 : 0, lazyRiverBoatState.vihaan ? V.head.getWorldPosition(new T.Vector3()).y + 0.2 : 0), bridgeUndersideY: bridgeDeckHeight(0.5, 0) - 0.055 }),
+      setLazyRiverBoatTarget: (x, z) => setRiddenVehicleTarget(x, z),
       getFireTruckState: () => ({ driving: !!fireTruckState.driver, passenger: !!fireTruckState.passenger, spraying: fireTruckState.spraying, x: fireTruckState.x, z: fireTruckState.z, speed: fireTruckState.speed, aim: { x: fireTruckState.aimX, z: fireTruckState.aimZ }, target: fireTruckState.target && { ...fireTruckState.target } }),
       getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getMovieTheaterState: () => ({ riders: { ahaan: !!movieTheaterState.ahaan, vihaan: !!movieTheaterState.vihaan }, seatHeight: theaterSeatHeight, rigOriginHeight: { ahaan: movieTheaterRigHeight(A), vihaan: movieTheaterRigHeight(V) }, scene: movieTheaterState.scene, sceneTitle: theaterScenes[movieTheaterState.scene], soundRequests: movieTheaterState.soundRequests, soundOn, controlsVisible: !movieTheaterControls.hidden, screenVisible: theaterScreen.visible, seats: 2, position: { x: -40, z: -38 }, riderPositions: { ahaan: { x: A.rig.position.x, y: A.rig.position.y, z: A.rig.position.z }, vihaan: { x: V.rig.position.x, y: V.rig.position.y, z: V.rig.position.z } } }),

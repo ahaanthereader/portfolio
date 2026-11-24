@@ -1,3 +1,29 @@
+## Lazy river boat — Nov 24, 2026
+
+- Read queue item 12 and `FEATURE-BRIEF-lazy-river-boat.md`.
+- Created `.worktrees/feature-lazy-river-boat` on `feature/lazy-river-boat` from `origin/main` at `6bc0df5`.
+- First concrete step: inspected the existing circular canal, dock, bridges, and float.
+- The canal centerline radius is 8.8 m. Four bridges cross the canal at the cardinal points.
+- The current dock sits at `(7, 0.8)`. The existing ride is a single-seat inflatable lounger.
+- Replaced the inflatable with a pointed flat-bottomed canal boat. Added two bench seats, gunwales, oars, and a soft wake.
+- Added independent E/Enter boarding and exits for Ahaan and Vihaan. Added keyboard steering and click-to-go along the canal loop.
+- The first click-to-go check found that the park render loop stopped while the boat carried riders. Kept the loop active while the boat moves or carries riders.
+- `node --check assets/park3d.js`, `node --check tests/lazy-river-boat-browser.cjs`, and `git diff --check` passed.
+- The desktop browser check reached the south bridge. Both riders fit below the bridge underside: head y `0.94 m`, underside y `3.245 m`.
+- The first full-loop browser attempt timed out because the test used the wrong Playwright timeout argument. The corrected test now reports the bridge counters after a full-loop timeout.
+- Desktop and mobile browser checks passed. Both boys boarded, rode the full loop under all four bridges, and exited independently.
+- Click-to-go reached the south bridge. WASD and arrow steering completed the full route. Sound stayed off. Browser errors were empty.
+- The check confirmed bridge clearance on the south crossing. Rider head y was `0.95 m`; bridge underside y was `3.245 m`.
+- `SCREENSHOT_ONLY=1` captures the bridge view without repeating the long route. I inspected desktop and mobile images. The side view shows the boat under the bridge.
+- Browser evidence: `/tmp/ahaan-lazy-river-boat/desktop-under-south-bridge.png` and `mobile-under-south-bridge.png`.
+- Side-view evidence: `/tmp/ahaan-lazy-river-boat-side/desktop-under-south-bridge.png` and `mobile-under-south-bridge.png`.
+- `node --check assets/park3d.js`, `node --check tests/lazy-river-boat-browser.cjs`, and `git diff --check` passed.
+- Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Bridge height matched at `8.00094 m`; browser errors were empty.
+- Existing `tests/quad-browser.cjs` passed mount, ride, and dismount checks. Browser errors were empty.
+- `node --check` passed for the boat, two-player, and quad checks. `git diff --check` passed.
+- Final local under-bridge screenshots: `/tmp/ahaan-lazy-river-boat-side/desktop-under-south-bridge.png` and `mobile-under-south-bridge.png`.
+- Next: commit the feature, publish it, live-verify desktop and mobile, and add the Fresh Drops entry with a live screenshot.
+
 ## Park expansion and water — Nov 23, 2026
 
 - Read queue item 11 and `FEATURE-BRIEF-park-expand-water.md`.
