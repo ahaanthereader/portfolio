@@ -23,6 +23,12 @@
 - The focused browser check passed on desktop and mobile. No files were published in that step.
 - Live screenshot review showed both riders behind the fire truck cab seats. Shifted both rider positions into the cab.
 - After the seat adjustment, `node --check assets/park3d.js` and the focused desktop and mobile browser checks passed again.
+- Committed the feature as `67fb91a` and merged it into main as `163c271`.
+- The first Pages run (`45306715219`) failed after artifact upload. A fresh Pages run (`45319308841`) succeeded.
+- Committed the cab seat correction as `627780b` and merged it into main as `d24b4c5`. Pages run `45322674329` succeeded.
+- Live desktop and mobile checks passed for car driving, fire truck driving, and solo spray. The desktop check also passed passenger boarding, aiming without steering, moving spray, and exits. Both viewports had zero browser errors.
+- Captured the live moving spray image at `/tmp/ahaan-car-fire-truck/moving-spray-desktop.png`.
+- Added the Fresh Drops card and screenshot at `public/fresh-drops/2026-11-23-car-fire-truck.png`. The card still needs publishing and live verification.
 
 ## Park pyramid — Nov 23, 2026
 
