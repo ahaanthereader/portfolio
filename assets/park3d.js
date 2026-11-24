@@ -3157,12 +3157,13 @@
     const actionPromptText = document.getElementById("actionPromptText");
     const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
 
-    const PARK_SPEEDS = Object.freeze({ bike: 8.25, bikeBoost: 12, quad: 18, eBike: 15.6, car: 24, chopper: 18, train: 5.7 });
+    const PARK_SPEEDS = Object.freeze({ bike: 8.25, bikeBoost: 12, quad: 18, eBike: 15.6, car: 24, fireTruck: 16, chopper: 18, train: 5.7 });
     const garageParking = {
       bike: { x: -18.55, z: 4.4, heading: -Math.PI / 2 },
       quad: { x: -18.55, z: 7.8, heading: -Math.PI / 2 },
       eBike: { x: -18.55, z: 11.2, heading: -Math.PI / 2 },
       car: { x: -18.55, z: 14.6, heading: -Math.PI / 2 },
+      fireTruck: { x: -27, z: 12, heading: Math.PI / 2 },
       chopper: { x: -12.75, z: 9.5, heading: 0 }
     };
     const bikeState = { ...garageParking.bike, speed: 0, riding: false, boostHeld: false, wheels: [], lean: 0, target: null };
@@ -3328,36 +3329,148 @@
     const carParking = garageParking.car;
     const carState = { ...carParking, speed: 0, driver: null, passenger: null, wheels: [], target: null };
     const carKeys = { up: false, down: false, left: false, right: false };
-    const carRoot = new T.Group();
-    const carBodyMat = new T.MeshStandardMaterial({ color: 0xc57a45, roughness: 0.58, metalness: 0.18 });
-    const carTrimMat = new T.MeshStandardMaterial({ color: 0x343637, roughness: 0.82 });
-    const carGlassMat = new T.MeshStandardMaterial({ color: 0x8fb5bd, roughness: 0.28, metalness: 0.08, transparent: true, opacity: 0.62 });
-    const carSeatMat = new T.MeshStandardMaterial({ color: 0x51463c, roughness: 0.9 });
-    const carBody = new T.Mesh(new T.BoxGeometry(1.76, 0.62, 3.25), carBodyMat);
-    carBody.position.set(0, 0.72, 0);
-    carBody.castShadow = true;
-    carRoot.add(carBody);
-    const carHood = new T.Mesh(new T.BoxGeometry(1.58, 0.34, 0.9), carBodyMat);
-    carHood.position.set(0, 1.12, 1.02);
-    carHood.castShadow = true;
-    carRoot.add(carHood);
-    const carRearDeck = new T.Mesh(new T.BoxGeometry(1.56, 0.28, 0.62), carBodyMat);
-    carRearDeck.position.set(0, 1.05, -1.15);
-    carRoot.add(carRearDeck);
-    const carRoof = new T.Mesh(new T.BoxGeometry(1.48, 0.13, 1.45), carBodyMat);
-    carRoof.position.set(0, 2.0, -0.1);
-    carRoot.add(carRoof);
-    [-0.68, 0.68].forEach(side => {
-      bikeRod(carRoot, [side, 1.0, 0.72], [side * 0.82, 1.95, 0.55], 0.055, carBodyMat);
-      bikeRod(carRoot, [side, 1.0, -0.83], [side * 0.82, 1.95, -0.72], 0.055, carBodyMat);
-      const window = new T.Mesh(new T.BoxGeometry(0.035, 0.72, 1.18), carGlassMat);
-      window.position.set(side * 0.72, 1.52, -0.08);
-      carRoot.add(window);
+    const fireTruckParking = garageParking.fireTruck;
+    const fireTruckState = { ...fireTruckParking, speed: 0, driver: null, passenger: null, wheels: [], target: null, aimX: 0, aimZ: 1, spraying: false };
+    const fireTruckKeys = { up: false, down: false, left: false, right: false };
+    const fireTruckRoot = new T.Group();
+    const fireTruckRedMat = new T.MeshStandardMaterial({ color: 0xc93635, roughness: 0.58, metalness: 0.08 });
+    const fireTruckTrimMat = new T.MeshStandardMaterial({ color: 0x343a3b, roughness: 0.82 });
+    const fireTruckChromeMat = new T.MeshStandardMaterial({ color: 0xb8c2c2, roughness: 0.34, metalness: 0.62 });
+    const fireTruckGlassMat = new T.MeshStandardMaterial({ color: 0xa9d9e2, roughness: 0.24, transparent: true, opacity: 0.82, side: T.DoubleSide });
+    const fireTruckSeatMat = new T.MeshStandardMaterial({ color: 0x4b4036, roughness: 0.88 });
+    const fireTruckTireMat = new T.MeshStandardMaterial({ color: 0x242625, roughness: 0.92 });
+    const fireTruckBody = new T.Mesh(new T.BoxGeometry(2.35, 0.9, 4.8), fireTruckRedMat);
+    fireTruckBody.position.set(0, 0.95, 0);
+    fireTruckBody.castShadow = true;
+    fireTruckRoot.add(fireTruckBody);
+    const fireTruckCab = new T.Mesh(new T.BoxGeometry(2.2, 1.22, 1.95), fireTruckRedMat);
+    fireTruckCab.position.set(0, 1.68, 1.15);
+    fireTruckCab.castShadow = true;
+    fireTruckRoot.add(fireTruckCab);
+    const fireTruckWindshield = new T.Mesh(new T.BoxGeometry(1.85, 0.78, 0.06), fireTruckGlassMat);
+    fireTruckWindshield.position.set(0, 1.85, 2.14);
+    fireTruckWindshield.rotation.x = -0.12;
+    fireTruckRoot.add(fireTruckWindshield);
+    [-1, 1].forEach(side => {
+      const sideWindow = new T.Mesh(new T.BoxGeometry(0.06, 0.7, 0.9), fireTruckGlassMat);
+      sideWindow.position.set(side * 1.12, 1.82, 1.18);
+      fireTruckRoot.add(sideWindow);
+      const seat = new T.Mesh(new T.BoxGeometry(0.7, 0.62, 0.68), fireTruckSeatMat);
+      seat.position.set(side * 0.47, 1.28, 1.02);
+      fireTruckRoot.add(seat);
     });
-    const carWindshield = new T.Mesh(new T.BoxGeometry(1.28, 0.65, 0.05), carGlassMat);
-    carWindshield.position.set(0, 1.55, 0.65);
-    carWindshield.rotation.x = -0.18;
+    const fireTruckBumper = new T.Mesh(new T.BoxGeometry(2.5, 0.2, 0.24), fireTruckChromeMat);
+    fireTruckBumper.position.set(0, 0.55, 2.45);
+    fireTruckRoot.add(fireTruckBumper);
+    [-0.78, 0.78].forEach(side => {
+      const lamp = new T.Mesh(new T.SphereGeometry(0.18, 12, 10), new T.MeshStandardMaterial({ color: 0xfff0bf, emissive: 0x79633b, emissiveIntensity: 0.22 }));
+      lamp.position.set(side, 1.0, 2.43);
+      fireTruckRoot.add(lamp);
+      const steadyLight = new T.Mesh(new T.BoxGeometry(0.48, 0.15, 0.22), new T.MeshStandardMaterial({ color: 0xffd96b, emissive: 0x80602a, emissiveIntensity: 0.35 }));
+      steadyLight.position.set(side * 0.5, 2.38, 1.28);
+      fireTruckRoot.add(steadyLight);
+    });
+    const fireTruckCabRoof = new T.Mesh(new T.BoxGeometry(2.24, 0.13, 2.02), fireTruckRedMat);
+    fireTruckCabRoof.position.set(0, 2.32, 1.15);
+    fireTruckRoot.add(fireTruckCabRoof);
+    const hoseReel = new T.Mesh(new T.CylinderGeometry(0.48, 0.48, 0.3, 18), fireTruckChromeMat);
+    hoseReel.rotation.z = Math.PI / 2;
+    hoseReel.position.set(0, 1.65, -0.35);
+    fireTruckRoot.add(hoseReel);
+    const hoseCore = new T.Mesh(new T.CylinderGeometry(0.3, 0.3, 0.34, 16), fireTruckTrimMat);
+    hoseCore.rotation.z = Math.PI / 2;
+    hoseCore.position.copy(hoseReel.position);
+    fireTruckRoot.add(hoseCore);
+    [-0.42, 0.42].forEach(side => {
+      const ladderRail = new T.Mesh(new T.BoxGeometry(0.1, 0.1, 3.5), fireTruckChromeMat);
+      ladderRail.position.set(side * 0.42, 2.48, -0.38);
+      fireTruckRoot.add(ladderRail);
+    });
+    for (let rung = 0; rung < 8; rung++) {
+      const ladderRung = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.82, 8), fireTruckChromeMat);
+      ladderRung.rotation.z = Math.PI / 2;
+      ladderRung.position.set(0, 2.48, -1.95 + rung * 0.45);
+      fireTruckRoot.add(ladderRung);
+    }
+    const fireTruckNozzle = new T.Mesh(new T.CylinderGeometry(0.1, 0.16, 0.4, 10), fireTruckChromeMat);
+    fireTruckNozzle.rotation.x = Math.PI / 2;
+    fireTruckNozzle.position.set(0, 2.77, -0.22);
+    fireTruckRoot.add(fireTruckNozzle);
+    [-1, 1].forEach(side => [-1, 1].forEach(front => {
+      const wheel = new T.Group();
+      wheel.position.set(side * 1.22, 0.5, front * 1.55);
+      const tire = new T.Mesh(new T.CylinderGeometry(0.43, 0.43, 0.28, 14), fireTruckTireMat);
+      tire.rotation.z = Math.PI / 2;
+      wheel.add(tire);
+      const hub = new T.Mesh(new T.CylinderGeometry(0.22, 0.22, 0.32, 12), fireTruckChromeMat);
+      hub.rotation.z = Math.PI / 2;
+      wheel.add(hub);
+      fireTruckRoot.add(wheel);
+      fireTruckState.wheels.push(wheel);
+    }));
+    fireTruckRoot.position.set(fireTruckState.x, 0.06, fireTruckState.z);
+    fireTruckRoot.rotation.y = fireTruckState.heading;
+    mapGroup.add(fireTruckRoot);
+    registerInteractive(fireTruckRoot, { name: "Fire truck", onInteract: () => mountFireTruck(A) });
+    const fireWaterMat = new T.MeshStandardMaterial({ color: 0x8bd7ee, emissive: 0x2b7188, emissiveIntensity: 0.12, transparent: true, opacity: 0.84, roughness: 0.25 });
+    const fireWaterDrops = Array.from({ length: 9 }, () => {
+      const drop = new T.Mesh(new T.SphereGeometry(0.14, 8, 7), fireWaterMat);
+      drop.visible = false;
+      mapGroup.add(drop);
+      return drop;
+    });
+    const fireWaterSplash = new T.Mesh(new T.TorusGeometry(0.5, 0.07, 6, 18), fireWaterMat);
+    fireWaterSplash.rotation.x = -Math.PI / 2;
+    fireWaterSplash.visible = false;
+    mapGroup.add(fireWaterSplash);
+    const carRoot = new T.Group();
+    const carBodyMat = new T.MeshStandardMaterial({ color: 0x317d9e, roughness: 0.46, metalness: 0.12 });
+    const carTrimMat = new T.MeshStandardMaterial({ color: 0x29383d, roughness: 0.78 });
+    const carMetalMat = new T.MeshStandardMaterial({ color: 0xb8c5c3, roughness: 0.34, metalness: 0.64 });
+    const carGlassMat = new T.MeshStandardMaterial({ color: 0xaad6df, roughness: 0.24, metalness: 0.06, transparent: true, opacity: 0.76, side: T.DoubleSide });
+    const carSeatMat = new T.MeshStandardMaterial({ color: 0x51463c, roughness: 0.9 });
+    const carProfile = new T.Shape();
+    carProfile.moveTo(-1.65, 0.48);
+    carProfile.lineTo(1.58, 0.48);
+    carProfile.lineTo(1.72, 0.82);
+    carProfile.lineTo(1.12, 1.08);
+    carProfile.lineTo(0.78, 1.12);
+    carProfile.lineTo(0.32, 1.88);
+    carProfile.lineTo(-0.72, 1.88);
+    carProfile.lineTo(-1.25, 1.12);
+    carProfile.lineTo(-1.62, 0.96);
+    carProfile.closePath();
+    const carBodyGeometry = new T.ExtrudeGeometry(carProfile, { depth: 1.58, steps: 1, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.055, bevelThickness: 0.045 });
+    carBodyGeometry.translate(0, 0, -0.79);
+    const carBody = new T.Mesh(carBodyGeometry, carBodyMat);
+    carBody.rotation.y = -Math.PI / 2;
+    carBody.castShadow = true;
+    carBody.receiveShadow = true;
+    carRoot.add(carBody);
+    const carSideWindowShape = new T.Shape();
+    carSideWindowShape.moveTo(-1.12, 1.18);
+    carSideWindowShape.lineTo(-0.78, 1.75);
+    carSideWindowShape.lineTo(0.25, 1.75);
+    carSideWindowShape.lineTo(0.65, 1.2);
+    carSideWindowShape.closePath();
+    const carSideWindowGeometry = new T.ShapeGeometry(carSideWindowShape);
+    [-0.68, 0.68].forEach(side => {
+      const window = new T.Mesh(carSideWindowGeometry, carGlassMat);
+      window.position.x = side * 0.86;
+      window.rotation.y = -Math.PI / 2;
+      carRoot.add(window);
+      bikeRod(carRoot, [side * 0.84, 1.12, 0.78], [side * 0.84, 1.86, 0.32], 0.055, carBodyMat);
+      bikeRod(carRoot, [side * 0.84, 1.12, -1.22], [side * 0.84, 1.86, -0.74], 0.055, carBodyMat);
+      bikeRod(carRoot, [side * 0.84, 1.18, -0.18], [side * 0.84, 1.82, -0.18], 0.045, carBodyMat);
+    });
+    const carWindshield = new T.Mesh(new T.BoxGeometry(1.38, 0.82, 0.045), carGlassMat);
+    carWindshield.position.set(0, 1.5, 0.54);
+    carWindshield.rotation.x = -0.45;
     carRoot.add(carWindshield);
+    const carRearGlass = new T.Mesh(new T.BoxGeometry(1.24, 0.7, 0.045), carGlassMat);
+    carRearGlass.position.set(0, 1.5, -0.96);
+    carRearGlass.rotation.x = 0.48;
+    carRoot.add(carRearGlass);
     [-0.43, 0.43].forEach(side => {
       const seat = new T.Mesh(new T.BoxGeometry(0.58, 0.62, 0.58), carSeatMat);
       seat.position.set(side, 1.18, -0.05);
@@ -3373,18 +3486,46 @@
     [-1, 1].forEach(side => [-1, 1].forEach(front => {
       const wheel = new T.Group();
       wheel.position.set(side * 0.91, 0.48, front * 1.08);
-      wheel.rotation.z = Math.PI / 2;
-      const tire = new T.Mesh(new T.CylinderGeometry(0.36, 0.36, 0.22, 12), carTrimMat);
+      const tire = new T.Mesh(new T.CylinderGeometry(0.37, 0.37, 0.26, 14), carTrimMat);
       tire.castShadow = true;
+      tire.rotation.z = Math.PI / 2;
       wheel.add(tire);
-      const hub = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.24, 10), bikeMetalMat);
+      const hub = new T.Mesh(new T.CylinderGeometry(0.22, 0.22, 0.12, 12), carMetalMat);
+      hub.position.x = side * 0.1;
+      hub.rotation.z = Math.PI / 2;
       wheel.add(hub);
+      const rim = new T.Mesh(new T.TorusGeometry(0.245, 0.025, 6, 20), carMetalMat);
+      rim.position.x = side * 0.17;
+      rim.rotation.y = side * Math.PI / 2;
+      wheel.add(rim);
+      const spokes = new T.Group();
+      spokes.position.x = side * 0.18;
+      spokes.rotation.y = side * Math.PI / 2;
+      for (let spokeIndex = 0; spokeIndex < 5; spokeIndex++) {
+        const spoke = new T.Mesh(new T.BoxGeometry(0.065, 0.31, 0.035), carMetalMat);
+        spoke.rotation.z = spokeIndex * Math.PI * 2 / 5;
+        spokes.add(spoke);
+      }
+      wheel.add(spokes);
       carRoot.add(wheel);
       carState.wheels.push(wheel);
     }));
+    const carBumper = new T.Mesh(new T.BoxGeometry(1.48, 0.16, 0.18), carMetalMat);
+    carBumper.position.set(0, 0.58, 1.66);
+    carRoot.add(carBumper);
+    const carGrille = new T.Mesh(new T.BoxGeometry(0.52, 0.27, 0.055), carTrimMat);
+    carGrille.position.set(0, 0.85, 1.72);
+    carRoot.add(carGrille);
+    const carHeadlightMat = new T.MeshStandardMaterial({ color: 0xffefc5, emissive: 0x8e7038, emissiveIntensity: 0.28 });
     [-0.56, 0.56].forEach(side => {
-      const lamp = new T.Mesh(new T.BoxGeometry(0.32, 0.18, 0.08), new T.MeshStandardMaterial({ color: 0xf3e6bb, emissive: 0x554522, emissiveIntensity: 0.18 }));
-      lamp.position.set(side, 1.0, 1.64);
+      const lamp = new T.Mesh(new T.BoxGeometry(0.32, 0.18, 0.075), carHeadlightMat);
+      lamp.position.set(side, 0.98, 1.67);
+      carRoot.add(lamp);
+    });
+    const carTailLightMat = new T.MeshStandardMaterial({ color: 0xb64b42, emissive: 0x46120e, emissiveIntensity: 0.16 });
+    [-0.56, 0.56].forEach(side => {
+      const lamp = new T.Mesh(new T.BoxGeometry(0.3, 0.16, 0.075), carTailLightMat);
+      lamp.position.set(side, 0.92, -1.63);
       carRoot.add(lamp);
     });
     carRoot.position.set(carState.x, 0.06, carState.z);
@@ -4398,6 +4539,62 @@
       const item = INTERACTABLES.find(entry => entry.id === "car");
       if (item) { item.x = carState.x; item.z = carState.z; }
     }
+    function fireTruckSeatPosition(actor) {
+      const side = fireTruckState.driver === actor ? -0.48 : 0.48;
+      const cos = Math.cos(fireTruckState.heading), sin = Math.sin(fireTruckState.heading);
+      return { x: fireTruckState.x + side * cos, z: fireTruckState.z - side * sin };
+    }
+    function positionFireTruckRider(actor) {
+      if (!actor) return;
+      const seat = fireTruckSeatPosition(actor);
+      actor.rig.position.set(seat.x, groundHeightAt(seat.x, seat.z, rigBaseY) - 0.12, seat.z);
+      actor.rig.rotation.set(0, fireTruckState.heading, 0);
+    }
+    function mountFireTruck(actor) {
+      if (!actor || currentActivity || (actor === V && !togetherEnabled)) return;
+      if (fireTruckState.driver === actor || fireTruckState.passenger === actor) { dismountFireTruck(actor); return; }
+      if (actor === V && !fireTruckState.driver) return;
+      if ((actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A)) || (actor === V && (quadState.riding || eBikeState.rider === V || carState.driver === V || carState.passenger === V || chopperState.rider === V))) return;
+      if (fireTruckState.driver && fireTruckState.passenger) return;
+      if (!fireTruckState.driver) fireTruckState.driver = actor;
+      else fireTruckState.passenger = actor;
+      fireTruckState.target = null;
+      Object.keys(fireTruckKeys).forEach(key => { fireTruckKeys[key] = false; });
+      targetPos = null;
+      currentNearbyItem = null;
+      vihaanNearbyItem = null;
+      if (actor === A) Object.keys(keys).forEach(key => { keys[key] = false; });
+      else Object.keys(vihaanKeys).forEach(key => { vihaanKeys[key] = false; });
+      setCarRiderPose(actor);
+      positionFireTruckRider(actor);
+      wake();
+    }
+    function dismountFireTruck(actor) {
+      const isDriver = fireTruckState.driver === actor;
+      const isPassenger = fireTruckState.passenger === actor;
+      if (!isDriver && !isPassenger) return;
+      const side = isDriver ? -1.65 : 1.65;
+      const exitX = fireTruckState.x + side * Math.cos(fireTruckState.heading);
+      const exitZ = fireTruckState.z - side * Math.sin(fireTruckState.heading);
+      actor.rig.position.set(exitX, groundHeightAt(exitX, exitZ, rigBaseY), exitZ);
+      actor.rig.rotation.y = fireTruckState.heading;
+      resetCarRiderPose(actor);
+      if (isDriver) {
+        fireTruckState.speed = 0;
+        fireTruckState.driver = null;
+        fireTruckState.target = null;
+        Object.keys(fireTruckKeys).forEach(key => { fireTruckKeys[key] = false; });
+      } else fireTruckState.passenger = null;
+      setFireTruckSpraying(false);
+      wake();
+    }
+    function setFireTruckSpraying(active) {
+      if (active && !fireTruckState.driver) return;
+      fireTruckState.spraying = active;
+      fireWaterDrops.forEach(drop => { drop.visible = active; });
+      fireWaterSplash.visible = active;
+      wake();
+    }
     function mountChopper(actor) {
       if (!actor || chopperState.rider || chopperState.altitude > 0.05 || currentActivity || (actor === A && (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || eatingTimer > 0)) || (actor === V && (!togetherEnabled || quadState.riding || eBikeState.rider === V || carState.driver === V || carState.passenger === V || vihaanEatingTimer > 0))) return;
       chopperState.rider = actor;
@@ -4535,6 +4732,18 @@
         onActivate: () => mountCar(A)
       },
       {
+        id: "fireTruck",
+        name: "Fire truck",
+        x: fireTruckState.x,
+        z: fireTruckState.z,
+        approachRadius: 4.6,
+        actionLabel: "Ride the fire truck 🚒",
+        promptText: "Press E to drive the fire truck.",
+        vihaanPromptText: "Press Enter to ride as operator.",
+        onActivate: () => mountFireTruck(A),
+        onVihaan: () => mountFireTruck(V)
+      },
+      {
         id: "chopper",
         name: "Chopper",
         x: chopperState.x,
@@ -4647,19 +4856,20 @@
       wake();
     }
     function activateVihaanItem() {
-      if (!vihaanNearbyItem) return;
-      if (vihaanNearbyItem.id === "trainRide") dismountTrain(V);
-      if (vihaanNearbyItem.id === "movieTheaterRide") leaveMovieTheater(V);
-      if (vihaanNearbyItem.id === "train") boardTrain(V);
-      if (vihaanNearbyItem.id === "chopper") mountChopper(V);
-      if (vihaanNearbyItem.id === "chopperRide") dismountChopper();
-      if (vihaanNearbyItem.id === "ebike") mountEbike(V);
-      if (vihaanNearbyItem.id === "ebikeRide") dismountEbike();
-      if (vihaanNearbyItem.id === "car") mountCar(V);
-      if (vihaanNearbyItem.id === "carRide") dismountCar(V);
-      if (vihaanNearbyItem.id === "icecream") openIceCreamPicker(V);
-      if (vihaanNearbyItem.onVihaan) vihaanNearbyItem.onVihaan();
-      if (vihaanNearbyItem.id === "trampoline") {
+      const item = vihaanNearbyItem;
+      if (!item) return;
+      if (item.id === "trainRide") dismountTrain(V);
+      if (item.id === "movieTheaterRide") leaveMovieTheater(V);
+      if (item.id === "train") boardTrain(V);
+      if (item.id === "chopper") mountChopper(V);
+      if (item.id === "chopperRide") dismountChopper();
+      if (item.id === "ebike") mountEbike(V);
+      if (item.id === "ebikeRide") dismountEbike();
+      if (item.id === "car") mountCar(V);
+      if (item.id === "carRide") dismountCar(V);
+      if (item.id === "icecream") openIceCreamPicker(V);
+      if (item.onVihaan) item.onVihaan();
+      if (item.id === "trampoline") {
         vihaanBounceTime = 5;
         moveActor(V, -4.85 - V.rig.position.x, 0.2 - V.rig.position.z);
         wake();
@@ -4724,6 +4934,9 @@
       } else if (togetherEnabled && (carState.driver === V || carState.passenger === V)) {
         closest = { id: "carRide", x: carState.x, z: carState.z, approachRadius: Infinity };
         minDistance = 0;
+      } else if (togetherEnabled && (fireTruckState.driver === V || fireTruckState.passenger === V)) {
+        closest = { id: "fireTruckRide", vihaanPromptText: fireTruckState.passenger === V ? "Hold Enter to spray. Press Q to leave." : "Press Q to leave the fire truck." };
+        minDistance = 0;
       } else if (togetherEnabled && eBikeState.rider === V) {
         closest = { id: "ebikeRide", x: eBikeState.x, z: eBikeState.z, approachRadius: Infinity };
         minDistance = 0;
@@ -4731,7 +4944,7 @@
         const quadDistance = Math.hypot(V.rig.position.x - quadState.x, V.rig.position.z - quadState.z);
         if (quadDistance < 2.2) { closest = { id: "quad", x: quadState.x, z: quadState.z }; minDistance = quadDistance; }
       }
-      if (togetherEnabled && !trainState.vihaan && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || item.onVihaan || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || item.id === "chopper").forEach(item => {
+      if (togetherEnabled && !trainState.vihaan && !quadState.riding && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && fireTruckState.driver !== V && fireTruckState.passenger !== V && !chopperState.rider) INTERACTABLES.filter(item => ["icecream", "trampoline"].includes(item.id) || (item.onVihaan && item.id !== "fireTruck") || (item.id === "ebike" && !eBikeState.rider) || (item.id === "car" && (!carState.driver || !carState.passenger)) || (item.id === "fireTruck" && fireTruckState.driver && !fireTruckState.passenger) || item.id === "chopper").forEach(item => {
         const distance = Math.hypot(V.rig.position.x - item.x, V.rig.position.z - item.z);
         if (distance <= item.approachRadius && distance < minDistance) { closest = item; minDistance = distance; }
       });
@@ -4743,7 +4956,7 @@
       if (closest !== vihaanNearbyItem) {
         vihaanNearbyItem = closest;
         if (closest && vihaanActionPrompt && vihaanActionPromptText) {
-          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainStopAllowsRiderExit() ? "Enter: leave the train." : "Wait for Ice Cream Stop to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
+          vihaanActionPromptText.textContent = closest.vihaanPromptText || (closest.id === "trainRide" ? (trainStopAllowsRiderExit() ? "Enter: leave the train." : "Wait for Ice Cream Stop to leave the train.") : closest.id === "train" ? "Press Enter to ride the train." : closest.id === "quad" ? "Press Enter to ride the quad." : closest.id === "chopper" ? "Press Enter to ride the chopper." : closest.id === "chopperRide" ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Enter: leave the chopper.") : closest.id === "ebike" ? "Press Enter to ride the e-bike." : closest.id === "ebikeRide" ? "Enter: park the e-bike." : closest.id === "car" ? "Press Enter to ride in the car." : closest.id === "carRide" ? "Enter: leave the car." : closest.id === "fireTruck" ? "Press Enter to ride as operator." : closest.id === "icecream" ? "Enter: choose ice cream 🍦" : "Enter: Jump! 🤸");
           vihaanActionPrompt.hidden = false;
           requestAnimationFrame(() => vihaanActionPrompt.classList.add("show"));
         } else if (vihaanActionPrompt) {
@@ -4765,14 +4978,15 @@
         if (actionPrompt && actionPromptText) { actionPromptText.textContent = currentNearbyItem.promptText; actionPrompt.hidden = false; }
         return;
       }
-      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || chopperState.rider === A) {
+      if (bikeState.riding || eBikeState.rider === A || carState.driver === A || carState.passenger === A || fireTruckState.driver === A || fireTruckState.passenger === A || chopperState.rider === A) {
         const ridingBike = bikeState.riding;
         const ridingEbike = eBikeState.rider === A;
         const ridingChopper = chopperState.rider === A;
+        const ridingFireTruck = fireTruckState.driver === A || fireTruckState.passenger === A;
         const rideItem = {
-          id: ridingBike ? "bikeRide" : ridingEbike ? "ebikeRide" : ridingChopper ? "chopperRide" : "carRide",
-          promptText: ridingBike ? "Press E to park the bike." : ridingEbike ? "Press E to park the e-bike." : ridingChopper ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Press E to leave the chopper.") : "Press E to leave the car.",
-          onActivate: ridingBike ? dismountBike : ridingEbike ? dismountEbike : ridingChopper ? dismountChopper : () => dismountCar(A)
+          id: ridingBike ? "bikeRide" : ridingEbike ? "ebikeRide" : ridingChopper ? "chopperRide" : ridingFireTruck ? "fireTruckRide" : "carRide",
+          promptText: ridingBike ? "Press E to park the bike." : ridingEbike ? "Press E to park the e-bike." : ridingChopper ? (chopperState.altitude > 0.05 ? "Land to leave the chopper." : "Press E to leave the chopper.") : ridingFireTruck ? (!togetherEnabled && fireTruckState.driver === A ? "Press E to leave. Hold Enter to spray forward." : "Press E to leave the fire truck.") : "Press E to leave the car.",
+          onActivate: ridingBike ? dismountBike : ridingEbike ? dismountEbike : ridingChopper ? dismountChopper : ridingFireTruck ? () => dismountFireTruck(A) : () => dismountCar(A)
         };
         currentNearbyItem = rideItem;
         if (actionPrompt && actionPromptText) {
@@ -4803,6 +5017,7 @@
         const item = INTERACTABLES[i];
         if (item.id === "ebike" && eBikeState.rider) continue;
         if (item.id === "car" && carState.driver && carState.passenger) continue;
+        if (item.id === "fireTruck" && fireTruckState.driver) continue;
         if (item.id === "chopper" && chopperState.rider) continue;
         const d = Math.hypot(px - item.x, pz - item.z);
         if (d <= item.approachRadius && d < minD) {
@@ -4820,7 +5035,7 @@
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "chopper", "icecream", "train", "movieTheater"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "fireTruck", "chopper", "icecream", "train", "movieTheater"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -5579,6 +5794,7 @@
         bikeState.riding && bikeState,
         eBikeState.rider && eBikeState,
         carState.driver && carState,
+        fireTruckState.driver && fireTruckState,
         togetherEnabled && quadState.riding && quadState,
         chopperState.rider && chopperState
       ].filter(Boolean).sort((a, b) => Math.hypot(a.x - x, a.z - z) - Math.hypot(b.x - x, b.z - z));
@@ -5650,7 +5866,7 @@
         if (intHits.length > 0) {
           const hit = intHits[0];
           const data = hit.object.userData;
-          const riddenVehicleName = bikeState.riding ? "Ahaan's bike" : eBikeState.rider ? "E-bike" : carState.driver ? "Two-seat car" : quadState.riding ? "Vihaan's quad" : chopperState.rider ? "Chopper" : null;
+          const riddenVehicleName = bikeState.riding ? "Ahaan's bike" : eBikeState.rider ? "E-bike" : carState.driver ? "Two-seat car" : fireTruckState.driver ? "Fire truck" : quadState.riding ? "Vihaan's quad" : chopperState.rider ? "Chopper" : null;
           if (riddenVehicleName && data && data.name !== riddenVehicleName) {
             const groundHit = raycaster.intersectObjects(walkableSurfaces)[0];
             if (groundHit) {
@@ -5761,6 +5977,31 @@
         leaveMovieTheater(theaterOwnExit);
         return;
       }
+      const enterKey = e.code === "Enter" || e.key === "Enter";
+      if (fireTruckState.passenger === V && togetherEnabled && enterKey) {
+        e.preventDefault();
+        setFireTruckSpraying(isDown);
+        return;
+      }
+      if (!togetherEnabled && fireTruckState.driver === A && enterKey) {
+        e.preventDefault();
+        setFireTruckSpraying(isDown);
+        return;
+      }
+      if (fireTruckState.passenger === V && togetherEnabled && e.code === "KeyQ" && isDown) {
+        e.preventDefault();
+        dismountFireTruck(V);
+        return;
+      }
+      if (fireTruckState.passenger === V && togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key)) {
+        if (isDown) {
+          const direction = e.key.slice(5).toLowerCase();
+          fireTruckState.aimX = direction === "left" ? -1 : direction === "right" ? 1 : 0;
+          fireTruckState.aimZ = direction === "up" ? 1 : direction === "down" ? -1 : 0;
+          e.preventDefault();
+        }
+        return;
+      }
       const ahaanMoveKey = /^(KeyW|KeyA|KeyS|KeyD)$/.test(e.code) || (!togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key));
       const vihaanMoveKey = togetherEnabled && /^Arrow(Up|Down|Left|Right)$/.test(e.key);
       if ((movieTheaterState.ahaan && ahaanMoveKey) || (movieTheaterState.vihaan && vihaanMoveKey)) {
@@ -5799,6 +6040,10 @@
         if (isDown && (carState.driver === A || carState.passenger === A) && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
           e.preventDefault();
           dismountCar(A);
+        }
+        if (isDown && (fireTruckState.driver === A || fireTruckState.passenger === A) && ((e.code || "") === "KeyE" || (e.key || "").toLowerCase() === "e")) {
+          e.preventDefault();
+          dismountFireTruck(A);
         }
         if (isDown && (carState.driver === V || carState.passenger === V) && (e.code === "Enter" || e.key === "Enter")) {
           e.preventDefault();
@@ -5856,6 +6101,11 @@
           dismountCar(A);
           return;
         }
+        if (fireTruckState.driver === A || fireTruckState.passenger === A) {
+          e.preventDefault();
+          dismountFireTruck(A);
+          return;
+        }
         if (bikeState.riding) {
           e.preventDefault();
           dismountBike();
@@ -5867,13 +6117,28 @@
           return;
         }
         if (currentNearbyItem && currentNearbyItem.id === "train") { e.preventDefault(); boardTrain(A); return; }
-        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "icecream", "movieTheater"].includes(currentNearbyItem.id))) {
+        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "fireTruck", "icecream", "movieTheater"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
           return;
         }
       }
 
+      if (fireTruckState.driver === A) {
+        const fireTruckKey =
+          code === "KeyW" || key.toLowerCase() === "w" || (!togetherEnabled && key === "ArrowUp") ? "up" :
+          code === "KeyS" || key.toLowerCase() === "s" || (!togetherEnabled && key === "ArrowDown") ? "down" :
+          code === "KeyA" || key.toLowerCase() === "a" || (!togetherEnabled && key === "ArrowLeft") ? "left" :
+          code === "KeyD" || key.toLowerCase() === "d" || (!togetherEnabled && key === "ArrowRight") ? "right" : null;
+        if (fireTruckKey) {
+          if (isDown) { fireTruckState.target = null; markerMat.opacity = 0; }
+          fireTruckKeys[fireTruckKey] = isDown;
+          e.preventDefault();
+          wake();
+        }
+        return;
+      }
+      if (fireTruckState.passenger === A) return;
       if (carState.driver === A) {
         const rideKey =
           code === "KeyW" || key.toLowerCase() === "w" ? "up" :
@@ -6412,6 +6677,61 @@
         if (item) { item.x = carState.x; item.z = carState.z; }
       }
 
+      if (fireTruckState.driver) {
+        const topSpeed = PARK_SPEEDS.fireTruck;
+        const autoTarget = advanceVehicleTarget(fireTruckState, dt, topSpeed, 3.8, 5.5, 0.3 + Math.min(1, fireTruckState.speed / topSpeed) * 0.38);
+        if (!autoTarget) {
+          if (fireTruckKeys.down) fireTruckState.speed = Math.max(0, fireTruckState.speed - dt * 5.5);
+          else if (fireTruckKeys.up) fireTruckState.speed = Math.min(topSpeed, fireTruckState.speed + dt * 3.8);
+          else fireTruckState.speed = Math.max(0, fireTruckState.speed - dt * 0.8);
+        }
+        const steer = autoTarget ? 0 : (fireTruckKeys.right ? 1 : 0) - (fireTruckKeys.left ? 1 : 0);
+        if (!autoTarget) fireTruckState.heading += steer * (0.3 + Math.min(1, fireTruckState.speed / topSpeed) * 0.38) * dt;
+        const truckStep = autoTarget ? fireTruckState.targetStep : null;
+        const nextX = truckStep ? truckStep.x : fireTruckState.x + Math.sin(fireTruckState.heading) * fireTruckState.speed * dt;
+        const nextZ = truckStep ? truckStep.z : fireTruckState.z + Math.cos(fireTruckState.heading) * fireTruckState.speed * dt;
+        const allowed = (x, z) => carPositionAllowed(x, z) && (!togetherEnabled || fireTruckState.passenger || Math.hypot(x - V.rig.position.x, z - V.rig.position.z) <= maxPlayerSeparation());
+        if (allowed(nextX, nextZ)) {
+          fireTruckState.x = nextX;
+          fireTruckState.z = nextZ;
+        } else {
+          const slideCandidates = [
+            { x: nextX, z: fireTruckState.z, distance: Math.abs(nextX - fireTruckState.x) },
+            { x: fireTruckState.x, z: nextZ, distance: Math.abs(nextZ - fireTruckState.z) }
+          ].sort((a, b) => b.distance - a.distance);
+          const slide = slideCandidates.find(candidate => candidate.distance > 0 && allowed(candidate.x, candidate.z));
+          if (slide) {
+            fireTruckState.x = slide.x;
+            fireTruckState.z = slide.z;
+            fireTruckState.speed = Math.max(0, fireTruckState.speed - dt * 1.8);
+          } else {
+            fireTruckState.speed = Math.max(0, fireTruckState.speed - dt * 5.5);
+            if (fireTruckState.target) { fireTruckState.target = null; markerMat.opacity = 0; }
+          }
+        }
+        fireTruckRoot.position.set(fireTruckState.x, bikeSurfaceHeightAt(fireTruckState.x, fireTruckState.z), fireTruckState.z);
+        fireTruckRoot.rotation.y = fireTruckState.heading;
+        fireTruckState.wheels.forEach(wheel => { wheel.rotation.x += fireTruckState.speed * dt / 0.43; });
+        isWalking = fireTruckState.driver === A && fireTruckState.speed > 0.06;
+        vihaanWalking = fireTruckState.driver === V && fireTruckState.speed > 0.06;
+        positionFireTruckRider(fireTruckState.driver);
+        positionFireTruckRider(fireTruckState.passenger);
+        const item = INTERACTABLES.find(entry => entry.id === "fireTruck");
+        if (item) { item.x = fireTruckState.x; item.z = fireTruckState.z; }
+      }
+
+      if (fireTruckState.spraying) {
+        const localAim = new T.Vector3(fireTruckState.aimX, 0, fireTruckState.aimZ).normalize();
+        const direction = localAim.applyAxisAngle(new T.Vector3(0, 1, 0), fireTruckState.heading);
+        const start = new T.Vector3(fireTruckState.x, bikeSurfaceHeightAt(fireTruckState.x, fireTruckState.z) + 2.74, fireTruckState.z);
+        const reach = 8.2;
+        fireWaterDrops.forEach((drop, index) => {
+          const progress = (index + 1) / (fireWaterDrops.length + 1);
+          drop.position.set(start.x + direction.x * reach * progress, start.y + Math.sin(progress * Math.PI) * 1.1 - progress * 2.65, start.z + direction.z * reach * progress);
+        });
+        fireWaterSplash.position.set(start.x + direction.x * reach, bikeSurfaceHeightAt(start.x + direction.x * reach, start.z + direction.z * reach) + 0.16, start.z + direction.z * reach);
+      }
+
       if (togetherEnabled) {
         if (quadState.riding) {
           const topSpeed = PARK_SPEEDS.quad;
@@ -6442,9 +6762,10 @@
         let moveX = (vihaanKeys.right ? 1 : 0) - (vihaanKeys.left ? 1 : 0);
         let moveZ = (vihaanKeys.down ? 1 : 0) - (vihaanKeys.up ? 1 : 0);
         const vihaanInCar = carState.driver === V || carState.passenger === V;
+        const vihaanInFireTruck = fireTruckState.driver === V || fireTruckState.passenger === V;
         const vihaanInChopper = chopperState.rider === V;
-        vihaanWalking = trainState.vihaan || movieTheaterState.vihaan || vihaanInChopper ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
-        if (!vihaanInCar && !vihaanInChopper && vihaanWalking) {
+        vihaanWalking = trainState.vihaan || movieTheaterState.vihaan || vihaanInChopper || vihaanInFireTruck ? false : vihaanInCar ? carState.driver === V && carState.speed > 0.06 : !quadState.riding && eBikeState.rider !== V && (moveX !== 0 || moveZ !== 0);
+        if (!vihaanInCar && !vihaanInFireTruck && !vihaanInChopper && vihaanWalking) {
           const length = Math.hypot(moveX, moveZ);
           moveX /= length; moveZ /= length;
           vihaanAngle = Math.atan2(moveX, moveZ);
@@ -6454,7 +6775,7 @@
           while (diff > Math.PI) diff -= Math.PI * 2;
           V.rig.rotation.y += diff * Math.min(1, dt * 14);
         }
-        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInChopper && !trainState.vihaan && !movieTheaterState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
+        if (V.updateWalk && eBikeState.rider !== V && !vihaanInCar && !vihaanInFireTruck && !vihaanInChopper && !trainState.vihaan && !movieTheaterState.vihaan) V.updateWalk(vihaanWalking, shiftHeld ? 11 : 8.5, walkDt);
       }
       if (vihaanWaveTimer > 0) {
         vihaanWaveTimer = Math.max(0, vihaanWaveTimer - dt);
@@ -6464,7 +6785,7 @@
         }
       }
       if (V.rig.visible) {
-        if (vihaanWaveTimer > 0 && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
+        if (vihaanWaveTimer > 0 && eBikeState.rider !== V && carState.driver !== V && carState.passenger !== V && fireTruckState.driver !== V && fireTruckState.passenger !== V && V.updateWave) V.updateWave(dt, vihaanWalking, calm());
         const vihaanGround = groundHeightAt(V.rig.position.x, V.rig.position.z, rigBaseY);
       if (movieTheaterState.vihaan) positionMovieRider(V, "vihaan");
       else if (trainState.vihaan) positionTrainRider(V, 2);
@@ -6489,8 +6810,9 @@
 
       // Smoothly rotate Ahaan towards heading
       const ahaanInCar = carState.driver === A || carState.passenger === A;
+      const ahaanInFireTruck = fireTruckState.driver === A || fireTruckState.passenger === A;
       const ahaanInChopper = chopperState.rider === A;
-      if (isWalking && !bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
+      if (isWalking && !bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInFireTruck && !ahaanInChopper && (!currentActivity || activityPhase === 0)) {
         const curRot = A.rig.rotation.y;
         let diff = ahaanAngle - curRot;
         while (diff < -Math.PI) diff += Math.PI * 2;
@@ -6504,12 +6826,12 @@
         waveTimer -= dt;
         if (waveTimer <= 0 && A.stopWave) A.stopWave();
       }
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWave && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInFireTruck && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWave && (!currentActivity || activityPhase === 0)) {
         wavingActive = A.updateWave(dt, isWalking, calm());
       }
 
       // Update leg and arm walk cycle
-      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWalk && (!currentActivity || activityPhase === 0)) {
+      if (!bikeState.riding && eBikeState.rider !== A && !ahaanInCar && !ahaanInFireTruck && !ahaanInChopper && !movieTheaterState.ahaan && A.updateWalk && (!currentActivity || activityPhase === 0)) {
         A.updateWalk(isWalking, 8.5, walkDt);
       }
 
@@ -6584,7 +6906,7 @@
       }
       const cameraMoving = currentCamPos.distanceTo(desiredPos) > 0.05 || currentCamTarget.distanceTo(desiredTarget) > 0.05;
 
-      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
+      if (cameraMoving || trainActive || movieTheaterActive || isWalking || vihaanWalking || vihaanWaveTimer > 0 || vihaanBounceTime > 0 || vihaanEatingTimer > 0 || targetPos || Object.values(keys).some(v => v) || Object.values(vihaanKeys).some(v => v) || Object.values(bikeKeys).some(v => v) || Object.values(eBikeKeys).some(v => v) || Object.values(carKeys).some(v => v) || Object.values(fireTruckKeys).some(v => v) || Object.values(chopperKeys).some(v => v) || chopperState.rider || chopperState.rotorSpeed > 0.02 || (bikeState.riding && bikeState.speed > 0.02) || (eBikeState.rider && eBikeState.speed > 0.02) || (carState.driver && carState.speed > 0.02) || (fireTruckState.driver && fireTruckState.speed > 0.02) || fireTruckState.spraying || eatingTimer > 0 || markerMat.opacity > 0 || isDragging || anyAnimActive || wavingActive || waveTimer > 0 || currentActivity || anyParticlesActive) {
         raf = requestAnimationFrame(frame);
       }
     }
@@ -6681,6 +7003,7 @@
       getQuadState: () => ({ riding: quadState.riding, x: quadState.x, z: quadState.z, speed: quadState.speed, target: quadState.target && { ...quadState.target } }),
       getEbikeState: () => ({ riding: !!eBikeState.rider, x: eBikeState.x, z: eBikeState.z, speed: eBikeState.speed, target: eBikeState.target && { ...eBikeState.target } }),
       getCarState: () => ({ driving: !!carState.driver, x: carState.x, z: carState.z, speed: carState.speed, target: carState.target && { ...carState.target } }),
+      getFireTruckState: () => ({ driving: !!fireTruckState.driver, passenger: !!fireTruckState.passenger, spraying: fireTruckState.spraying, x: fireTruckState.x, z: fireTruckState.z, speed: fireTruckState.speed, aim: { x: fireTruckState.aimX, z: fireTruckState.aimZ }, target: fireTruckState.target && { ...fireTruckState.target } }),
       getTrainState: () => ({ progress: trainState.progress, speed: trainState.speed, dwell: trainState.dwell, riders: { ahaan: trainState.ahaan, vihaan: trainState.vihaan }, dinoSounds: trainState.dinoSounds, trainChuffs: trainState.trainChuffs, tourMessage: trainTourCaption.textContent, smokePuffs: trainSmokePuffs.filter(puff => puff.mesh.visible).length, engineColor: trainBodyMats[0].color.getHex(), enginePosition: { x: trainCars[0].position.x, z: trainCars[0].position.z }, engineHeading: trainCars[0].rotation.y, currentStation: trainStations[trainState.currentStation]?.name || null, nextStation: trainStations[trainState.nextStation]?.name || null, stationCount: trainStations.length, stations: trainStations.map(station => station.name), routeLength: trainRouteLength, tieCount: sleepers.count, railCount: 2, carriageCount: trainCars.length }),
       getMovieTheaterState: () => ({ riders: { ahaan: !!movieTheaterState.ahaan, vihaan: !!movieTheaterState.vihaan }, seatHeight: theaterSeatHeight, rigOriginHeight: { ahaan: movieTheaterRigHeight(A), vihaan: movieTheaterRigHeight(V) }, scene: movieTheaterState.scene, sceneTitle: theaterScenes[movieTheaterState.scene], soundRequests: movieTheaterState.soundRequests, soundOn, controlsVisible: !movieTheaterControls.hidden, screenVisible: theaterScreen.visible, seats: 2, position: { x: -40, z: -38 }, riderPositions: { ahaan: { x: A.rig.position.x, y: A.rig.position.y, z: A.rig.position.z }, vihaan: { x: V.rig.position.x, y: V.rig.position.y, z: V.rig.position.z } } }),
       getPyramidState: () => ({ position: { x: pyramid.position.x, z: pyramid.position.z }, baseSize: pyramidState.baseSize, height: pyramidState.height, color: pyramidStone.color.getHex(), visible: pyramidBody.visible, signVisible: pyramidSign.visible, pathVisible: pyramidPath.visible }),
