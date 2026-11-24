@@ -1,5 +1,7 @@
 ## Park day/night and weather — Nov 24, 2026
 
+- Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).
+- Next: publish from a clean worktree, verify the live Park on desktop and mobile, and add the Fresh Drops card with a live night screenshot.
 - Read queue item 13 and `FEATURE-BRIEF-park-day-night-weather.md`.
 - Queue item 12 is complete and live. This feature follows the lazy river boat.
 - Created `.worktrees/feature-park-day-night-weather` on `feature/park-day-night-weather` from `origin/main` at `9bd0d4b`.
