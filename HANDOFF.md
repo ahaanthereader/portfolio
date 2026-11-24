@@ -34,7 +34,10 @@
 - Copied the live desktop screenshot to `public/fresh-drops/2026-11-24-lazy-river-boat.png` in the publish worktree.
 - Added the boat card to the top of Fresh Drops. Updated the Park rides menu date to Nov 24. The home Fresh Drops card already has the Nov 24 date.
 - `tests/water-park-fresh-drops-browser.cjs` passed on desktop and mobile. The new screenshot loaded, NEW badges appeared, and browser errors were empty.
-- Next: commit the Fresh Drops update, publish it, and verify the live card and image.
+- Fresh Drops commit: `9b95d74` (`Add lazy river boat to Fresh Drops`). It contains the live desktop screenshot.
+- The home Fresh Drops card date remains Nov 24. The Play menu shows NEW for Park rides through Nov 30.
+- Local Fresh Drops check passed on desktop and mobile. The new image loaded at full width, NEW badges appeared, and browser errors were empty.
+- Next: publish the Fresh Drops update, wait for Pages, and verify the live card and image.
 
 ## Park expansion and water — Nov 23, 2026
 
