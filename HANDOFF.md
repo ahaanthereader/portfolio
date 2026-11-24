@@ -45,6 +45,41 @@
 - Inspected `/tmp/ahaan-park-pyramid/fresh-drops-1280.png`. The pyramid card appears first with the live screenshot.
 - The worktree is complete. A final handoff record commit and Pages check remain.
 
+## Water park — Nov 23, 2026
+
+- Read `FEATURE-BRIEF-park-water-park.md` and overnight queue item 9. The northeast section must sit diagonally opposite the southwest zoo at `(-45, 45)`.
+- Plan the water park in the northeast outer lawn, approximately `x=30..49`, `z=-49..-29`. Keep the train loop and rim trees clear.
+- Place the splash slide near `(40, -35)`, wave pool near `(34, -42)`, lazy river loop near `(43, -43)`, and dump tower near `(32, -35)`. Confirm clearances during layout.
+- Add a walk path from the existing park core and a dedicated train stop near `(30, -29)`, after checking route and tree clearance.
+- North clouds currently sit around `y=19..22`, `z=-18..-28`. Move the clouds away from the water park sightline or fade them when the park is viewed.
+- Keep water motion slow and calm. Add no sudden dump motion, flashing effects, or unrequested sound. Make all four rides usable by both boys in Play together.
+- Use E, Enter, and tap prompts consistent with existing ride interactions. Add the new menu entry under Play with a seven-day NEW tag and direct arrival hash.
+- Planned browser check: `tests/park-water-park-browser.cjs`; cover desktop `1280x800`, mobile `390x844`, each ride mount/exit, both boys, prompts, and zero page errors.
+- Headroom baseline at 2026-11-23 08:26 CT: `headroom perf` reported 7 requests and `115,265 -> 114,422` tokens, with 843 saved. `headroom savings` reported 843 saved tokens; it printed no `tokens_before` or `tokens_after` pair. No savings percentage is recorded.
+- `headroom perf` emitted a LiteLLM model-cost fetch warning and used its local backup. The report completed. No command error occurred.
+- Step 1 edit failures or retries: 1 patch context mismatch while inserting the section. The retry succeeded.
+- Built a sandy northeast promenade and four rides in `assets/park3d.js` at the planned locations: splash slide `(40, -35)`, wave pool `(34, -42)`, lazy river `(43, -43)`, and dump tower `(32, -35)`.
+- Added visible ride structures, labeled signs, shallow water, gentle fountain jets, and a slow bucket tip. The bucket waterfall stays calm and has no sound.
+- Added E and Enter ride interactions for Ahaan and Vihaan. Each rider can exit and return to the saved position. Play together remains required for Vihaan interactions.
+- Added a slow slide cycle, gentle wave pool bob, and lazy river float loop with a visible ring for each rider. The dump tower runs a slow, soft water cycle.
+- `node --check assets/park3d.js` and `git diff --check` passed. No browser check was run in this step.
+- Implementation edit attempts: 2 patch context mismatches. The combined input patch did not match `handleKey`; smaller patches succeeded. A later duplicate spread patch found the water ride entries already present. No code was changed by that duplicate attempt.
+- Added a sandy access path from the park core and a `Water Park Stop` on the existing train loop. Riders can exit there; boarding stays at Ice Cream Stop.
+- The north clouds now hide only while Ahaan views the water park. Added Play menu link `index.html#waterpark` with the Nov 23 NEW date and direct arrival.
+- Added `tests/park-water-park-browser.cjs`. It checks all rides, motion, boarding and exit, Play together, cloud clearance, train stop, direct arrival, NEW tag, desktop `1280x800`, mobile `390x844`, and zero page or console errors.
+- Browser check first failed because the wave pool rider did not move. The update ran only during playground activity. It now runs each frame. A Play together check then failed because the test placed the boys beyond their separation limit; the test now keeps Ahaan near the rides.
+- The first local server attempt failed with `listen EPERM` on `127.0.0.1`. The approved rerun passed on desktop and mobile. Evidence: `/tmp/ahaan-water-park/`.
+- Inspected the desktop overview and ride screenshots. The clouds no longer block the water rides.
+- Updated the train browser check for five stations. `park-train-browser.cjs` passed on desktop and mobile, including the station sound and one-station boarding checks. It reported zero errors.
+- Final pre-publish `node --check` passed for `assets/park3d.js`, `tests/park-water-park-browser.cjs`, and `tests/park-train-browser.cjs`. `git diff --check` passed.
+- Feature commit `1d2b34b` (`Add water park rides to the park`) was pushed to `main`.
+- Push Pages run `45295248049` failed because the deploy job found no `github-pages` artifact. Clean workflow-dispatch run `45298950451` succeeded and uploaded the artifact.
+- Live `tests/park-water-park-browser.cjs` passed at desktop and mobile. All four rides, Play together, the NEW link, direct arrival, train stop, and zero browser or console errors passed. Evidence: `/tmp/ahaan-water-park-live/`.
+- Inspected the live desktop wave pool screenshot. Copied it to `public/fresh-drops/2026-11-23-water-park.png` for the Fresh Drops entry.
+- Added the Fresh Drops card first in the list with the live screenshot and `You asked for a water park!` copy. The home date is already Nov 23, 2026.
+- Added `tests/water-park-fresh-drops-browser.cjs`. Local desktop and mobile checks passed for the image, first card, NEW badges, no horizontal overflow, and zero browser errors. Evidence: `/tmp/ahaan-water-park-fresh-drops/`.
+- Fresh Drops commit and second Pages publish remain.
+
 ## Guided train: one boarding station — Nov 23, 2026
 
 - Created `.worktrees/feature-park-train-single-boarding` on `feature/park-train-single-boarding` from `origin/main` at `a052a0b`.

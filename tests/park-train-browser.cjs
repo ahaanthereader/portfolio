@@ -38,8 +38,8 @@ let server;
       await page.evaluate(() => Park3D.setCustomCamera({ x: 17, y: 28, z: -2 }, { x: 5, y: 0, z: -17 }));
 
       const initial = await page.evaluate(() => Park3D.getTrainState());
-      assert.equal(initial.stationCount, 4, 'four stations exist');
-      assert.deepEqual(initial.stations, ['Ice Cream Stop', 'Bridge Stop', 'South Grove', 'West Grove']);
+assert.equal(initial.stationCount, 5, 'five stations exist');
+assert.deepEqual(initial.stations, ['Ice Cream Stop', 'Water Park Stop', 'Bridge Stop', 'South Grove', 'West Grove']);
       assert.equal(initial.tieCount, 320, 'track has visible sleepers');
       assert.equal(initial.railCount, 2, 'track has two rails');
       assert.equal(initial.carriageCount, 3, 'train has one engine and two carriages');
@@ -77,7 +77,7 @@ let server;
         assert.ok(Math.abs(ridingFrame.ahaan.x) < 0.5 && Math.abs(ridingFrame.vihaan.x) < 0.5, 'both riders stay in the center view');
         await page.screenshot({ path: path.join(evidenceDir, 'both-riding-1280.png') });
         await page.waitForFunction(() => Park3D.getTrainState().currentStation === 'Bridge Stop' && Park3D.getTrainState().dwell > 2.2, null, { timeout: 120000 });
-        assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 1, 'friendly sound plays at Bridge Stop when enabled');
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 2, 'friendly sound plays at Water Park and Bridge stops when enabled');
         assert.ok((await page.evaluate(() => Park3D.getTrainState())).tourMessage.includes('wooden bridge'), 'tour describes the bridge on the right');
         assert.ok(await page.evaluate(() => Math.hypot(Park3D.getV().rig.position.x - 18, Park3D.getV().rig.position.z - 9) < 12), 'Vihaan follows train to Bridge Stop');
       } else {
@@ -114,7 +114,7 @@ let server;
             const state = Park3D.getTrainState();
             return state.currentStation === name && state.dwell > 2.2;
           }, station, { timeout: 120000 });
-          assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, ['South Grove', 'West Grove', 'Ice Cream Stop'].indexOf(station) + 2, `friendly sound plays at ${station}`);
+          assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, { 'South Grove': 3, 'West Grove': 4, 'Ice Cream Stop': 5 }[station], `friendly sound plays at ${station}`);
           assert.ok((await page.evaluate(() => Park3D.getTrainState())).tourMessage.includes(line), `tour narration appears at ${station}`);
           if (station !== 'Ice Cream Stop') {
             await page.evaluate(() => document.activeElement?.blur());
@@ -126,7 +126,7 @@ let server;
             assert.match(await page.locator('#actionPromptText').textContent(), /Wait for Ice Cream Stop/);
           }
         }
-        assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 4, 'friendly sound plays at all four perimeter stops');
+        assert.equal((await page.evaluate(() => Park3D.getTrainState())).dinoSounds, 5, 'friendly sound plays at all five perimeter stops');
         await page.evaluate(() => document.activeElement?.blur());
         await page.keyboard.press('E');
         await page.waitForFunction(() => !Park3D.getTrainState().riders.ahaan && Park3D.getTrainState().riders.vihaan);
