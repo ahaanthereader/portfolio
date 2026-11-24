@@ -34,7 +34,15 @@
 - Final local desktop and mobile checks passed. They include direct controls in reduced-motion mode, puddle fill and drainage, sound off, and zero page errors.
 - Pages run `45411509540` and clean run `45412440780` failed because GitHub found no uploaded artifact. Clean run `45415563213` succeeded.
 - First live browser check showed rain and puddle fill. It did not allow enough time for sunny drainage. The updated check uses longer intervals.
-- Next: commit the beam and rain timing fixes, publish them, and rerun live verification.
+- Latest fix commit: `7ff4d29d8bd7e044883cc84286c4d18163ed70b3` (`Tune park night glow and weather pacing`).
+- Push Pages run `45422154640` succeeded for the latest fix commit.
+- Live desktop and mobile checks passed for day, evening, night, rain fill, sunny drain, Auto, reduced motion, sound off, and zero page errors.
+- Live headless rate samples were 4.1 FPS desktop and 5.2 FPS mobile. The browser harness uses software rendering and reports low baseline rates too.
+- Inspected live night and rain screenshots. Night light blend reached `0.996`; the screenshot shows the Park center and warm lamp globes.
+- Added the live night screenshot at `public/fresh-drops/2026-11-24-park-day-night-weather.png` and a new Fresh Drops card.
+- Updated the Fresh Drops browser check for the new top card. `node --check tests/water-park-fresh-drops-browser.cjs` passed.
+- The Fresh Drops check passed on desktop and mobile. The image loaded, the NEW badge appeared, and there were zero browser errors.
+- Next: commit the Fresh Drops card, screenshot, and check; push; then live-check the card and NEW badge.
 
 ## Lazy river boat — Nov 24, 2026
 
