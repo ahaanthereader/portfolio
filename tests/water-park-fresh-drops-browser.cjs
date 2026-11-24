@@ -45,6 +45,8 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       assert.equal(await firstCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: NEW badge is visible`);
       const screenshot = firstCard.locator('img');
       assert.match(await screenshot.getAttribute('src'), /2026-11-24-park-expand-water\.png$/);
+      await screenshot.scrollIntoViewIfNeeded();
+      await screenshot.evaluate(image => image.decode());
       assert.ok(await screenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: live screenshot loads at full width`);
       await page.screenshot({ path: path.join(evidenceDir, `fresh-drops-${viewport.name}.png`) });
 
