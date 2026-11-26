@@ -1,3 +1,24 @@
+## Brief queue — Nov 25, 2026
+
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. You own this item. Work in this worktree on `feature/books-shelf`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+## Books shelf — Nov 25, 2026
+
+- Began queue item 20 in the assigned `feature/books-shelf` worktree.
+- Read the brief, `reading.html`, `assets/reading.js`, `assets/shared.js`, `assets/site.css`, and `assets/fit-reading.css`.
+- The shelf already has horizontal overflow and arrow handlers. The handlers hide both arrows when the current book list fits. The shelf has no drag or snap support.
+- The Aesop card must link to `aesop.html`. No Aesop cover file appears in `images/book-covers/` yet.
+- The desktop layout puts `Currently Reading` in an auto-sized second grid column. Its clipping needs a layout fix that accounts for the page width.
+- Activated the Sally UX review skill and loaded its persona and project defaults. The `uv run` resolver could not write to its user cache, so I used the listed TOML defaults directly.
+- Saved Sally's UX review in `sally-books-shelf-review.md`. Her recommendations cover semantic cards, snap points, arrow controls, mouse dragging, readable details, bounded layout, and reduced motion.
+- Applied the review: added a custom Aesop cover, linked its card to `aesop.html`, kept the other cards keyboard operable, and added a scroll-snap shelf with arrows and mouse dragging.
+- Replaced the old Aesop text link with the shelf card. Bounded the desktop side column and made the Currently Reading text wrap. Mobile keeps the card inside the page width.
+- Added `tests/reading-shelf-browser.cjs` for 1280 × 800 and 390 × 844 checks. The browser check passed arrow navigation, actual card dragging, keyboard details, Aesop cover visibility, card bounds, zero horizontal overflow, and zero browser or console errors.
+- Inspected desktop and mobile screenshots. The scrolled screenshots show the full Aesop cover and details. The Currently Reading card stays within the viewport width.
+- Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
+- `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
+- Next: review the final diff, sync with current `main`, then publish and add the Fresh Drops entry with a live screenshot.
+
 ## Park day/night and weather — Nov 24, 2026
 
 - Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).
