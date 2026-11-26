@@ -40,21 +40,24 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
       await page.goto(`${baseUrl}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
       const firstCard = page.locator('.fresh-drop').first();
-      assert.match(await firstCard.locator('h2').textContent(), /clear view of the park/i, `${viewport.name}: Park flower-removal card is first`);
-      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-25');
+      assert.match(await firstCard.locator('h2').textContent(), /Aesop's Fables joins the book shelf/i, `${viewport.name}: books shelf card is first`);
+      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-26');
       assert.equal(await firstCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: NEW badge is visible`);
       const screenshot = firstCard.locator('img');
-      assert.match(await screenshot.getAttribute('src'), /2026-11-25-flowers-remove\.png$/);
+      assert.match(await screenshot.getAttribute('src'), /2026-11-26-books-shelf\.png$/);
       await screenshot.scrollIntoViewIfNeeded();
       await screenshot.evaluate(image => image.decode());
       assert.ok(await screenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: live screenshot loads at full width`);
       await page.screenshot({ path: path.join(evidenceDir, `fresh-drops-${viewport.name}.png`) });
 
       await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
-      assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-25');
+      assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-26');
       assert.equal(await page.locator('.fresh-drops-home [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: home card shows NEW`);
       assert.equal(await page.locator('.park-rides-nav').getAttribute('data-new-date'), '2026-11-24');
       assert.equal(await page.locator('.park-rides-nav [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Park rides menu shows NEW`);
+      const readingNav = page.locator('.fresh-drops-nav[href="reading.html"]');
+      assert.equal(await readingNav.getAttribute('data-new-date'), '2026-11-26');
+      assert.equal(await readingNav.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Reading Nook menu shows NEW`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${viewport.name}: no horizontal overflow`);
       await page.screenshot({ path: path.join(evidenceDir, `home-${viewport.name}.png`) });
       await page.close();

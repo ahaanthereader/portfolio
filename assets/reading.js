@@ -46,12 +46,14 @@
       if (e.pointerType !== "mouse" || e.button !== 0) return;
       dragStart = { x: e.clientX, left: shelf.scrollLeft, moved: false };
       shelf.classList.add("is-dragging");
-      shelf.setPointerCapture(e.pointerId);
     });
     shelf.addEventListener("pointermove", e => {
       if (!dragStart) return;
       const distance = e.clientX - dragStart.x;
-      if (Math.abs(distance) > 5) dragStart.moved = true;
+      if (Math.abs(distance) > 5 && !dragStart.moved) {
+        dragStart.moved = true;
+        shelf.setPointerCapture(e.pointerId);
+      }
       if (dragStart.moved) shelf.scrollLeft = dragStart.left - distance;
     });
     const stopDrag = () => {

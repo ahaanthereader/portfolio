@@ -6,6 +6,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
 const root = path.resolve(__dirname, '..');
 const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-books-shelf';
+const baseUrl = process.env.BASE_URL;
 let server;
 let point = 'server-start';
 const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); process.exit(2); }, 30000);
@@ -29,12 +30,14 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   try {
     point = 'desktop-initial';
-    await page.goto(`http://127.0.0.1:${server.address().port}/reading.html`, { waitUntil: 'domcontentloaded' });
+    await page.goto(baseUrl || `http://127.0.0.1:${server.address().port}/reading.html`, { waitUntil: 'domcontentloaded' });
     await page.locator('.book img').first().waitFor();
     assert.equal(await page.locator('.book').count(), 3);
     assert.equal(await page.locator('.book[href="aesop.html"]').count(), 1);
     assert.equal(await page.locator('.book[href="aesop.html"] img').evaluate(img => img.complete && img.naturalWidth > 0), true);
     await page.locator('#shelfNext').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('.fresh-drops-nav[href="reading.html"]').getAttribute('data-new-date'), '2026-11-26');
+    assert.equal(await page.locator('.fresh-drops-nav[href="reading.html"] [data-fresh-new]').getAttribute('hidden'), null);
     assert.equal(await page.locator('#shelfNext').isVisible(), true);
     assert.equal(await page.locator('#shelfPrev').isVisible(), false);
     const desktopCard = await page.locator('.reading-now').evaluate(node => {
@@ -44,7 +47,6 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
     assert.ok(desktopCard.left >= 0 && desktopCard.right <= desktopCard.viewport);
     assert.match(desktopCard.text, /Exploring a brand-new country on every page/);
     await page.screenshot({ path: path.join(evidenceDir, 'desktop-shelf.png') });
-
     point = 'desktop-arrow-scroll';
     await page.locator('#shelfNext').click();
     await page.waitForTimeout(400);
@@ -98,7 +100,13 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.locator('.book img').first().waitFor();
+    await page.locator('#shelfNext').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#shelfNext').isVisible(), true);
+    const mobileArrowSize = await page.locator('#shelfNext').evaluate(node => {
+      const rect = node.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    });
+    assert.ok(mobileArrowSize.width >= 44 && mobileArrowSize.height >= 44);
     assert.equal(await page.locator('.book[href="aesop.html"] img').evaluate(img => img.complete && img.naturalWidth > 0), true);
     const mobile = await page.evaluate(() => {
       const node = document.querySelector('.reading-now');
