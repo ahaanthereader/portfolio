@@ -62,7 +62,9 @@
 - Saved the live Stormy screenshot at `public/fresh-drops/2026-11-26-day-night-heavy-rain-storm.png`. Added the Nov 26 Fresh Drops entry with “You asked for this!”, updated the home card date and Park rides NEW date, and updated its browser check.
 - The Fresh Drops check passed locally on desktop and mobile. The image loaded at full width, NEW labels appeared, and browser errors were empty.
 - Main then advanced with commits `2c05d28`, `4d77468`, and `22f0d23`. Sync these commits before the Fresh Drops publish.
-- Next: merge latest main, rerun the Fresh Drops check, publish the entry, and live-verify the Fresh Drops page.
+- Merged the latest main commits. The Fresh Drops check passed again on desktop and mobile. The live image loaded at full width, NEW labels showed, and browser errors were empty.
+- Fresh Drops commit: `35418bd` (`Add day night storm to Fresh Drops`). Merge commit: `80eb163`.
+- Next: publish the entry, live-verify Fresh Drops, and record the final deployment details.
 
 ## Park floral decoration cleanup — Nov 25, 2026
 
