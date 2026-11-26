@@ -1,3 +1,17 @@
+## Brief queue — Nov 25, 2026
+
+- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. You own this item. Work in this worktree on `feature/day-night-weather`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
+- The weather update supports Auto, Sunny, Cloudy, and Light rain. It pools 18 rain streaks and grows six path puddles. Sound defaults off.
+- Added visible Day, Night, and Auto buttons to the main Park navigation. Kept the dropdown controls and synced both day control sets.
+- Added Heavy rain and Stormy weather. Heavy rain uses all 48 rain streaks, faster and larger drops, and faster, wider puddles.
+- Stormy weather darkens the Park, adds steady wind-driven rain, and uses slow, soft lightning flashes. Thunder uses the existing sound engine only when sound is on.
+- Added `tests/park-day-night-weather-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed quick controls, touch taps, heavy-rain puddle growth, storm darkening, lightning, silent default, and zero browser errors.
+- Inspected desktop and mobile screenshots in `/tmp/ahaan-day-night-weather`. The screenshots show the prominent controls, heavier rain, storm rain, and storm darkening.
+- `node --check assets/park3d.js`, `node --check tests/park-day-night-weather-browser.cjs`, and `git diff --check` passed.
+- Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Both riders stayed in frame, bridge height matched at 8.00094 m, and browser errors were empty. Evidence: `/tmp/ahaan-two-player`.
+- Next: run relevant existing Park checks, commit the feature, sync and publish per the driver workflow, then live-verify and add the Fresh Drops entry with its screenshot.
+
 ## Park day/night and weather — Nov 24, 2026
 
 - Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).
