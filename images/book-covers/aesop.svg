@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-labelledby="title desc">
+  <title id="title">Aesop's Fables</title>
+  <desc id="desc">A green storybook cover with a gold sun, a fox, a tortoise, and a hare.</desc>
+  <defs>
+    <linearGradient id="field" x2="0" y2="1"><stop stop-color="#386c4c"/><stop offset="1" stop-color="#193b32"/></linearGradient>
+    <linearGradient id="sun" x2="0" y2="1"><stop stop-color="#ffe8a0"/><stop offset="1" stop-color="#e7ad4c"/></linearGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#field)"/>
+  <rect x="17" y="17" width="366" height="566" rx="14" fill="none" stroke="#e9c875" stroke-width="3"/>
+  <path d="M20 376 Q102 330 196 380 T380 365 V580 H20Z" fill="#244c3c"/>
+  <circle cx="200" cy="250" r="112" fill="url(#sun)"/>
+  <g fill="#fff3c4" opacity=".8"><path d="m71 116 5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/><path d="m322 174 4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/></g>
+  <g transform="translate(86 243)">
+    <path d="M23 69 8 42l31 13 23-24 12 32 36 4-28 20 10 34-31-17-29 21 6-34-29-18z" fill="#c76a42" stroke="#583d32" stroke-width="5" stroke-linejoin="round"/>
+    <path d="m22 68-25-7 15 21M76 67l13-22 5 28" fill="#c76a42" stroke="#583d32" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="57" cy="68" r="4" fill="#302a25"/>
+  </g>
+  <g transform="translate(221 294)">
+    <ellipse cx="61" cy="39" rx="48" ry="30" fill="#83a55c" stroke="#304b38" stroke-width="5"/>
+    <path d="M28 38q33-43 66 0M47 15v47M74 10v57" fill="none" stroke="#526e45" stroke-width="5"/>
+    <circle cx="113" cy="35" r="20" fill="#83a55c" stroke="#304b38" stroke-width="5"/>
+    <path d="m108 17-3-17 17 16" fill="#83a55c" stroke="#304b38" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="118" cy="32" r="3" fill="#302a25"/>
+    <path d="M30 58v15m58-16v16" stroke="#304b38" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <text x="200" y="93" text-anchor="middle" fill="#fff5d8" font-family="Georgia,serif" font-size="25" letter-spacing="5">CLASSIC STORIES</text>
+  <text x="200" y="465" text-anchor="middle" fill="#fff4d5" font-family="Georgia,serif" font-size="44" font-weight="bold">AESOP'S</text>
+  <text x="200" y="514" text-anchor="middle" fill="#f4cf78" font-family="Georgia,serif" font-size="38" font-weight="bold" letter-spacing="4">FABLES</text>
+  <text x="200" y="548" text-anchor="middle" fill="#e2eadc" font-family="Georgia,serif" font-size="16" letter-spacing="2">TEN TALES · TEN MORALS</text>
+</svg>

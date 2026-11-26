@@ -1,4 +1,48 @@
-## Brief queue — Nov 25, 2026
+# HANDOFF — Ahaan's Portfolio
+
+## Brief queue — Nov 25, 2026 (Nishant's six fixes, in order)
+
+- Queue item 14 — Nav fix + PillNav-style improvement: `FEATURE-BRIEF-nav-fix.md`. Owner: worker 0004, main repo checkout. Sync with origin/main first.
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. Owner: new worker, worktree `.worktrees/feature-flowers-remove` on `feature/flowers-remove`.
+- Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. Owner: new worker, worktree `.worktrees/feature-water-slides-fix` on `feature/water-slides-fix`.
+- Queue item 17 — Make the zoo animals interactive: `FEATURE-BRIEF-zoo-interact.md`. Owner: new worker, worktree `.worktrees/feature-zoo-interact` on `feature/zoo-interact`.
+- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. Owner: new worker, worktree `.worktrees/feature-day-night-weather` on `feature/day-night-weather`.
+- Queue item 19 — Fire truck realistic hose spray + standing second player: `FEATURE-BRIEF-fire-truck-spray.md`. Owner: new worker, worktree `.worktrees/feature-fire-truck-spray` on `feature/fire-truck-spray`.
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. Owner: new worker, worktree `.worktrees/feature-books-shelf` on `feature/books-shelf`.
+- Each worker works in its own worktree (or the main checkout for 0004) and merges to main only after its browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+
+## Nav fix — Nov 25, 2026
+
+- Started queue item 14 in the main checkout, as assigned.
+- Read `FEATURE-BRIEF-nav-fix.md` and synced main to `origin/main` at `4d77468`. Preserved the local queue and upstream work history in `HANDOFF.md`.
+- Inspected the home nav markup, grouped-menu handlers, CSS breakpoints, Park controls, and toggle pills.
+- Read the React Bits Pill Nav reference. The brief requires a vanilla implementation with no added packages.
+- Corrected the home nav label color, kept carets inline, and added the moving active highlight, rising hover fill, and current-section dot.
+- Put the Park settings and toggle pills in clear header rows. Kept each toggle on one line and moved desktop dropdowns below the controls.
+- Added `tests/nav-fix-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed the layout, dropdown, active marker, pill wrapping, and mobile menu checks with zero browser errors.
+- Inspected `/tmp/ahaan-nav-fix/desktop.png` and `/tmp/ahaan-nav-fix/mobile.png`. The desktop Play menu clears the controls. The mobile header keeps the Park and toggle controls inside the nav.
+- `node --check assets/shared.js`, `node --check tests/nav-fix-browser.cjs`, and `git diff --check` passed.
+
+## Books shelf — Nov 25, 2026
+
+- Began queue item 20 in the assigned `feature/books-shelf` worktree.
+- Read the brief, `reading.html`, `assets/reading.js`, `assets/shared.js`, `assets/site.css`, and `assets/fit-reading.css`.
+- The shelf already has horizontal overflow and arrow handlers. The handlers hide both arrows when the current book list fits. The shelf has no drag or snap support.
+- The Aesop card must link to `aesop.html`. No Aesop cover file appears in `images/book-covers/` yet.
+- The desktop layout puts `Currently Reading` in an auto-sized second grid column. Its clipping needs a layout fix that accounts for the page width.
+- Activated the Sally UX review skill and loaded its persona and project defaults. The `uv run` resolver could not write to its user cache, so I used the listed TOML defaults directly.
+- Saved Sally's UX review in `sally-books-shelf-review.md`. Her recommendations cover semantic cards, snap points, arrow controls, mouse dragging, readable details, bounded layout, and reduced motion.
+- Applied the review: added a custom Aesop cover, linked its card to `aesop.html`, kept the other cards keyboard operable, and added a scroll-snap shelf with arrows and mouse dragging.
+- Replaced the old Aesop text link with the shelf card. Bounded the desktop side column and made the Currently Reading text wrap. Mobile keeps the card inside the page width.
+- Added `tests/reading-shelf-browser.cjs` for 1280 × 800 and 390 × 844 checks. The browser check passed arrow navigation, actual card dragging, keyboard details, Aesop cover visibility, card bounds, zero horizontal overflow, and zero browser or console errors.
+- Inspected desktop and mobile screenshots. The scrolled screenshots show the full Aesop cover and details. The Currently Reading card stays within the viewport width.
+- Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
+- `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
+- Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
+- Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
+
+## Day/night and Park flower updates merged from main — Nov 25, 2026
 
 - Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. You own this item. Work in this worktree on `feature/day-night-weather`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
