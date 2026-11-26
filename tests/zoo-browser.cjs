@@ -39,7 +39,7 @@ const standAt = a => { const dx = -45 - a.x, dz = 45 - a.z, d = Math.hypot(dx, d
   const errors = [];
   try {
     for (const vp of [{ name: 'desktop', width: 1280, height: 800 }, { name: 'mobile', width: 390, height: 844 }]) {
-      const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } });
+      const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, isMobile: vp.name === 'mobile', hasTouch: vp.name === 'mobile' });
       page.on('pageerror', error => errors.push(`${vp.name}: ${error.message}`));
       page.on('console', msg => { if (msg.type() === 'error') errors.push(`${vp.name} console: ${msg.text()}`); });
       await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -48,6 +48,7 @@ const standAt = a => { const dx = -45 - a.x, dz = 45 - a.z, d = Math.hypot(dx, d
       for (const animal of ANIMALS) {
         const spot = standAt(animal);
         await page.evaluate(({ x, z }) => window.Park3D.teleportAhaan(x, z), spot);
+        await page.evaluate(({ x, z }) => window.Park3D.setCustomCamera({ x: x + 7, y: 20, z: z + 20 }, { x, y: 1, z }), animal);
         await page.waitForTimeout(400);
         assert.equal(await page.evaluate(() => { const i = window.Park3D.getCurrentNearbyItem(); return i && i.id; }), animal.id, `${vp.name}: ${animal.name} prompt`);
         assert.match(await page.locator('#actionPromptText').textContent(), new RegExp(animal.name.toLowerCase()));
@@ -55,7 +56,23 @@ const standAt = a => { const dx = -45 - a.x, dz = 45 - a.z, d = Math.hypot(dx, d
         await page.waitForTimeout(300);
         assert.match(await page.locator('#abGreeting').textContent(), new RegExp(`Hi, ${animal.name}`));
         assert.equal((await page.locator('#abSub').textContent()).trim(), animal.fact);
-        await page.waitForTimeout(1200);
+        // Click the visible animal model to check direct mouse and touch interaction.
+        const animalPoint = await page.evaluate(id => {
+          const api = window.Park3D;
+          const meshes = api.interactiveMeshes.filter(item => item.userData && item.userData.id === id);
+          if (!meshes.length) return null;
+          const point = new THREE.Vector3();
+          const target = meshes.find(item => item.geometry && item.geometry.type === 'SphereGeometry') || meshes[0];
+          target.getWorldPosition(point);
+          return api.projectPoint(point);
+        }, animal.id);
+        assert.ok(animalPoint, `${vp.name}: ${animal.name} clickable mesh`);
+        if (vp.name === 'mobile') await page.touchscreen.tap(animalPoint.x, animalPoint.y);
+        else await page.mouse.click(animalPoint.x, animalPoint.y);
+        await page.waitForTimeout(300);
+        assert.match(await page.locator('#abGreeting').textContent(), new RegExp(`Hi, ${animal.name}`), `${vp.name}: ${animal.name} click response`);
+        assert.equal((await page.locator('#abSub').textContent()).trim(), animal.fact, `${vp.name}: ${animal.name} click fact`);
+        await page.waitForTimeout(250);
         await page.screenshot({ path: path.join(evidenceDir, `${vp.name}-${animal.name.toLowerCase()}.png`) });
       }
 

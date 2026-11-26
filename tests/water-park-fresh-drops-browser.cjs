@@ -39,11 +39,10 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
       await page.goto(`${baseUrl}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
-      const firstCard = page.locator('.fresh-drop').first();
-      assert.match(await firstCard.locator('h2').textContent(), /Aesop's Fables joins the book shelf/i, `${viewport.name}: books shelf card is first`);
-      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-26');
-      assert.equal(await firstCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: NEW badge is visible`);
-      const screenshot = firstCard.locator('img');
+      const booksCard = page.locator('.fresh-drop').filter({ hasText: "Aesop's Fables joins the book shelf" }).first();
+      assert.equal(await booksCard.locator('time').getAttribute('datetime'), '2026-11-26');
+      assert.equal(await booksCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: books card NEW badge is visible`);
+      const screenshot = booksCard.locator('img');
       assert.match(await screenshot.getAttribute('src'), /2026-11-26-books-shelf\.png$/);
       await screenshot.scrollIntoViewIfNeeded();
       await screenshot.evaluate(image => image.decode());
@@ -53,7 +52,7 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
       assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-26');
       assert.equal(await page.locator('.fresh-drops-home [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: home card shows NEW`);
-      assert.equal(await page.locator('.park-rides-nav').getAttribute('data-new-date'), '2026-11-24');
+      assert.equal(await page.locator('.park-rides-nav').getAttribute('data-new-date'), '2026-11-26');
       assert.equal(await page.locator('.park-rides-nav [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Park rides menu shows NEW`);
       const readingNav = page.locator('.fresh-drops-nav[href="reading.html"]');
       assert.equal(await readingNav.getAttribute('data-new-date'), '2026-11-26');

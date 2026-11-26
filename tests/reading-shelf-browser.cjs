@@ -111,9 +111,10 @@ const timeout = setTimeout(() => { console.error(`FAIL timeout at ${point}`); pr
     const mobile = await page.evaluate(() => {
       const node = document.querySelector('.reading-now');
       const rect = node.getBoundingClientRect();
-      return { pageWidth: document.documentElement.scrollWidth, viewport: innerWidth, left: rect.left, right: rect.right, text: node.innerText };
+      const overflow = [...document.querySelectorAll('body *')].map(element => ({ tag: element.tagName, id: element.id, className: typeof element.className === 'string' ? element.className : '', left: Math.round(element.getBoundingClientRect().left), right: Math.round(element.getBoundingClientRect().right), width: Math.round(element.getBoundingClientRect().width) })).filter(element => element.right > innerWidth + 1 || element.left < -1).sort((a, b) => b.right - a.right).slice(0, 8);
+      return { pageWidth: document.documentElement.scrollWidth, viewport: innerWidth, left: rect.left, right: rect.right, text: node.innerText, overflow };
     });
-    assert.ok(mobile.pageWidth <= mobile.viewport, `horizontal overflow: ${mobile.pageWidth}`);
+    assert.ok(mobile.pageWidth <= mobile.viewport, `horizontal overflow: ${mobile.pageWidth}; ${JSON.stringify(mobile.overflow)}`);
     assert.ok(mobile.left >= 0 && mobile.right <= mobile.viewport);
     assert.match(mobile.text, /Exploring a brand-new country on every page/);
     await page.screenshot({ path: path.join(evidenceDir, 'mobile-shelf.png'), fullPage: true });

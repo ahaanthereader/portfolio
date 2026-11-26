@@ -2577,18 +2577,26 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         wake();
       }
 
-      return ANIMALS.map(animal => ({
-        id: animal.id,
-        name: animal.name,
-        x: animal.x,
-        z: animal.z,
-        approachRadius: fenceRadius + 2.3,
-        actionLabel: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
-        promptText: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
-        vihaanPromptText: `Enter: say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
-        onActivate: () => greet(animal, "Ahaan"),
-        onVihaan: () => greet(animal, "Vihaan")
-      }));
+      return ANIMALS.map(animal => {
+        // Register the animal model for direct mouse and touch activation.
+        registerInteractive(animal.model.root, {
+          id: animal.id,
+          name: animal.name,
+          onInteract: () => greet(animal, "Ahaan")
+        });
+        return {
+          id: animal.id,
+          name: animal.name,
+          x: animal.x,
+          z: animal.z,
+          approachRadius: fenceRadius + 2.3,
+          actionLabel: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+          promptText: `Say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+          vihaanPromptText: `Enter: say hi to the ${animal.name.toLowerCase()} ${animal.emoji}`,
+          onActivate: () => greet(animal, "Ahaan"),
+          onVihaan: () => greet(animal, "Vihaan")
+        };
+      });
     }
 
     function buildWaterPark(parent, T) {
@@ -7666,6 +7674,11 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
     window.Park3D = {
       interactiveMeshes,
+      projectPoint(point) {
+        const projected = new T.Vector3(point.x, point.y, point.z).project(camera);
+        const rect = canvas.getBoundingClientRect();
+        return { x: rect.left + (projected.x + 1) * rect.width / 2, y: rect.top + (1 - projected.y) * rect.height / 2 };
+      },
       STATES,
       INTERACTABLES,
       getDayWeatherState: () => ({

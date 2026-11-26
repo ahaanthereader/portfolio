@@ -189,10 +189,33 @@ renderBadges();
   }
   // Grouped menus (Read / Explore / Play / My stuff): open on click, one at a time; Esc or a click outside closes.
   const groups = $$(".nav-group");
+  const nav = $("#navLinks"), highlight = nav && nav.querySelector(".nav-highlight");
+  const moveHighlight = group => {
+    if (!highlight || !group) return;
+    highlight.style.width = `${group.offsetWidth}px`;
+    highlight.style.height = `${group.offsetHeight}px`;
+    highlight.style.transform = `translate(${group.offsetLeft}px, ${group.offsetTop}px)`;
+    highlight.style.opacity = "1";
+  };
+  const setCurrent = group => {
+    groups.forEach(item => { const button = item.querySelector(".nav-gbtn"); item.classList.toggle("is-current", item === group); button.classList.toggle("is-current", item === group); });
+    moveHighlight(group);
+  };
+  const currentPath = location.pathname.split("/").pop() || "index.html";
+  const currentLink = $$("#navLinks .nav-pop a").find(link => {
+    const target = new URL(link.href, location.href);
+    return target.pathname.split("/").pop() === currentPath && (target.hash ? target.hash === location.hash || currentPath === "index.html" : true);
+  });
+  setCurrent(currentLink ? currentLink.closest(".nav-group") : null);
+  groups.forEach(group => {
+    group.addEventListener("mouseenter", () => moveHighlight(group));
+    group.addEventListener("mouseleave", () => moveHighlight(groups.find(item => item.classList.contains("is-current"))));
+  });
+  window.addEventListener("resize", () => moveHighlight(groups.find(item => item.classList.contains("is-current"))));
   const closeAll = keep => groups.forEach(g => { if (g !== keep) { g.classList.remove("open"); g.querySelector(".nav-gbtn").setAttribute("aria-expanded", "false"); } });
   groups.forEach(g => {
     const b = g.querySelector(".nav-gbtn");
-    b.addEventListener("click", e => { e.stopPropagation(); const open = !g.classList.contains("open"); closeAll(g); g.classList.toggle("open", open); b.setAttribute("aria-expanded", String(open)); });
+    b.addEventListener("click", e => { e.stopPropagation(); const open = !g.classList.contains("open"); closeAll(g); g.classList.toggle("open", open); b.setAttribute("aria-expanded", String(open)); setCurrent(g); });
   });
   document.addEventListener("click", e => { if (!e.target.closest(".nav-group")) closeAll(); });
   document.addEventListener("keydown", e => { if (e.key !== "Escape") return; const g = groups.find(x => x.classList.contains("open")); if (g) { closeAll(); g.querySelector(".nav-gbtn").focus(); } });
