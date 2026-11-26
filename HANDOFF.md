@@ -42,9 +42,9 @@
 - Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
 - Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
 
-## Day/night and Park flower updates merged from main — Nov 25, 2026
+## Day/night, heavy rain, and stormy weather — Nov 25–26, 2026
 
-- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. You own this item. Work in this worktree on `feature/day-night-weather`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- Queue item 18 is complete and live. Published from `feature/day-night-weather` after desktop and mobile browser checks passed.
 - First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
 - The weather update supports Auto, Sunny, Cloudy, and Light rain. It pools 18 rain streaks and grows six path puddles. Sound defaults off.
 - Added visible Day, Night, and Auto buttons to the main Park navigation. Kept the dropdown controls and synced both day control sets.
@@ -61,10 +61,12 @@
 - Live desktop and mobile weather checks passed on the published site. The prominent controls, Heavy rain, Stormy, heavy-rain puddle growth, darkened storm view, lightning, sound-off default, and zero browser errors passed.
 - Saved the live Stormy screenshot at `public/fresh-drops/2026-11-26-day-night-heavy-rain-storm.png`. Added the Nov 26 Fresh Drops entry with “You asked for this!”, updated the home card date and Park rides NEW date, and updated its browser check.
 - The Fresh Drops check passed locally on desktop and mobile. The image loaded at full width, NEW labels appeared, and browser errors were empty.
-- Main then advanced with commits `2c05d28`, `4d77468`, and `22f0d23`. Sync these commits before the Fresh Drops publish.
+- Main then advanced with commits `2c05d28`, `4d77468`, and `22f0d23`. Merged those commits before the Fresh Drops publish.
 - Merged the latest main commits. The Fresh Drops check passed again on desktop and mobile. The live image loaded at full width, NEW labels showed, and browser errors were empty.
 - Fresh Drops commit: `35418bd` (`Add day night storm to Fresh Drops`). Merge commit: `80eb163`.
-- Next: publish the entry, live-verify Fresh Drops, and record the final deployment details.
+- Published the Fresh Drops entry and live screenshot in commit `3c9b97d`. Pages run `45769656008` succeeded.
+- Final live Fresh Drops check passed on desktop and mobile. The screenshot loaded at full width, the Nov 26 entry appeared first, NEW labels appeared, the home date matched, and browser errors were empty.
+- Final screenshots: `/tmp/ahaan-water-park-fresh-drops/fresh-drops-desktop.png` and `home-mobile.png`.
 
 ## Park floral decoration cleanup — Nov 25, 2026
 
