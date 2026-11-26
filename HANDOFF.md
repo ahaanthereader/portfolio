@@ -32,6 +32,9 @@
 - `main` advanced with the zoo interaction change (`211aa39`, `d86bcb8`). Merged `origin/main`; Git merged the shared `park3d.js` changes without conflict.
 - Reran `tests/park-water-park-browser.cjs` after the zoo merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
 - Synced screenshot evidence: `/tmp/ahaan-water-slides-zoo-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- `main` advanced with the navigation Fresh Drops update (`aa7d3f7`, `d3db779`). Merged the new card and home update.
+- Reran `tests/park-water-park-browser.cjs` after the merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-nav-drops-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
 - Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
 - Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
