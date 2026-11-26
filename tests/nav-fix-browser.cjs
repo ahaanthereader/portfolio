@@ -32,7 +32,8 @@ const baseUrl = process.env.BASE_URL;
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name}: ${message.text()} (${message.location().url})`); });
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => document.querySelector('.home-hero')?.classList.contains('park-ready'), null, { timeout: 45000 });
+      await page.locator('#navLinks .nav-gbtn').first().waitFor({ state: 'attached' });
+      await page.waitForTimeout(800);
       const layout = await page.evaluate(() => {
         const rect = element => { const { x, y, width, height } = element.getBoundingClientRect(); return { x, y, width, height, right: x + width, bottom: y + height }; };
         const intersects = (a, b) => a.x < b.right && a.right > b.x && a.y < b.bottom && a.bottom > b.y;
@@ -71,7 +72,10 @@ const baseUrl = process.env.BASE_URL;
         await page.locator('.nav-gbtn').filter({ hasText: 'My stuff' }).click();
         assert.equal(await page.locator('#ng-mine [data-fresh-new]').isVisible(), true, 'desktop: Fresh Drops shows its NEW badge');
       } else {
-        await page.locator('#menuBtn').click();
+        const mobileMenu = page.locator('#menuBtn');
+        const menuState = await mobileMenu.evaluate(element => { const style = getComputedStyle(element); const rect = element.getBoundingClientRect(); return { display: style.display, visibility: style.visibility, viewportWidth: innerWidth, buttonWidth: rect.width, pageClass: document.body.className }; });
+        assert.notEqual(menuState.display, 'none', `mobile: menu button is available (${JSON.stringify(menuState)})`);
+        await mobileMenu.click({ timeout: 5000 });
         assert.equal(await page.locator('#navLinks').evaluate(element => element.classList.contains('open')), true, 'mobile: menu opens');
         assert.equal(await page.locator('#navLinks .nav-group').count(), 4, 'mobile: all four nav groups remain available');
         assert.equal(await page.locator('#ng-mine [data-fresh-new]').isVisible(), true, 'mobile: Fresh Drops shows its NEW badge');

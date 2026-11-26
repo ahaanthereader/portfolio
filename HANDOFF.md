@@ -56,6 +56,7 @@
 - Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. Owner: new worker, worktree `.worktrees/feature-day-night-weather` on `feature/day-night-weather`.
 - Queue item 19 — Fire truck realistic hose spray + standing second player: `FEATURE-BRIEF-fire-truck-spray.md`. Owner: new worker, worktree `.worktrees/feature-fire-truck-spray` on `feature/fire-truck-spray`.
 - Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. Owner: new worker, worktree `.worktrees/feature-books-shelf` on `feature/books-shelf`.
+- Queue item 21 — Consolidate navigation: one lean grouped nav at the top, remove the duplicated right-side panel: `FEATURE-BRIEF-nav-consolidate.md`. Owner: worker 0004, main repo checkout (builds on the nav-fix item 14).
 - Each worker works in its own worktree (or the main checkout for 0004) and merges to main only after its browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 
 
@@ -98,6 +99,8 @@
 - `origin/main` moved to `d86bcb8` before the Fresh Drops push. Merged the zoo update and kept both November 26 Fresh Drops cards.
 - The combined update deployed successfully in Pages run `45773268692`. Final live checks passed on desktop and mobile with zero browser errors.
 - The live check opened Play and My stuff, confirmed the Fresh Drops NEW badge, and loaded the nav card screenshot. Evidence: `/tmp/ahaan-nav-fix-final-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
+- `origin/main` advanced again with the water slide and zoo Fresh Drops updates. Merged `4aeef00` as `63cf912`, then deployed the combined main tip in Pages run `45777320978`.
+- Final live desktop and mobile checks passed after that merge. The nav card screenshot loaded, the Fresh Drops badge appeared, and browser errors were empty. Evidence: `/tmp/ahaan-nav-fix-post-merge-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
 
 ## Books shelf — Nov 25, 2026
 
