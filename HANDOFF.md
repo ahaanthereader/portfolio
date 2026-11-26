@@ -1,4 +1,4 @@
-## Brief queue — Nov 25, 2026
+# HANDOFF — Ahaan's Portfolio
 
 - Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. You own this item. Work in this worktree on `feature/water-slides-fix`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - First concrete step: checked Pages run `45442602019`. The run succeeded for main commit `40320fd40b98c6000f7bffc67797ad4c001f27c2`.
@@ -19,10 +19,14 @@
 - `main` advanced again with the day/night and storm update (`a00ac1d`, `801a13c`). Fetched and merged `origin/main` into the publish worktree. Resolved the `HANDOFF.md` conflict with both feature records preserved.
 - Reran `tests/park-water-park-browser.cjs` on the updated publish worktree. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
 - Synced screenshot evidence: `/tmp/ahaan-water-slides-publish-check/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
-- Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Push after the weather merge was rejected because main advanced. Fetched main before the next sync.
 - `main` advanced again with the Aesop shelf update (`22f0d23`, `4d77468`). Fetched and merged `origin/main` into the publish worktree. Kept the Books, weather, flower, and water slide handoff sections.
 - Reran `tests/park-water-park-browser.cjs` after the Books merge. Desktop and mobile passed all four rides, input checks, Play together, and zero page or console errors.
 - Synced screenshot evidence: `/tmp/ahaan-water-slides-books-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Push after the Books merge was rejected because main advanced. Fetched main before the next sync.
+- `main` advanced with the navigation fix (`2c05d28`). Fetched and merged `origin/main`. Resolved the `HANDOFF.md` conflict while keeping all queue items and feature records.
+- Reran `tests/park-water-park-browser.cjs` after the navigation merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-nav-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
 - Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
 - Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
@@ -34,6 +38,29 @@
 - Saved the live desktop Park screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added a Fresh Drops entry and updated the home card date to Nov 25.
 - Updated `tests/water-park-fresh-drops-browser.cjs` for the new first entry. Local desktop and mobile checks passed. The image loaded, NEW badges appeared, and browser errors were empty.
 - Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. You own this item. Work in this worktree on `feature/books-shelf`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+## Brief queue — Nov 25, 2026 (Nishant's six fixes, in order)
+
+- Queue item 14 — Nav fix + PillNav-style improvement: `FEATURE-BRIEF-nav-fix.md`. Owner: worker 0004, main repo checkout. Sync with origin/main first.
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. Owner: new worker, worktree `.worktrees/feature-flowers-remove` on `feature/flowers-remove`.
+- Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. Owner: new worker, worktree `.worktrees/feature-water-slides-fix` on `feature/water-slides-fix`.
+- Queue item 17 — Make the zoo animals interactive: `FEATURE-BRIEF-zoo-interact.md`. Owner: new worker, worktree `.worktrees/feature-zoo-interact` on `feature/zoo-interact`.
+- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. Owner: new worker, worktree `.worktrees/feature-day-night-weather` on `feature/day-night-weather`.
+- Queue item 19 — Fire truck realistic hose spray + standing second player: `FEATURE-BRIEF-fire-truck-spray.md`. Owner: new worker, worktree `.worktrees/feature-fire-truck-spray` on `feature/fire-truck-spray`.
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. Owner: new worker, worktree `.worktrees/feature-books-shelf` on `feature/books-shelf`.
+- Each worker works in its own worktree (or the main checkout for 0004) and merges to main only after its browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+
+## Nav fix — Nov 25, 2026
+
+- Started queue item 14 in the main checkout, as assigned.
+- Read `FEATURE-BRIEF-nav-fix.md` and synced main to `origin/main` at `4d77468`. Preserved the local queue and upstream work history in `HANDOFF.md`.
+- Inspected the home nav markup, grouped-menu handlers, CSS breakpoints, Park controls, and toggle pills.
+- Read the React Bits Pill Nav reference. The brief requires a vanilla implementation with no added packages.
+- Corrected the home nav label color, kept carets inline, and added the moving active highlight, rising hover fill, and current-section dot.
+- Put the Park settings and toggle pills in clear header rows. Kept each toggle on one line and moved desktop dropdowns below the controls.
+- Added `tests/nav-fix-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed the layout, dropdown, active marker, pill wrapping, and mobile menu checks with zero browser errors.
+- Inspected `/tmp/ahaan-nav-fix/desktop.png` and `/tmp/ahaan-nav-fix/mobile.png`. The desktop Play menu clears the controls. The mobile header keeps the Park and toggle controls inside the nav.
+- `node --check assets/shared.js`, `node --check tests/nav-fix-browser.cjs`, and `git diff --check` passed.
 
 ## Books shelf — Nov 25, 2026
 
