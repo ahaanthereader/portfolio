@@ -1,5 +1,52 @@
 # HANDOFF — Ahaan's Portfolio
 
+- Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. You own this item. Work in this worktree on `feature/water-slides-fix`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- First concrete step: checked Pages run `45442602019`. The run succeeded for main commit `40320fd40b98c6000f7bffc67797ad4c001f27c2`.
+- The last successful Pages commit includes water park feature commit `1d2b34b`.
+- Live browser check passed at 1280 × 800 and 390 × 844. The four prompts appeared, prompt-button clicks boarded the rides, and slide, wave pool, and lazy river visibly moved riders. The dump tower boarded and played its existing pour animation. Play together boarding and exits passed. Console errors were empty.
+- Screenshot review confirmed that the scene renders, but the existing check activates the prompt button rather than the ride geometry.
+- Code diagnosis found no registered water park mesh tap targets. The standalone `E` handler also omits water ride IDs, so keyboard activation does not run outside Play together.
+- Added low-profile invisible hit targets to each ride so scene clicks can reach the ride handlers.
+- Added standalone `E` activation and changed each ride badge to `E or tap`.
+- Hid the fixed Fresh Drops link while Ahaan views the northeast water park. The link covered the slide on mobile and intercepted taps.
+- Updated `tests/park-water-park-browser.cjs` to verify desktop clicks, mobile prompt taps, `E` exits, visible movement, Play together, the Fresh Drops clearance, and zero browser errors.
+- `node --check` passed for `assets/park3d.js` and `tests/park-water-park-browser.cjs`. `git diff --check` passed.
+- Final local browser check passed at 1280 × 800 and 390 × 844. It covered all four rides, both input modes, exits, Play together, and zero console or page errors.
+- Screenshot evidence: `/tmp/ahaan-water-slides-final-local/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Committed feature changes as `0f7267e` (`Fix water park ride interactions`).
+- Fetched the latest main after it advanced by two commits. Merged `origin/main` into this branch and resolved the `HANDOFF.md` conflict with both queue items preserved.
+- Reran `tests/park-water-park-browser.cjs` after the sync. Desktop and mobile passed all four rides, input checks, Play together, and zero page or console errors.
+- `main` advanced again with the day/night and storm update (`a00ac1d`, `801a13c`). Fetched and merged `origin/main` into the publish worktree. Resolved the `HANDOFF.md` conflict with both feature records preserved.
+- Reran `tests/park-water-park-browser.cjs` on the updated publish worktree. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-publish-check/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Push after the weather merge was rejected because main advanced. Fetched main before the next sync.
+- `main` advanced again with the Aesop shelf update (`22f0d23`, `4d77468`). Fetched and merged `origin/main` into the publish worktree. Kept the Books, weather, flower, and water slide handoff sections.
+- Reran `tests/park-water-park-browser.cjs` after the Books merge. Desktop and mobile passed all four rides, input checks, Play together, and zero page or console errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-books-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Push after the Books merge was rejected because main advanced. Fetched main before the next sync.
+- `main` advanced with the navigation fix (`2c05d28`). Fetched and merged `origin/main`. Resolved the `HANDOFF.md` conflict while keeping all queue items and feature records.
+- Reran `tests/park-water-park-browser.cjs` after the navigation merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-nav-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- `main` advanced with the weather Fresh Drops release (`f53ae40`). Merged the Handoff update. The merge changed no application or test code; the last synced browser pass remains valid.
+- Push after the weather release merge was rejected because main advanced. Fetched main before syncing again.
+- `main` advanced with the zoo interaction change (`211aa39`, `d86bcb8`). Merged `origin/main`; Git merged the shared `park3d.js` changes without conflict.
+- Reran `tests/park-water-park-browser.cjs` after the zoo merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-zoo-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- `main` advanced with the navigation Fresh Drops update (`aa7d3f7`, `d3db779`). Merged the new card and home update.
+- Reran `tests/park-water-park-browser.cjs` after the merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-nav-drops-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Push was rejected because main moved again. Merged the zoo Fresh Drops release (`622fea6`, `6abb164`). It changed Fresh Drops and home date data, not Park code.
+- Next: publish this browser-verified Park code, verify live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
+- Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
+- Inspected both browser screenshots. The Park view has clean left and right edges. Evidence: `/tmp/ahaan-flowers-remove/desktop.png` and `mobile.png`.
+- `node --check tests/flowers-remove-browser.cjs` and `git diff --check` passed. The only remaining `.hero-botany` text is this handoff note and the browser assertion.
+- Feature commit `2f93b23` (`Remove flowers from Park view`) was pushed to `main` after the browser checks passed. Pages run `45753688735` succeeded.
+- Live desktop and mobile Park checks passed. Both screenshots show clean edges. Browser errors were empty. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
+- Saved the live desktop Park screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added a Fresh Drops entry and updated the home card date to Nov 25.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new first entry. Local desktop and mobile checks passed. The image loaded, NEW badges appeared, and browser errors were empty.
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. You own this item. Work in this worktree on `feature/books-shelf`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 ## Brief queue — Nov 25, 2026 (Nishant's six fixes, in order)
 
 - Queue item 14 — Nav fix + PillNav-style improvement: `FEATURE-BRIEF-nav-fix.md`. Owner: worker 0004, main repo checkout. Sync with origin/main first.
@@ -21,7 +68,17 @@
 - `node --check assets/park3d.js`, `node --check tests/zoo-browser.cjs`, and `git diff --check` passed.
 - The zoo browser check passed at 1280×800 and 390×844. All animal clicks showed the expected facts. Vihaan’s prompt greeted as Vihaan. Browser errors were empty.
 - Screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
-- Next: rerun the zoo and Fresh Drops checks after the main merge, then publish and verify live.
+- Merged current `origin/main` at `d3db779` after main moved. The merge kept the zoo feature and newer nav work.
+- Main Pages push runs `45770497141`, `45770813781`, and `45771202614` failed. Upload completed, but GitHub could not find the Pages artifact.
+- A later main push created run `45773268692`. The run succeeded and included the zoo feature.
+- The live zoo browser check passed at 1280×800 and 390×844. It covered four animal clicks, four touch taps, both prompts, and Play together. Browser errors were empty.
+- Live screenshots: `/tmp/ahaan-zoo-interact-live/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-live/mobile-{tiger,elephant,kangaroo,monkey}.png`.
+- Added the live tiger screenshot to Fresh Drops. Added a Nov 26 card with “You asked for this!” and updated the zoo menu NEW date to Nov 26.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new top card, screenshot, and Zoo NEW badge. The local Fresh Drops check passed on desktop and mobile with zero browser errors.
+- Fresh Drops commit `622fea6` is live. Pages run `45774139854` succeeded.
+- The live Fresh Drops check passed on desktop and mobile. The zoo card appeared first, the image loaded at full width, NEW labels appeared, and browser errors were empty.
+- Live screenshots: `/tmp/ahaan-zoo-interact-fresh-drops-live/fresh-drops-desktop.png` and `home-desktop.png`, plus mobile versions.
+- Queue item 17 is complete and live.
 
 ## Nav fix — Nov 25, 2026
 
