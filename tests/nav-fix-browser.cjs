@@ -7,10 +7,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
 const siteRoot = path.resolve(__dirname, '..');
 const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-fix';
+const baseUrl = process.env.BASE_URL;
 
 (async () => {
   fs.mkdirSync(evidenceDir, { recursive: true });
-  const server = http.createServer((request, response) => {
+  const server = baseUrl ? null : http.createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const filePath = path.resolve(siteRoot, `.${pathname}`);
     if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
@@ -21,7 +22,8 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-fix';
       response.writeHead(200, { 'content-type': type }).end(data);
     });
   });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  if (server) await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const pageUrl = baseUrl ? new URL('index.html', baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).href : `http://127.0.0.1:${server.address().port}/index.html`;
   const browser = await chromium.launch({ headless: true });
   const errors = [];
   try {
@@ -29,7 +31,7 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-fix';
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name}: ${message.text()}`); });
-      await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => document.querySelector('.home-hero')?.classList.contains('park-ready'), null, { timeout: 45000 });
       const layout = await page.evaluate(() => {
         const rect = element => { const { x, y, width, height } = element.getBoundingClientRect(); return { x, y, width, height, right: x + width, bottom: y + height }; };
@@ -66,10 +68,13 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-fix';
           return menu.top >= controls.bottom;
         });
         assert.equal(dropdownClearsControls, true, 'desktop: open dropdown stays below Park and toggle controls');
+        await page.locator('.nav-gbtn').filter({ hasText: 'My stuff' }).click();
+        assert.equal(await page.locator('#ng-mine [data-fresh-new]').isVisible(), true, 'desktop: Fresh Drops shows its NEW badge');
       } else {
         await page.locator('#menuBtn').click();
         assert.equal(await page.locator('#navLinks').evaluate(element => element.classList.contains('open')), true, 'mobile: menu opens');
         assert.equal(await page.locator('#navLinks .nav-group').count(), 4, 'mobile: all four nav groups remain available');
+        assert.equal(await page.locator('#ng-mine [data-fresh-new]').isVisible(), true, 'mobile: Fresh Drops shows its NEW badge');
       }
       await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}.png`) });
       await page.close();
@@ -78,6 +83,6 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-fix';
     console.log(JSON.stringify({ viewports: ['desktop 1280x800', 'mobile 390x844'], errors, evidenceDir }, null, 2));
   } finally {
     await browser.close();
-    await new Promise(resolve => server.close(resolve));
+    if (server) await new Promise(resolve => server.close(resolve));
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

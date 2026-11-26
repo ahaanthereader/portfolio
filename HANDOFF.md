@@ -23,6 +23,10 @@
 - Added `tests/nav-fix-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed the layout, dropdown, active marker, pill wrapping, and mobile menu checks with zero browser errors.
 - Inspected `/tmp/ahaan-nav-fix/desktop.png` and `/tmp/ahaan-nav-fix/mobile.png`. The desktop Play menu clears the controls. The mobile header keeps the Park and toggle controls inside the nav.
 - `node --check assets/shared.js`, `node --check tests/nav-fix-browser.cjs`, and `git diff --check` passed.
+- Commit `2c05d28` reached `main`. Pages run `45765250051` succeeded after the initial artifact upload error.
+- Live desktop and mobile checks passed with zero browser errors. Evidence: `/tmp/ahaan-nav-fix-live/desktop.png` and `mobile.png`.
+- Added the live desktop screenshot and Fresh Drops card. The Fresh Drops home link and menu item show NEW through the seven-day freshness window.
+- Rechecked the local desktop and mobile pages after the Fresh Drops update. The NEW badge appeared in both menu layouts, and the check reported zero browser errors.
 
 ## Books shelf — Nov 25, 2026
 
