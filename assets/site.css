@@ -926,6 +926,7 @@
     .page-home .nav-links .nav-pop a:hover { background: rgba(47,122,91,.12); color: var(--forest-d); }
   }
   @media (max-width: 680px) {
+    .nav-links { position: fixed; inset: 64px 0 auto; }
     .nav-group { padding: 6px 0; border-bottom: 1px solid var(--line); }
     .nav-group:last-child { border-bottom: 0; }
     .nav-gbtn, .page-home .nav-gbtn { pointer-events: none; padding: 4px 12px; color: var(--ink); background: none; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; text-shadow: none; }

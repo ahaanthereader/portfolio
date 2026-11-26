@@ -39,22 +39,34 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
       await page.goto(`${baseUrl}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
-      const firstCard = page.locator('.fresh-drop').first();
-      assert.match(await firstCard.locator('h2').textContent(), /meet the animals/i, `${viewport.name}: zoo interaction card is first`);
-      assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-26');
-      assert.equal(await firstCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: NEW badge is visible`);
-      const screenshot = firstCard.locator('img');
-      assert.match(await screenshot.getAttribute('src'), /2026-11-26-zoo-interact\.png$/);
-      await screenshot.scrollIntoViewIfNeeded();
-      await screenshot.evaluate(image => image.decode());
-      assert.ok(await screenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: live zoo screenshot loads at full width`);
+      const booksCard = page.locator('.fresh-drop').filter({ hasText: "Aesop's Fables joins the book shelf" }).first();
+      assert.equal(await booksCard.locator('time').getAttribute('datetime'), '2026-11-26');
+      assert.equal(await booksCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: books card NEW badge is visible`);
+      const booksScreenshot = booksCard.locator('img');
+      assert.match(await booksScreenshot.getAttribute('src'), /2026-11-26-books-shelf\.png$/);
+      await booksScreenshot.scrollIntoViewIfNeeded();
+      await booksScreenshot.evaluate(image => image.decode());
+      assert.ok(await booksScreenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: books shelf screenshot loads at full width`);
+
+      const zooCard = page.locator('.fresh-drop').filter({ hasText: /You asked to meet the animals/ }).first();
+      assert.equal(await zooCard.locator('time').getAttribute('datetime'), '2026-11-26');
+      assert.equal(await zooCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: zoo card NEW badge is visible`);
+      const zooScreenshot = zooCard.locator('img');
+      assert.match(await zooScreenshot.getAttribute('src'), /2026-11-26-zoo-interact\.png$/);
+      await zooScreenshot.scrollIntoViewIfNeeded();
+      await zooScreenshot.evaluate(image => image.decode());
+      assert.ok(await zooScreenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: zoo screenshot loads at full width`);
       await page.screenshot({ path: path.join(evidenceDir, `fresh-drops-${viewport.name}.png`) });
 
-      await page.goto(`${baseUrl}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${baseUrl}/index.html`, { waitUntil: 'commit' });
+      await page.waitForFunction(() => document.querySelector('.fresh-drops-home [data-fresh-new]')?.hidden === false, null, { timeout: 10000 });
       assert.equal(await page.locator('.fresh-drops-home').getAttribute('data-latest-date'), '2026-11-26');
       assert.equal(await page.locator('.fresh-drops-home [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: home card shows NEW`);
       assert.equal(await page.locator('.park-rides-nav').getAttribute('data-new-date'), '2026-11-26');
       assert.equal(await page.locator('.park-rides-nav [data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Park rides menu shows NEW`);
+      const readingNav = page.locator('.fresh-drops-nav[href="reading.html"]');
+      assert.equal(await readingNav.getAttribute('data-new-date'), '2026-11-26');
+      assert.equal(await readingNav.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Reading Nook menu shows NEW`);
       const zooLink = page.locator('#ng-play a[href="index.html#zoo"]');
       assert.equal(await zooLink.getAttribute('data-new-date'), '2026-11-26');
       assert.equal(await zooLink.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: Zoo menu shows NEW`);
@@ -63,7 +75,7 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       await page.close();
     }
     assert.deepEqual(errors, [], `Browser errors: ${errors.join(' | ')}`);
-    console.log(`zoo-interact-fresh-drops-browser: PASS (desktop + mobile, live image, NEW labels, zero browser errors). Evidence: ${evidenceDir}`);
+    console.log(`recent-fresh-drops-browser: PASS (desktop + mobile, books and zoo screenshots, NEW labels, zero browser errors). Evidence: ${evidenceDir}`);
   } finally {
     await browser.close();
     if (server) server.close();

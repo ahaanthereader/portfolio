@@ -118,7 +118,19 @@
 - Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
 - `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
 - Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
-- Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
+- The user updated the active environment date to Nov 26. The release date, screenshot name, NEW date, and home card date use `2026-11-26`.
+- Pushed `4d77468` to `main`. Pages run `45762735194` succeeded.
+- Live desktop and mobile shelf checks passed on the published page. They covered arrows, drag, keyboard, reduced motion, Aesop cover visibility, layout bounds, and zero page or console errors.
+- Saved the live desktop shelf screenshot to `public/fresh-drops/2026-11-26-books-shelf.png`.
+- Added a Nov 26 Fresh Drops card with “You asked for this!” copy. Added a seven-day NEW badge to Reading Nook in the home and Reading menus.
+- Updated the Fresh Drops browser check. Local desktop and mobile checks passed for the new card, screenshot, home badge, menu badge, and zero browser errors.
+- Local shelf checks passed for desktop and mobile after the Fresh Drops edits. Normal Aesop card activation opened `aesop.html` during a direct browser probe.
+- Main moved again with the nav fix, stronger weather controls, and zoo interaction updates. I merged `origin/main` and kept each update and Fresh Drops card.
+- The merged navigation rules caused 530 pixels of horizontal overflow on mobile Reading Nook. The hidden grouped menu used relative positioning outside the home page.
+- Restored the fixed position for the collapsed mobile menu. The shelf and Fresh Drops browser checks now pass at desktop and mobile sizes after the merge.
+- Main moved again with the zoo interaction release and Fresh Drops card. I merged `origin/main` and kept the zoo, nav, weather, and books cards.
+- Updated the Fresh Drops check to find the books and zoo cards by title. The check validates both screenshots and each seven-day NEW badge.
+- Next: rerun the shelf and Fresh Drops checks after the latest merge, then publish the combined branch and verify the live shelf, cards, screenshot, and NEW badges.
 
 ## Day/night, heavy rain, and stormy weather — Nov 25–26, 2026
 
