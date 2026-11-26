@@ -10,7 +10,10 @@
 - Inspected desktop and mobile screenshots in `/tmp/ahaan-day-night-weather`. The screenshots show the prominent controls, heavier rain, storm rain, and storm darkening.
 - `node --check assets/park3d.js`, `node --check tests/park-day-night-weather-browser.cjs`, and `git diff --check` passed.
 - Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Both riders stayed in frame, bridge height matched at 8.00094 m, and browser errors were empty. Evidence: `/tmp/ahaan-two-player`.
-- Next: publish the feature, live-verify, and add the Fresh Drops entry with its screenshot.
+- Main moved first with Park flowers and Fresh Drops updates (`2f93b23`, `ce17574`). Merged `origin/main` and kept both updates.
+- After the merge, the weather browser check passed on desktop and mobile. The merged Fresh Drops check also passed on desktop and mobile, with images loaded, NEW badges, and zero browser errors.
+- Feature commit: `23b9b8c` (`Add prominent day and storm weather controls`). Merge commit: `a00ac1d`.
+- Next: publish these commits, live-verify the Park on desktop and mobile, then add the live screenshot and Fresh Drops entry.
 
 ## Park floral decoration cleanup — Nov 25, 2026
 
