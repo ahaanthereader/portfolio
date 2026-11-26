@@ -28,7 +28,10 @@
 - Live screenshots: `/tmp/ahaan-zoo-interact-live/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-live/mobile-{tiger,elephant,kangaroo,monkey}.png`.
 - Added the live tiger screenshot to Fresh Drops. Added a Nov 26 card with “You asked for this!” and updated the zoo menu NEW date to Nov 26.
 - Updated `tests/water-park-fresh-drops-browser.cjs` for the new top card, screenshot, and Zoo NEW badge. The local Fresh Drops check passed on desktop and mobile with zero browser errors.
-- Next: publish the Fresh Drops update, wait for Pages, then verify the live card and screenshot on desktop and mobile.
+- Fresh Drops commit `622fea6` is live. Pages run `45774139854` succeeded.
+- The live Fresh Drops check passed on desktop and mobile. The zoo card appeared first, the image loaded at full width, NEW labels appeared, and browser errors were empty.
+- Live screenshots: `/tmp/ahaan-zoo-interact-fresh-drops-live/fresh-drops-desktop.png` and `home-desktop.png`, plus mobile versions.
+- Queue item 17 is complete and live.
 
 ## Nav fix — Nov 25, 2026
 
