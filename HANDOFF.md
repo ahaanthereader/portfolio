@@ -17,7 +17,34 @@
 - Inspected desktop and mobile screenshots. The scrolled screenshots show the full Aesop cover and details. The Currently Reading card stays within the viewport width.
 - Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
 - `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
-- Next: review the final diff, sync with current `main`, then publish and add the Fresh Drops entry with a live screenshot.
+- Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
+- Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
+
+## Day/night and Park flower updates merged from main — Nov 25, 2026
+
+- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. You own this item. Work in this worktree on `feature/day-night-weather`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
+- The weather update supports Auto, Sunny, Cloudy, and Light rain. It pools 18 rain streaks and grows six path puddles. Sound defaults off.
+- Added visible Day, Night, and Auto buttons to the main Park navigation. Kept the dropdown controls and synced both day control sets.
+- Added Heavy rain and Stormy weather. Heavy rain uses all 48 rain streaks, faster and larger drops, and faster, wider puddles.
+- Stormy weather darkens the Park, adds steady wind-driven rain, and uses slow, soft lightning flashes. Thunder uses the existing sound engine only when sound is on.
+- Added `tests/park-day-night-weather-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed quick controls, touch taps, heavy-rain puddle growth, storm darkening, lightning, silent default, and zero browser errors.
+- Inspected desktop and mobile screenshots in `/tmp/ahaan-day-night-weather`. The screenshots show the prominent controls, heavier rain, storm rain, and storm darkening.
+- `node --check assets/park3d.js`, `node --check tests/park-day-night-weather-browser.cjs`, and `git diff --check` passed.
+- Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Both riders stayed in frame, bridge height matched at 8.00094 m, and browser errors were empty. Evidence: `/tmp/ahaan-two-player`.
+- Main moved first with Park flowers and Fresh Drops updates (`2f93b23`, `ce17574`). Merged `origin/main` and kept both updates.
+- After the merge, the weather browser check passed on desktop and mobile. The merged Fresh Drops check also passed on desktop and mobile, with images loaded, NEW badges, and zero browser errors.
+- Feature commit: `23b9b8c` (`Add prominent day and storm weather controls`). Merge commit: `a00ac1d`.
+- Next: publish these commits, live-verify the Park on desktop and mobile, then add the live screenshot and Fresh Drops entry.
+
+## Park floral decoration cleanup — Nov 25, 2026
+
+- Removed both flower elements and their rules from `index.html` and `assets/site.css`.
+- Desktop and mobile checks passed. The Park view has clean left and right edges. Browser errors were empty.
+- Feature commit `2f93b23` (`Remove flowers from Park view`) was pushed to `main`. Pages run `45753688735` succeeded.
+- Live desktop and mobile checks passed. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
+- Saved the live desktop screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added the Fresh Drops entry and updated the home card date.
+- Updated `tests/water-park-fresh-drops-browser.cjs`. Local desktop and mobile checks passed.
 
 ## Park day/night and weather — Nov 24, 2026
 
