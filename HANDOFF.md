@@ -1,3 +1,18 @@
+## Brief queue — Nov 25, 2026
+
+- Queue item 17 — Make the zoo animals interactive: `FEATURE-BRIEF-zoo-interact.md`. You own this item. Work in this worktree on `feature/zoo-interact`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+## Zoo animal interaction — Nov 25, 2026
+
+- Read queue item 17 and `FEATURE-BRIEF-zoo-interact.md`.
+- First concrete step: confirmed that keyboard prompts already call `greet()` for Ahaan and Vihaan. The animal models had no mouse or touch interaction registration.
+- Registered each animal model with the park raycast interaction system. A click or tap calls the existing greeting, joy animation, and fact bubble. The two proximity prompts still activate each actor separately.
+- Updated `tests/zoo-browser.cjs` to click each animal on desktop and tap each animal on mobile. The check also covers all proximity prompts, Enter, Vihaan's separate kangaroo prompt in Play together, and page errors.
+- `node --check assets/park3d.js`, `node --check tests/zoo-browser.cjs`, and `git diff --check` passed.
+- `tests/zoo-browser.cjs` passed on desktop 1280x800 and mobile 390x844. All four direct model interactions showed the expected fact, Vihaan's prompt greeted as Vihaan, and browser errors were empty.
+- Browser screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
+- Next: inspect the final diff, sync with `main` if needed, publish, and verify the live feature and Fresh Drops entry.
+
 ## Park day/night and weather — Nov 24, 2026
 
 - Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).
