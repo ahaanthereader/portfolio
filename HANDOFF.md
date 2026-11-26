@@ -1,17 +1,92 @@
-## Brief queue — Nov 25, 2026
+# HANDOFF — Ahaan's Portfolio
 
-- Queue item 17 — Make the zoo animals interactive: `FEATURE-BRIEF-zoo-interact.md`. You own this item. Work in this worktree on `feature/zoo-interact`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+## Brief queue — Nov 25, 2026 (Nishant's six fixes, in order)
 
-## Zoo animal interaction — Nov 25, 2026
+- Queue item 14 — Nav fix + PillNav-style improvement: `FEATURE-BRIEF-nav-fix.md`. Owner: worker 0004, main repo checkout. Sync with origin/main first.
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. Owner: new worker, worktree `.worktrees/feature-flowers-remove` on `feature/flowers-remove`.
+- Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. Owner: new worker, worktree `.worktrees/feature-water-slides-fix` on `feature/water-slides-fix`.
+- Queue item 17 — Make the zoo animals interactive: `FEATURE-BRIEF-zoo-interact.md`. Owner: new worker, worktree `.worktrees/feature-zoo-interact` on `feature/zoo-interact`.
+- Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. Owner: new worker, worktree `.worktrees/feature-day-night-weather` on `feature/day-night-weather`.
+- Queue item 19 — Fire truck realistic hose spray + standing second player: `FEATURE-BRIEF-fire-truck-spray.md`. Owner: new worker, worktree `.worktrees/feature-fire-truck-spray` on `feature/fire-truck-spray`.
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. Owner: new worker, worktree `.worktrees/feature-books-shelf` on `feature/books-shelf`.
+- Each worker works in its own worktree (or the main checkout for 0004) and merges to main only after its browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+
+## Zoo animal interaction — Nov 25–26, 2026
 
 - Read queue item 17 and `FEATURE-BRIEF-zoo-interact.md`.
-- First concrete step: confirmed that keyboard prompts already call `greet()` for Ahaan and Vihaan. The animal models had no mouse or touch interaction registration.
-- Registered each animal model with the park raycast interaction system. A click or tap calls the existing greeting, joy animation, and fact bubble. The two proximity prompts still activate each actor separately.
-- Updated `tests/zoo-browser.cjs` to click each animal on desktop and tap each animal on mobile. The check also covers all proximity prompts, Enter, Vihaan's separate kangaroo prompt in Play together, and page errors.
+- Confirmed that the existing proximity prompts already call `greet()` for Ahaan and Vihaan. Animal models had no mouse or touch interaction registration.
+- Registered each animal model with the park raycast system. A click or tap calls the existing greeting, joy motion, and fact bubble. The two prompts still activate each player separately.
+- Updated `tests/zoo-browser.cjs` to test mouse clicks on desktop and touch taps on mobile. The check covers all four prompts, Enter, Vihaan’s separate kangaroo prompt in Play together, and page errors.
 - `node --check assets/park3d.js`, `node --check tests/zoo-browser.cjs`, and `git diff --check` passed.
-- `tests/zoo-browser.cjs` passed on desktop 1280x800 and mobile 390x844. All four direct model interactions showed the expected fact, Vihaan's prompt greeted as Vihaan, and browser errors were empty.
-- Browser screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
-- Next: inspect the final diff, sync with `main` if needed, publish, and verify the live feature and Fresh Drops entry.
+- The zoo browser check passed at 1280×800 and 390×844. All animal clicks showed the expected facts. Vihaan’s prompt greeted as Vihaan. Browser errors were empty.
+- Screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
+- Next: rerun the zoo and Fresh Drops checks after the main merge, then publish and verify live.
+
+## Nav fix — Nov 25, 2026
+
+- Started queue item 14 in the main checkout, as assigned.
+- Read `FEATURE-BRIEF-nav-fix.md` and synced main to `origin/main` at `4d77468`. Preserved the local queue and upstream work history in `HANDOFF.md`.
+- Inspected the home nav markup, grouped-menu handlers, CSS breakpoints, Park controls, and toggle pills.
+- Read the React Bits Pill Nav reference. The brief requires a vanilla implementation with no added packages.
+- Corrected the home nav label color, kept carets inline, and added the moving active highlight, rising hover fill, and current-section dot.
+- Put the Park settings and toggle pills in clear header rows. Kept each toggle on one line and moved desktop dropdowns below the controls.
+- Added `tests/nav-fix-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed the layout, dropdown, active marker, pill wrapping, and mobile menu checks with zero browser errors.
+- Inspected `/tmp/ahaan-nav-fix/desktop.png` and `/tmp/ahaan-nav-fix/mobile.png`. The desktop Play menu clears the controls. The mobile header keeps the Park and toggle controls inside the nav.
+- `node --check assets/shared.js`, `node --check tests/nav-fix-browser.cjs`, and `git diff --check` passed.
+
+## Books shelf — Nov 25, 2026
+
+- Began queue item 20 in the assigned `feature/books-shelf` worktree.
+- Read the brief, `reading.html`, `assets/reading.js`, `assets/shared.js`, `assets/site.css`, and `assets/fit-reading.css`.
+- The shelf already has horizontal overflow and arrow handlers. The handlers hide both arrows when the current book list fits. The shelf has no drag or snap support.
+- The Aesop card must link to `aesop.html`. No Aesop cover file appears in `images/book-covers/` yet.
+- The desktop layout puts `Currently Reading` in an auto-sized second grid column. Its clipping needs a layout fix that accounts for the page width.
+- Activated the Sally UX review skill and loaded its persona and project defaults. The `uv run` resolver could not write to its user cache, so I used the listed TOML defaults directly.
+- Saved Sally's UX review in `sally-books-shelf-review.md`. Her recommendations cover semantic cards, snap points, arrow controls, mouse dragging, readable details, bounded layout, and reduced motion.
+- Applied the review: added a custom Aesop cover, linked its card to `aesop.html`, kept the other cards keyboard operable, and added a scroll-snap shelf with arrows and mouse dragging.
+- Replaced the old Aesop text link with the shelf card. Bounded the desktop side column and made the Currently Reading text wrap. Mobile keeps the card inside the page width.
+- Added `tests/reading-shelf-browser.cjs` for 1280 × 800 and 390 × 844 checks. The browser check passed arrow navigation, actual card dragging, keyboard details, Aesop cover visibility, card bounds, zero horizontal overflow, and zero browser or console errors.
+- Inspected desktop and mobile screenshots. The scrolled screenshots show the full Aesop cover and details. The Currently Reading card stays within the viewport width.
+- Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
+- `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
+- Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
+- Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
+
+## Day/night, heavy rain, and stormy weather — Nov 25–26, 2026
+
+- Queue item 18 is complete and live. Published from `feature/day-night-weather` after desktop and mobile browser checks passed.
+- First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
+- The weather update supports Auto, Sunny, Cloudy, and Light rain. It pools 18 rain streaks and grows six path puddles. Sound defaults off.
+- Added visible Day, Night, and Auto buttons to the main Park navigation. Kept the dropdown controls and synced both day control sets.
+- Added Heavy rain and Stormy weather. Heavy rain uses all 48 rain streaks, faster and larger drops, and faster, wider puddles.
+- Stormy weather darkens the Park, adds steady wind-driven rain, and uses slow, soft lightning flashes. Thunder uses the existing sound engine only when sound is on.
+- Added `tests/park-day-night-weather-browser.cjs`. Desktop 1280×800 and mobile 390×844 passed quick controls, touch taps, heavy-rain puddle growth, storm darkening, lightning, silent default, and zero browser errors.
+- Inspected desktop and mobile screenshots in `/tmp/ahaan-day-night-weather`. The screenshots show the prominent controls, heavier rain, storm rain, and storm darkening.
+- `node --check assets/park3d.js`, `node --check tests/park-day-night-weather-browser.cjs`, and `git diff --check` passed.
+- Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Both riders stayed in frame, bridge height matched at 8.00094 m, and browser errors were empty. Evidence: `/tmp/ahaan-two-player`.
+- Main moved first with Park flowers and Fresh Drops updates (`2f93b23`, `ce17574`). Merged `origin/main` and kept both updates.
+- After the merge, the weather browser check passed on desktop and mobile. The merged Fresh Drops check also passed on desktop and mobile, with images loaded, NEW badges, and zero browser errors.
+- Feature commit: `23b9b8c` (`Add prominent day and storm weather controls`). Merge commit: `a00ac1d`.
+- Published the feature and handoff through commit `801a13c` on `main`. Push run `45760843886` and clean run `45767182415` failed because Pages could not find the uploaded artifact. A later main push run `45765250051` succeeded and included the feature.
+- Live desktop and mobile weather checks passed on the published site. The prominent controls, Heavy rain, Stormy, heavy-rain puddle growth, darkened storm view, lightning, sound-off default, and zero browser errors passed.
+- Saved the live Stormy screenshot at `public/fresh-drops/2026-11-26-day-night-heavy-rain-storm.png`. Added the Nov 26 Fresh Drops entry with “You asked for this!”, updated the home card date and Park rides NEW date, and updated its browser check.
+- The Fresh Drops check passed locally on desktop and mobile. The image loaded at full width, NEW labels appeared, and browser errors were empty.
+- Main then advanced with commits `2c05d28`, `4d77468`, and `22f0d23`. Merged those commits before the Fresh Drops publish.
+- Merged the latest main commits. The Fresh Drops check passed again on desktop and mobile. The live image loaded at full width, NEW labels showed, and browser errors were empty.
+- Fresh Drops commit: `35418bd` (`Add day night storm to Fresh Drops`). Merge commit: `80eb163`.
+- Published the Fresh Drops entry and live screenshot in commit `3c9b97d`. Pages run `45769656008` succeeded.
+- Final live Fresh Drops check passed on desktop and mobile. The screenshot loaded at full width, the Nov 26 entry appeared first, NEW labels appeared, the home date matched, and browser errors were empty.
+- Final screenshots: `/tmp/ahaan-water-park-fresh-drops/fresh-drops-desktop.png` and `home-mobile.png`.
+
+## Park floral decoration cleanup — Nov 25, 2026
+
+- Removed both flower elements and their rules from `index.html` and `assets/site.css`.
+- Desktop and mobile checks passed. The Park view has clean left and right edges. Browser errors were empty.
+- Feature commit `2f93b23` (`Remove flowers from Park view`) was pushed to `main`. Pages run `45753688735` succeeded.
+- Live desktop and mobile checks passed. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
+- Saved the live desktop screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added the Fresh Drops entry and updated the home card date.
+- Updated `tests/water-park-fresh-drops-browser.cjs`. Local desktop and mobile checks passed.
 
 ## Park day/night and weather — Nov 24, 2026
 
