@@ -1,3 +1,20 @@
+## Brief queue — Nov 25, 2026
+
+- Queue item 16 — Fix the water park slides: `FEATURE-BRIEF-water-slides-fix.md`. You own this item. Work in this worktree on `feature/water-slides-fix`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- First concrete step: checked Pages run `45442602019`. The run succeeded for main commit `40320fd40b98c6000f7bffc67797ad4c001f27c2`.
+- The last successful Pages commit includes water park feature commit `1d2b34b`.
+- Live browser check passed at 1280 × 800 and 390 × 844. The four prompts appeared, prompt-button clicks boarded the rides, and slide, wave pool, and lazy river visibly moved riders. The dump tower boarded and played its existing pour animation. Play together boarding and exits passed. Console errors were empty.
+- Screenshot review confirmed that the scene renders, but the existing check activates the prompt button rather than the ride geometry.
+- Code diagnosis found no registered water park mesh tap targets. The standalone `E` handler also omits water ride IDs, so keyboard activation does not run outside Play together.
+- Added low-profile invisible hit targets to each ride so scene clicks can reach the ride handlers.
+- Added standalone `E` activation and changed each ride badge to `E or tap`.
+- Hid the fixed Fresh Drops link while Ahaan views the northeast water park. The link covered the slide on mobile and intercepted taps.
+- Updated `tests/park-water-park-browser.cjs` to verify desktop clicks, mobile prompt taps, `E` exits, visible movement, Play together, the Fresh Drops clearance, and zero browser errors.
+- `node --check` passed for `assets/park3d.js` and `tests/park-water-park-browser.cjs`. `git diff --check` passed.
+- Final local browser check passed at 1280 × 800 and 390 × 844. It covered all four rides, both input modes, exits, Play together, and zero console or page errors.
+- Screenshot evidence: `/tmp/ahaan-water-slides-final-local/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Next: commit the fix, sync with the latest main, publish, verify live interactions, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+
 ## Park day/night and weather — Nov 24, 2026
 
 - Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).

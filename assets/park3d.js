@@ -2654,6 +2654,21 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         const label = add(new T.Mesh(new T.PlaneGeometry(signWidth - 0.14, 0.66), new T.MeshBasicMaterial({ map: new T.CanvasTexture(labelCanvas), side: T.DoubleSide })), ride.x, 2.2, ride.z + 2.405, false);
         ride.label = rideSigns[i];
         ride.approachRadius = 3.6;
+
+        const hitTarget = new T.Mesh(
+          new T.PlaneGeometry(3.8, 3.8),
+          new T.MeshBasicMaterial({ transparent: true, opacity: 0, colorWrite: false, depthWrite: false })
+        );
+        hitTarget.rotation.x = -Math.PI / 2;
+        hitTarget.position.set(ride.x, 0.16, ride.z);
+        group.add(hitTarget);
+        registerInteractive(hitTarget, {
+          id: ride.id,
+          name: ride.name,
+          x: ride.x,
+          z: ride.z,
+          onInteract: () => toggleWaterRide(A, ride)
+        });
       });
       landmarkAnimators.push(dt => {
         if (calm()) return false;
@@ -3650,6 +3665,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     // Nearby interaction prompt state
     let currentNearbyItem = null;
     const actionPrompt = document.getElementById("actionPrompt");
+    const freshDropsHome = document.querySelector(".fresh-drops-home");
     const actionPromptBtn = document.getElementById("actionPromptBtn");
     const actionPromptText = document.getElementById("actionPromptText");
     const actionKeyBadge = actionPromptBtn && actionPromptBtn.querySelector(".action-key-badge");
@@ -5737,7 +5753,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         currentNearbyItem = closest;
         if (currentNearbyItem && actionPrompt && actionPromptText) {
           actionPromptText.textContent = togetherEnabled ? currentNearbyItem.promptText.replace("Press Enter", "Press E") : currentNearbyItem.promptText;
-          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "fireTruck", "chopper", "icecream", "train", "movieTheater", "riverBoat"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
+          if (actionKeyBadge) actionKeyBadge.textContent = ["bike", "ebike", "car", "fireTruck", "chopper", "icecream", "train", "movieTheater", "riverBoat", "water-slide", "wave-pool", "lazy-river-water-park", "dump-tower"].includes(currentNearbyItem.id) ? "E or tap" : (togetherEnabled ? "E" : "Enter");
           actionPrompt.hidden = false;
           requestAnimationFrame(() => actionPrompt.classList.add("show"));
         } else if (actionPrompt) {
@@ -6462,7 +6478,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       isPointerDown = false;
 
       // If user tapped without dragging: check interactive objects first, then walkable ground
-      if (!isDragging && (e.button === 0 || e.button === undefined)) {
+      if (!isDragging && (e.pointerType === "touch" || e.button === 0 || e.button === undefined)) {
         const rect = canvas.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -6775,7 +6791,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
           return;
         }
         if (currentNearbyItem && currentNearbyItem.id === "train") { e.preventDefault(); boardTrain(A); return; }
-        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "fireTruck", "icecream", "movieTheater", "riverBoat"].includes(currentNearbyItem.id))) {
+        if (currentNearbyItem && (togetherEnabled || ["bike", "ebike", "car", "fireTruck", "icecream", "movieTheater", "riverBoat", "water-slide", "wave-pool", "lazy-river-water-park", "dump-tower"].includes(currentNearbyItem.id))) {
           e.preventDefault();
           currentNearbyItem.onActivate();
           return;
@@ -7550,6 +7566,12 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         });
       }
       const waterParkInView = A.rig.position.x > 25 && A.rig.position.z < -25;
+      if (freshDropsHome) {
+        freshDropsHome.style.visibility = waterParkInView ? "hidden" : "";
+        freshDropsHome.style.pointerEvents = waterParkInView ? "none" : "";
+        if (waterParkInView) freshDropsHome.setAttribute("aria-hidden", "true");
+        else freshDropsHome.removeAttribute("aria-hidden");
+      }
       clouds.forEach(cl => {
         if (cl.userData.blocksWaterPark) cl.visible = !waterParkInView;
       });
