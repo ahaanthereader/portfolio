@@ -28,6 +28,11 @@
         <div class="nav-pop" id="ng-mine"><a href="calendar.html">Calendar</a><a href="rewards.html">Rewards</a><a href="journey.html">My Journey</a><a class="fresh-drops-nav" href="fresh-drops.html">✨ Fresh Drops</a></div></div>
     </div>
     <div class="nav-controls">
+      <div class="park-day-quick" role="group" aria-label="Day and night">
+        <button type="button" data-park-day="day" aria-pressed="false">☀️ Day</button>
+        <button type="button" data-park-day="night" aria-pressed="false">🌙 Night</button>
+        <button type="button" data-park-day="auto" aria-pressed="true">Auto</button>
+      </div>
       <details class="park-weather-controls">
         <summary aria-label="Park day and weather settings">☀️ Park</summary>
         <div class="park-weather-panel">
@@ -38,7 +43,7 @@
           </label>
           <label>Weather
             <select id="parkWeatherMode" aria-label="Weather mode">
-              <option value="auto">Auto</option><option value="sunny">Sunny</option><option value="cloudy">Cloudy</option><option value="rain">Light rain</option>
+              <option value="auto">Auto</option><option value="sunny">Sunny</option><option value="cloudy">Cloudy</option><option value="rain">Light rain</option><option value="heavy-rain">Heavy rain</option><option value="stormy">Stormy</option>
             </select>
           </label>
         </div>

@@ -79,6 +79,8 @@
       window.AhaanAudio.strike(246.94, { when: 0.24, decay: 0.3, peak: 0.03, attack: 0.05, partials: [[1, 1, 1], [1.5, 0.1, 0.5]] });
     } else if (type === "wind") {
       window.AhaanAudio.bell(392.00, 0, 0.05);
+    } else if (type === "thunder") {
+      window.AhaanAudio.strike(73.42, { decay: 2.8, peak: 0.045, attack: 0.18, partials: [[1, 1, 1], [1.47, 0.28, 0.9], [2.01, 0.12, 0.8]] });
     } else if (type === "bounce") {
       window.AhaanAudio.strike(196.00, {
         decay: 0.28,
@@ -184,6 +186,8 @@
 
     const dayModeControl = document.getElementById("parkDayMode");
     const weatherModeControl = document.getElementById("parkWeatherMode");
+    const quickDayButtons = [...document.querySelectorAll("[data-park-day]")];
+    const parkBaseExposure = renderer.toneMappingExposure;
     let dayMode = dayModeControl ? dayModeControl.value : "auto";
     let weatherMode = weatherModeControl ? weatherModeControl.value : "auto";
     let dayClock = 0;
@@ -191,6 +195,9 @@
     let phaseNow = 0;
     let nightMix = 0;
     let rainRippleBoost = 1;
+    let stormClock = 0;
+    let lightningGlow = 0;
+    let nextLightning = 9;
     const parkLights = [];
     const parkPuddles = [];
     const rainDrops = [];
@@ -205,6 +212,7 @@
     let previousCloudy = null;
     const setDayControl = () => {
       dayMode = dayModeControl.value;
+      quickDayButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.parkDay === dayMode)));
       dayClock = 0;
       if (calm() && dayMode !== "auto") {
         phaseNow = { day: 0, evening: 1, night: 2 }[dayMode];
@@ -214,6 +222,11 @@
         render();
       } else wake();
     };
+    quickDayButtons.forEach(button => button.addEventListener("click", () => {
+      if (!dayModeControl) return;
+      dayModeControl.value = button.dataset.parkDay;
+      dayModeControl.dispatchEvent(new Event("change", { bubbles: true }));
+    }));
     const setWeatherControl = () => {
       weatherMode = weatherModeControl.value;
       if (calm()) { updateParkWeather(0); render(); }
@@ -240,6 +253,12 @@
         nightColors[key].copy(dayColorLooks[names[fromIndex]][key]).lerp(dayColorLooks[names[(fromIndex + 1) % 3]][key], blend);
         colors[key].copy(nightColors[key]);
       });
+      if (weatherMode === "stormy") {
+        colors.top.multiplyScalar(0.42);
+        colors.mid.multiplyScalar(0.5);
+        colors.bottom.multiplyScalar(0.62);
+        colors.fog.multiplyScalar(0.62);
+      }
       sun.intensity = from.sunPower + (to.sunPower - from.sunPower) * blend;
       hemi.intensity = from.hemiPower + (to.hemiPower - from.hemiPower) * blend;
       rimSun.intensity = from.rimPower + (to.rimPower - from.rimPower) * blend;
@@ -259,17 +278,36 @@
         const cycle = weatherClock % 120;
         activeWeather = cycle < 72 ? "sunny" : cycle < 96 ? "cloudy" : "rain";
       }
-      const raining = activeWeather === "rain";
-      const cloudy = activeWeather === "cloudy";
-      rainRippleBoost = raining ? 1.55 : 1;
+      const raining = ["rain", "heavy-rain", "stormy"].includes(activeWeather);
+      const heavyRain = activeWeather === "heavy-rain" || activeWeather === "stormy";
+      const stormy = activeWeather === "stormy";
+      const cloudy = ["cloudy", "heavy-rain", "stormy"].includes(activeWeather);
+      rainRippleBoost = raining ? (heavyRain ? 2.15 : 1.55) : 1;
+      if (stormy && !calm()) {
+        stormClock += dt;
+        lightningGlow = Math.max(0, lightningGlow - dt * 0.28);
+        nextLightning -= dt;
+        if (nextLightning <= 0) {
+          lightningGlow = 0.3;
+          nextLightning = 10 + Math.random() * 7;
+          if (soundOn) playSound("thunder");
+        }
+      } else { stormClock = 0; lightningGlow = 0; nextLightning = 9; }
+      if (stormy) {
+        hemi.intensity = Math.max(0.24, hemi.intensity * 0.58) + lightningGlow;
+        sun.intensity *= 0.52;
+      }
+      renderer.toneMappingExposure = parkBaseExposure * (stormy ? 0.66 + lightningGlow * 0.3 : 1);
       const rainCenterX = A ? A.rig.position.x : 0;
       const rainCenterZ = A ? A.rig.position.z : 0;
-      rainDrops.forEach(drop => {
-        drop.visible = raining && !calm();
+      rainDrops.forEach((drop, dropIndex) => {
+        drop.visible = raining && !calm() && dropIndex < (heavyRain ? rainDrops.length : 18);
         if (!drop.visible) return;
         const data = drop.userData;
-        drop.position.set(rainCenterX + data.x, data.y, rainCenterZ + data.z);
-        data.y -= data.speed * dt;
+        drop.position.set(rainCenterX + data.x + (stormy ? stormClock * 1.8 : heavyRain ? weatherClock * 0.35 : 0), data.y, rainCenterZ + data.z);
+        drop.scale.set(heavyRain ? 1.4 : 1, heavyRain ? 1.35 : 1, 1);
+        drop.rotation.z = stormy ? -0.28 : heavyRain ? -0.1 : 0;
+        data.y -= data.speed * dt * (heavyRain ? 1.55 : 1);
         if (data.y < 0.5) {
           data.y = 5 + (data.x % 3);
           data.x = Math.sin(weatherClock + data.speed) * 9;
@@ -277,9 +315,10 @@
         }
       });
       parkPuddles.forEach(item => {
-        item.level = Math.max(0, Math.min(1, item.level + (raining ? dt * 0.22 : activeWeather === "sunny" ? -dt * 0.08 : 0)));
+        item.level = Math.max(0, Math.min(1, item.level + (raining ? dt * (heavyRain ? 0.42 : 0.22) : activeWeather === "sunny" ? -dt * 0.08 : 0)));
         item.puddle.material.opacity = item.level * 0.55;
-        item.ripple += dt * (raining && item.level > 0.08 ? 0.6 : 0);
+        item.puddle.scale.setScalar(heavyRain ? 1.12 : 1);
+        item.ripple += dt * (raining && item.level > 0.08 ? (heavyRain ? 1.15 : 0.6) : 0);
         const pulse = item.ripple % 1;
         item.ring.scale.setScalar(0.8 + pulse * 1.8);
         item.ring.material.opacity = raining && item.level > 0.08 ? (1 - pulse) * 0.42 : 0;
@@ -288,13 +327,13 @@
         globe.material.emissiveIntensity = nightMix * 0.8;
         if (glow) glow.material.opacity = nightMix * 0.2;
       });
-      if (clouds && previousCloudy !== cloudy) {
+      if (clouds && previousCloudy !== activeWeather) {
         clouds.forEach(cloud => cloud.traverse(node => {
-          if (node.isMesh && node.material && node.material.color && node.geometry.type === "SphereGeometry") node.material.color.set(cloudy ? 0xb5c0c8 : 0xffffff);
+          if (node.isMesh && node.material && node.material.color && node.geometry.type === "SphereGeometry") node.material.color.set(stormy ? 0x718395 : cloudy ? 0xb5c0c8 : 0xffffff);
         }));
-        previousCloudy = cloudy;
+        previousCloudy = activeWeather;
       }
-      return raining || weatherMode === "auto";
+      return raining || weatherMode === "auto" || stormy;
     }
 
     // ==========================================
@@ -774,8 +813,8 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       });
 
       const rainMat = new T.MeshBasicMaterial({ color: 0x90b9ce, transparent: true, opacity: 0.72, depthWrite: false });
-      const rainGeo = new T.BoxGeometry(0.05, 0.75, 0.05);
-      for (let i = 0; i < 18; i++) {
+      const rainGeo = new T.BoxGeometry(0.07, 1.05, 0.04);
+      for (let i = 0; i < 48; i++) {
         const drop = new T.Mesh(rainGeo, rainMat);
         drop.visible = false;
         drop.userData = { x: Math.sin(i * 19.7) * 9, z: Math.cos(i * 13.1) * 9, y: 2 + (i % 6) * 0.7, speed: 4 + (i % 4) * 0.6 };
@@ -7654,6 +7693,10 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
       getDayWeatherState: () => ({
         dayMode,
         weatherMode,
+        stormy: weatherMode === "stormy",
+        visibleRainCount: rainDrops.filter(drop => drop.visible).length,
+        lightningGlow,
+        exposure: renderer.toneMappingExposure,
         phase: phaseNow,
         nightMix,
         sunIntensity: sun.intensity,
