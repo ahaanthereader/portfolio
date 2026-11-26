@@ -15,7 +15,8 @@
 - Screenshot evidence: `/tmp/ahaan-water-slides-final-local/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
 - Committed feature changes as `0f7267e` (`Fix water park ride interactions`).
 - Fetched the latest main after it advanced by two commits. Merged `origin/main` into this branch and resolved the `HANDOFF.md` conflict with both queue items preserved.
-- Next: rerun the browser check on the synced branch, publish, verify live interactions, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Reran `tests/park-water-park-browser.cjs` after the sync. Desktop and mobile passed all four rides, input checks, Play together, and zero page or console errors.
+- Next: publish the verified commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
 - Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
 - Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
