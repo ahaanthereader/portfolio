@@ -30,7 +30,7 @@ const baseUrl = process.env.BASE_URL;
     for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: 'mobile', width: 390, height: 844 }]) {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
-      page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name}: ${message.text()}`); });
+      page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name}: ${message.text()} (${message.location().url})`); });
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => document.querySelector('.home-hero')?.classList.contains('park-ready'), null, { timeout: 45000 });
       const layout = await page.evaluate(() => {
@@ -78,11 +78,11 @@ const baseUrl = process.env.BASE_URL;
       }
       await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}.png`) });
       await page.goto(new URL('fresh-drops.html', pageUrl).href, { waitUntil: 'domcontentloaded' });
-      const newestDrop = page.locator('.fresh-drop').first();
-      assert.equal(await newestDrop.locator('time').getAttribute('datetime'), '2026-11-26', `${viewport.name}: nav Fresh Drops card is newest`);
-      assert.equal(await newestDrop.locator('h2').innerText(), 'A clearer home navigation', `${viewport.name}: nav Fresh Drops card is present`);
-      assert.equal(await newestDrop.locator('[data-fresh-new]').isVisible(), true, `${viewport.name}: newest card shows NEW`);
-      await page.waitForFunction(() => { const image = document.querySelector('.fresh-drop img'); return image?.complete && image.naturalWidth > 0; });
+      const navDrop = page.locator('.fresh-drop').filter({ hasText: 'A clearer home navigation' }).first();
+      assert.equal(await navDrop.locator('time').getAttribute('datetime'), '2026-11-26', `${viewport.name}: nav Fresh Drops card has current date`);
+      assert.equal(await navDrop.locator('[data-fresh-new]').isVisible(), true, `${viewport.name}: nav card shows NEW`);
+      await navDrop.locator('img').evaluate(image => image.decode());
+      assert.ok(await navDrop.locator('img').evaluate(image => image.naturalWidth > 0), `${viewport.name}: nav screenshot loads`);
       await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}-fresh-drops.png`) });
       await page.close();
     }

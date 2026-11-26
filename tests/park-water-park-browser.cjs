@@ -40,7 +40,7 @@ const rides = [
     for (const viewport of [
       { name: 'desktop', width: 1280, height: 800 },
       { name: 'mobile', width: 390, height: 844 }
-    ]) {
+    ].filter(item => !process.env.VIEWPORT_ONLY || item.name === process.env.VIEWPORT_ONLY)) {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
@@ -55,24 +55,33 @@ const rides = [
         await page.evaluate(({ x, z }) => window.Park3D.teleportAhaan(x, z), ride);
         await page.waitForTimeout(350);
         assert.equal((await page.evaluate(() => window.Park3D.getWaterParkState())).obstructingCloudsVisible.every(visible => !visible), true, `${viewport.name}: north clouds clear the water park view`);
+        assert.equal(await page.locator('.fresh-drops-home').evaluate(node => getComputedStyle(node).visibility), 'hidden', `${viewport.name}: Fresh Drops card clears the water park tap area`);
         assert.equal(await page.evaluate(() => window.Park3D.getCurrentNearbyItem()?.id), ride.id, `${viewport.name}: ${ride.id} nearby prompt`);
         assert.match(await page.locator('#actionPromptText').textContent(), ride.prompt, `${viewport.name}: ${ride.id} prompt text`);
+        assert.equal(await page.locator('#actionPromptBtn .action-key-badge').textContent(), 'E or tap', `${viewport.name}: ${ride.id} shows keyboard and tap choices`);
+        await page.evaluate(({ x, z }) => window.Park3D.setCustomCamera({ x: x + 14, y: 13, z: z + 16 }, { x, y: 1, z }), ride);
+        await page.waitForTimeout(400);
         const before = await page.evaluate(() => ({ x: window.Park3D.getA().rig.position.x, z: window.Park3D.getA().rig.position.z }));
-        await page.locator('#actionPromptBtn').click();
+        if (viewport.name === 'mobile') {
+          const promptBounds = await page.locator('#actionPromptBtn').boundingBox();
+          await page.touchscreen.tap(promptBounds.x + promptBounds.width / 2, promptBounds.y + promptBounds.height / 2);
+        } else {
+          await page.locator('#actionPromptBtn').click();
+        }
         await page.waitForTimeout(1100);
-        assert.equal((await page.evaluate(() => window.Park3D.getWaterParkState())).riders.ahaan, ride.id, `${viewport.name}: ${ride.id} boards`);
+        assert.equal((await page.evaluate(() => window.Park3D.getWaterParkState())).riders.ahaan, ride.id, `${viewport.name}: ${ride.id} ${viewport.name === 'mobile' ? 'prompt tap' : 'prompt click'} boards`);
         if (ride.id === 'water-slide' || ride.id === 'wave-pool' || ride.id === 'lazy-river-water-park') {
           await page.waitForTimeout(1000);
           const after = await page.evaluate(() => ({ x: window.Park3D.getA().rig.position.x, z: window.Park3D.getA().rig.position.z }));
           assert.ok(Math.hypot(after.x - before.x, after.z - before.z) > 0.15, `${viewport.name}: ${ride.id} moves gently`);
         }
-        await page.locator('#actionPromptBtn').click();
+        await page.keyboard.press('e');
         await page.waitForTimeout(350);
-        assert.equal((await page.evaluate(() => window.Park3D.getWaterParkState())).riders.ahaan, null, `${viewport.name}: ${ride.id} exits`);
+        assert.equal((await page.evaluate(() => window.Park3D.getWaterParkState())).riders.ahaan, null, `${viewport.name}: ${ride.id} exits with E`);
         await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}-${ride.id}.png`) });
       }
 
-      await page.evaluate(() => window.Park3D.setCustomCamera({ x: 63, y: 62, z: 78 }, { x: 39, y: 0, z: -39 }));
+      await page.evaluate(() => window.Park3D.setCustomCamera());
       await page.waitForTimeout(800);
       await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}-overview.png`) });
 
