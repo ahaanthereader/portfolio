@@ -20,6 +20,10 @@
 - Reran `tests/park-water-park-browser.cjs` on the updated publish worktree. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
 - Synced screenshot evidence: `/tmp/ahaan-water-slides-publish-check/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
 - Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- `main` advanced again with the Aesop shelf update (`22f0d23`, `4d77468`). Fetched and merged `origin/main` into the publish worktree. Kept the Books, weather, flower, and water slide handoff sections.
+- Reran `tests/park-water-park-browser.cjs` after the Books merge. Desktop and mobile passed all four rides, input checks, Play together, and zero page or console errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-books-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
 - Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
 - Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
@@ -29,6 +33,28 @@
 - Live desktop and mobile Park checks passed. Both screenshots show clean edges. Browser errors were empty. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
 - Saved the live desktop Park screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added a Fresh Drops entry and updated the home card date to Nov 25.
 - Updated `tests/water-park-fresh-drops-browser.cjs` for the new first entry. Local desktop and mobile checks passed. The image loaded, NEW badges appeared, and browser errors were empty.
+- Queue item 20 — Books page: Aesop's Fables cover card + scroll-through shelf (React Bits Carousel pattern, vanilla) + Sally UX review + Currently Reading clipping fix: `FEATURE-BRIEF-books-shelf.md`. You own this item. Work in this worktree on `feature/books-shelf`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+
+## Books shelf — Nov 25, 2026
+
+- Began queue item 20 in the assigned `feature/books-shelf` worktree.
+- Read the brief, `reading.html`, `assets/reading.js`, `assets/shared.js`, `assets/site.css`, and `assets/fit-reading.css`.
+- The shelf already has horizontal overflow and arrow handlers. The handlers hide both arrows when the current book list fits. The shelf has no drag or snap support.
+- The Aesop card must link to `aesop.html`. No Aesop cover file appears in `images/book-covers/` yet.
+- The desktop layout puts `Currently Reading` in an auto-sized second grid column. Its clipping needs a layout fix that accounts for the page width.
+- Activated the Sally UX review skill and loaded its persona and project defaults. The `uv run` resolver could not write to its user cache, so I used the listed TOML defaults directly.
+- Saved Sally's UX review in `sally-books-shelf-review.md`. Her recommendations cover semantic cards, snap points, arrow controls, mouse dragging, readable details, bounded layout, and reduced motion.
+- Applied the review: added a custom Aesop cover, linked its card to `aesop.html`, kept the other cards keyboard operable, and added a scroll-snap shelf with arrows and mouse dragging.
+- Replaced the old Aesop text link with the shelf card. Bounded the desktop side column and made the Currently Reading text wrap. Mobile keeps the card inside the page width.
+- Added `tests/reading-shelf-browser.cjs` for 1280 × 800 and 390 × 844 checks. The browser check passed arrow navigation, actual card dragging, keyboard details, Aesop cover visibility, card bounds, zero horizontal overflow, and zero browser or console errors.
+- Inspected desktop and mobile screenshots. The scrolled screenshots show the full Aesop cover and details. The Currently Reading card stays within the viewport width.
+- Local evidence: `/tmp/ahaan-books-shelf/desktop-shelf.png`, `desktop-aesop-card.png`, `desktop-scrolled.png`, `mobile-shelf.png`, and `mobile-scrolled.png`.
+- `node --check assets/reading.js`, `node --check tests/reading-shelf-browser.cjs`, and `git diff --check` passed.
+- Main moved first with day/night weather controls and Park flower cleanup. I merged `origin/main` and kept both updates.
+- Next: rerun the shelf check after the merge, then publish and add the Fresh Drops entry with a live screenshot.
+
+## Day/night and Park flower updates merged from main — Nov 25, 2026
+
 - Queue item 18 — Day/night more prominent + heavy rain and stormy weather: `FEATURE-BRIEF-day-night-weather.md`. You own this item. Work in this worktree on `feature/day-night-weather`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - First concrete step: read the new brief and Item 13 record, then inspected the active branch and existing Park controls, rain pool, puddles, lighting, and sound toggle.
 - The weather update supports Auto, Sunny, Cloudy, and Light rain. It pools 18 rain streaks and grows six path puddles. Sound defaults off.

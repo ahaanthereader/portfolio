@@ -9,6 +9,8 @@ const BOOKS = [
     blurb: "A girl follows a hurrying rabbit down a hole into a topsy-turvy world of riddles, a grinning cat, and a very grumpy queen. Ahaan's favorite!" },
   { title: "Rapunzel", author: "Paul O. Zelinsky", cover: "images/book-covers/rapunzel.jpg", color: "var(--gold)", stars: 5,
     blurb: "The classic fairy tale of a girl with impossibly long hair, locked away in a tall tower — beautifully retold and painted." },
+  { title: "Aesop's Fables", author: "Aesop · retold by V. S. Vernon Jones", cover: "images/book-covers/aesop.svg", href: "aesop.html", color: "#294f3b", stars: 5,
+    blurb: "Ten classic stories with memorable animals and thoughtful morals. Open the book to read a fable." },
 ];
 
 /* ---- Geography: continent facts ---- */
