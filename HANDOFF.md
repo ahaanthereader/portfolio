@@ -21,7 +21,14 @@
 - `node --check assets/park3d.js`, `node --check tests/zoo-browser.cjs`, and `git diff --check` passed.
 - The zoo browser check passed at 1280×800 and 390×844. All animal clicks showed the expected facts. Vihaan’s prompt greeted as Vihaan. Browser errors were empty.
 - Screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
-- Next: rerun the zoo and Fresh Drops checks after the main merge, then publish and verify live.
+- Merged current `origin/main` at `d3db779` after main moved. The merge kept the zoo feature and newer nav work.
+- Main Pages push runs `45770497141`, `45770813781`, and `45771202614` failed. Upload completed, but GitHub could not find the Pages artifact.
+- A later main push created run `45773268692`. The run succeeded and included the zoo feature.
+- The live zoo browser check passed at 1280×800 and 390×844. It covered four animal clicks, four touch taps, both prompts, and Play together. Browser errors were empty.
+- Live screenshots: `/tmp/ahaan-zoo-interact-live/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-live/mobile-{tiger,elephant,kangaroo,monkey}.png`.
+- Added the live tiger screenshot to Fresh Drops. Added a Nov 26 card with “You asked for this!” and updated the zoo menu NEW date to Nov 26.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new top card, screenshot, and Zoo NEW badge. The local Fresh Drops check passed on desktop and mobile with zero browser errors.
+- Next: publish the Fresh Drops update, wait for Pages, then verify the live card and screenshot on desktop and mobile.
 
 ## Nav fix — Nov 25, 2026
 
