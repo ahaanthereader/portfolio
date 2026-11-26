@@ -13,7 +13,18 @@
 - `node --check` passed for `assets/park3d.js` and `tests/park-water-park-browser.cjs`. `git diff --check` passed.
 - Final local browser check passed at 1280 × 800 and 390 × 844. It covered all four rides, both input modes, exits, Play together, and zero console or page errors.
 - Screenshot evidence: `/tmp/ahaan-water-slides-final-local/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
-- Next: commit the fix, sync with the latest main, publish, verify live interactions, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Committed feature changes as `0f7267e` (`Fix water park ride interactions`).
+- Fetched the latest main after it advanced by two commits. Merged `origin/main` into this branch and resolved the `HANDOFF.md` conflict with both queue items preserved.
+- Next: rerun the browser check on the synced branch, publish, verify live interactions, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
+- Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
+- Inspected both browser screenshots. The Park view has clean left and right edges. Evidence: `/tmp/ahaan-flowers-remove/desktop.png` and `mobile.png`.
+- `node --check tests/flowers-remove-browser.cjs` and `git diff --check` passed. The only remaining `.hero-botany` text is this handoff note and the browser assertion.
+- Feature commit `2f93b23` (`Remove flowers from Park view`) was pushed to `main` after the browser checks passed. Pages run `45753688735` succeeded.
+- Live desktop and mobile Park checks passed. Both screenshots show clean edges. Browser errors were empty. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
+- Saved the live desktop Park screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added a Fresh Drops entry and updated the home card date to Nov 25.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new first entry. Local desktop and mobile checks passed. The image loaded, NEW badges appeared, and browser errors were empty.
 
 ## Park day/night and weather — Nov 24, 2026
 
