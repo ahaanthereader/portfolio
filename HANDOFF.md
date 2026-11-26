@@ -28,7 +28,11 @@
 - Reran `tests/park-water-park-browser.cjs` after the navigation merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
 - Synced screenshot evidence: `/tmp/ahaan-water-slides-nav-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
 - `main` advanced with the weather Fresh Drops release (`f53ae40`). Merged the Handoff update. The merge changed no application or test code; the last synced browser pass remains valid.
-- Next: publish the tested code, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
+- Push after the weather release merge was rejected because main advanced. Fetched main before syncing again.
+- `main` advanced with the zoo interaction change (`211aa39`, `d86bcb8`). Merged `origin/main`; Git merged the shared `park3d.js` changes without conflict.
+- Reran `tests/park-water-park-browser.cjs` after the zoo merge. Desktop and mobile passed all four rides, prompt click/tap, `E` exits, Play together, and zero browser errors.
+- Synced screenshot evidence: `/tmp/ahaan-water-slides-zoo-sync/desktop-water-slide.png`, `desktop-wave-pool.png`, `desktop-lazy-river-water-park.png`, `desktop-dump-tower.png`, and matching mobile images.
+- Next: publish this tested commit, verify the live rides, then add the live screenshot and Fresh Drops card with a seven-day NEW tag.
 - Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 - Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
 - Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
