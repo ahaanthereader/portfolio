@@ -13,7 +13,12 @@
 - Main moved first with Park flowers and Fresh Drops updates (`2f93b23`, `ce17574`). Merged `origin/main` and kept both updates.
 - After the merge, the weather browser check passed on desktop and mobile. The merged Fresh Drops check also passed on desktop and mobile, with images loaded, NEW badges, and zero browser errors.
 - Feature commit: `23b9b8c` (`Add prominent day and storm weather controls`). Merge commit: `a00ac1d`.
-- Next: publish these commits, live-verify the Park on desktop and mobile, then add the live screenshot and Fresh Drops entry.
+- Published the feature and handoff through commit `801a13c` on `main`. Push run `45760843886` and clean run `45767182415` failed because Pages could not find the uploaded artifact. A later main push run `45765250051` succeeded and included the feature.
+- Live desktop and mobile weather checks passed on the published site. The prominent controls, Heavy rain, Stormy, heavy-rain puddle growth, darkened storm view, lightning, sound-off default, and zero browser errors passed.
+- Saved the live Stormy screenshot at `public/fresh-drops/2026-11-26-day-night-heavy-rain-storm.png`. Added the Nov 26 Fresh Drops entry with “You asked for this!”, updated the home card date and Park rides NEW date, and updated its browser check.
+- The Fresh Drops check passed locally on desktop and mobile. The image loaded at full width, NEW labels appeared, and browser errors were empty.
+- Main then advanced with commits `2c05d28`, `4d77468`, and `22f0d23`. Sync these commits before the Fresh Drops publish.
+- Next: merge latest main, rerun the Fresh Drops check, publish the entry, and live-verify the Fresh Drops page.
 
 ## Park floral decoration cleanup — Nov 25, 2026
 
