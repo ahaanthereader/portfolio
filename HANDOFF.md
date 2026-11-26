@@ -10,7 +10,16 @@
 - Inspected desktop and mobile screenshots in `/tmp/ahaan-day-night-weather`. The screenshots show the prominent controls, heavier rain, storm rain, and storm darkening.
 - `node --check assets/park3d.js`, `node --check tests/park-day-night-weather-browser.cjs`, and `git diff --check` passed.
 - Existing `tests/two-player-browser.cjs` passed on desktop and mobile. Both riders stayed in frame, bridge height matched at 8.00094 m, and browser errors were empty. Evidence: `/tmp/ahaan-two-player`.
-- Next: run relevant existing Park checks, commit the feature, sync and publish per the driver workflow, then live-verify and add the Fresh Drops entry with its screenshot.
+- Next: publish the feature, live-verify, and add the Fresh Drops entry with its screenshot.
+
+## Park floral decoration cleanup — Nov 25, 2026
+
+- Removed both flower elements and their rules from `index.html` and `assets/site.css`.
+- Desktop and mobile checks passed. The Park view has clean left and right edges. Browser errors were empty.
+- Feature commit `2f93b23` (`Remove flowers from Park view`) was pushed to `main`. Pages run `45753688735` succeeded.
+- Live desktop and mobile checks passed. Evidence: `/tmp/ahaan-flowers-remove-live/desktop.png` and `mobile.png`.
+- Saved the live desktop screenshot as `public/fresh-drops/2026-11-25-flowers-remove.png`. Added the Fresh Drops entry and updated the home card date.
+- Updated `tests/water-park-fresh-drops-browser.cjs`. Local desktop and mobile checks passed.
 
 ## Park day/night and weather — Nov 24, 2026
 
