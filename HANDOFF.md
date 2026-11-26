@@ -51,6 +51,17 @@
 - Each worker works in its own worktree (or the main checkout for 0004) and merges to main only after its browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
 
 
+## Zoo animal interaction — Nov 25–26, 2026
+
+- Read queue item 17 and `FEATURE-BRIEF-zoo-interact.md`.
+- Confirmed that the existing proximity prompts already call `greet()` for Ahaan and Vihaan. Animal models had no mouse or touch interaction registration.
+- Registered each animal model with the park raycast system. A click or tap calls the existing greeting, joy motion, and fact bubble. The two prompts still activate each player separately.
+- Updated `tests/zoo-browser.cjs` to test mouse clicks on desktop and touch taps on mobile. The check covers all four prompts, Enter, Vihaan’s separate kangaroo prompt in Play together, and page errors.
+- `node --check assets/park3d.js`, `node --check tests/zoo-browser.cjs`, and `git diff --check` passed.
+- The zoo browser check passed at 1280×800 and 390×844. All animal clicks showed the expected facts. Vihaan’s prompt greeted as Vihaan. Browser errors were empty.
+- Screenshots: `/tmp/ahaan-zoo-interact-final/desktop-{tiger,elephant,kangaroo,monkey}.png` and `/tmp/ahaan-zoo-interact-final/mobile-{tiger,elephant,kangaroo,monkey}.png`.
+- Next: rerun the zoo and Fresh Drops checks after the main merge, then publish and verify live.
+
 ## Nav fix — Nov 25, 2026
 
 - Started queue item 14 in the main checkout, as assigned.
