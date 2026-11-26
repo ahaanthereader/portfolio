@@ -1,3 +1,11 @@
+## Brief queue — Nov 25, 2026
+
+- Queue item 15 — Remove the floral side decorations from the park view: `FEATURE-BRIEF-flowers-remove.md`. You own this item. Work in this worktree on `feature/flowers-remove`. Merge to main only after your browser checks pass. If main moves first, sync before merging; resolve conflicts keeping both features.
+- Queue item 15 progress: confirmed `index.html` is the only page with `.hero-botany` markup. Removed both flower elements and all related rules from `assets/site.css`.
+- Added `tests/flowers-remove-browser.cjs`. Desktop 1280 × 800 and mobile 390 × 844 passed. The Park canvas appeared, flower markup was absent, and browser errors were empty.
+- Inspected both browser screenshots. The Park view has clean left and right edges. Evidence: `/tmp/ahaan-flowers-remove/desktop.png` and `mobile.png`.
+- `node --check tests/flowers-remove-browser.cjs` and `git diff --check` passed. The only remaining `.hero-botany` text is this handoff note and the browser assertion.
+
 ## Park day/night and weather — Nov 24, 2026
 
 - Feature implementation commit: `94c09fdf22cefe4f0a336fa817f35c6c41881d41` (`Add park day night and weather controls`).
