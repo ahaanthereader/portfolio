@@ -77,6 +77,13 @@ const baseUrl = process.env.BASE_URL;
         assert.equal(await page.locator('#ng-mine [data-fresh-new]').isVisible(), true, 'mobile: Fresh Drops shows its NEW badge');
       }
       await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}.png`) });
+      await page.goto(new URL('fresh-drops.html', pageUrl).href, { waitUntil: 'domcontentloaded' });
+      const newestDrop = page.locator('.fresh-drop').first();
+      assert.equal(await newestDrop.locator('time').getAttribute('datetime'), '2026-11-26', `${viewport.name}: nav Fresh Drops card is newest`);
+      assert.equal(await newestDrop.locator('h2').innerText(), 'A clearer home navigation', `${viewport.name}: nav Fresh Drops card is present`);
+      assert.equal(await newestDrop.locator('[data-fresh-new]').isVisible(), true, `${viewport.name}: newest card shows NEW`);
+      await page.waitForFunction(() => { const image = document.querySelector('.fresh-drop img'); return image?.complete && image.naturalWidth > 0; });
+      await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}-fresh-drops.png`) });
       await page.close();
     }
     assert.deepEqual(errors, [], 'browser reports no page or console errors');
