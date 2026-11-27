@@ -119,6 +119,9 @@
 - Added the live desktop screenshot and Fresh Drops card dated Nov 26. The nav menu entry and home card use the seven-day NEW date.
 - Local desktop and mobile checks passed after the Fresh Drops update. The card showed NEW, its screenshot loaded, and errors were empty.
 - Inspected `/tmp/ahaan-nav-consolidate/desktop-fresh-drops.png`. The nav consolidation card appears first with its screenshot and NEW badge.
+- Fresh Drops commit `a951ce2` reached main. Pages run `45927278982` succeeded.
+- Final live checks passed at 1280×800 and 390×844. All 21 destinations returned HTTP 200; the nav screenshot loaded; NEW appeared; and browser errors were empty.
+- Final live evidence: `/tmp/ahaan-nav-consolidate-final-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
 
 ## Books shelf — Nov 25, 2026
 
