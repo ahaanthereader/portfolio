@@ -140,7 +140,7 @@
     const renderer = new T.WebGLRenderer({ canvas, antialias: true, powerPreference: "low-power" });
     renderer.outputEncoding = T.sRGBEncoding;
     renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.0;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = T.PCFSoftShadowMap;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
@@ -169,12 +169,13 @@
     scene.add(sunOrb, moonOrb);
 
     // ---- Lighting: Warm Golden Watercolor Sun & Ambient Meadow Bounce ----
-    const hemi = new T.HemisphereLight(0xfcf8ee, 0x8a997d, 1.15);
+    const hemi = new T.HemisphereLight(0xfcf8ee, 0x8a997d, 0.95);
     scene.add(hemi);
     const sun = new T.DirectionalLight(0xfff5e2, 1.35);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -68, right: 68, top: 68, bottom: -68, near: 1, far: 150 });
+    Object.assign(sun.shadow.camera, { left: -58, right: 58, top: 58, bottom: -58, near: 1, far: 150 });
+    sun.shadow.camera.updateProjectionMatrix();
     sun.shadow.bias = -0.0003;
     sun.position.set(-25, 48, 28);
     scene.add(sun);
@@ -485,6 +486,35 @@
     mapGroup.scale.set(PARK_EXPANSION, 1, PARK_EXPANSION);
     scene.add(mapGroup);
 
+    function createPathTexture(T) {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 128;
+      const g = canvas.getContext("2d");
+      g.fillStyle = "#dcd0b6";
+      g.fillRect(0, 0, 128, 128);
+      for (let i = 0; i < 180; i++) {
+        const x = Math.random() * 128, y = Math.random() * 128;
+        g.fillStyle = i % 3 === 0 ? "rgba(255, 250, 238, 0.28)" : "rgba(130, 107, 78, 0.10)";
+        g.beginPath();
+        g.ellipse(x, y, 1 + Math.random() * 2.4, 0.7 + Math.random() * 1.5, Math.random() * Math.PI, 0, Math.PI * 2);
+        g.fill();
+      }
+      g.strokeStyle = "rgba(255, 249, 232, 0.20)";
+      g.lineWidth = 1;
+      for (let i = 0; i < 18; i++) {
+        const x = Math.random() * 128, y = Math.random() * 128;
+        g.beginPath();
+        g.moveTo(x, y);
+        g.lineTo(x + 3 + Math.random() * 8, y + (Math.random() - 0.5) * 3);
+        g.stroke();
+      }
+      const texture = new T.CanvasTexture(canvas);
+      texture.encoding = T.sRGBEncoding;
+      texture.wrapS = texture.wrapT = T.RepeatWrapping;
+      texture.repeat.set(4, 12);
+      return texture;
+    }
+
     // Procedural watercolor meadow wash texture (Singapore Sketchbook aesthetic)
     function createMeadowTexture(T) {
       const c = document.createElement("canvas");
@@ -717,7 +747,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
     sunbeamMaterial = buildSunbeams(scene, T);
 
     function buildPaths(parent, states, T, walkables) {
-      const pathMat = new T.MeshStandardMaterial({ color: 0xdcd0b6, roughness: 0.94, flatShading: true });
+      const pathMat = new T.MeshStandardMaterial({ color: 0xffffff, map: createPathTexture(T), roughness: 0.94 });
       const curbMat = new T.MeshStandardMaterial({ color: 0xbfae8e, roughness: 0.90 });
       const stoneMat = new T.MeshStandardMaterial({ color: 0xf4ece0, roughness: 0.88 });
 
@@ -2066,8 +2096,10 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
         crown.add(mainSph);
         const c1 = new T.Mesh(new T.SphereGeometry(0.9 * scale, 8, 7), fMat);
         c1.position.set(0.6 * scale, 0.4 * scale, 0.3 * scale);
+        c1.castShadow = true;
         const c2 = new T.Mesh(new T.SphereGeometry(0.85 * scale, 8, 7), fMat);
         c2.position.set(-0.5 * scale, 0.3 * scale, -0.4 * scale);
+        c2.castShadow = true;
         crown.add(c1, c2);
         tree.add(crown);
         parent.add(tree);

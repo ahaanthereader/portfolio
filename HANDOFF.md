@@ -1723,3 +1723,26 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Final live Story Studio checks passed at 1280 × 800 and 390 × 844. Keep it, Escape, Delete, Undo, five-second expiry, and new-book cleanup passed. No page or console errors appeared.
 - Final live Fresh Drops check showed 15 entries. The new image loaded at 1280 pixels wide. Desktop and mobile had no horizontal overflow. The home card date was `2026-11-21`. Page errors, console errors, and failed requests were empty.
 - Final live screenshots: `/tmp/ahaan-story-studio-delete-live/desktop-undo.png`, `mobile-confirm.png`, and `mobile-undo.png`; `/tmp/story-studio-fresh-drops-live-44991263301/fresh-drops-desktop.png` and `fresh-drops-mobile.png`.
+
+## Park realism pass — Nov 27, 2026
+
+- Read queue item 22 and `FEATURE-BRIEF-park-realism-pass.md` in the main checkout.
+- The scene already has ACES tone mapping, sRGB output, fog, a gradient sky, day/night lighting, soft shadows, and a procedural meadow texture.
+- The connecting paths still use a flat material. Some scene objects lack shadow casting.
+- Added `tests/park-realism-browser.cjs` for desktop and mobile captures, day/night/weather controls, frame sampling, and browser errors.
+- Baseline passed at 1280 × 800 and 390 × 844. Headless samples were 6 FPS desktop and 8 FPS mobile. These samples are comparison data, not real-device performance.
+- Baseline screenshots: `/tmp/ahaan-park-realism/before/day-1280.png` and `day-390.png`.
+- Added a self-contained canvas texture to the connecting paths. Added shadow casting to the two oak crown meshes that lacked it.
+- Tightened the directional shadow camera to the park bounds and reduced hemisphere fill from 1.15 to 0.95. Lowered exposure from 1.05 to 1.0 to preserve color detail.
+- The first broad shadow pass measured 5 FPS desktop and 8 FPS mobile. Narrowed the pass to missing oak crown meshes; final samples returned to 6 FPS desktop and 8 FPS mobile.
+- The final Park check passed at 1280 × 800 and 390 × 844. Day, night, and rain controls passed. Console and page errors were empty.
+- Updated the performance sample to run during day mode. That run measured 5 FPS desktop and 7 FPS mobile; the earlier 6/8 sample ran after night and rain changes, so the samples do not match.
+- `node --check assets/park3d.js`, `node --check tests/park-realism-browser.cjs`, and `git diff --check` passed.
+- Inspected final desktop and mobile screenshots. Evidence: `/tmp/ahaan-park-realism/final/day-1280.png` and `day-390.png`.
+- Optional bloom was skipped. The headless baseline measured 6 FPS desktop and 8 FPS mobile, so an extra full-screen pass has no performance headroom here.
+- Headless frame samples are comparison data. They do not confirm real-device frame rate.
+- Added the Nov 27 Fresh Drops card and Park rides NEW dates. Added a local screenshot preview at `public/fresh-drops/2026-11-27-park-realism.png`.
+- The Park realism and Fresh Drops browser check passed at desktop and mobile sizes. The card date and NEW badge passed. The image loaded, and horizontal overflow and browser errors were empty.
+- Updated `tests/water-park-fresh-drops-browser.cjs` for the new first card and home date. Its desktop and mobile regression check passed.
+- Local Fresh Drops screenshots: `/tmp/ahaan-park-realism/final-check/fresh-drops-1280.png` and `fresh-drops-390.png`.
+- Next: publish the verified change, replace the local screenshot preview with the live screenshot, and run the live checks.
