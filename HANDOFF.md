@@ -1741,8 +1741,12 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Inspected final desktop and mobile screenshots. Evidence: `/tmp/ahaan-park-realism/final/day-1280.png` and `day-390.png`.
 - Optional bloom was skipped. The headless baseline measured 6 FPS desktop and 8 FPS mobile, so an extra full-screen pass has no performance headroom here.
 - Headless frame samples are comparison data. They do not confirm real-device frame rate.
-- Added the Nov 27 Fresh Drops card and Park rides NEW dates. Added a local screenshot preview at `public/fresh-drops/2026-11-27-park-realism.png`.
+- Added the Nov 27 Fresh Drops card and Park rides NEW dates. Replaced the local screenshot with the live desktop screenshot at `public/fresh-drops/2026-11-27-park-realism.png`.
 - The Park realism and Fresh Drops browser check passed at desktop and mobile sizes. The card date and NEW badge passed. The image loaded, and horizontal overflow and browser errors were empty.
 - Updated `tests/water-park-fresh-drops-browser.cjs` for the new first card and home date. Its desktop and mobile regression check passed.
 - Local Fresh Drops screenshots: `/tmp/ahaan-park-realism/final-check/fresh-drops-1280.png` and `fresh-drops-390.png`.
-- Next: publish the verified change, replace the local screenshot preview with the live screenshot, and run the live checks.
+- Commit `ccd9d92` (`Improve Park realism and Fresh Drops`) was pushed to main. Pages run `46052679329` succeeded.
+- Live desktop and mobile checks passed. Park day/night/rain states passed, the Fresh Drops card and screenshot loaded, NEW appeared, and browser errors were empty.
+- Live screenshots: `/tmp/ahaan-park-realism/live/day-1280.png`, `day-390.png`, `fresh-drops-1280.png`, and `fresh-drops-390.png`.
+- `tests/park-realism-browser.cjs` now accepts `BASE_URL` for local and live checks.
+- Next: publish the live screenshot replacement and run the final live Fresh Drops check.

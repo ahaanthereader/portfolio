@@ -11,17 +11,22 @@ let server;
 
 (async () => {
   fs.mkdirSync(evidenceDir, { recursive: true });
-  server = http.createServer((request, response) => {
-    const requestedPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const filePath = path.resolve(siteRoot, `.${requestedPath}`);
-    if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
-    fs.readFile(filePath, (error, data) => {
-      if (error) { response.writeHead(404).end(); return; }
-      const type = filePath.endsWith('.html') ? 'text/html' : filePath.endsWith('.css') ? 'text/css' : filePath.endsWith('.js') ? 'text/javascript' : 'application/octet-stream';
-      response.writeHead(200, { 'content-type': type }).end(data);
+  let baseUrl = process.env.BASE_URL;
+  if (!baseUrl) {
+    server = http.createServer((request, response) => {
+      const requestedPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+      const filePath = path.resolve(siteRoot, `.${requestedPath}`);
+      if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
+      fs.readFile(filePath, (error, data) => {
+        if (error) { response.writeHead(404).end(); return; }
+        const type = filePath.endsWith('.html') ? 'text/html' : filePath.endsWith('.css') ? 'text/css' : filePath.endsWith('.js') ? 'text/javascript' : 'application/octet-stream';
+        response.writeHead(200, { 'content-type': type }).end(data);
+      });
     });
-  });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    baseUrl = `http://127.0.0.1:${server.address().port}`;
+  }
+  const pageUrl = file => `${baseUrl.replace(/\/$/, '')}/${file}`;
   const browser = await chromium.launch({ headless: true });
   const results = [];
   try {
@@ -30,7 +35,7 @@ let server;
       page.on('pageerror', error => errors.push(error.message));
       page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
       await page.addInitScript(() => localStorage.removeItem('ahaanDoorsSound'));
-      await page.goto(`http://127.0.0.1:${server.address().port}/index.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(pageUrl('index.html'), { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.Park3D?.getDayWeatherState);
       await page.evaluate(() => {
         for (const [id, value] of [['parkDayMode', 'day'], ['parkWeatherMode', 'sunny']]) {
@@ -84,7 +89,7 @@ let server;
       const page = await browser.newPage({ viewport, isMobile: viewport.width === 390, hasTouch: viewport.width === 390 });
       page.on('pageerror', error => errors.push(error.message));
       page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-      await page.goto(`http://127.0.0.1:${server.address().port}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(pageUrl('fresh-drops.html'), { waitUntil: 'domcontentloaded' });
       const firstCard = page.locator('.fresh-drop').first();
       assert.equal(await firstCard.locator('time').getAttribute('datetime'), '2026-11-27');
       assert.equal(await firstCard.locator('h2').textContent(), 'A brighter Park with more depth');
@@ -101,7 +106,7 @@ let server;
     process.stdout.write(JSON.stringify({ results, freshDrops: 'pass', errors, screenshots: evidenceDir }));
   } finally {
     await browser.close();
-    server.close();
+    if (server) server.close();
   }
 })().catch(error => {
   console.error(error);
