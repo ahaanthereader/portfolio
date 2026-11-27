@@ -1770,31 +1770,37 @@
     gap: 8px;
   }
   @media (min-width: 1000px) {
-    .page-home .nav-inner { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; row-gap: 8px; }
-    .page-home .nav-links { grid-column: 2; justify-self: end; }
-    .page-home .nav-controls { grid-column: 1 / -1; justify-self: center; flex-wrap: nowrap; }
-    .page-home .nav-pop { top: calc(100% + 82px); }
+    .page-home .nav-inner { display: flex; column-gap: 18px; row-gap: 0; flex-wrap: nowrap; }
+    .page-home .nav-links { margin-left: auto; }
+    .page-home .nav-controls { width: auto; flex: 0 0 auto; }
+    .page-home .nav-pop { top: calc(100% + 8px); }
   }
   @media (max-width: 680px) {
-    .page-home .nav-inner { flex-wrap: wrap; row-gap: 8px; }
-    .page-home .nav-controls { width: 100%; justify-content: center; flex-wrap: wrap; }
+    .page-home .nav-inner { flex-wrap: nowrap; row-gap: 0; gap: 8px; }
+    .page-home .nav-controls { width: auto; justify-content: flex-end; flex: 0 0 auto; }
   }
+  .park-controls { position: relative; }
+  .park-controls > summary { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 7px 12px; border: 1px solid #bfae8e; border-radius: 999px; background: #fffaf0; color: #263b4d; font: 700 .9rem/1 system-ui, sans-serif; cursor: pointer; list-style: none; white-space: nowrap; }
+  .park-controls > summary::-webkit-details-marker { display: none; }
+  .park-controls > summary:focus-visible, .park-controls-ok:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .park-controls[open] > summary { background: #f0dfb6; }
+  .park-controls-panel { position: absolute; z-index: 140; top: calc(100% + 8px); right: 0; display: grid; gap: 12px; width: min(340px, calc(100vw - 24px)); max-height: calc(100vh - 84px); overflow-y: auto; padding: 14px; border: 1px solid #d4c7ae; border-radius: 16px; background: #fffaf0; box-shadow: 0 8px 24px #263b4d2b; }
+  .park-control-selects { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .park-control-selects label { display: grid; gap: 4px; min-width: 0; color: #263b4d; font-size: .8rem; font-weight: 700; }
+  .park-control-selects select { width: 100%; min-width: 0; min-height: 40px; padding: 4px 8px; border: 1px solid #bfae8e; border-radius: 8px; background: white; color: #263b4d; font: inherit; }
+  .park-control-selects select:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .park-control-toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .park-control-toggles .breeze-pill { width: 100%; min-height: 42px; height: auto; padding: 7px 8px; justify-content: center; font-size: .84rem; white-space: normal; }
+  .park-control-toggles .together-btn { grid-column: 1 / -1; }
+  .park-controls-ok { width: 100%; min-height: 46px; border: 0; border-radius: 12px; background: #2f7a5b; color: #fff; font: 700 1rem system-ui, sans-serif; cursor: pointer; }
+  .park-controls-ok:hover { background: #245f47; }
   .park-day-quick { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid #bfae8e; border-radius: 999px; background: #fffaf0; }
   .park-day-quick button { min-height: 38px; padding: 5px 11px; border: 0; border-radius: 999px; background: transparent; color: #263b4d; font: 700 .9rem/1 system-ui, sans-serif; cursor: pointer; touch-action: manipulation; }
   .park-day-quick button[aria-pressed="true"] { background: #f0dfb6; box-shadow: inset 0 0 0 1px #bfae8e; }
   .park-day-quick button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-  .park-weather-controls { position: relative; }
-  .park-weather-controls summary { cursor: pointer; list-style: none; border: 1px solid #d4c7ae; border-radius: 999px; padding: 7px 11px; background: #fffaf0; color: #263b4d; font-size: .88rem; }
-  .park-weather-controls summary::-webkit-details-marker { display: none; }
-  .park-weather-controls summary:focus-visible, .park-weather-controls select:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-  .park-weather-panel { position: absolute; z-index: 140; top: calc(100% + 8px); right: 0; display: grid; gap: 10px; min-width: 190px; padding: 12px; border: 1px solid #d4c7ae; border-radius: 14px; background: #fffaf0; box-shadow: 0 8px 24px #263b4d2b; }
-  .park-weather-panel label { display: grid; gap: 4px; color: #263b4d; font-size: .8rem; }
-  .park-weather-panel select { width: 100%; min-height: 36px; border: 1px solid #bfae8e; border-radius: 8px; background: white; color: #263b4d; padding: 4px 8px; }
   @media (max-width: 620px) {
-    .nav-controls { gap: 5px; flex-wrap: wrap; justify-content: center; }
+    .nav-controls { gap: 5px; flex-wrap: nowrap; justify-content: flex-end; }
     .park-day-quick button { min-height: 42px; padding: 5px 8px; font-size: .82rem; }
-    .page-home .nav-controls .breeze-pill { padding: 0 6px; gap: 4px; font-size: .8rem; }
-    .together-btn { padding: 0 6px; font-size: .8rem; }
   }
 
   /* ============ Discovery Card Modal ============ */

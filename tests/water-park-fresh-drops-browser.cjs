@@ -39,7 +39,16 @@ const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-water-park-fresh-dro
       page.on('pageerror', error => errors.push(`${viewport.name}: ${error.message}`));
       page.on('console', message => { if (message.type() === 'error') errors.push(`${viewport.name} console: ${message.text()}`); });
       await page.goto(`${baseUrl}/fresh-drops.html`, { waitUntil: 'domcontentloaded' });
-      const realismCard = page.locator('.fresh-drop').first();
+      const navLeanCard = page.locator('.fresh-drop').filter({ hasText: 'One tidy row for Park controls' }).first();
+      assert.equal(await navLeanCard.locator('time').getAttribute('datetime'), '2026-11-27');
+      assert.equal(await navLeanCard.locator('[data-fresh-new]').getAttribute('hidden'), null, `${viewport.name}: nav lean card NEW badge is visible`);
+      const navLeanScreenshot = navLeanCard.locator('img');
+      assert.match(await navLeanScreenshot.getAttribute('src'), /2026-11-27-nav-lean\.png$/);
+      await navLeanScreenshot.scrollIntoViewIfNeeded();
+      await navLeanScreenshot.evaluate(image => image.decode());
+      assert.ok(await navLeanScreenshot.evaluate(image => image.complete && image.naturalWidth >= 1200), `${viewport.name}: nav lean screenshot loads at full width`);
+
+      const realismCard = page.locator('.fresh-drop').filter({ hasText: 'A brighter Park with more depth' }).first();
       assert.equal(await realismCard.locator('time').getAttribute('datetime'), '2026-11-27');
       assert.equal(await realismCard.locator('h2').textContent(), 'A brighter Park with more depth');
       const realismScreenshot = realismCard.locator('img');

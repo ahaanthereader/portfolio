@@ -187,6 +187,13 @@ renderBadges();
     btn.addEventListener("click", () => { btn.classList.toggle("open"); links.classList.toggle("open"); });
     $$("#navLinks a").forEach(a => a.addEventListener("click", () => { btn.classList.remove("open"); links.classList.remove("open"); }));
   }
+  const parkControls = $("#parkControls"), parkControlsOk = $("#parkControlsOk");
+  if (parkControls && parkControlsOk) {
+    parkControlsOk.addEventListener("click", () => {
+      parkControls.open = false;
+      parkControls.querySelector("summary")?.focus({ preventScroll: true });
+    });
+  }
   // Grouped menus (Read / Explore / Play / My stuff): open on click, one at a time; Esc or a click outside closes.
   const groups = $$(".nav-group");
   const nav = $("#navLinks"), highlight = nav && nav.querySelector(".nav-highlight");
