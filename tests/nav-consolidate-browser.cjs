@@ -7,6 +7,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
 const siteRoot = path.resolve(__dirname, '..');
 const evidenceDir = process.env.EVIDENCE_DIR || '/tmp/ahaan-nav-consolidate';
+const liveBaseUrl = process.env.BASE_URL;
 const groups = {
   Read: ['reading.html', 'kindle.html', 'library.html', 'story.html', 'sketchbook.html'],
   Explore: ['geography.html', 'quiz.html', 'doors.html', 'bells.html'],
@@ -16,7 +17,7 @@ const groups = {
 
 (async () => {
   fs.mkdirSync(evidenceDir, { recursive: true });
-  const server = http.createServer((request, response) => {
+  const server = liveBaseUrl ? null : http.createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const filePath = path.resolve(siteRoot, `.${pathname}`);
     if (!filePath.startsWith(`${siteRoot}${path.sep}`)) { response.writeHead(403).end(); return; }
@@ -27,8 +28,8 @@ const groups = {
       response.writeHead(200, { 'content-type': type }).end(data);
     });
   });
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const baseUrl = `http://127.0.0.1:${server.address().port}/`;
+  if (server) await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const baseUrl = liveBaseUrl ? `${liveBaseUrl.replace(/\/$/, '')}/` : `http://127.0.0.1:${server.address().port}/`;
   const browser = await chromium.launch({ headless: true });
   const errors = [];
   try {
@@ -82,12 +83,20 @@ const groups = {
         await page.screenshot({ path: path.join(evidenceDir, 'mobile-menu.png'), fullPage: true });
       }
 
+      await page.goto(`${baseUrl}fresh-drops.html`, { waitUntil: 'domcontentloaded' });
+      const navDrop = page.locator('.fresh-drop').filter({ hasText: 'One neat place to find things' }).first();
+      assert.equal(await navDrop.locator('time').getAttribute('datetime'), '2026-11-26', `${viewport.name}: nav Fresh Drops card has current date`);
+      assert.equal(await navDrop.locator('[data-fresh-new]').isVisible(), true, `${viewport.name}: nav card shows NEW`);
+      await navDrop.locator('img').evaluate(image => image.decode());
+      assert.ok(await navDrop.locator('img').evaluate(image => image.naturalWidth > 0), `${viewport.name}: nav screenshot loads`);
+      await page.screenshot({ path: path.join(evidenceDir, `${viewport.name}-fresh-drops.png`) });
+
       await page.close();
     }
     assert.deepEqual(errors, [], 'browser reports no page or console errors');
     console.log(JSON.stringify({ viewports: ['desktop 1280x800', 'mobile 390x844'], destinations: Object.values(groups).flat().length, errors, evidenceDir }, null, 2));
   } finally {
     await browser.close();
-    await new Promise(resolve => server.close(resolve));
+    if (server) await new Promise(resolve => server.close(resolve));
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

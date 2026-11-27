@@ -113,6 +113,12 @@
 - Added `tests/nav-consolidate-browser.cjs`. Desktop and mobile passed. All 21 menu destinations returned HTTP 200, only one set of four groups remained, and the Fresh Drops card cleared the nav and viewport edges.
 - Inspected `/tmp/ahaan-nav-consolidate/desktop.png` and `mobile.png`. The grouped menu opens below the header. The mobile menu uses one button, and the Fresh Drops card is fully visible.
 - `node --check assets/park3d.js`, `node --check tests/nav-consolidate-browser.cjs`, and `git diff --check` passed.
+- Commit `8c117c0` was published. Pages run `45926445670` succeeded.
+- Live desktop and mobile checks passed all 21 destinations, the single grouped nav, the compact mobile menu, and the unobstructed Fresh Drops card. Browser errors were empty.
+- Live screenshots: `/tmp/ahaan-nav-consolidate-live/desktop.png` and `mobile.png`.
+- Added the live desktop screenshot and Fresh Drops card dated Nov 26. The nav menu entry and home card use the seven-day NEW date.
+- Local desktop and mobile checks passed after the Fresh Drops update. The card showed NEW, its screenshot loaded, and errors were empty.
+- Inspected `/tmp/ahaan-nav-consolidate/desktop-fresh-drops.png`. The nav consolidation card appears first with its screenshot and NEW badge.
 
 ## Books shelf — Nov 25, 2026
 
