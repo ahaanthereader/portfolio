@@ -101,6 +101,8 @@
 - The live check opened Play and My stuff, confirmed the Fresh Drops NEW badge, and loaded the nav card screenshot. Evidence: `/tmp/ahaan-nav-fix-final-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
 - `origin/main` advanced again with the water slide and zoo Fresh Drops updates. Merged `4aeef00` as `63cf912`, then deployed the combined main tip in Pages run `45777320978`.
 - Final live desktop and mobile checks passed after that merge. The nav card screenshot loaded, the Fresh Drops badge appeared, and browser errors were empty. Evidence: `/tmp/ahaan-nav-fix-post-merge-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
+- Merged the Books shelf release into main as `cc4bfd7`. Pages run `45915120325` succeeded.
+- Rechecked the live nav and Fresh Drops card after the merge. Desktop and mobile passed with zero browser errors. Evidence: `/tmp/ahaan-nav-fix-release-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
 
 ## Books shelf — Nov 25, 2026
 
