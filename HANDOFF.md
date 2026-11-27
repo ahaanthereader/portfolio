@@ -1769,4 +1769,6 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Commit `2bb9bcd` (`Slim Park navigation and add controls`) was pushed to main. Pages run `46058446896` succeeded.
 - Live desktop and mobile browser checks passed. All nav destinations returned HTTP 200. All controls worked, the Fresh Drops NEW label showed, and browser errors were empty.
 - Live evidence: `/tmp/ahaan-nav-lean/live/desktop.png`, `desktop-controls.png`, `mobile.png`, `mobile-menu.png`, `mobile-controls.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
-- Replaced the Fresh Drops image with the live desktop screenshot. Next: publish the screenshot replacement and run the final live check.
+- Replaced the Fresh Drops image with the live desktop screenshot. Commit `090d75b` (`Save live lean nav screenshot`) was pushed to main. Pages run `46059473927` succeeded.
+- After the screenshot deploy, the live Fresh Drops browser check passed on desktop and mobile. Screenshots loaded, NEW labels showed, and browser errors were empty.
+- Final live nav checks passed after the screenshot deploy. Desktop and mobile checks passed all four groups, all destinations, every control, and Fresh Drops. Browser errors were empty. Evidence: `/tmp/ahaan-nav-lean/live-final`.
