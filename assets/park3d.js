@@ -6481,7 +6481,7 @@ const waterParkInteractables = buildWaterPark(mapGroup, T);
 
     hero.addEventListener("pointerdown", e => {
       if (calm()) return;
-      if (e.target.closest && e.target.closest(".candy-blanket, .nav, .breeze-pill, .sound-btn, .map-controls, .discovery-modal, .discovery-backdrop, .state-toast, .ahaan-bubble, button, a")) return;
+      if (e.target.closest && e.target.closest(".nav, .breeze-pill, .sound-btn, .map-controls, .discovery-modal, .discovery-backdrop, .state-toast, .ahaan-bubble, button, a")) return;
 
       isPointerDown = true;
       isDragging = false;

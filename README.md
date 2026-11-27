@@ -5,7 +5,7 @@ and the kid on the highest swing in the park.
 
 ## Tech
 - **Static pages, no build step, no npm dependencies.** One HTML page per corner of the site (`index.html`, `reading.html`, `kindle.html`, `geography.html`, `quiz.html`, `doors.html`, `bells.html`, `swing.html`, `library.html`, `story.html`, `music.html`, `movies.html`, `games.html`, `calendar.html`, `rewards.html`, `journey.html`).
-- **Shared files in `assets/`:** `site.css` (all styles), `shared.js` (data, badges, nav), one script per page, plus `audio.js` (soft sound with a volume ceiling and limiter), `brush-wc.js` (optional p5.brush watercolor, lazy-loaded), `ahaan3d.js` (3D Ahaan, Three.js lazy-loaded) and `candy.js` (home page "pick a sweet").
+- **Shared files in `assets/`:** `site.css` (all styles), `shared.js` (data, badges, nav), one script per page, plus `audio.js` (soft sound with a volume ceiling and limiter), `brush-wc.js` (optional p5.brush watercolor, lazy-loaded), and `ahaan3d.js` (3D Ahaan, Three.js lazy-loaded).
 - **Fonts:** Fraunces (headings) + Fredoka (body) via Google Fonts.
 - **Sensory-friendly by design:** see `docs/sensory-friendly-spec.md`. Nothing plays sound or moves unless Ahaan starts it.
 - **Hosting:** GitHub Pages via GitHub Actions (`.github/workflows/pages.yml`), auto-deploys on push to `main`.

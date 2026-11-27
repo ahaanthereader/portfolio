@@ -104,6 +104,16 @@
 - Merged the Books shelf release into main as `cc4bfd7`. Pages run `45915120325` succeeded.
 - Rechecked the live nav and Fresh Drops card after the merge. Desktop and mobile passed with zero browser errors. Evidence: `/tmp/ahaan-nav-fix-release-live/desktop.png`, `mobile.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
 
+## Navigation consolidation — Nov 26, 2026
+
+- Started queue item 21 in the assigned main checkout. Read `FEATURE-BRIEF-nav-consolidate.md`.
+- Located the duplicate “Pages” panel in `index.html`. Its groups came from `assets/candy.js`; the panel also contained the “Singapore Sketchbook Collection” footer.
+- Removed the panel markup and its script include from the home page. The top Read, Explore, Play, and My stuff menu remains in place.
+- Removed the unused candy drawer script and its drawer styles. Moved the Fresh Drops card below the home nav on desktop and mobile.
+- Added `tests/nav-consolidate-browser.cjs`. Desktop and mobile passed. All 21 menu destinations returned HTTP 200, only one set of four groups remained, and the Fresh Drops card cleared the nav and viewport edges.
+- Inspected `/tmp/ahaan-nav-consolidate/desktop.png` and `mobile.png`. The grouped menu opens below the header. The mobile menu uses one button, and the Fresh Drops card is fully visible.
+- `node --check assets/park3d.js`, `node --check tests/nav-consolidate-browser.cjs`, and `git diff --check` passed.
+
 ## Books shelf — Nov 25, 2026
 
 - Began queue item 20 in the assigned `feature/books-shelf` worktree.
