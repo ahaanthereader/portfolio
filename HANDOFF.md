@@ -1759,12 +1759,14 @@ When one job finishes, start the next brief without waiting. Update this HANDOFF
 - Read queue item 23 and `FEATURE-BRIEF-nav-lean.md` on `main` at `3f25e1f`.
 - The home nav had four grouped menus plus a full second row of Park controls. The day and weather panel had no close button.
 - Moved all Park controls into one Controls popover. Added an OK button that closes the panel and returns focus to Controls.
-- Kept the four grouped menus and all destinations. Added a Nov 27 Fresh Drops entry with a local screenshot preview.
+- Kept the four grouped menus and all destinations. Added a Nov 27 Fresh Drops entry with a live screenshot.
 - Added `tests/nav-lean-browser.cjs` for desktop and mobile nav, panel behavior, controls, and browser errors.
 - Desktop and mobile browser checks passed. Four nav groups and all destinations passed. The single Controls button opened the panel. Day, Night, Auto, weather, Breeze, Sound, and Play together controls worked.
 - The OK button closed the panel and returned focus to Controls on both viewports. No horizontal overflow or browser errors appeared.
 - Updated `tests/water-park-fresh-drops-browser.cjs`. Its desktop and mobile checks passed for the new card, the Park realism card, older entries, images, and NEW labels.
 - `node --check assets/shared.js`, `node --check tests/nav-lean-browser.cjs`, `node --check tests/water-park-fresh-drops-browser.cjs`, and `git diff --check` passed.
 - Local evidence: `/tmp/ahaan-nav-lean/local-final/desktop.png`, `desktop-controls.png`, `mobile.png`, `mobile-menu.png`, and `mobile-controls.png`.
-- The Fresh Drops entry uses a local screenshot preview at `public/fresh-drops/2026-11-27-nav-lean.png`.
-- Next: commit and publish the verified nav, replace the preview with the live screenshot, and live-verify desktop and mobile.
+- Commit `2bb9bcd` (`Slim Park navigation and add controls`) was pushed to main. Pages run `46058446896` succeeded.
+- Live desktop and mobile browser checks passed. All nav destinations returned HTTP 200. All controls worked, the Fresh Drops NEW label showed, and browser errors were empty.
+- Live evidence: `/tmp/ahaan-nav-lean/live/desktop.png`, `desktop-controls.png`, `mobile.png`, `mobile-menu.png`, `mobile-controls.png`, `desktop-fresh-drops.png`, and `mobile-fresh-drops.png`.
+- Replaced the Fresh Drops image with the live desktop screenshot. Next: publish the screenshot replacement and run the final live check.
